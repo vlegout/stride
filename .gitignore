@@ -4,3 +4,7 @@ node_modules
 .DS_Store
 
 public/data.json
+
+data/2025/
+data/files/
+data/fit/
