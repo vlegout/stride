@@ -7,8 +7,15 @@ import { useEffect, useState } from 'react';
 interface Activity {
   fit: string;
   sport: string;
+
+  end: string;
   start_time: string;
+  total_timer_time: string;
+  total_elapsed_time: string;
+
   total_distance: string;
+
+  average_speed: string;
 }
 
 function App() {
@@ -23,6 +30,7 @@ function App() {
           <li>Sport: {activity.sport}</li>
           <li>Start Time: {activity.start_time}</li>
           <li>Total Distance: {activity.total_distance}</li>
+          <li>Average Speed: {activity.average_speed}</li>
         </ul>
         ));
         setActivities(activityElements);
@@ -34,7 +42,7 @@ function App() {
 
   return (
     <>
-      <h1>Hello World</h1>
+      <h1>Activities</h1>
       <ul>
         { activities }
       </ul>
