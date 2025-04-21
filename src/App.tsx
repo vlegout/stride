@@ -10,6 +10,8 @@ import { LatLngExpression } from "leaflet";
 
 import { useEffect, useState } from "react";
 
+import { DateTime } from "luxon";
+
 interface Activity {
   id: string;
 
@@ -56,7 +58,12 @@ function App() {
               <li>Title: {activity.title}</li>
               <li>Description: {activity.description}</li>
               <li>Sport: {activity.sport}</li>
-              <li>Start Time: {activity.start_time}</li>
+              <li>
+                Start Time:{" "}
+                {DateTime.fromSQL(activity.start_time).toLocaleString(
+                  DateTime.DATETIME_MED_WITH_SECONDS,
+                )}
+              </li>
               <li>Total Elapsed Time: {activity.total_elapsed_time}</li>
               <li>Total Timer Time: {activity.total_timer_time}</li>
               <li>Total Distance: {activity.total_distance}</li>
