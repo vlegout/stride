@@ -130,7 +130,9 @@ async def run():
             if file.endswith(".fit"):
                 activity = await get_activity_from_fit(os.path.join(root, file))
 
-                with open("./public/activities/" + str(activity.id) + ".json", "w") as file:
+                with open(
+                    "./public/activities/" + str(activity.id) + ".json", "w"
+                ) as file:
                     json.dump(activity.model_dump(), file, default=str)
 
                 activities.activities.append(activity)
@@ -156,7 +158,7 @@ async def run():
                 activity.description = config["description"]
 
             with open("./public/activities/" + str(activity.id) + ".json", "w") as file:
-                    json.dump(activity.model_dump(), file, default=str)
+                json.dump(activity.model_dump(), file, default=str)
 
             activities.activities.append(activity)
 
