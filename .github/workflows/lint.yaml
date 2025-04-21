@@ -1,10 +1,7 @@
-name: Lint and Build
+name: Lint
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
 
 jobs:
   lint:
@@ -23,7 +20,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: astral-sh/ruff-action@v3
         with:
-          src: "./data"
+          src: "./scripts"
       - run: ruff format
       - run: ruff check
 
