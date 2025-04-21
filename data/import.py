@@ -16,7 +16,7 @@ import math
 import os
 import uuid
 
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Tuple
 
 import fitdecode
 import gpxpy
@@ -82,7 +82,7 @@ async def get_lat_lon(points: List[float]) -> Tuple[float, float]:
 
 
 async def get_activity_from_fit(fit_file: str) -> Activity:
-    activity = Activity(id = uuid.uuid4(), fit=fit_file)
+    activity = Activity(id=uuid.uuid4(), fit=fit_file)
 
     with fitdecode.FitReader(fit_file) as fit:
         for frame in fit:
@@ -125,7 +125,6 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
 async def run():
     activities = Activities(activities=[])
 
-    fit_files = []
     for root, _, files in os.walk("files"):
         for file in files:
             if file.endswith(".fit"):
@@ -161,12 +160,17 @@ async def run():
     activities.activities.sort(key=lambda x: x.start_time, reverse=True)
 
     with open("../public/activities.json", "w") as file:
-        json.dump(activities.model_dump(exclude={"activities": {"__all__": {"points"}}}), file, default=str)
+        json.dump(
+            activities.model_dump(exclude={"activities": {"__all__": {"points"}}}),
+            file,
+            default=str,
+        )
 
     activities.activities = activities.activities[:10]
 
     with open("../public/last.json", "w") as file:
         json.dump(activities.model_dump(), file, default=str)
+
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run())

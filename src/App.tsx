@@ -28,7 +28,7 @@ interface Activity {
 
   average_speed: string;
 
-  points: Array<LatLngExpression>;
+  points: LatLngExpression[];
   lat: number;
   lon: number;
 }
