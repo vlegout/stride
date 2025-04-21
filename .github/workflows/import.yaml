@@ -1,5 +1,8 @@
 name: Import
 
+on:
+  push:
+
 jobs:
   import:
     runs-on: ubuntu-latest
