@@ -5,6 +5,9 @@ node_modules
 
 public/data.json
 
+*.fit
+*.gpx
+
 data/2025/
 data/files/
 data/fit/
