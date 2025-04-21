@@ -22,6 +22,6 @@ jobs:
     steps:
       - uses: astral-sh/ruff-action@v3
         with:
-          src: "./data/import.py"
+          src: "./data"
       - run: ruff format
       - run: ruff check
