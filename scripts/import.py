@@ -137,9 +137,6 @@ async def run():
 
                 activities.activities.append(activity)
 
-            if len(activities.activities) > 20:
-                break
-
     yaml_files = []
     for root, _, files in os.walk("./data/"):
         for file in files:
