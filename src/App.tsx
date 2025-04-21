@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 
 import { DateTime } from "luxon";
 
+import { Box } from "@chakra-ui/react"
+
 interface Activity {
   id: string;
 
@@ -49,7 +51,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <Box>
       <h1>Activities</h1>
       <div>
         {activities.map((activity) => (
@@ -80,7 +82,7 @@ function App() {
           </div>
         ))}
       </div>
-    </>
+    </Box>
   );
 }
 
