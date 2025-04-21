@@ -1,11 +1,5 @@
 name: Import
 
-on:
-  pull_request:
-  push:
-    branches:
-      - main
-
 jobs:
   import:
     runs-on: ubuntu-latest
