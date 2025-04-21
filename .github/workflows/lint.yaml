@@ -9,10 +9,27 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v4
       - run: npm install --include=dev
       - run: ./node_modules/prettier/bin/prettier.cjs ./src --check
+      - run: ./node_modules/eslint/bin/eslint.js ./src
       - run: npm run build
+
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: astral-sh/ruff-action@v3
+        with:
+          src: "./data"
+      - run: ruff format
+      - run: ruff check
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: pre-commit/action@v3.0.1
