@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 
 import { DateTime } from "luxon";
 
-import { Box } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react";
 
 interface Activity {
   id: string;
