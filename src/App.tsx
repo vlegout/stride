@@ -1,14 +1,14 @@
-import './App.css';
+import "./App.css";
 
-import axios from 'axios';
+import axios from "axios";
 
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 
-import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
+import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 
-import { LatLngExpression } from 'leaflet';
+import { LatLngExpression } from "leaflet";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 interface Activity {
   id: string;
@@ -37,12 +37,13 @@ function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
-    axios.get('/last.json')
-      .then(response => {
+    axios
+      .get("/last.json")
+      .then((response) => {
         setActivities(response.data.activities);
       })
-      .catch(error => {
-        console.error('Error fetching data:', error);
+      .catch((error) => {
+        console.error("Error fetching data:", error);
       });
   }, []);
 
@@ -50,7 +51,7 @@ function App() {
     <>
       <h1>Activities</h1>
       <div>
-        { activities.map((activity) => (
+        {activities.map((activity) => (
           <div key={activity.id}>
             <ul>
               <li>Title: {activity.title}</li>
@@ -63,7 +64,7 @@ function App() {
             <MapContainer
               center={[activity.lat, activity.lon]}
               zoom={12}
-              style={{ height: '500px', width: '500px' }}
+              style={{ height: "500px", width: "500px" }}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               <Polyline positions={activity.points} />
@@ -72,7 +73,7 @@ function App() {
         ))}
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
