@@ -36,10 +36,10 @@ class Activity(BaseModel):
     title: str = None
     description: str = None
 
-    end: datetime.datetime = None
     start_time: datetime.datetime = None
     total_timer_time: datetime.timedelta = None
     total_elapsed_time: datetime.timedelta = None
+    timestamp: datetime.datetime = None
 
     total_distance: float = 0.0
 
@@ -101,7 +101,7 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
                     elif field.name == "enhanced_avg_speed" and field.value:
                         activity.average_speed = field.value * 60 * 60 / 1000
                     if field.name == "timestamp":
-                        activity.end = field.value
+                        activity.timestamp = field.value
 
     conv = Converter()
     gpx = conv.fit_to_gpx(f_in=fit_file, f_out="file.gpx")
