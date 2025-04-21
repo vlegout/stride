@@ -125,12 +125,12 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
 async def run():
     activities = Activities(activities=[])
 
-    for root, _, files in os.walk("files"):
+    for root, _, files in os.walk("data/files"):
         for file in files:
             if file.endswith(".fit"):
                 activity = await get_activity_from_fit(os.path.join(root, file))
 
-                with open("../public/" + str(activity.id) + ".json", "w") as file:
+                with open("./public/activities/" + str(activity.id) + ".json", "w") as file:
                     json.dump(activity.model_dump(), file, default=str)
 
                 activities.activities.append(activity)
@@ -139,7 +139,7 @@ async def run():
                 break
 
     yaml_files = []
-    for root, _, files in os.walk("."):
+    for root, _, files in os.walk("./data/"):
         for file in files:
             if file.endswith(".yaml"):
                 yaml_files.append(os.path.join(root, file))
@@ -148,18 +148,21 @@ async def run():
         with open(yaml_file, "r") as file:
             config = yaml.safe_load(file)
 
-            activity = await get_activity_from_fit("fit/" + config["fit"])
+            activity = await get_activity_from_fit("data/fit/" + config["fit"])
 
             if config.get("title"):
                 activity.title = config["title"]
             if config.get("description"):
                 activity.description = config["description"]
 
+            with open("./public/activities/" + str(activity.id) + ".json", "w") as file:
+                    json.dump(activity.model_dump(), file, default=str)
+
             activities.activities.append(activity)
 
     activities.activities.sort(key=lambda x: x.start_time, reverse=True)
 
-    with open("../public/activities.json", "w") as file:
+    with open("./public/activities.json", "w") as file:
         json.dump(
             activities.model_dump(exclude={"activities": {"__all__": {"points"}}}),
             file,
@@ -168,7 +171,7 @@ async def run():
 
     activities.activities = activities.activities[:10]
 
-    with open("../public/last.json", "w") as file:
+    with open("./public/last.json", "w") as file:
         json.dump(activities.model_dump(), file, default=str)
 
 
