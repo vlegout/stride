@@ -15,4 +15,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
       - run: aws s3 cp --recursive s3://vlegout-sport/data .
+      - run: mkdir -p public/activities
       - run: uv run scripts/import.py
+      - run: aws s3 rm --recursive s3://vlegout-sport/public
+      - run: aws s3 cp --recursive public s3://vlegout-sport/public
