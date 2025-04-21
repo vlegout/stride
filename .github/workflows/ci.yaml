@@ -1,0 +1,17 @@
+name: Lint and Build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+      - run: ./node_modules/prettier/bin/prettier.cjs ./src --check
+      - run: npm run build
