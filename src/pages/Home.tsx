@@ -1,5 +1,3 @@
-import "./App.css";
-
 import axios from "axios";
 
 import "leaflet/dist/leaflet.css";
@@ -36,7 +34,7 @@ interface Activity {
   lon: number;
 }
 
-function App() {
+const Home = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
@@ -84,6 +82,6 @@ function App() {
       </div>
     </Box>
   );
-}
+};
 
-export default App;
+export default Home;
