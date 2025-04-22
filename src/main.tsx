@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 
 import Layout from "./components/Layout";
 
-import "./index.css";
+import "leaflet/dist/leaflet.css";
 
 const router = createBrowserRouter([
   {
