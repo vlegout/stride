@@ -1,9 +1,18 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Flex, Link, HStack } from "@chakra-ui/react";
 
 const Header = () => {
   return (
-    <Box>
-      <Heading>Activities</Heading>
+    <Box px={4}>
+      <Flex h={16}>
+        <HStack>
+            <Box>
+              <Link>Home</Link>
+            </Box>
+            <Box>
+              <Link>Activities</Link>
+            </Box>
+        </HStack>
+      </Flex>
     </Box>
   );
 };
