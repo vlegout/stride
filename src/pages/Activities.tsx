@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { DateTime } from "luxon";
-import { Box } from "@chakra-ui/react";
+import { Box, Table } from "@chakra-ui/react";
 
 import type { Activity } from "../types";
 
@@ -21,25 +20,28 @@ const Home = () => {
 
   return (
     <Box>
-      {activities.map((activity) => (
-        <div key={activity.id}>
-          <ul>
-            <li>Title: {activity.title}</li>
-            <li>Description: {activity.description}</li>
-            <li>Sport: {activity.sport}</li>
-            <li>
-              Start Time:{" "}
-              {DateTime.fromSQL(activity.start_time).toLocaleString(
-                DateTime.DATETIME_MED_WITH_SECONDS,
-              )}
-            </li>
-            <li>Total Elapsed Time: {activity.total_elapsed_time}</li>
-            <li>Total Timer Time: {activity.total_timer_time}</li>
-            <li>Total Distance: {activity.total_distance}</li>
-            <li>Average Speed: {activity.average_speed}</li>
-          </ul>
-        </div>
-      ))}
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader>Title</Table.ColumnHeader>
+            <Table.ColumnHeader>Sport</Table.ColumnHeader>
+            <Table.ColumnHeader>Start Time</Table.ColumnHeader>
+            <Table.ColumnHeader>Total Distance</Table.ColumnHeader>
+            <Table.ColumnHeader>Average Speed</Table.ColumnHeader>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {activities.map((activity) => (
+            <Table.Row key={activity.id}>
+              <Table.Cell>{activity.title}</Table.Cell>
+              <Table.Cell>{activity.sport}</Table.Cell>
+              <Table.Cell>{activity.start_time}</Table.Cell>
+              <Table.Cell>{activity.total_distance}</Table.Cell>
+              <Table.Cell>{activity.average_speed}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
     </Box>
   );
 };
