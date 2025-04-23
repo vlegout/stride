@@ -5,12 +5,12 @@ const Header = () => {
     <Box px={4}>
       <Flex h={16}>
         <HStack>
-            <Box>
-              <Link>Home</Link>
-            </Box>
-            <Box>
-              <Link>Activities</Link>
-            </Box>
+          <Box>
+            <Link>Home</Link>
+          </Box>
+          <Box>
+            <Link>Activities</Link>
+          </Box>
         </HStack>
       </Flex>
     </Box>
