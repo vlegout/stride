@@ -1,4 +1,5 @@
 import axios from "axios";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { Box, Table } from "@chakra-ui/react";
 
@@ -35,7 +36,12 @@ const Home = () => {
             <Table.Row key={activity.id}>
               <Table.Cell>{activity.title}</Table.Cell>
               <Table.Cell>{activity.sport}</Table.Cell>
-              <Table.Cell>{activity.start_time}</Table.Cell>
+              <Table.Cell>
+                {" "}
+                {DateTime.fromSQL(activity.start_time).toLocaleString(
+                  DateTime.DATETIME_MED_WITH_SECONDS,
+                )}
+              </Table.Cell>
               <Table.Cell>{activity.total_distance}</Table.Cell>
               <Table.Cell>{activity.average_speed}</Table.Cell>
             </Table.Row>

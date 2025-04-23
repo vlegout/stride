@@ -10,8 +10,8 @@ export interface Activity {
   description: string;
 
   start_time: string;
-  total_timer_time: string;
-  total_elapsed_time: string;
+  total_timer_time: number;
+  total_elapsed_time: number;
 
   total_distance: string;
 

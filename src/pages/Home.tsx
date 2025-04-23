@@ -1,7 +1,7 @@
 import axios from "axios";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 import { useEffect, useState } from "react";
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 import { Box } from "@chakra-ui/react";
 
 import type { Activity } from "../types";
@@ -34,8 +34,20 @@ const Home = () => {
                 DateTime.DATETIME_MED_WITH_SECONDS,
               )}
             </li>
-            <li>Total Elapsed Time: {activity.total_elapsed_time}</li>
-            <li>Total Timer Time: {activity.total_timer_time}</li>
+            <li>
+              Total Timer Time:{" "}
+              {Duration.fromObject({ seconds: activity.total_timer_time })
+                .rescale()
+                .set({ milliseconds: 0 })
+                .toHuman({ unitDisplay: "narrow" })}
+            </li>
+            <li>
+              Total Elapsed Time:{" "}
+              {Duration.fromObject({ seconds: activity.total_elapsed_time })
+                .rescale()
+                .set({ milliseconds: 0 })
+                .toHuman({ unitDisplay: "narrow" })}
+            </li>
             <li>Total Distance: {activity.total_distance}</li>
             <li>Average Speed: {activity.average_speed}</li>
           </ul>
