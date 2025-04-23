@@ -1,4 +1,5 @@
-import { Box, Flex, Link, HStack } from "@chakra-ui/react";
+import { Box, Flex, HStack } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -6,10 +7,10 @@ const Header = () => {
       <Flex h={16}>
         <HStack>
           <Box>
-            <Link>Home</Link>
+            <Link to="/">Home</Link>
           </Box>
           <Box>
-            <Link>Activities</Link>
+            <Link to="/activities">Activities</Link>
           </Box>
         </HStack>
       </Flex>
