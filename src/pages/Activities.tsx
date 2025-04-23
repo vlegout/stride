@@ -38,9 +38,7 @@ const Home = () => {
               <Table.Cell>{activity.sport}</Table.Cell>
               <Table.Cell>
                 {" "}
-                {DateTime.fromSQL(activity.start_time).toLocaleString(
-                  DateTime.DATETIME_MED_WITH_SECONDS,
-                )}
+                {DateTime.fromSQL(activity.start_time).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)}
               </Table.Cell>
               <Table.Cell>{activity.total_distance}</Table.Cell>
               <Table.Cell>{activity.average_speed}</Table.Cell>

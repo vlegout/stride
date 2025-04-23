@@ -29,10 +29,7 @@ const Home = () => {
             <li>Description: {activity.description}</li>
             <li>Sport: {activity.sport}</li>
             <li>
-              Start Time:{" "}
-              {DateTime.fromSQL(activity.start_time).toLocaleString(
-                DateTime.DATETIME_MED_WITH_SECONDS,
-              )}
+              Start Time: {DateTime.fromSQL(activity.start_time).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)}
             </li>
             <li>
               Total Timer Time:{" "}
@@ -51,11 +48,7 @@ const Home = () => {
             <li>Total Distance: {activity.total_distance}</li>
             <li>Average Speed: {activity.average_speed}</li>
           </ul>
-          <MapContainer
-            center={[activity.lat, activity.lon]}
-            zoom={12}
-            style={{ height: "500px", width: "500px" }}
-          >
+          <MapContainer center={[activity.lat, activity.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <Polyline positions={activity.points} />
           </MapContainer>
