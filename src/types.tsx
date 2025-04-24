@@ -13,9 +13,9 @@ export interface Activity {
   total_timer_time: number;
   total_elapsed_time: number;
 
-  total_distance: string;
+  total_distance: number;
 
-  average_speed: string;
+  average_speed: number;
 
   points: LatLngExpression[];
   lat: number;

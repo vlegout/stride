@@ -45,8 +45,8 @@ const Home = () => {
                 .set({ milliseconds: 0 })
                 .toHuman({ unitDisplay: "narrow" })}
             </li>
-            <li>Total Distance: {activity.total_distance}</li>
-            <li>Average Speed: {activity.average_speed}</li>
+            <li>Total Distance: {(activity.total_distance / 1000).toFixed(2)} km</li>
+            <li>Average Speed: {activity.average_speed.toFixed(2)} km/h</li>
           </ul>
           <MapContainer center={[activity.lat, activity.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

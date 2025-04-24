@@ -40,8 +40,8 @@ const Home = () => {
                 {" "}
                 {DateTime.fromSQL(activity.start_time).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)}
               </Table.Cell>
-              <Table.Cell>{activity.total_distance}</Table.Cell>
-              <Table.Cell>{activity.average_speed}</Table.Cell>
+              <Table.Cell>{(activity.total_distance / 1000).toFixed(2)} km</Table.Cell>
+              <Table.Cell>{activity.average_speed.toFixed(2)} km/h</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
