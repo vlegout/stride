@@ -1,0 +1,20 @@
+import { DateTime, Duration } from "luxon";
+
+export function formatSpeed(speed: number): string {
+  return `${speed.toFixed(2)} km/h`;
+}
+
+export function formatDistance(distance: number): string {
+  return `${(distance / 1000).toFixed(2)} km`;
+}
+
+export function formatDuration(seconds: number): string {
+  return Duration.fromObject({ seconds: seconds })
+    .rescale()
+    .set({ milliseconds: 0 })
+    .toHuman({ unitDisplay: "narrow" });
+}
+
+export function formatDateTime(datetime: string): string {
+  return DateTime.fromSQL(datetime).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS);
+}

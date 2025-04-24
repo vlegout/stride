@@ -1,10 +1,10 @@
 import axios from "axios";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 import { useEffect, useState } from "react";
-import { DateTime, Duration } from "luxon";
 import { Box } from "@chakra-ui/react";
 
 import type { Activity } from "../types";
+import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 
 const Home = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -28,25 +28,11 @@ const Home = () => {
             <li>Title: {activity.title}</li>
             <li>Description: {activity.description}</li>
             <li>Sport: {activity.sport}</li>
-            <li>
-              Start Time: {DateTime.fromSQL(activity.start_time).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)}
-            </li>
-            <li>
-              Total Timer Time:{" "}
-              {Duration.fromObject({ seconds: activity.total_timer_time })
-                .rescale()
-                .set({ milliseconds: 0 })
-                .toHuman({ unitDisplay: "narrow" })}
-            </li>
-            <li>
-              Total Elapsed Time:{" "}
-              {Duration.fromObject({ seconds: activity.total_elapsed_time })
-                .rescale()
-                .set({ milliseconds: 0 })
-                .toHuman({ unitDisplay: "narrow" })}
-            </li>
-            <li>Total Distance: {(activity.total_distance / 1000).toFixed(2)} km</li>
-            <li>Average Speed: {activity.average_speed.toFixed(2)} km/h</li>
+            <li>Start Time: {formatDateTime(activity.start_time)}</li>
+            <li>Total Timer Time: {formatDuration(activity.total_timer_time)}</li>
+            <li>Total Elapsed Time: {formatDuration(activity.total_elapsed_time)}</li>
+            <li>Total Distance: {formatDistance(activity.total_distance)}</li>
+            <li>Average Speed: {formatSpeed(activity.average_speed)}</li>
           </ul>
           <MapContainer center={[activity.lat, activity.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
