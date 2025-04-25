@@ -1,31 +1,28 @@
-import axios from "axios";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
-import { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
-import type { Activity } from "../types";
+import { fetchLastActivities } from "../api";
+
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 
 const Home = () => {
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const { data, error, isPending, isFetching } = useQuery({
+    queryKey: ["lastActivitiesId"],
+    queryFn: async () => fetchLastActivities(),
+  });
 
-  useEffect(() => {
-    axios
-      .get("/last.json")
-      .then((response) => {
-        setActivities(response.data.activities);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+  if (isPending || isFetching || error) return "Loading...";
 
   return (
     <Box>
-      {activities.map((activity) => (
+      {data.map((activity) => (
         <div key={activity.id}>
           <ul>
-            <li>Title: {activity.title}</li>
+            <li>
+              Title: <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
+            </li>
             <li>Description: {activity.description}</li>
             <li>Sport: {activity.sport}</li>
             <li>Start Time: {formatDateTime(activity.start_time)}</li>

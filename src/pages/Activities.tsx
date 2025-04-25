@@ -1,23 +1,17 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { Box, Table } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
 
-import type { Activity } from "../types";
+import { fetchActivities } from "../api";
+
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 
 const Home = () => {
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const { data, error, isPending, isFetching } = useQuery({
+    queryKey: ["activitiesId"],
+    queryFn: async () => fetchActivities(),
+  });
 
-  useEffect(() => {
-    axios
-      .get("/activities.json")
-      .then((response) => {
-        setActivities(response.data.activities);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+  if (isPending || isFetching || error) return "Loading...";
 
   return (
     <Box>
@@ -32,7 +26,7 @@ const Home = () => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {activities.map((activity) => (
+          {data.map((activity) => (
             <Table.Row key={activity.id}>
               <Table.Cell>{activity.title}</Table.Cell>
               <Table.Cell>{activity.sport}</Table.Cell>
