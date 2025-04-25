@@ -9,6 +9,8 @@ mkdir -p ~/aws/bin
 
 export PATH=~/aws/bin:$PATH
 
-aws s3 cp --recursive s3://vlegout-sport/public ./public
+aws s3 cp s3://vlegout-sport/public.tar.xz .
+
+tar -xvf public.tar.xz
 
 npm run build
