@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <Box px={4}>
+    <Box px={4} bgColor="gray.200">
       <Flex h={16}>
         <HStack>
           <Box>
