@@ -1,4 +1,5 @@
 import { Box, Table } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchActivities } from "../api";
@@ -28,7 +29,9 @@ const Home = () => {
         <Table.Body>
           {data.map((activity) => (
             <Table.Row key={activity.id}>
-              <Table.Cell>{activity.title}</Table.Cell>
+              <Table.Cell>
+                <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
+              </Table.Cell>
               <Table.Cell>{activity.sport}</Table.Cell>
               <Table.Cell>{formatDateTime(activity.start_time)}</Table.Cell>
               <Table.Cell>{formatDistance(activity.total_distance)}</Table.Cell>

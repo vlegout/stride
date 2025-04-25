@@ -1,7 +1,7 @@
-import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 import { Box } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 
 import { fetchLastActivities } from "../api";
 

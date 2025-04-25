@@ -1,6 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 
 import { fetchActivity } from "../api";
 
@@ -29,6 +30,10 @@ const ActivityComponent = () => {
           <li>Total Distance: {formatDistance(data.total_distance)}</li>
           <li>Average Speed: {formatSpeed(data.average_speed)}</li>
         </ul>
+        <MapContainer center={[data.lat, data.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <Polyline positions={data.points} />
+        </MapContainer>
       </div>
     </Box>
   );
