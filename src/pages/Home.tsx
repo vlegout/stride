@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Heading, Separator, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
@@ -18,12 +18,12 @@ const Home = () => {
   return (
     <Box>
       {data.map((activity) => (
-        <div key={activity.id}>
+        <Box key={activity.id} paddingTop="10px">
+          <Heading>
+            <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
+          </Heading>
+          <Text>{activity.description}</Text>
           <ul>
-            <li>
-              Title: <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
-            </li>
-            <li>Description: {activity.description}</li>
             <li>Sport: {activity.sport}</li>
             <li>Start Time: {formatDateTime(activity.start_time)}</li>
             <li>Total Timer Time: {formatDuration(activity.total_timer_time)}</li>
@@ -31,11 +31,14 @@ const Home = () => {
             <li>Total Distance: {formatDistance(activity.total_distance)}</li>
             <li>Average Speed: {formatSpeed(activity.average_speed)}</li>
           </ul>
-          <MapContainer center={[activity.lat, activity.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Polyline positions={activity.points} />
-          </MapContainer>
-        </div>
+          <Box padding="10px">
+            <MapContainer center={[activity.lat, activity.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <Polyline positions={activity.points} />
+            </MapContainer>
+          </Box>
+          <Separator size="lg" />
+        </Box>
       ))}
     </Box>
   );

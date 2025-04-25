@@ -6,10 +6,10 @@ const Header = () => {
     <Box px={4} bgColor="gray.200">
       <Flex h={16}>
         <HStack>
-          <Box>
+          <Box paddingLeft="20px">
             <Link to="/">Home</Link>
           </Box>
-          <Box>
+          <Box paddingLeft="20px">
             <Link to="/activities">Activities</Link>
           </Box>
         </HStack>

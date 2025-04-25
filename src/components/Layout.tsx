@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Grid } from "@chakra-ui/react";
+import { Box, Flex, Grid } from "@chakra-ui/react";
 
 import Header from "../components/Header";
 
@@ -8,7 +8,11 @@ const Layout = () => {
     <Grid>
       <main>
         <Header />
-        <Outlet />
+        <Flex justifyContent="center" paddingTop="20px">
+          <Box maxWidth="800px">
+            <Outlet />
+          </Box>
+        </Flex>
       </main>
     </Grid>
   );
