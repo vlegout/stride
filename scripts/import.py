@@ -139,6 +139,14 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
 
 async def dump_actitivities(activities: List[Activities], full: bool):
     for activity in activities.activities:
+        if not activity.title:
+            if activity.sport == "running":
+                activity.title = "Run"
+            elif activity.sport == "cycling":
+                activity.title = "Ride"
+            else:
+                activity.title = "Activity"
+
         data = activity.model_dump()
 
         if full and activity.fit.startswith("data/files"):
