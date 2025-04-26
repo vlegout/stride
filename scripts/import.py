@@ -17,15 +17,26 @@ import os
 import sys
 import uuid
 
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import fitdecode
-import gpxpy
 import yaml
 
-from fit2gpx import Converter
+from pydantic import BaseModel, field_validator
 
-from pydantic import BaseModel
+
+class Point(BaseModel):
+    lat: float
+    lon: float
+    timestamp: datetime.datetime
+    heart_rate: int = None
+    enhanced_speed: float = None
+    power: int = None
+
+    @field_validator("enhanced_speed", mode="before")
+    @classmethod
+    def speed_to_kmh(cls, value: float) -> float:
+        return value * 60 * 60 / 1000
 
 
 class Activity(BaseModel):
@@ -55,26 +66,26 @@ class Activity(BaseModel):
     lat: float = 0.0
     lon: float = 0.0
 
-    points: List[Any] = None
+    points: List[Point] = []
 
 
 class Activities(BaseModel):
     activities: list[Activity]
 
 
-async def get_lat_lon(points: List[float]) -> Tuple[float, float]:
+async def get_lat_lon(points: List[Point]) -> Tuple[float, float]:
     x = y = z = 0.0
 
     if len(points) == 0:
         return 0.0, 0.0
 
     for point in points:
-        lat = math.radians(float(point[1]))
-        lon = math.radians(float(point[0]))
+        lon = math.radians(float(point.lon))
+        lat = math.radians(float(point.lat))
 
-        x += math.cos(lat) * math.cos(lon)
-        y += math.cos(lat) * math.sin(lon)
-        z += math.sin(lat)
+        x += math.cos(lon) * math.cos(lat)
+        y += math.cos(lon) * math.sin(lat)
+        z += math.sin(lon)
 
     total = len(points)
 
@@ -82,10 +93,30 @@ async def get_lat_lon(points: List[float]) -> Tuple[float, float]:
     y = y / total
     z = z / total
 
-    lat = math.atan2(y, x)
-    lon = math.atan2(z, math.sqrt(x * x + y * y))
+    lon = math.atan2(y, x)
+    lat = math.atan2(z, math.sqrt(x * x + y * y))
 
-    return map(math.degrees, (lat, lon))
+    return map(math.degrees, (lon, lat))
+
+
+def get_point(
+    frame: fitdecode.records.FitDataMessage,
+) -> Optional[Dict[str, Any]]:
+    data: Dict[str, Any] = {}
+
+    if not frame.has_field("position_lat") or not frame.get_value("position_lat"):
+        return None
+    elif not frame.has_field("position_long") or not frame.get_value("position_long"):
+        return None
+
+    data["lat"] = frame.get_value("position_lat") / ((2**32) / 360)
+    data["lon"] = frame.get_value("position_long") / ((2**32) / 360)
+
+    for field in list(Point.model_fields.keys())[2:]:
+        if frame.has_field(field) and frame.get_value(field):
+            data[field] = frame.get_value(field)
+
+    return data
 
 
 async def get_activity_from_fit(fit_file: str) -> Activity:
@@ -117,22 +148,13 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
                         activity.total_anaerobic_training_effect = field.value
                     if field.name == "timestamp":
                         activity.timestamp = field.value
+            if frame.frame_type == fitdecode.FIT_FRAME_DATA and frame.name == "record":
+                if frame.name == "record":
+                    point = get_point(frame)
+                    if point:
+                        activity.points.append(Point(**point))
 
-    conv = Converter()
-    gpx = conv.fit_to_gpx(f_in=fit_file, f_out="file.gpx")
-
-    points = []
-
-    with open("file.gpx") as gpxfile:
-        gpx = gpxpy.parse(gpxfile)
-
-        for track in gpx.tracks:
-            for segment in track.segments:
-                for point in segment.points:
-                    points.append((point.latitude, point.longitude))
-
-    activity.points = points
-    activity.lat, activity.lon = await get_lat_lon(points)
+    activity.lat, activity.lon = await get_lat_lon(activity.points)
 
     return activity
 
