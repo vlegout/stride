@@ -43,8 +43,14 @@ class Activity(BaseModel):
     timestamp: datetime.datetime = None
 
     total_distance: float = 0.0
+    total_ascent: float = 0.0
 
     average_speed: float = 0.0
+
+    total_calories: float = 0.0
+
+    total_training_effect: float = 0.0
+    total_anaerobic_training_effect: float = 0.0
 
     lat: float = 0.0
     lon: float = 0.0
@@ -95,12 +101,20 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
                         activity.start_time = field.value
                     if field.name == "total_distance":
                         activity.total_distance = field.value
+                    if field.name == "total_ascent":
+                        activity.total_ascent = field.value
                     if field.name == "total_timer_time":
                         activity.total_timer_time = field.value
                     if field.name == "total_elapsed_time":
                         activity.total_elapsed_time = field.value
                     elif field.name == "enhanced_avg_speed" and field.value:
                         activity.average_speed = field.value * 60 * 60 / 1000
+                    if field.name == "total_calories":
+                        activity.total_calories = field.value
+                    if field.name == "total_training_effect":
+                        activity.total_training_effect = field.value
+                    if field.name == "total_anaerobic_training_effect":
+                        activity.total_anaerobic_training_effect = field.value
                     if field.name == "timestamp":
                         activity.timestamp = field.value
 

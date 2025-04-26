@@ -14,8 +14,14 @@ export interface Activity {
   total_elapsed_time: number;
 
   total_distance: number;
+  total_ascent: number;
 
   average_speed: number;
+
+  total_calories: number;
+
+  total_training_effect: number;
+  total_aerobic_training_effect: number;
 
   points: LatLngExpression[];
   lat: number;

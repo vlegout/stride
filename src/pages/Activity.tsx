@@ -27,6 +27,10 @@ const ActivityComponent = () => {
         <li>Total Timer Time: {formatDuration(data.total_timer_time)}</li>
         <li>Total Elapsed Time: {formatDuration(data.total_elapsed_time)}</li>
         <li>Total Distance: {formatDistance(data.total_distance)}</li>
+        <li>Total Ascent: {data.total_ascent}</li>
+        <li>Total Calories: {data.total_calories}</li>
+        <li>Total Training Effect: {data.total_training_effect}</li>
+        <li>Total Aerobic Training Effect: {data.total_aerobic_training_effect}</li>
         <li>Average Speed: {formatSpeed(data.average_speed)}</li>
       </ul>
       <Box padding="10px">

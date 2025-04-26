@@ -29,6 +29,10 @@ const Home = () => {
             <li>Total Timer Time: {formatDuration(activity.total_timer_time)}</li>
             <li>Total Elapsed Time: {formatDuration(activity.total_elapsed_time)}</li>
             <li>Total Distance: {formatDistance(activity.total_distance)}</li>
+            <li>Total Ascent: {activity.total_ascent}</li>
+            <li>Total Calories: {activity.total_calories}</li>
+            <li>Total Training Effect: {activity.total_training_effect}</li>
+            <li>Total Aerobic Training Effect: {activity.total_aerobic_training_effect}</li>
             <li>Average Speed: {formatSpeed(activity.average_speed)}</li>
           </ul>
           <Box padding="10px">
