@@ -14,6 +14,7 @@ import datetime
 import json
 import math
 import os
+import sys
 import uuid
 
 from typing import Any, List, Tuple
@@ -33,12 +34,12 @@ class Activity(BaseModel):
     fit: str
     sport: str = None
 
-    title: str = None
-    description: str = None
+    title: str = ""
+    description: str = ""
 
     start_time: datetime.datetime = None
-    total_timer_time: datetime.timedelta = None
-    total_elapsed_time: datetime.timedelta = None
+    total_timer_time: float = 0.0
+    total_elapsed_time: float = 0.0
     timestamp: datetime.datetime = None
 
     total_distance: float = 0.0
@@ -122,44 +123,16 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
     return activity
 
 
-async def run():
-    activities = Activities(activities=[])
+async def dump_actitivities(activities: List[Activities], full: bool):
+    for activity in activities.activities:
+        data = activity.model_dump()
 
-    for root, _, files in os.walk("data/files"):
-        for file in files:
-            if file.endswith(".fit"):
-                activity = await get_activity_from_fit(os.path.join(root, file))
+        if full and activity.fit.startswith("data/files"):
+            with open("./legacy/" + str(activity.id) + ".json", "w") as file:
+                json.dump(data, file, default=str)
 
-                with open(
-                    "./public/activities/" + str(activity.id) + ".json", "w"
-                ) as file:
-                    json.dump(activity.model_dump(), file, default=str)
-
-                activities.activities.append(activity)
-
-    yaml_files = []
-    for root, _, files in os.walk("./data/"):
-        for file in files:
-            if file.endswith(".yaml"):
-                yaml_files.append(os.path.join(root, file))
-
-    for yaml_file in yaml_files:
-        with open(yaml_file, "r") as file:
-            config = yaml.safe_load(file)
-
-            activity = await get_activity_from_fit("data/fit/" + config["fit"])
-
-            if config.get("title"):
-                activity.title = config["title"]
-            if config.get("description"):
-                activity.description = config["description"]
-
-            with open("./public/activities/" + str(activity.id) + ".json", "w") as file:
-                json.dump(activity.model_dump(), file, default=str)
-
-            activities.activities.append(activity)
-
-    activities.activities.sort(key=lambda x: x.start_time, reverse=True)
+        with open("./public/activities/" + str(activity.id) + ".json", "w") as file:
+            json.dump(data, file, default=str)
 
     with open("./public/activities.json", "w") as file:
         json.dump(
@@ -174,5 +147,44 @@ async def run():
         json.dump(activities.model_dump(), file, default=str)
 
 
+async def run(argv: List[str]):
+    full = False
+    if len(argv) > 1 and argv[1] == "true":
+        full = True
+
+    print("Full import:", full)
+
+    activities = Activities(activities=[])
+
+    for root, _, files in os.walk("data/files" if full else "legacy"):
+        for data_file in files:
+            if full:
+                activity = await get_activity_from_fit(os.path.join(root, data_file))
+            else:
+                activity = Activity.parse_file(os.path.join(root, data_file))
+
+            activities.activities.append(activity)
+
+    for root, _, files in os.walk("./data/"):
+        for yaml_file in files:
+            if not yaml_file.endswith(".yaml"):
+                continue
+
+            with open(os.path.join(root, yaml_file), "r") as file:
+                config = yaml.safe_load(file)
+                activity = await get_activity_from_fit("data/fit/" + config["fit"])
+
+                if config.get("title"):
+                    activity.title = config["title"]
+                if config.get("description"):
+                    activity.description = config["description"]
+
+                activities.activities.append(activity)
+
+    activities.activities.sort(key=lambda x: x.start_time, reverse=True)
+
+    await dump_actitivities(activities, full)
+
+
 loop = asyncio.get_event_loop()
-loop.run_until_complete(run())
+loop.run_until_complete(run(sys.argv))
