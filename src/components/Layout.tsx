@@ -9,7 +9,7 @@ const Layout = () => {
       <main>
         <Header />
         <Flex justifyContent="center" paddingTop="20px">
-          <Box maxWidth="800px">
+          <Box maxWidth="1000px">
             <Outlet />
           </Box>
         </Flex>
