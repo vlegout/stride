@@ -1,8 +1,6 @@
 # /// script
 # dependencies = [
-#   "fit2gpx",
 #   "fitdecode",
-#   "gpxpy",
 #   "pydantic",
 #   "pyyaml",
 # ]
@@ -22,10 +20,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import fitdecode
 import yaml
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 
-class Point(BaseModel):
+class Point(BaseModel, validate_assignment=True):
     lat: float
     lon: float
     timestamp: datetime.datetime
@@ -40,23 +38,24 @@ class Point(BaseModel):
 
 
 class Activity(BaseModel):
-    id: uuid.UUID = None
+    id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
 
     fit: str
-    sport: str = None
 
     title: str = ""
     description: str = ""
 
+    sport: str = None
+
     start_time: datetime.datetime = None
+    timestamp: datetime.datetime = None
     total_timer_time: float = 0.0
     total_elapsed_time: float = 0.0
-    timestamp: datetime.datetime = None
 
     total_distance: float = 0.0
     total_ascent: float = 0.0
 
-    average_speed: float = 0.0
+    enhanced_avg_speed: float = Field(default=0.0, serialization_alias="average_speed")
 
     total_calories: float = 0.0
 
@@ -67,6 +66,23 @@ class Activity(BaseModel):
     lon: float = 0.0
 
     points: List[Point] = []
+
+    @field_validator("enhanced_avg_speed", mode="before")
+    @classmethod
+    def speed_to_kmh(cls, value: float) -> float:
+        return value * 60 * 60 / 1000
+
+    @field_serializer("title")
+    def serialize_title(self, title: str) -> str:
+        if title:
+            return title
+
+        if self.sport == "running":
+            return "Run"
+        elif self.sport == "cycling":
+            return "Ride"
+
+        return "Activity"
 
 
 class Activities(BaseModel):
@@ -99,9 +115,17 @@ async def get_lat_lon(points: List[Point]) -> Tuple[float, float]:
     return map(math.degrees, (lon, lat))
 
 
-def get_point(
-    frame: fitdecode.records.FitDataMessage,
-) -> Optional[Dict[str, Any]]:
+def get_session(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
+    data: Dict[str, Any] = {}
+
+    for field in list(Activity.model_fields.keys())[4:]:
+        if frame.has_field(field) and frame.get_value(field):
+            data[field] = frame.get_value(field)
+
+    return data
+
+
+def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
     data: Dict[str, Any] = {}
 
     if not frame.has_field("position_lat") or not frame.get_value("position_lat"):
@@ -120,40 +144,22 @@ def get_point(
 
 
 async def get_activity_from_fit(fit_file: str) -> Activity:
-    activity = Activity(id=uuid.uuid4(), fit=fit_file)
+    activity = None
+    points = []
 
     with fitdecode.FitReader(fit_file) as fit:
         for frame in fit:
-            if frame.frame_type == fitdecode.FIT_FRAME_DATA and frame.name == "session":
-                for field in frame.fields:
-                    if field.name == "sport":
-                        activity.sport = field.value
-                    if field.name == "start_time":
-                        activity.start_time = field.value
-                    if field.name == "total_distance":
-                        activity.total_distance = field.value
-                    if field.name == "total_ascent":
-                        activity.total_ascent = field.value
-                    if field.name == "total_timer_time":
-                        activity.total_timer_time = field.value
-                    if field.name == "total_elapsed_time":
-                        activity.total_elapsed_time = field.value
-                    elif field.name == "enhanced_avg_speed" and field.value:
-                        activity.average_speed = field.value * 60 * 60 / 1000
-                    if field.name == "total_calories":
-                        activity.total_calories = field.value
-                    if field.name == "total_training_effect":
-                        activity.total_training_effect = field.value
-                    if field.name == "total_anaerobic_training_effect":
-                        activity.total_anaerobic_training_effect = field.value
-                    if field.name == "timestamp":
-                        activity.timestamp = field.value
-            if frame.frame_type == fitdecode.FIT_FRAME_DATA and frame.name == "record":
-                if frame.name == "record":
-                    point = get_point(frame)
-                    if point:
-                        activity.points.append(Point(**point))
+            if not isinstance(frame, fitdecode.records.FitDataMessage):
+                continue
 
+            if frame.name == "session":
+                if session := get_session(frame):
+                    activity = Activity(**session, fit=fit_file)
+            elif frame.name == "record":
+                if point := get_record(frame):
+                    points.append(Point(**point))
+
+    activity.points = points
     activity.lat, activity.lon = await get_lat_lon(activity.points)
 
     return activity
@@ -161,15 +167,7 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
 
 async def dump_actitivities(activities: List[Activities], full: bool):
     for activity in activities.activities:
-        if not activity.title:
-            if activity.sport == "running":
-                activity.title = "Run"
-            elif activity.sport == "cycling":
-                activity.title = "Ride"
-            else:
-                activity.title = "Activity"
-
-        data = activity.model_dump()
+        data = activity.model_dump(by_alias=True)
 
         if full and activity.fit.startswith("data/files"):
             with open("./legacy/" + str(activity.id) + ".json", "w") as file:
@@ -180,7 +178,9 @@ async def dump_actitivities(activities: List[Activities], full: bool):
 
     with open("./public/activities.json", "w") as file:
         json.dump(
-            activities.model_dump(exclude={"activities": {"__all__": {"points"}}}),
+            activities.model_dump(
+                by_alias=True, exclude={"activities": {"__all__": {"points"}}}
+            ),
             file,
             default=str,
         )
@@ -188,7 +188,7 @@ async def dump_actitivities(activities: List[Activities], full: bool):
     activities.activities = activities.activities[:10]
 
     with open("./public/last.json", "w") as file:
-        json.dump(activities.model_dump(), file, default=str)
+        json.dump(activities.model_dump(by_alias=True), file, default=str)
 
 
 async def run(argv: List[str]):
