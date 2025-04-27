@@ -17,19 +17,19 @@ import uuid
 
 from typing import Any, Dict, List, Optional, Tuple
 
-import fitdecode
+import fitdecode  # type: ignore
 import yaml
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
 
-class Point(BaseModel, validate_assignment=True):
+class Point(BaseModel):
     lat: float
     lon: float
     timestamp: datetime.datetime
-    heart_rate: int = None
-    enhanced_speed: float = None
-    power: int = None
+    heart_rate: int = 0
+    enhanced_speed: float = 0
+    power: int = 0
 
     @field_validator("enhanced_speed", mode="before")
     @classmethod
@@ -45,10 +45,10 @@ class Activity(BaseModel):
     title: str = ""
     description: str = ""
 
-    sport: str = None
+    sport: str = ""
 
-    start_time: datetime.datetime = None
-    timestamp: datetime.datetime = None
+    start_time: datetime.datetime
+    timestamp: datetime.datetime
     total_timer_time: float = 0.0
     total_elapsed_time: float = 0.0
 
@@ -112,7 +112,9 @@ async def get_lat_lon(points: List[Point]) -> Tuple[float, float]:
     lon = math.atan2(y, x)
     lat = math.atan2(z, math.sqrt(x * x + y * y))
 
-    return map(math.degrees, (lon, lat))
+    lat, lon = map(math.degrees, (lon, lat))
+
+    return lat, lon
 
 
 def get_session(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
@@ -159,13 +161,16 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
                 if point := get_record(frame):
                     points.append(Point(**point))
 
+    if not activity:
+        raise ValueError("Cannot find activity in file " + fit_file)
+
     activity.points = points
     activity.lat, activity.lon = await get_lat_lon(activity.points)
 
     return activity
 
 
-async def dump_actitivities(activities: List[Activities], full: bool):
+async def dump_actitivities(activities: Activities, full: bool):
     for activity in activities.activities:
         data = activity.model_dump(by_alias=True)
 
