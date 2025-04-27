@@ -21,7 +21,6 @@ export interface Activity {
   total_calories: number;
 
   total_training_effect: number;
-  total_aerobic_training_effect: number;
 
   points: LatLngExpression[];
   lat: number;

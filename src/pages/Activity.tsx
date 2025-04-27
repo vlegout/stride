@@ -30,7 +30,6 @@ const ActivityComponent = () => {
         <li>Total Ascent: {data.total_ascent}</li>
         <li>Total Calories: {data.total_calories}</li>
         <li>Total Training Effect: {data.total_training_effect}</li>
-        <li>Total Aerobic Training Effect: {data.total_aerobic_training_effect}</li>
         <li>Average Speed: {formatSpeed(data.average_speed)}</li>
       </ul>
       <Box padding="10px">

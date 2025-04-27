@@ -60,7 +60,6 @@ class Activity(BaseModel):
     total_calories: float = 0.0
 
     total_training_effect: float = 0.0
-    total_anaerobic_training_effect: float = 0.0
 
     lat: float = 0.0
     lon: float = 0.0

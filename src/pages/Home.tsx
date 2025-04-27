@@ -32,7 +32,6 @@ const Home = () => {
             <li>Total Ascent: {activity.total_ascent}</li>
             <li>Total Calories: {activity.total_calories}</li>
             <li>Total Training Effect: {activity.total_training_effect}</li>
-            <li>Total Aerobic Training Effect: {activity.total_aerobic_training_effect}</li>
             <li>Average Speed: {formatSpeed(activity.average_speed)}</li>
           </ul>
           <Box padding="10px">
