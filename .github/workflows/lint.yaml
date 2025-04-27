@@ -24,6 +24,13 @@ jobs:
       - run: ruff format
       - run: ruff check
 
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: astral-sh/setup-uv@v5
+      - run: uv run --with mypy --with pydantic-settings --with types-PyYAML mypy ./scripts/import.py
+
   pre-commit:
     runs-on: ubuntu-latest
     steps:
