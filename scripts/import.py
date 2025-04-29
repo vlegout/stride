@@ -46,12 +46,12 @@ class Activity(BaseModel):
     title: str = ""
     description: str = ""
 
-    sport: str = ""
+    sport: str
 
     start_time: datetime.datetime
     timestamp: datetime.datetime
-    total_timer_time: float = 0.0
-    total_elapsed_time: float = 0.0
+    total_timer_time: float
+    total_elapsed_time: float
 
     total_distance: float = 0.0
     total_ascent: float = 0.0
