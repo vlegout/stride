@@ -201,7 +201,8 @@ async def dump_actitivities(activities: Activities, full: bool):
     with open("./public/activities.json", "w") as file:
         json.dump(
             activities.model_dump(
-                by_alias=True, exclude={"activities": {"__all__": {"points"}}}
+                by_alias=True,
+                exclude={"activities": {"__all__": {"data_points", "trace_points"}}},
             ),
             file,
             default=str,
