@@ -28,8 +28,9 @@ class Point(BaseModel):
     lon: float
     timestamp: datetime.datetime
     heart_rate: int = 0
-    enhanced_speed: float = 0
+    enhanced_speed: float = Field(default=0.0, serialization_alias="speed")
     power: int = 0
+    enhanced_altitude: float = Field(default=0.0, serialization_alias="altitude")
 
     @field_validator("enhanced_speed", mode="before")
     @classmethod
