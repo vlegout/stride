@@ -89,7 +89,7 @@ class Activities(BaseModel):
     activities: list[Activity]
 
 
-async def get_lat_lon(points: List[Point]) -> Tuple[float, float]:
+def get_lat_lon(points: List[Point]) -> Tuple[float, float]:
     x = y = z = 0.0
 
     if len(points) == 0:
@@ -165,7 +165,7 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
     activity.points = points
-    activity.lat, activity.lon = await get_lat_lon(activity.points)
+    activity.lat, activity.lon = get_lat_lon(activity.points)
 
     return activity
 
