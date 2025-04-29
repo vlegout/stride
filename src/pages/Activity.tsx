@@ -2,6 +2,7 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
+import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 
 import { fetchActivity } from "../api";
 
@@ -35,9 +36,30 @@ const ActivityComponent = () => {
       <Box padding="10px">
         <MapContainer center={[data.lat, data.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <Polyline positions={data.points} />
+          <Polyline positions={data.trace_points} />
         </MapContainer>
       </Box>
+      <LineChart width={600} height={300} data={data.data_points}>
+        <CartesianGrid stroke="#ccc" />
+        <Line type="monotone" dataKey="heart_rate" stroke="#8884d8" dot={false} />
+        <XAxis dataKey="timestamp" />
+        <YAxis />
+        <Tooltip />
+      </LineChart>
+      <LineChart width={600} height={300} data={data.data_points}>
+        <CartesianGrid stroke="#ccc" />
+        <Line type="monotone" dataKey="speed" stroke="#8884d8" dot={false} />
+        <XAxis dataKey="timestamp" />
+        <YAxis />
+        <Tooltip />
+      </LineChart>
+      <LineChart width={600} height={300} data={data.data_points}>
+        <CartesianGrid stroke="#ccc" />
+        <Line type="monotone" dataKey="altitude" stroke="#8884d8" dot={false} />
+        <XAxis dataKey="timestamp" />
+        <YAxis />
+        <Tooltip />
+      </LineChart>
     </Box>
   );
 };

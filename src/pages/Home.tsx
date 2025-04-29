@@ -37,7 +37,7 @@ const Home = () => {
           <Box padding="10px">
             <MapContainer center={[activity.lat, activity.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Polyline positions={activity.points} />
+              <Polyline positions={activity.trace_points} />
             </MapContainer>
           </Box>
           <Separator size="lg" />

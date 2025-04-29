@@ -1,5 +1,14 @@
 import { LatLngExpression } from "leaflet";
 
+export type DataPoint = {
+  timestamp: number;
+
+  heart_rate: number;
+  speed: number;
+  power: number;
+  altitude: number;
+}
+
 export interface Activity {
   id: string;
 
@@ -22,7 +31,8 @@ export interface Activity {
 
   total_training_effect: number;
 
-  points: LatLngExpression[];
+  data_points: DataPoint[];
+  trace_points: LatLngExpression[];
   lat: number;
   lon: number;
 }
