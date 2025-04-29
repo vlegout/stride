@@ -23,7 +23,15 @@ import yaml
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
 
-class Point(BaseModel):
+MAX_DATA_POINTS = 500
+
+
+class TracePoint(BaseModel):
+    lat: float
+    lon: float
+
+
+class DataPoint(BaseModel):
     lat: float
     lon: float
     timestamp: datetime.datetime
@@ -65,7 +73,8 @@ class Activity(BaseModel):
     lat: float = 0.0
     lon: float = 0.0
 
-    points: List[Point] = []
+    data_points: List[DataPoint] = []
+    trace_points: List[TracePoint] = []
 
     @field_validator("enhanced_avg_speed", mode="before")
     @classmethod
@@ -89,7 +98,7 @@ class Activities(BaseModel):
     activities: list[Activity]
 
 
-def get_lat_lon(points: List[Point]) -> Tuple[float, float]:
+def get_lat_lon(points: List[TracePoint]) -> Tuple[float, float]:
     x = y = z = 0.0
 
     if len(points) == 0:
@@ -138,7 +147,7 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
     data["lat"] = frame.get_value("position_lat") / ((2**32) / 360)
     data["lon"] = frame.get_value("position_long") / ((2**32) / 360)
 
-    for field in list(Point.model_fields.keys())[2:]:
+    for field in list(DataPoint.model_fields.keys())[2:]:
         if frame.has_field(field) and frame.get_value(field):
             data[field] = frame.get_value(field)
 
@@ -147,7 +156,8 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
 
 async def get_activity_from_fit(fit_file: str) -> Activity:
     activity = None
-    points = []
+    data_points = []
+    trace_points = []
 
     with fitdecode.FitReader(fit_file) as fit:
         for frame in fit:
@@ -159,13 +169,20 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
                     activity = Activity(**session, fit=fit_file)
             elif frame.name == "record":
                 if point := get_record(frame):
-                    points.append(Point(**point))
+                    trace_points.append(TracePoint(lat=point["lat"], lon=point["lon"]))
+                    data_points.append(DataPoint(**point))
 
     if not activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
-    activity.points = points
-    activity.lat, activity.lon = get_lat_lon(activity.points)
+    activity.data_points = data_points
+    activity.trace_points = trace_points
+    activity.lat, activity.lon = get_lat_lon(activity.trace_points)
+
+    while len(activity.data_points) > MAX_DATA_POINTS:
+        activity.data_points = [
+            dp for idx, dp in enumerate(activity.data_points) if idx % 2 == 0
+        ]
 
     return activity
 
