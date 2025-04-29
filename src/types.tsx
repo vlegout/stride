@@ -7,7 +7,7 @@ export type DataPoint = {
   speed: number;
   power: number;
   altitude: number;
-}
+};
 
 export interface Activity {
   id: string;
