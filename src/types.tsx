@@ -1,13 +1,13 @@
 import { LatLngExpression } from "leaflet";
 
-export type DataPoint = {
+export interface DataPoint {
   timestamp: number;
 
   heart_rate: number;
   speed: number;
   power: number;
   altitude: number;
-};
+}
 
 export interface Activity {
   id: string;
