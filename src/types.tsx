@@ -1,5 +1,14 @@
 import { LatLngExpression } from "leaflet";
 
+export interface Lap {
+  start_time: string;
+  total_elapsed_time: number;
+  total_distance: number;
+  max_heart_rate: number;
+  avg_heart_rate: number;
+  max_speed: number;
+}
+
 export interface DataPoint {
   timestamp: number;
 
@@ -31,6 +40,7 @@ export interface Activity {
 
   total_training_effect: number;
 
+  laps: Lap[];
   data_points: DataPoint[];
   trace_points: LatLngExpression[];
   lat: number;

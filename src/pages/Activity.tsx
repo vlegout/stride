@@ -2,7 +2,7 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
-import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 
 import { fetchActivity } from "../api";
 
@@ -39,6 +39,14 @@ const ActivityComponent = () => {
           <Polyline positions={data.trace_points} />
         </MapContainer>
       </Box>
+      <BarChart width={730} height={250} data={data.laps}>
+        <CartesianGrid stroke="#ccc" />
+        <XAxis dataKey="number" label="Lap" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="total_elapsed_time" fill="#8884d8" />
+      </BarChart>
       <LineChart width={600} height={300} data={data.data_points}>
         <CartesianGrid stroke="#ccc" />
         <Line type="monotone" dataKey="heart_rate" stroke="#8884d8" dot={false} />
