@@ -26,6 +26,15 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 MAX_DATA_POINTS = 500
 
 
+class Lap(BaseModel):
+    start_time: datetime.datetime
+    total_elapsed_time: float
+    total_distance: float = 0.0
+    max_speed: float = 0.0
+    max_heart_rate: int = 0
+    avg_heart_rate: int = 0
+
+
 class TracePoint(BaseModel):
     lat: float
     lon: float
@@ -73,6 +82,7 @@ class Activity(BaseModel):
     lat: float = 0.0
     lon: float = 0.0
 
+    laps: List[Lap] = []
     data_points: List[DataPoint] = []
     trace_points: List[TracePoint] = []
 
@@ -126,6 +136,16 @@ def get_lat_lon(points: List[TracePoint]) -> Tuple[float, float]:
     return lat, lon
 
 
+def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
+    data: Dict[str, Any] = {}
+
+    for field in list(Lap.model_fields.keys()):
+        if frame.has_field(field) and frame.get_value(field):
+            data[field] = frame.get_value(field)
+
+    return data
+
+
 def get_session(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
     data: Dict[str, Any] = {}
 
@@ -156,6 +176,7 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
 
 async def get_activity_from_fit(fit_file: str) -> Activity:
     activity = None
+    laps = []
     data_points = []
     trace_points = []
 
@@ -167,6 +188,9 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
             if frame.name == "session":
                 if session := get_session(frame):
                     activity = Activity(**session, fit=fit_file)
+            if frame.name == "lap":
+                if lap := get_lap(frame):
+                    laps.append(Lap(**lap))
             elif frame.name == "record":
                 if point := get_record(frame):
                     trace_points.append(TracePoint(lat=point["lat"], lon=point["lon"]))
@@ -175,6 +199,7 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
     if not activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
+    activity.laps = laps
     activity.data_points = data_points
     activity.trace_points = trace_points
     activity.lat, activity.lon = get_lat_lon(activity.trace_points)
@@ -202,7 +227,9 @@ async def dump_actitivities(activities: Activities, full: bool):
         json.dump(
             activities.model_dump(
                 by_alias=True,
-                exclude={"activities": {"__all__": {"data_points", "trace_points"}}},
+                exclude={
+                    "activities": {"__all__": {"laps", "data_points", "trace_points"}}
+                },
             ),
             file,
             default=str,
