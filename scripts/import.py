@@ -27,6 +27,7 @@ MAX_DATA_POINTS = 500
 
 
 class Lap(BaseModel):
+    index: int = 0
     start_time: datetime.datetime
     total_elapsed_time: float
     total_distance: float = 0.0
@@ -176,6 +177,7 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
 
 async def get_activity_from_fit(fit_file: str) -> Activity:
     activity = None
+    index = 0
     laps = []
     data_points = []
     trace_points = []
@@ -191,6 +193,8 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
             if frame.name == "lap":
                 if lap := get_lap(frame):
                     laps.append(Lap(**lap))
+                    index += 1
+                    laps[-1].index = index
             elif frame.name == "record":
                 if point := get_record(frame):
                     trace_points.append(TracePoint(lat=point["lat"], lon=point["lon"]))
