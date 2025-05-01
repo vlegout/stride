@@ -6,6 +6,7 @@ export interface Pace {
 }
 
 export interface Lap {
+  index: number;
   start_time: string;
   total_elapsed_time: number;
   total_distance: number;

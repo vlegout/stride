@@ -2,11 +2,14 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, TooltipItem } from "chart.js";
+import { Bar } from "react-chartjs-2";
 
 import { fetchActivity } from "../api";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
+
+import { Lap } from "../types";
 
 const ActivityComponent = () => {
   const params = useParams();
@@ -17,6 +20,45 @@ const ActivityComponent = () => {
   });
 
   if (isPending || isFetching || error) return "Loading...";
+
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+
+  const options = {
+    responsive: true,
+    scales: {
+      y: {
+        max: Math.max(...data.laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60)) + 0.2,
+        min: Math.min(...data.laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60)) - 0.2,
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context: TooltipItem<"bar">): string {
+            return (
+              Math.floor(context.raw) +
+              ":" +
+              Math.floor(60 * (context.raw % 1))
+                .toString()
+                .padStart(2, "0")
+            );
+          },
+        },
+      },
+    },
+  };
+
+  const barData = {
+    labels: data.laps.map((lap: Lap) => lap.index),
+    datasets: [
+      {
+        data: data.laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60),
+      },
+    ],
+  };
 
   return (
     <Box>
@@ -39,35 +81,7 @@ const ActivityComponent = () => {
           <Polyline positions={data.trace_points} />
         </MapContainer>
       </Box>
-      <BarChart width={730} height={250} data={data.laps}>
-        <CartesianGrid stroke="#ccc" />
-        <XAxis dataKey="number" label="Lap" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="pace" fill="#8884d8" />
-      </BarChart>
-      <LineChart width={600} height={300} data={data.data_points}>
-        <CartesianGrid stroke="#ccc" />
-        <Line type="monotone" dataKey="heart_rate" stroke="#8884d8" dot={false} />
-        <XAxis dataKey="timestamp" />
-        <YAxis />
-        <Tooltip />
-      </LineChart>
-      <LineChart width={600} height={300} data={data.data_points}>
-        <CartesianGrid stroke="#ccc" />
-        <Line type="monotone" dataKey="speed" stroke="#8884d8" dot={false} />
-        <XAxis dataKey="timestamp" />
-        <YAxis />
-        <Tooltip />
-      </LineChart>
-      <LineChart width={600} height={300} data={data.data_points}>
-        <CartesianGrid stroke="#ccc" />
-        <Line type="monotone" dataKey="altitude" stroke="#8884d8" dot={false} />
-        <XAxis dataKey="timestamp" />
-        <YAxis />
-        <Tooltip />
-      </LineChart>
+      <Bar options={options} data={barData} />
     </Box>
   );
 };
