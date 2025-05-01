@@ -10,9 +10,10 @@ import {
   LineElement,
   PointElement,
   Tooltip,
-  TooltipItem,
+  ChartOptions,
 } from "chart.js";
 import { Bar, Line } from "react-chartjs-2";
+import { DateTime } from "luxon";
 
 import { fetchActivity } from "../api";
 
@@ -32,7 +33,7 @@ const ActivityComponent = () => {
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
-  const barOptions = {
+  const barOptions: ChartOptions<"bar"> = {
     responsive: true,
     scales: {
       y: {
@@ -46,7 +47,7 @@ const ActivityComponent = () => {
       },
       tooltip: {
         callbacks: {
-          label: function (context: TooltipItem<"bar">): string {
+          label: function (context): string {
             return (
               Math.floor(context.raw as number) +
               ":" +
@@ -69,8 +70,17 @@ const ActivityComponent = () => {
     ],
   };
 
-  const lineOptions = {
+  const lineOptions: ChartOptions<"line"> = {
     responsive: true,
+    scales: {
+      x: {
+        ticks: {
+          callback: function (this, value): string {
+            return DateTime.fromSQL(this.getLabelForValue(value as number)).toFormat("HH:mm:ss");
+          },
+        },
+      },
+    },
   };
 
   const lineDataSpeed = {
