@@ -26,6 +26,11 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 MAX_DATA_POINTS = 500
 
 
+class Pace(BaseModel):
+    minutes: int = 0
+    seconds: int = 0
+
+
 class Lap(BaseModel):
     index: int = 0
     start_time: datetime.datetime
@@ -35,7 +40,7 @@ class Lap(BaseModel):
     max_speed: float = 0.0
     max_heart_rate: int = 0
     avg_heart_rate: int = 0
-    pace: tuple[int, int] = (0, 0)
+    pace: Pace = Pace()
 
 
 class TracePoint(BaseModel):
@@ -150,9 +155,9 @@ def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]
         pace = datetime.timedelta(
             seconds=data.get("total_timer_time") * 1000 / data.get("total_distance")  # type: ignore
         )
-        data["pace"] = (
-            math.floor(pace.total_seconds() / 60),
-            int(pace.total_seconds() % 60),
+        data["pace"] = Pace(
+            minutes=math.floor(pace.total_seconds() / 60),
+            seconds=int(pace.total_seconds() % 60),
         )
 
     return data
