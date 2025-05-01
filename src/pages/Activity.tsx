@@ -2,14 +2,23 @@ import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, TooltipItem } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  BarElement,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
+  TooltipItem,
+} from "chart.js";
+import { Bar, Line } from "react-chartjs-2";
 
 import { fetchActivity } from "../api";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 
-import { Lap } from "../types";
+import { DataPoint, Lap } from "../types";
 
 const ActivityComponent = () => {
   const params = useParams();
@@ -21,9 +30,9 @@ const ActivityComponent = () => {
 
   if (isPending || isFetching || error) return "Loading...";
 
-  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+  ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
-  const options = {
+  const barOptions = {
     responsive: true,
     scales: {
       y: {
@@ -60,36 +69,80 @@ const ActivityComponent = () => {
     ],
   };
 
-  return (
-    <Flex>
-      <Box padding="10px" width="50vw">
-        <Box>
-          <Heading>{data.title}</Heading>
-          <Text>{data.description}</Text>
-          <ul>
-            <li>Sport: {data.sport}</li>
-            <li>Start Time: {formatDateTime(data.start_time)}</li>
-            <li>Total Timer Time: {formatDuration(data.total_timer_time)}</li>
-            <li>Total Elapsed Time: {formatDuration(data.total_elapsed_time)}</li>
-            <li>Total Distance: {formatDistance(data.total_distance)}</li>
-            <li>Total Ascent: {data.total_ascent}</li>
-            <li>Total Calories: {data.total_calories}</li>
-            <li>Total Training Effect: {data.total_training_effect}</li>
-            <li>Average Speed: {formatSpeed(data.average_speed)}</li>
-          </ul>
-        </Box>
-        <Box maxWidth="500px">
-          <Bar options={options} data={barData} />
-        </Box>
-      </Box>
+  const lineOptions = {
+    responsive: true,
+  };
 
-      <Box padding="10px" width="50vw">
-        <MapContainer center={[data.lat, data.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <Polyline positions={data.trace_points} />
-        </MapContainer>
-      </Box>
-    </Flex>
+  const lineDataSpeed = {
+    labels: data.data_points.map((point: DataPoint) => point.timestamp),
+    datasets: [
+      {
+        data: data.data_points.map((point: DataPoint) => point.speed),
+      },
+    ],
+  };
+
+  const lineDataHR = {
+    labels: data.data_points.map((point: DataPoint) => point.timestamp),
+    datasets: [
+      {
+        data: data.data_points.map((point: DataPoint) => point.heart_rate),
+      },
+    ],
+  };
+
+  const lineDataAltitude = {
+    labels: data.data_points.map((point: DataPoint) => point.timestamp),
+    datasets: [
+      {
+        data: data.data_points.map((point: DataPoint) => point.altitude),
+      },
+    ],
+  };
+
+  return (
+    <Box>
+      <Flex>
+        <Box padding="10px" width="50vw">
+          <Box>
+            <Heading>{data.title}</Heading>
+            <Text>{data.description}</Text>
+            <ul>
+              <li>Sport: {data.sport}</li>
+              <li>Start Time: {formatDateTime(data.start_time)}</li>
+              <li>Total Timer Time: {formatDuration(data.total_timer_time)}</li>
+              <li>Total Elapsed Time: {formatDuration(data.total_elapsed_time)}</li>
+              <li>Total Distance: {formatDistance(data.total_distance)}</li>
+              <li>Total Ascent: {data.total_ascent}</li>
+              <li>Total Calories: {data.total_calories}</li>
+              <li>Total Training Effect: {data.total_training_effect}</li>
+              <li>Average Speed: {formatSpeed(data.average_speed)}</li>
+            </ul>
+          </Box>
+          <Box maxWidth="500px">
+            <Bar options={barOptions} data={barData} />
+          </Box>
+        </Box>
+
+        <Box padding="10px" width="50vw">
+          <MapContainer center={[data.lat, data.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <Polyline positions={data.trace_points} />
+          </MapContainer>
+        </Box>
+      </Flex>
+      <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
+        <Box width="80%" margin="40px" maxWidth="800px">
+          <Line options={lineOptions} data={lineDataSpeed} />
+        </Box>
+        <Box width="80%" margin="40px" maxWidth="800px">
+          <Line options={lineOptions} data={lineDataHR} />
+        </Box>
+        <Box width="80%" margin="40px" maxWidth="800px">
+          <Line options={lineOptions} data={lineDataAltitude} />
+        </Box>
+      </Flex>
+    </Box>
   );
 };
 
