@@ -148,7 +148,7 @@ def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]
 
     if data.get("total_timer_time") and data.get("total_distance"):
         pace = datetime.timedelta(
-            seconds=data.get("total_timer_time") * 1000 / data.get("total_distance")
+            seconds=data.get("total_timer_time") * 1000 / data.get("total_distance")  # type: ignore
         )
         data["pace"] = (
             math.floor(pace.total_seconds() / 60),
