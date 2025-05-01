@@ -30,10 +30,12 @@ class Lap(BaseModel):
     index: int = 0
     start_time: datetime.datetime
     total_elapsed_time: float
+    total_timer_time: float = 0.0
     total_distance: float = 0.0
     max_speed: float = 0.0
     max_heart_rate: int = 0
     avg_heart_rate: int = 0
+    pace: tuple[int, int] = (0, 0)
 
 
 class TracePoint(BaseModel):
@@ -143,6 +145,15 @@ def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]
     for field in list(Lap.model_fields.keys()):
         if frame.has_field(field) and frame.get_value(field):
             data[field] = frame.get_value(field)
+
+    if data.get("total_timer_time") and data.get("total_distance"):
+        pace = datetime.timedelta(
+            seconds=data.get("total_timer_time") * 1000 / data.get("total_distance")
+        )
+        data["pace"] = (
+            math.floor(pace.total_seconds() / 60),
+            int(pace.total_seconds() % 60),
+        )
 
     return data
 

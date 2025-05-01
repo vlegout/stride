@@ -45,7 +45,7 @@ const ActivityComponent = () => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Bar dataKey="total_elapsed_time" fill="#8884d8" />
+        <Bar dataKey="pace" fill="#8884d8" />
       </BarChart>
       <LineChart width={600} height={300} data={data.data_points}>
         <CartesianGrid stroke="#ccc" />

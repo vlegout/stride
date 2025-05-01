@@ -1,5 +1,10 @@
 import { LatLngExpression } from "leaflet";
 
+export interface Pace {
+  minutes: number;
+  seconds: number;
+}
+
 export interface Lap {
   start_time: string;
   total_elapsed_time: number;
@@ -7,6 +12,7 @@ export interface Lap {
   max_heart_rate: number;
   avg_heart_rate: number;
   max_speed: number;
+  pace: Pace;
 }
 
 export interface DataPoint {
