@@ -39,9 +39,9 @@ const ActivityComponent = () => {
         callbacks: {
           label: function (context: TooltipItem<"bar">): string {
             return (
-              Math.floor(context.raw) +
+              Math.floor(context.raw as number) +
               ":" +
-              Math.floor(60 * (context.raw % 1))
+              Math.floor(60 * ((context.raw as number) % 1))
                 .toString()
                 .padStart(2, "0")
             );
