@@ -257,9 +257,12 @@ async def dump_actitivities(activities: Activities, full: bool):
 
 
 async def run(argv: List[str]):
+    partial = False
     full = False
     if len(argv) > 1 and argv[1] == "true":
         full = True
+    if len(argv) > 2 and argv[2] == "true":
+        partial = True
 
     print("Full import:", full)
 
@@ -269,6 +272,9 @@ async def run(argv: List[str]):
         for data_file in files:
             if full:
                 activity = await get_activity_from_fit(os.path.join(root, data_file))
+
+                if partial and len(activities.activities) > 20:
+                    break
             else:
                 activity = Activity.parse_file(os.path.join(root, data_file))
 
