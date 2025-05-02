@@ -220,6 +220,13 @@ def get_activity_from_fit(fit_file: str) -> Activity:
             dp for idx, dp in enumerate(activity.data_points) if idx % 2 == 0
         ]
 
+    values = []
+    for point in data_points:
+        values.append(point.enhanced_speed)
+        if len(values) >= 10:
+            point.enhanced_speed = sum(values) / len(values)
+            values.pop(0)
+
     return activity
 
 
