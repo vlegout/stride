@@ -7,19 +7,20 @@ import {
   CategoryScale,
   BarElement,
   LinearScale,
-  LineElement,
-  PointElement,
   Tooltip,
   ChartOptions,
+  LineElement,
+  PointElement,
 } from "chart.js";
-import { Bar, Line } from "react-chartjs-2";
-import { DateTime } from "luxon";
+import { Bar } from "react-chartjs-2";
 
 import { fetchActivity } from "../api";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 
 import { DataPoint, Lap } from "../types";
+
+import LineChart from "../components/LineChart";
 
 const ActivityComponent = () => {
   const params = useParams();
@@ -70,45 +71,10 @@ const ActivityComponent = () => {
     ],
   };
 
-  const lineOptions: ChartOptions<"line"> = {
-    responsive: true,
-    scales: {
-      x: {
-        ticks: {
-          callback: function (this, value): string {
-            return DateTime.fromSQL(this.getLabelForValue(value as number)).toFormat("HH:mm:ss");
-          },
-        },
-      },
-    },
-  };
-
-  const lineDataSpeed = {
-    labels: data.data_points.map((point: DataPoint) => point.timestamp),
-    datasets: [
-      {
-        data: data.data_points.map((point: DataPoint) => point.speed),
-      },
-    ],
-  };
-
-  const lineDataHR = {
-    labels: data.data_points.map((point: DataPoint) => point.timestamp),
-    datasets: [
-      {
-        data: data.data_points.map((point: DataPoint) => point.heart_rate),
-      },
-    ],
-  };
-
-  const lineDataAltitude = {
-    labels: data.data_points.map((point: DataPoint) => point.timestamp),
-    datasets: [
-      {
-        data: data.data_points.map((point: DataPoint) => point.altitude),
-      },
-    ],
-  };
+  const labels = data.data_points.map((point: DataPoint) => point.timestamp);
+  const speedData = data.data_points.map((point: DataPoint) => point.speed);
+  const hrData = data.data_points.map((point: DataPoint) => point.heart_rate);
+  const altitudeData = data.data_points.map((point: DataPoint) => point.altitude);
 
   return (
     <Box>
@@ -143,13 +109,13 @@ const ActivityComponent = () => {
       </Flex>
       <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
         <Box width="80%" margin="40px" maxWidth="800px">
-          <Line options={lineOptions} data={lineDataSpeed} />
+          <LineChart labels={labels} data={speedData} />
         </Box>
         <Box width="80%" margin="40px" maxWidth="800px">
-          <Line options={lineOptions} data={lineDataHR} />
+          <LineChart labels={labels} data={hrData} />
         </Box>
         <Box width="80%" margin="40px" maxWidth="800px">
-          <Line options={lineOptions} data={lineDataAltitude} />
+          <LineChart labels={labels} data={altitudeData} />
         </Box>
       </Flex>
     </Box>
