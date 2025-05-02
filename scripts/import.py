@@ -42,6 +42,7 @@ class DataPoint(BaseModel):
     lat: float
     lon: float
     timestamp: datetime.datetime
+    distance: float = 0.0
     heart_rate: int = 0
     enhanced_speed: float = Field(default=0.0, serialization_alias="speed")
     power: int = 0

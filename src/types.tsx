@@ -18,7 +18,7 @@ export interface Lap {
 
 export interface DataPoint {
   timestamp: string;
-
+  distance: number;
   heart_rate: number;
   speed: number;
   power: number;

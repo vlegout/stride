@@ -1,18 +1,14 @@
 import { Box } from "@chakra-ui/react";
 import { ChartOptions } from "chart.js";
-import { DateTime } from "luxon";
 import { Line } from "react-chartjs-2";
 
-const LineChart = ({ labels, data }: { labels: string[]; data: number[] }) => {
+const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
   const lineOptions: ChartOptions<"line"> = {
     responsive: true,
     scales: {
       x: {
-        ticks: {
-          callback: function (this, value): string {
-            return DateTime.fromSQL(this.getLabelForValue(value as number)).toFormat("HH:mm:ss");
-          },
-        },
+        type: "linear",
+        max: Math.max(...labels),
       },
     },
   };

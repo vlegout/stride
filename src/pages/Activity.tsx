@@ -71,7 +71,7 @@ const ActivityComponent = () => {
     ],
   };
 
-  const labels = data.data_points.map((point: DataPoint) => point.timestamp);
+  const labels = data.data_points.map((point: DataPoint) => point.distance / 1000);
   const speedData = data.data_points.map((point: DataPoint) => point.speed);
   const hrData = data.data_points.map((point: DataPoint) => point.heart_rate);
   const altitudeData = data.data_points.map((point: DataPoint) => point.altitude);
