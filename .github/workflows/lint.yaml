@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: astral-sh/setup-uv@v5
-      - run: uv run --project scripts --with mypy mypy ./scripts/import.py
+      - run: uv run --project scripts mypy ./scripts/import.py
 
   pre-commit:
     runs-on: ubuntu-latest
