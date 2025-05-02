@@ -11,6 +11,11 @@ const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
         max: Math.max(...labels),
       },
     },
+    elements: {
+      point: {
+        radius: 0,
+      },
+    },
   };
 
   const lineData = {
