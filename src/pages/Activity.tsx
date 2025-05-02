@@ -2,25 +2,16 @@ import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  BarElement,
-  LinearScale,
-  Tooltip,
-  ChartOptions,
-  LineElement,
-  PointElement,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
 
 import { fetchActivity } from "../api";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 
-import { DataPoint, Lap } from "../types";
+import { DataPoint } from "../types";
 
 import LineChart from "../components/LineChart";
+import LapChart from "../components/LapChart";
 
 const ActivityComponent = () => {
   const params = useParams();
@@ -33,43 +24,6 @@ const ActivityComponent = () => {
   if (isPending || isFetching || error) return "Loading...";
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
-
-  const barOptions: ChartOptions<"bar"> = {
-    responsive: true,
-    scales: {
-      y: {
-        max: Math.max(...data.laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60)) + 0.2,
-        min: Math.min(...data.laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60)) - 0.2,
-      },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context): string {
-            return (
-              Math.floor(context.raw as number) +
-              ":" +
-              Math.floor(60 * ((context.raw as number) % 1))
-                .toString()
-                .padStart(2, "0")
-            );
-          },
-        },
-      },
-    },
-  };
-
-  const barData = {
-    labels: data.laps.map((lap: Lap) => lap.index),
-    datasets: [
-      {
-        data: data.laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60),
-      },
-    ],
-  };
 
   const labels = data.data_points.map((point: DataPoint) => point.distance / 1000);
   const speedData = data.data_points.map((point: DataPoint) => point.speed);
@@ -96,7 +50,7 @@ const ActivityComponent = () => {
             </ul>
           </Box>
           <Box maxWidth="500px">
-            <Bar options={barOptions} data={barData} />
+            <LapChart laps={data.laps} />
           </Box>
         </Box>
 
