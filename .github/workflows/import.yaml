@@ -27,7 +27,8 @@ jobs:
       - run: mkdir -p public/activities
       - if: ${{ ! inputs.full }}
         run: aws s3 cp s3://vlegout-sport/legacy.tar.xz . && tar -xJf legacy.tar.xz
-      - run: mkdir -p legacy && uv run scripts/import.py ${{ inputs.full }}
+        run: uv run --project scripts scripts/import.py
       - if: ${{ inputs.full }}
+        run: mkdir -p legacy && uv run --project scripts scripts/import.py --full
         run: tar -cJf legacy.tar.xz legacy && aws s3 cp legacy.tar.xz s3://vlegout-sport/legacy.tar.xz
       - run: tar -cJf public.tar.xz public && aws s3 cp public.tar.xz s3://vlegout-sport/public.tar.xz
