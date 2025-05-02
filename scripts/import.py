@@ -1,22 +1,12 @@
-# /// script
-# dependencies = [
-#   "fitdecode",
-#   "pydantic",
-#   "pyyaml",
-# ]
-# ///
-
-
-import asyncio
 import datetime
 import json
 import math
 import os
-import sys
 import uuid
 
 from typing import Any, Dict, List, Optional, Tuple
 
+import click
 import fitdecode  # type: ignore
 import yaml
 
@@ -191,7 +181,7 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
     return data
 
 
-async def get_activity_from_fit(fit_file: str) -> Activity:
+def get_activity_from_fit(fit_file: str) -> Activity:
     activity = None
     index = 0
     laps = []
@@ -232,7 +222,7 @@ async def get_activity_from_fit(fit_file: str) -> Activity:
     return activity
 
 
-async def dump_actitivities(activities: Activities, full: bool):
+def dump_actitivities(activities: Activities, full: bool):
     for activity in activities.activities:
         data = activity.model_dump(by_alias=True)
 
@@ -261,22 +251,19 @@ async def dump_actitivities(activities: Activities, full: bool):
         json.dump(activities.model_dump(by_alias=True), file, default=str)
 
 
-async def run(argv: List[str]):
-    partial = False
-    full = False
-    if len(argv) > 1 and argv[1] == "true":
-        full = True
-    if len(argv) > 2 and argv[2] == "true":
-        partial = True
-
+@click.command()
+@click.option("--full", is_flag=True, help="Full import of all activities.")
+@click.option("--partial", is_flag=True, help="Partial import of activities.")
+def run(full, partial):
     print("Full import:", full)
+    print("Partial import:", partial)
 
     activities = Activities(activities=[])
 
     for root, _, files in os.walk("data/files" if full else "legacy"):
         for data_file in files:
             if full:
-                activity = await get_activity_from_fit(os.path.join(root, data_file))
+                activity = get_activity_from_fit(os.path.join(root, data_file))
 
                 if partial and len(activities.activities) > 20:
                     break
@@ -292,7 +279,7 @@ async def run(argv: List[str]):
 
             with open(os.path.join(root, yaml_file), "r") as file:
                 config = yaml.safe_load(file)
-                activity = await get_activity_from_fit("data/fit/" + config["fit"])
+                activity = get_activity_from_fit("data/fit/" + config["fit"])
 
                 if config.get("title"):
                     activity.title = config["title"]
@@ -303,8 +290,8 @@ async def run(argv: List[str]):
 
     activities.activities.sort(key=lambda x: x.start_time, reverse=True)
 
-    await dump_actitivities(activities, full)
+    dump_actitivities(activities, full)
 
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(run(sys.argv))
+if __name__ == "__main__":
+    run()
