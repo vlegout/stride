@@ -13,4 +13,6 @@ aws s3 cp s3://vlegout-sport/public.tar.xz .
 
 tar -xvf public.tar.xz
 
+cp src/data/running.svg public/favicon.svg
+
 npm run build
