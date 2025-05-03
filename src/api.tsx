@@ -9,7 +9,7 @@ export async function fetchActivities({ queryKey }: { queryKey: [string, number[
     return data.activities.filter(
       (activity: Activity) =>
         activity.total_distance >= distance[0] * 1000 &&
-        (distance[1] !== 99 || activity.total_distance <= distance[1] * 1000),
+        (distance[1] === 99 || activity.total_distance <= distance[1] * 1000),
     );
   }
 
@@ -17,7 +17,7 @@ export async function fetchActivities({ queryKey }: { queryKey: [string, number[
     (activity: Activity) =>
       activity.sport === sport &&
       activity.total_distance >= distance[0] * 1000 &&
-      (distance[1] !== 99 || activity.total_distance <= distance[1] * 1000),
+      (distance[1] === 99 || activity.total_distance <= distance[1] * 1000),
   );
 }
 
