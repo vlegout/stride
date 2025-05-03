@@ -23,7 +23,7 @@ const ActivitiesComponent = () => {
 
   return (
     <Flex justifyContent="center" paddingTop="20px">
-      <Box maxWidth="1000px">
+      <Box maxWidth="1200px">
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -34,6 +34,7 @@ const ActivitiesComponent = () => {
                 <TableCell>Average Speed</TableCell>
                 <TableCell>Total Ascent</TableCell>
                 <TableCell>Calories</TableCell>
+                <TableCell>Training Effect</TableCell>
                 <TableCell>Device</TableCell>
               </TableRow>
             </TableHead>
@@ -48,6 +49,7 @@ const ActivitiesComponent = () => {
                   <TableCell>{formatSpeed(activity.average_speed)}</TableCell>
                   <TableCell>{activity.total_ascent}</TableCell>
                   <TableCell>{activity.total_calories}</TableCell>
+                  <TableCell>{activity.total_training_effect}</TableCell>
                   <TableCell>{activity.device}</TableCell>
                 </TableRow>
               ))}
