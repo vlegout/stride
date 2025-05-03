@@ -1,17 +1,16 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
 
 import { fetchActivity } from "../api";
-
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
-
 import { DataPoint } from "../types";
 
 import LineChart from "../components/LineChart";
 import LapChart from "../components/LapChart";
+import SportLogo from "../components/SportLogo";
 
 const ActivityComponent = () => {
   const params = useParams();
@@ -36,10 +35,13 @@ const ActivityComponent = () => {
         <Box padding="10px" width="50vw">
           <Box>
             <Heading>{data.title}</Heading>
-            <Text>{data.description}</Text>
+            <Flex>
+              <Box marginRight="10px" marginLeft="10px">
+                <SportLogo sport={data.sport} />
+              </Box>
+              <Center h="40px">{formatDateTime(data.start_time)}</Center>
+            </Flex>
             <ul>
-              <li>Sport: {data.sport}</li>
-              <li>Start Time: {formatDateTime(data.start_time)}</li>
               <li>Total Timer Time: {formatDuration(data.total_timer_time)}</li>
               <li>Total Elapsed Time: {formatDuration(data.total_elapsed_time)}</li>
               <li>Total Distance: {formatDistance(data.total_distance)}</li>

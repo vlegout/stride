@@ -1,11 +1,11 @@
-import { Box, Flex, Heading, Separator, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Separator } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 
 import { fetchLastActivities } from "../api";
-
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
+import SportLogo from "../components/SportLogo";
 
 const Home = () => {
   const { data, error, isPending, isFetching } = useQuery({
@@ -23,10 +23,13 @@ const Home = () => {
             <Heading>
               <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
             </Heading>
-            <Text>{activity.description}</Text>
+            <Flex>
+              <Box marginRight="10px" marginLeft="10px">
+                <SportLogo sport={activity.sport} />
+              </Box>
+              <Center h="40px">{formatDateTime(activity.start_time)}</Center>
+            </Flex>
             <ul>
-              <li>Sport: {activity.sport}</li>
-              <li>Start Time: {formatDateTime(activity.start_time)}</li>
               <li>Total Timer Time: {formatDuration(activity.total_timer_time)}</li>
               <li>Total Elapsed Time: {formatDuration(activity.total_elapsed_time)}</li>
               <li>Total Distance: {formatDistance(activity.total_distance)}</li>
