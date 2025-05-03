@@ -219,6 +219,7 @@ def get_activity_from_fit(fit_file: str) -> Activity:
             elif frame.name == "record":
                 if point := get_record(frame):
                     trace_points.append(TracePoint(lat=point["lat"], lon=point["lon"]))
+                    data_points.append(DataPoint(**point))
             elif frame.name == "device_info":
                 if frame.has_field("garmin_product") and frame.get_value(
                     "garmin_product"
