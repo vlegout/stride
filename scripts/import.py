@@ -45,6 +45,11 @@ class Lap(BaseModel):
     pace: Pace = Pace()
 
 
+class Split(BaseModel):
+    index: int = 0
+    pace: Pace = Pace()
+
+
 class TracePoint(BaseModel):
     lat: float
     lon: float

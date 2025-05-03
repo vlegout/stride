@@ -7,6 +7,7 @@ import { Lap } from "../types";
 const LineChart = ({ laps }: { laps: Lap[] }) => {
   const barOptions: ChartOptions<"bar"> = {
     responsive: true,
+    animation: false,
     scales: {
       y: {
         max: Math.max(...laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60)) + 0.2,

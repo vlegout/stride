@@ -5,6 +5,7 @@ import { Line } from "react-chartjs-2";
 const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
   const lineOptions: ChartOptions<"line"> = {
     responsive: true,
+    animation: false,
     scales: {
       x: {
         type: "linear",
