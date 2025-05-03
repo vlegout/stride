@@ -39,6 +39,7 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
       {
         data: laps.map((lap: Lap) => lap.pace.minutes + lap.pace.seconds / 60),
         barPercentage: 1,
+        categoryPercentage: 1,
       },
     ],
   };
