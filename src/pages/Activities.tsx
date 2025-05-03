@@ -1,6 +1,13 @@
-import { Box, Flex, Table } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 
 import { fetchActivities } from "../api";
 
@@ -17,34 +24,34 @@ const Home = () => {
   return (
     <Flex justifyContent="center" paddingTop="20px">
       <Box maxWidth="1000px">
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeader>Title</Table.ColumnHeader>
-              <Table.ColumnHeader>Sport</Table.ColumnHeader>
-              <Table.ColumnHeader>Start Time</Table.ColumnHeader>
-              <Table.ColumnHeader>Total Distance</Table.ColumnHeader>
-              <Table.ColumnHeader>Average Speed</Table.ColumnHeader>
-              <Table.ColumnHeader>Total Ascent</Table.ColumnHeader>
-              <Table.ColumnHeader>Calories</Table.ColumnHeader>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {data.map((activity) => (
-              <Table.Row key={activity.id}>
-                <Table.Cell>
-                  <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
-                </Table.Cell>
-                <Table.Cell>{activity.sport}</Table.Cell>
-                <Table.Cell>{formatDateTime(activity.start_time)}</Table.Cell>
-                <Table.Cell>{formatDistance(activity.total_distance)}</Table.Cell>
-                <Table.Cell>{formatSpeed(activity.average_speed)}</Table.Cell>
-                <Table.Cell>{activity.total_ascent}</Table.Cell>
-                <Table.Cell>{activity.total_calories}</Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Root>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Start Time</TableCell>
+                <TableCell>Distance</TableCell>
+                <TableCell>Average Speed</TableCell>
+                <TableCell>Total Ascent</TableCell>
+                <TableCell>Calories</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.map((activity) => (
+                <TableRow key={activity.id}>
+                  <TableCell>
+                    <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
+                  </TableCell>
+                  <TableCell>{formatDateTime(activity.start_time)}</TableCell>
+                  <TableCell>{formatDistance(activity.total_distance)}</TableCell>
+                  <TableCell>{formatSpeed(activity.average_speed)}</TableCell>
+                  <TableCell>{activity.total_ascent}</TableCell>
+                  <TableCell>{activity.total_calories}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
     </Flex>
   );
