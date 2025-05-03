@@ -1,9 +1,15 @@
 import type { Activity } from "./types";
 
-export async function fetchActivities(): Promise<Activity[]> {
+export async function fetchActivities({ queryKey }: { queryKey: [string] }): Promise<Activity[]> {
+  const [sport] = queryKey;
   const response = await fetch(`/activities.json`);
   const data = await response.json();
-  return data.activities;
+
+  if (sport === "all") {
+    return data.activities;
+  }
+
+  return data.activities.filter((activity: Activity) => activity.sport === sport);
 }
 
 export async function fetchLastActivities(): Promise<Activity[]> {

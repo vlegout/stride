@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { FormControl, InputLabel, MenuItem } from "@mui/material";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,20 +13,38 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
 import { fetchActivities } from "../api";
-
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 
 const ActivitiesComponent = () => {
+  const [sport, setSport] = useState("all");
+
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: ["activitiesId"],
-    queryFn: async () => fetchActivities(),
+    queryKey: [sport],
+    queryFn: fetchActivities,
   });
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setSport(event.target.value);
+  };
 
   if (isPending || isFetching || error) return "Loading...";
 
   return (
     <Flex justifyContent="center" paddingTop="20px">
       <Box maxWidth="1200px">
+        <FormControl fullWidth>
+          <InputLabel id="activities-sport">Age</InputLabel>
+          <Select
+            labelId="activities-sport"
+            value={sport}
+            label="Age"
+            onChange={handleChange}
+          >
+            <MenuItem value={"all"}>All</MenuItem>
+            <MenuItem value={"running"}>Running</MenuItem>
+            <MenuItem value={"cycling"}>Cycling</MenuItem>
+          </Select>
+        </FormControl>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
