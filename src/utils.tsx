@@ -9,9 +9,8 @@ export function formatDistance(distance: number): string {
 }
 
 export function formatDuration(seconds: number): string {
-  return Duration.fromObject({ seconds: seconds })
+  return Duration.fromObject({ seconds: Math.floor(seconds) })
     .rescale()
-    .set({ milliseconds: 0 })
     .toHuman({ unitDisplay: "narrow" });
 }
 
