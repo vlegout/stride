@@ -15,6 +15,18 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 
 MAX_DATA_POINTS = 500
 
+DEVICE_MAP = {
+    "edge_530": "Edge 530",
+    "fr10": "FR 10",
+    "fr110": "FR 110",
+    "fr235": "FR 235",
+    "fr745": "FR 745",
+    "3121": "Edge 530",
+    "3589": "FR 745",
+    "4062": "Edge 840",
+    "4315": "FR 965",
+}
+
 
 class Pace(BaseModel):
     minutes: int = 0
@@ -63,6 +75,7 @@ class Activity(BaseModel):
     description: str = ""
 
     sport: str
+    device: str = ""
 
     start_time: datetime.datetime
     timestamp: datetime.datetime
@@ -183,11 +196,12 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
 
 
 def get_activity_from_fit(fit_file: str) -> Activity:
-    activity = None
-    index = 0
-    laps = []
-    data_points = []
-    trace_points = []
+    activity: Optional[Activity] = None
+    device: str = ""
+    index: int = 0
+    laps: List[Lap] = []
+    data_points: List[DataPoint] = []
+    trace_points: List[TracePoint] = []
 
     with fitdecode.FitReader(fit_file) as fit:
         for frame in fit:
@@ -197,7 +211,7 @@ def get_activity_from_fit(fit_file: str) -> Activity:
             if frame.name == "session":
                 if session := get_session(frame):
                     activity = Activity(**session, fit=fit_file)
-            if frame.name == "lap":
+            elif frame.name == "lap":
                 if lap := get_lap(frame):
                     laps.append(Lap(**lap))
                     index += 1
@@ -205,11 +219,18 @@ def get_activity_from_fit(fit_file: str) -> Activity:
             elif frame.name == "record":
                 if point := get_record(frame):
                     trace_points.append(TracePoint(lat=point["lat"], lon=point["lon"]))
-                    data_points.append(DataPoint(**point))
+            elif frame.name == "device_info":
+                if frame.has_field("garmin_product") and frame.get_value(
+                    "garmin_product"
+                ):
+                    value = str(frame.get_value("garmin_product"))
+                    if value in DEVICE_MAP:
+                        device = DEVICE_MAP[value]
 
     if not activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
+    activity.device = device
     activity.laps = laps
     activity.data_points = data_points
     activity.trace_points = trace_points

@@ -30,6 +30,7 @@ export interface Activity {
 
   fit: string;
   sport: string;
+  device: string;
 
   title: string;
   description: string;

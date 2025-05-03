@@ -34,6 +34,7 @@ const Home = () => {
                 <TableCell>Average Speed</TableCell>
                 <TableCell>Total Ascent</TableCell>
                 <TableCell>Calories</TableCell>
+                <TableCell>Device</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -47,6 +48,7 @@ const Home = () => {
                   <TableCell>{formatSpeed(activity.average_speed)}</TableCell>
                   <TableCell>{activity.total_ascent}</TableCell>
                   <TableCell>{activity.total_calories}</TableCell>
+                  <TableCell>{activity.device}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
