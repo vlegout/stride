@@ -13,7 +13,7 @@ import { fetchActivities } from "../api";
 
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 
-const Home = () => {
+const ActivitiesComponent = () => {
   const { data, error, isPending, isFetching } = useQuery({
     queryKey: ["activitiesId"],
     queryFn: async () => fetchActivities(),
@@ -59,4 +59,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ActivitiesComponent;
