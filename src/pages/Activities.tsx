@@ -34,12 +34,7 @@ const ActivitiesComponent = () => {
       <Box maxWidth="1200px">
         <FormControl fullWidth>
           <InputLabel id="activities-sport">Age</InputLabel>
-          <Select
-            labelId="activities-sport"
-            value={sport}
-            label="Age"
-            onChange={handleChange}
-          >
+          <Select labelId="activities-sport" value={sport} label="Age" onChange={handleChange}>
             <MenuItem value={"all"}>All</MenuItem>
             <MenuItem value={"running"}>Running</MenuItem>
             <MenuItem value={"cycling"}>Cycling</MenuItem>
