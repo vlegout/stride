@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { FormControl, InputLabel, MenuItem } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Slider } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -17,14 +17,25 @@ import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 
 const ActivitiesComponent = () => {
   const [sport, setSport] = useState("all");
+  const [distance, setDistance] = useState<number[]>([1, 100]);
 
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport],
+    queryKey: [sport, distance],
     queryFn: fetchActivities,
   });
 
   const handleChange = (event: SelectChangeEvent) => {
     setSport(event.target.value);
+  };
+
+  const minDistance = 10;
+
+  const handleDistanceChange = (_event: Event, newValue: number[], activeThumb: number) => {
+    if (activeThumb === 0) {
+      setDistance([Math.min(newValue[0], distance[1] - minDistance), distance[1]]);
+    } else {
+      setDistance([distance[0], Math.max(newValue[1], distance[0] + minDistance)]);
+    }
   };
 
   if (isPending || isFetching || error) return "Loading...";
@@ -39,6 +50,17 @@ const ActivitiesComponent = () => {
             <MenuItem value={"running"}>Running</MenuItem>
             <MenuItem value={"cycling"}>Cycling</MenuItem>
           </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <Slider
+            getAriaLabel={() => "Minimum distance"}
+            value={distance}
+            onChange={handleDistanceChange}
+            valueLabelDisplay="auto"
+            disableSwap
+            min={5}
+            max={100}
+          />
         </FormControl>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">

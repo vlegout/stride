@@ -1,15 +1,24 @@
 import type { Activity } from "./types";
 
-export async function fetchActivities({ queryKey }: { queryKey: [string] }): Promise<Activity[]> {
-  const [sport] = queryKey;
+export async function fetchActivities({ queryKey }: { queryKey: [string, number[]] }): Promise<Activity[]> {
+  const [sport, distance] = queryKey;
   const response = await fetch(`/activities.json`);
   const data = await response.json();
 
   if (sport === "all") {
-    return data.activities;
+    return data.activities.filter(
+      (activity: Activity) =>
+        activity.total_distance >= distance[0] * 1000 &&
+        (distance[1] !== 99 || activity.total_distance <= distance[1] * 1000),
+    );
   }
 
-  return data.activities.filter((activity: Activity) => activity.sport === sport);
+  return data.activities.filter(
+    (activity: Activity) =>
+      activity.sport === sport &&
+      activity.total_distance >= distance[0] * 1000 &&
+      (distance[1] !== 99 || activity.total_distance <= distance[1] * 1000),
+  );
 }
 
 export async function fetchLastActivities(): Promise<Activity[]> {
