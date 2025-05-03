@@ -16,5 +16,5 @@ export function formatDuration(seconds: number): string {
 }
 
 export function formatDateTime(datetime: string): string {
-  return DateTime.fromSQL(datetime).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS);
+  return DateTime.fromSQL(datetime).toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
 }
