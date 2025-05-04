@@ -14,6 +14,7 @@ import Paper from "@mui/material/Paper";
 
 import { fetchActivities } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
+import SportLogo from "../components/SportLogo";
 
 const ActivitiesComponent = () => {
   const [sport, setSport] = useState("all");
@@ -69,6 +70,7 @@ const ActivitiesComponent = () => {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
+                <TableCell>Sport</TableCell>
                 <TableCell>Title</TableCell>
                 <TableCell>Start Time</TableCell>
                 <TableCell>Distance</TableCell>
@@ -82,6 +84,9 @@ const ActivitiesComponent = () => {
             <TableBody>
               {data.map((activity) => (
                 <TableRow key={activity.id}>
+                  <TableCell>
+                    <SportLogo sport={activity.sport} width={25} />
+                  </TableCell>
                   <TableCell>
                     <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
                   </TableCell>
