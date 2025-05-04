@@ -2,15 +2,13 @@ import datetime
 import json
 import math
 import os
-import uuid
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import click
 import fitdecode  # type: ignore
 import yaml
 
-from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from data import Lap, Pace, DataPoint, TracePoint, Activity, Activities
 from utils import get_delta_lat_lon, get_lat_lon
