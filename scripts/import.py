@@ -98,6 +98,8 @@ class Activity(BaseModel):
 
     lat: float = 0.0
     lon: float = 0.0
+    delta_lat: float = 0.0
+    delta_lon: float = 0.0
 
     laps: List[Lap] = []
     data_points: List[DataPoint] = []
@@ -200,6 +202,16 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
     return data
 
 
+def get_delta_lat_lon(lat: float, max_distance: float) -> Tuple[float, float]:
+    earth_radius = 6371000
+    delta_lat = max_distance / earth_radius * (180 / math.pi)
+    delta_lon = (
+        max_distance / (earth_radius * math.cos(math.radians(lat))) * (180 / math.pi)
+    )
+
+    return (delta_lat, delta_lon)
+
+
 def get_activity_from_fit(fit_file: str) -> Activity:
     activity: Optional[Activity] = None
     device: str = ""
@@ -248,11 +260,22 @@ def get_activity_from_fit(fit_file: str) -> Activity:
         ]
 
     values = []
-    for data_point in data_points:
-        values.append(data_point.enhanced_speed)
+    max_distance = 1.0
+    for dp in data_points:
+        values.append(dp.enhanced_speed)
         if len(values) >= 10:
-            data_point.enhanced_speed = sum(values) / len(values)
+            dp.enhanced_speed = sum(values) / len(values)
             values.pop(0)
+
+        distance = (
+            math.sqrt((dp.lat - activity.lat) ** 2 + (dp.lon - activity.lon) ** 2)
+            * 111139
+        )
+        max_distance = max(max_distance, distance)
+
+    activity.delta_lat, activity.delta_lon = get_delta_lat_lon(
+        activity.lat, max_distance
+    )
 
     return activity
 

@@ -39,7 +39,13 @@ const Home = () => {
               <li>Average Speed: {formatSpeed(activity.average_speed)}</li>
             </ul>
             <Box padding="10px">
-              <MapContainer center={[activity.lat, activity.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
+              <MapContainer
+                bounds={[
+                  [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
+                  [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
+                ]}
+                style={{ height: "500px", width: "500px" }}
+              >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <Polyline positions={activity.trace_points} />
               </MapContainer>

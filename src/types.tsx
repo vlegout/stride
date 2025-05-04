@@ -53,4 +53,6 @@ export interface Activity {
   trace_points: LatLngExpression[];
   lat: number;
   lon: number;
+  delta_lat: number;
+  delta_lon: number;
 }
