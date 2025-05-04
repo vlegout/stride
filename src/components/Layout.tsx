@@ -8,7 +8,7 @@ const Layout = () => {
     <Grid>
       <main>
         <Header />
-        <Box>
+        <Box marginTop="20px">
           <Outlet />
         </Box>
       </main>

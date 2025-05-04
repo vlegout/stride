@@ -36,7 +36,7 @@ const ActivitiesComponent = () => {
   if (isPending || isFetching || error) return "Loading...";
 
   return (
-    <Flex justifyContent="center" paddingTop="20px">
+    <Flex justifyContent="center">
       <Box maxWidth="1200px">
         <Flex marginBottom="10px">
           <Box flex="1" marginRight="10px">
