@@ -37,25 +37,34 @@ const ActivitiesComponent = () => {
   return (
     <Flex justifyContent="center" paddingTop="20px">
       <Box maxWidth="1200px">
-        <FormControl fullWidth>
-          <InputLabel id="activities-sport">Age</InputLabel>
-          <Select labelId="activities-sport" value={sport} label="Age" onChange={handleChange}>
-            <MenuItem value={"all"}>All</MenuItem>
-            <MenuItem value={"running"}>Running</MenuItem>
-            <MenuItem value={"cycling"}>Cycling</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <Slider
-            getAriaLabel={() => "Minimum distance"}
-            value={distance}
-            onChangeCommitted={handleDistanceChange}
-            valueLabelDisplay="auto"
-            disableSwap
-            min={5}
-            max={100}
-          />
-        </FormControl>
+        <Flex marginBottom="10px">
+          <Box flex="1" marginRight="10px">
+            <FormControl fullWidth>
+              <InputLabel id="activities-sport">Age</InputLabel>
+              <Select labelId="activities-sport" value={sport} label="Age" onChange={handleChange}>
+                <MenuItem value={"all"}>All</MenuItem>
+                <MenuItem value={"running"}>Running</MenuItem>
+                <MenuItem value={"cycling"}>Cycling</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <Box flex="1" marginLeft="10px">
+            <FormControl fullWidth>
+              Distance
+              <Box marginLeft="10px" marginRight="10px">
+                <Slider
+                  getAriaLabel={() => "Minimum distance"}
+                  value={distance}
+                  onChangeCommitted={handleDistanceChange}
+                  valueLabelDisplay="auto"
+                  disableSwap
+                  min={5}
+                  max={100}
+                />
+              </Box>
+            </FormControl>
+          </Box>
+        </Flex>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
