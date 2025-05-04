@@ -28,8 +28,8 @@ const ActivitiesComponent = () => {
     setSport(event.target.value);
   };
 
-  const handleDistanceChange = (_event: Event, newValue: number[]) => {
-    setDistance(newValue);
+  const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number[]) => {
+    setDistance(value);
   };
 
   if (isPending || isFetching || error) return "Loading...";
