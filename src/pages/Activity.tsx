@@ -28,6 +28,7 @@ const ActivityComponent = () => {
   const speedData = data.data_points.map((point: DataPoint) => point.speed);
   const hrData = data.data_points.map((point: DataPoint) => point.heart_rate);
   const altitudeData = data.data_points.map((point: DataPoint) => point.altitude);
+  const powerData = data.data_points.map((point: DataPoint) => point.power);
 
   return (
     <Box>
@@ -72,6 +73,9 @@ const ActivityComponent = () => {
         </Box>
         <Box width="80%" margin="40px" maxWidth="800px">
           <LineChart labels={labels} data={altitudeData} />
+        </Box>
+        <Box width="80%" margin="40px" maxWidth="800px">
+          <LineChart labels={labels} data={powerData} />
         </Box>
       </Flex>
     </Box>
