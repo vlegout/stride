@@ -12,6 +12,9 @@ import yaml
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
+from data import Lap, Pace, DataPoint, TracePoint, Activity, Activities
+from utils import get_delta_lat_lon, get_lat_lon
+
 
 MAX_DATA_POINTS = 500
 
@@ -26,133 +29,6 @@ DEVICE_MAP = {
     "4062": "Edge 840",
     "4315": "FR 965",
 }
-
-
-class Pace(BaseModel):
-    minutes: int = 0
-    seconds: int = 0
-
-
-class Lap(BaseModel):
-    index: int = 0
-    start_time: datetime.datetime
-    total_elapsed_time: float
-    total_timer_time: float = 0.0
-    total_distance: float = 0.0
-    max_speed: float = 0.0
-    max_heart_rate: int = 0
-    avg_heart_rate: int = 0
-    pace: Pace = Pace()
-
-
-class Split(BaseModel):
-    index: int = 0
-    pace: Pace = Pace()
-
-
-class TracePoint(BaseModel):
-    lat: float
-    lon: float
-
-
-class DataPoint(BaseModel):
-    lat: float
-    lon: float
-    timestamp: datetime.datetime
-    distance: float = 0.0
-    heart_rate: int = 0
-    enhanced_speed: float = Field(default=0.0, serialization_alias="speed")
-    power: int = 0
-    enhanced_altitude: float = Field(default=0.0, serialization_alias="altitude")
-
-    @field_validator("enhanced_speed", mode="before")
-    @classmethod
-    def speed_to_kmh(cls, value: float) -> float:
-        return value * 60 * 60 / 1000
-
-
-class Activity(BaseModel):
-    id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
-
-    fit: str
-
-    title: str = ""
-    description: str = ""
-
-    sport: str
-    device: str = ""
-
-    start_time: datetime.datetime
-    timestamp: datetime.datetime
-    total_timer_time: float
-    total_elapsed_time: float
-
-    total_distance: float = 0.0
-    total_ascent: float = 0.0
-
-    enhanced_avg_speed: float = Field(default=0.0, serialization_alias="average_speed")
-
-    total_calories: float = 0.0
-
-    total_training_effect: float = 0.0
-
-    lat: float = 0.0
-    lon: float = 0.0
-    delta_lat: float = 0.0
-    delta_lon: float = 0.0
-
-    laps: List[Lap] = []
-    data_points: List[DataPoint] = []
-    trace_points: List[TracePoint] = []
-
-    @field_validator("enhanced_avg_speed", mode="before")
-    @classmethod
-    def speed_to_kmh(cls, value: float) -> float:
-        return value * 60 * 60 / 1000
-
-    @field_serializer("title")
-    def serialize_title(self, title: str) -> str:
-        if title:
-            return title
-
-        if self.sport == "running":
-            return "Run"
-        elif self.sport == "cycling":
-            return "Ride"
-
-        return "Activity"
-
-
-class Activities(BaseModel):
-    activities: list[Activity]
-
-
-def get_lat_lon(points: List[TracePoint]) -> Tuple[float, float]:
-    x = y = z = 0.0
-
-    if len(points) == 0:
-        return 0.0, 0.0
-
-    for point in points:
-        lon = math.radians(float(point.lon))
-        lat = math.radians(float(point.lat))
-
-        x += math.cos(lon) * math.cos(lat)
-        y += math.cos(lon) * math.sin(lat)
-        z += math.sin(lon)
-
-    total = len(points)
-
-    x = x / total
-    y = y / total
-    z = z / total
-
-    lon = math.atan2(y, x)
-    lat = math.atan2(z, math.sqrt(x * x + y * y))
-
-    lat, lon = map(math.degrees, (lon, lat))
-
-    return lat, lon
 
 
 def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
@@ -200,16 +76,6 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
             data[field] = frame.get_value(field)
 
     return data
-
-
-def get_delta_lat_lon(lat: float, max_distance: float) -> Tuple[float, float]:
-    earth_radius = 6371000
-    delta_lat = max_distance / earth_radius * (180 / math.pi)
-    delta_lon = (
-        max_distance / (earth_radius * math.cos(math.radians(lat))) * (180 / math.pi)
-    )
-
-    return (delta_lat, delta_lon)
 
 
 def get_activity_from_fit(fit_file: str) -> Activity:
