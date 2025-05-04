@@ -28,14 +28,8 @@ const ActivitiesComponent = () => {
     setSport(event.target.value);
   };
 
-  const minDistance = 10;
-
-  const handleDistanceChange = (_event: Event, newValue: number[], activeThumb: number) => {
-    if (activeThumb === 0) {
-      setDistance([Math.min(newValue[0], distance[1] - minDistance), distance[1]]);
-    } else {
-      setDistance([distance[0], Math.max(newValue[1], distance[0] + minDistance)]);
-    }
+  const handleDistanceChange = (_event: Event, newValue: number[]) => {
+    setDistance(newValue);
   };
 
   if (isPending || isFetching || error) return "Loading...";
@@ -55,7 +49,7 @@ const ActivitiesComponent = () => {
           <Slider
             getAriaLabel={() => "Minimum distance"}
             value={distance}
-            onChange={handleDistanceChange}
+            onChangeCommitted={handleDistanceChange}
             valueLabelDisplay="auto"
             disableSwap
             min={5}
