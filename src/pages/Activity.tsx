@@ -58,7 +58,13 @@ const ActivityComponent = () => {
         </Box>
 
         <Box padding="10px" width="50vw">
-          <MapContainer center={[data.lat, data.lon]} zoom={12} style={{ height: "500px", width: "500px" }}>
+          <MapContainer
+            bounds={[
+              [data.lat - data.delta_lat, data.lon - data.delta_lon],
+              [data.lat + data.delta_lat, data.lon + data.delta_lon],
+            ]}
+            style={{ height: "500px", width: "500px" }}
+          >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <Polyline positions={data.trace_points} />
           </MapContainer>
