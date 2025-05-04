@@ -30,7 +30,7 @@ const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
 
   return (
     <Box>
-      <Line options={lineOptions} data={lineData} />
+      <Line height={"100px"} options={lineOptions} data={lineData} />
     </Box>
   );
 };
