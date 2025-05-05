@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Heading, Separator } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Separator, Table } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
@@ -25,21 +25,32 @@ const Home = () => {
                 <Heading>
                   <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
                 </Heading>
-                <Flex>
+                <Flex paddingTop="20px">
                   <Box marginRight="10px" marginLeft="10px">
                     <SportLogo sport={activity.sport} />
                   </Box>
                   <Center h="40px">{formatDateTime(activity.start_time)}</Center>
                 </Flex>
-                <ul>
-                  <li>Total Timer Time: {formatDuration(activity.total_timer_time)}</li>
-                  <li>Total Elapsed Time: {formatDuration(activity.total_elapsed_time)}</li>
-                  <li>Total Distance: {formatDistance(activity.total_distance)}</li>
-                  <li>Total Ascent: {activity.total_ascent}</li>
-                  <li>Total Calories: {activity.total_calories}</li>
-                  <li>Total Training Effect: {activity.total_training_effect}</li>
-                  <li>Average Speed: {formatSpeed(activity.average_speed)}</li>
-                </ul>
+                <Table.Root paddingTop="20px">
+                  <Table.Body>
+                    <Table.Row>
+                      <Table.Cell>Timer Time: {formatDuration(activity.total_timer_time)}</Table.Cell>
+                      <Table.Cell>Elapsed Time: {formatDuration(activity.total_elapsed_time)}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>Distance: {formatDistance(activity.total_distance)}</Table.Cell>
+                      <Table.Cell>Average Speed: {formatSpeed(activity.average_speed)}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>Calories: {activity.total_calories}</Table.Cell>
+                      <Table.Cell>Training Effect: {activity.total_training_effect}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                      <Table.Cell>Device: {activity.device}</Table.Cell>
+                      <Table.Cell>Ascent: {activity.total_ascent}m</Table.Cell>
+                    </Table.Row>
+                  </Table.Body>
+                </Table.Root>
               </Box>
               <Box padding="10px">
                 <MapContainer

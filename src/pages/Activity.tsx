@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Heading } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Table } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Polyline } from "react-leaflet";
@@ -37,23 +37,34 @@ const ActivityComponent = () => {
           <Box padding="10px" width="50vw">
             <Box>
               <Heading>{data.title}</Heading>
-              <Flex>
+              <Flex paddingTop="20px">
                 <Box marginRight="10px" marginLeft="10px">
                   <SportLogo sport={data.sport} />
                 </Box>
                 <Center h="40px">{formatDateTime(data.start_time)}</Center>
               </Flex>
-              <ul>
-                <li>Total Timer Time: {formatDuration(data.total_timer_time)}</li>
-                <li>Total Elapsed Time: {formatDuration(data.total_elapsed_time)}</li>
-                <li>Total Distance: {formatDistance(data.total_distance)}</li>
-                <li>Total Ascent: {data.total_ascent}</li>
-                <li>Total Calories: {data.total_calories}</li>
-                <li>Total Training Effect: {data.total_training_effect}</li>
-                <li>Average Speed: {formatSpeed(data.average_speed)}</li>
-              </ul>
+              <Table.Root paddingTop="20px">
+                <Table.Body>
+                  <Table.Row>
+                    <Table.Cell>Timer Time: {formatDuration(data.total_timer_time)}</Table.Cell>
+                    <Table.Cell>Elapsed Time: {formatDuration(data.total_elapsed_time)}</Table.Cell>
+                  </Table.Row>
+                  <Table.Row>
+                    <Table.Cell>Distance: {formatDistance(data.total_distance)}</Table.Cell>
+                    <Table.Cell>Average Speed: {formatSpeed(data.average_speed)}</Table.Cell>
+                  </Table.Row>
+                  <Table.Row>
+                    <Table.Cell>Calories: {data.total_calories}</Table.Cell>
+                    <Table.Cell>Training Effect: {data.total_training_effect}</Table.Cell>
+                  </Table.Row>
+                  <Table.Row>
+                    <Table.Cell>Device: {data.device}</Table.Cell>
+                    <Table.Cell>Ascent: {data.total_ascent}m</Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table.Root>
             </Box>
-            <Box maxWidth="500px">
+            <Box maxWidth="500px" paddingTop="20px">
               <LapChart laps={data.laps} />
             </Box>
           </Box>
