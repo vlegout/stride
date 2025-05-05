@@ -12,7 +12,7 @@ const SportLogo = ({ sport, width = 40 }: { sport: string; width?: number }) => 
     case "running":
       return <LogoRun style={{ width: `${width}px`, height: `${width}px` }} />;
     case "swimming":
-        return <LogoSwim style={{ width: `${width}px`, height: `${width}px` }} />;
+      return <LogoSwim style={{ width: `${width}px`, height: `${width}px` }} />;
     default:
       return null;
   }
