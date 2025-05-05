@@ -44,8 +44,9 @@ const ActivitiesComponent = () => {
               <InputLabel id="activities-sport">Age</InputLabel>
               <Select labelId="activities-sport" value={sport} label="Age" onChange={handleChange}>
                 <MenuItem value={"all"}>All</MenuItem>
-                <MenuItem value={"running"}>Running</MenuItem>
                 <MenuItem value={"cycling"}>Cycling</MenuItem>
+                <MenuItem value={"running"}>Running</MenuItem>
+                <MenuItem value={"swimming"}>Swimming</MenuItem>
               </Select>
             </FormControl>
           </Box>
