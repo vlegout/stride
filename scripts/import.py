@@ -194,7 +194,8 @@ def run(full, partial):
                 if partial and len(activities.activities) > 20:
                     break
             else:
-                activity = Activity.parse_file(os.path.join(root, data_file))
+                with open(os.path.join(root, data_file), "r") as file:
+                    activity = Activity.model_validate_json(file.read())
 
             activities.activities.append(activity)
 
