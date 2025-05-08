@@ -99,9 +99,9 @@ def get_activity_from_fit(fit_file: str) -> Activity:
                     laps[-1].index = index
             elif frame.name == "record":
                 if point := get_record(frame):
-                    point = DataPoint(**point)
-                    data_points.append(point)
-                    trace_points.append(TracePoint(lat=point.lat, lon=point.lon))
+                    data_point = DataPoint(**point)
+                    data_points.append(data_point)
+                    trace_points.append(TracePoint(lat=data_point.lat, lon=data_point.lon))
 
             elif frame.name == "device_info":
                 if frame.has_field("garmin_product") and frame.get_value(
