@@ -13,5 +13,6 @@ dependencies = [
 dev-dependencies = [
     "mypy>=1.15.0",
     "pydantic-settings>=2.9.1",
+    "pyright>=1.1.400",
     "types-pyyaml>=6.0.12.20250402",
 ]

@@ -34,6 +34,13 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: uv run --project scripts mypy ./scripts
 
+  pyright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: astral-sh/setup-uv@v5
+      - run: cd scripts && uv run pyright .
+
   pre-commit:
     runs-on: ubuntu-latest
     steps:

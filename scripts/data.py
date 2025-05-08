@@ -6,6 +6,10 @@ from typing import List
 from pydantic import BaseModel, Field, field_validator, field_serializer
 
 
+def to_degrees(value: float) -> float:
+    return value / ((2**32) / 360)
+
+
 class Pace(BaseModel):
     minutes: int = 0
     seconds: int = 0
@@ -42,6 +46,16 @@ class DataPoint(BaseModel):
     @classmethod
     def speed_to_kmh(cls, value: float) -> float:
         return value * 60 * 60 / 1000
+
+    @field_validator("lat", mode="before")
+    @classmethod
+    def lat_to_degrees(cls, value: float) -> float:
+        return to_degrees(value)
+
+    @field_validator("lon", mode="before")
+    @classmethod
+    def lon_to_degrees(cls, value: float) -> float:
+        return to_degrees(value)
 
 
 class Activity(BaseModel):

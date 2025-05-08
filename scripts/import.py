@@ -66,8 +66,8 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
     elif not frame.has_field("position_long") or not frame.get_value("position_long"):
         return None
 
-    data["lat"] = frame.get_value("position_lat") / ((2**32) / 360)
-    data["lon"] = frame.get_value("position_long") / ((2**32) / 360)
+    data["lat"] = frame.get_value("position_lat")
+    data["lon"] = frame.get_value("position_long")
 
     for field in list(DataPoint.model_fields.keys())[2:]:
         if frame.has_field(field) and frame.get_value(field):
@@ -99,8 +99,10 @@ def get_activity_from_fit(fit_file: str) -> Activity:
                     laps[-1].index = index
             elif frame.name == "record":
                 if point := get_record(frame):
-                    trace_points.append(TracePoint(lat=point["lat"], lon=point["lon"]))
-                    data_points.append(DataPoint(**point))
+                    point = DataPoint(**point)
+                    data_points.append(point)
+                    trace_points.append(TracePoint(lat=point.lat, lon=point.lon))
+
             elif frame.name == "device_info":
                 if frame.has_field("garmin_product") and frame.get_value(
                     "garmin_product"
