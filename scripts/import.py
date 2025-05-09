@@ -238,6 +238,16 @@ def get_activity_from_yaml(yaml_file: str) -> Activity:
     return activity
 
 
+def get_activity_or_legacy(data_file: str, full: bool) -> Activity:
+    if full:
+        activity = get_activity_from_fit(data_file)
+    else:
+        with open(data_file, "r") as file:
+            activity = Activity.model_validate_json(file.read())
+
+    return activity
+
+
 @click.command()
 @click.option("--full", is_flag=True, help="Full import of all activities.")
 @click.option("--partial", is_flag=True, help="Partial import of activities.")
@@ -248,18 +258,27 @@ def run(full, partial):
 
     activities = Activities(activities=[])
 
+    data_files = []
     for root, _, files in os.walk("data/files" if full else "legacy"):
         for data_file in files:
-            if full:
-                activity = get_activity_from_fit(os.path.join(root, data_file))
+            data_files.append(os.path.join(root, data_file))
 
-                if partial and len(activities.activities) > 20:
+            if full and partial:
+                if len(data_files) >= 20:
                     break
-            else:
-                with open(os.path.join(root, data_file), "r") as file:
-                    activity = Activity.model_validate_json(file.read())
 
-            activities.activities.append(activity)
+    with concurrent.futures.ProcessPoolExecutor(max_workers=NP_CPUS) as executor:
+        future_activities = {
+            executor.submit(get_activity_or_legacy, data_file, full): data_file
+            for data_file in data_files
+        }
+        for future in concurrent.futures.as_completed(future_activities):
+            yaml_file = future_activities[future]
+            try:
+                activity = future.result()
+                activities.activities.append(activity)
+            except Exception as e:
+                print(f"Error processing {yaml_file}: {e}")
 
     input_files = []
     for root, _, files in os.walk("./data/"):
@@ -268,7 +287,7 @@ def run(full, partial):
                 continue
             input_files.append(os.path.join(root, yaml_file))
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=NP_CPUS) as executor:
         future_activities = {
             executor.submit(get_activity_from_yaml, input_file): input_file
             for input_file in input_files
