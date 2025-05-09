@@ -1,6 +1,8 @@
+import concurrent.futures
 import datetime
 import json
 import math
+import multiprocessing
 import os
 
 from typing import Any, Dict, List, Optional
@@ -13,6 +15,8 @@ import yaml
 from data import Lap, Pace, DataPoint, TracePoint, Activity, Activities
 from utils import get_delta_lat_lon, get_lat_lon
 
+
+NP_CPUS = multiprocessing.cpu_count()
 
 MAX_DATA_POINTS = 500
 
@@ -221,10 +225,24 @@ def dump_actitivities(activities: Activities, full: bool):
         json.dump(activities.model_dump(by_alias=True), file, default=str)
 
 
+def get_activity_from_yaml(yaml_file: str) -> Activity:
+    with open(yaml_file, "r") as file:
+        config = yaml.safe_load(file)
+        activity = get_activity_from_fit("data/fit/" + config["fit"])
+
+        if config.get("title"):
+            activity.title = config["title"]
+        if config.get("description"):
+            activity.description = config["description"]
+
+    return activity
+
+
 @click.command()
 @click.option("--full", is_flag=True, help="Full import of all activities.")
 @click.option("--partial", is_flag=True, help="Partial import of activities.")
 def run(full, partial):
+    print("CPU:", NP_CPUS)
     print("Full import:", full)
     print("Partial import:", partial)
 
@@ -243,21 +261,25 @@ def run(full, partial):
 
             activities.activities.append(activity)
 
+    input_files = []
     for root, _, files in os.walk("./data/"):
         for yaml_file in files:
             if not yaml_file.endswith(".yaml"):
                 continue
+            input_files.append(os.path.join(root, yaml_file))
 
-            with open(os.path.join(root, yaml_file), "r") as file:
-                config = yaml.safe_load(file)
-                activity = get_activity_from_fit("data/fit/" + config["fit"])
-
-                if config.get("title"):
-                    activity.title = config["title"]
-                if config.get("description"):
-                    activity.description = config["description"]
-
+    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+        future_activities = {
+            executor.submit(get_activity_from_yaml, input_file): input_file
+            for input_file in input_files
+        }
+        for future in concurrent.futures.as_completed(future_activities):
+            yaml_file = future_activities[future]
+            try:
+                activity = future.result()
                 activities.activities.append(activity)
+            except Exception as e:
+                print(f"Error processing {yaml_file}: {e}")
 
     activities.activities.sort(key=lambda x: x.start_time, reverse=True)
 
