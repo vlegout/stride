@@ -76,6 +76,50 @@ def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, An
     return data
 
 
+class DataProcessor(fitdecode.DefaultDataProcessor):
+    """
+    A `DefaultDataProcessor` that also:
+
+    * Converts all ``speed`` and ``*_speeds`` fields (by name) to ``km/h``
+      (standard's default is ``m/s``)
+    * Converts GPS coordinates (i.e. FIT's semicircles type) to ``deg``
+
+    From https://github.com/polyvertex/fitdecode/blob/master/fitdecode/processors.py
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def on_process_field(self, reader, field_data):
+        """
+        Convert all ``*_speed`` fields using `process_field_speed`.
+
+        All other units will use the default method.
+        """
+        if field_data.name and field_data.name.endswith("_speed"):
+            self.process_field_speed(reader, field_data)
+        else:
+            super().on_process_field(reader, field_data)
+
+    def process_field_speed(self, reader, field_data):
+        if field_data.value is not None:
+            factor = 60.0 * 60.0 / 1000.0
+
+            # record.enhanced_speed field can be a tuple...
+            # see https://github.com/dtcooper/python-fitparse/issues/62
+            if isinstance(field_data.value, (tuple, list)):
+                field_data.value = tuple(x * factor for x in field_data.value)
+            else:
+                field_data.value *= factor
+
+        field_data.units = "km/h"
+
+    def process_units_semicircles(self, reader, field_data):
+        if field_data.value is not None:
+            field_data.value *= 180.0 / (2**31)
+        field_data.units = "deg"
+
+
 def get_activity_from_fit(fit_file: str) -> Activity:
     activity: Optional[Activity] = None
     device: str = ""
@@ -84,7 +128,7 @@ def get_activity_from_fit(fit_file: str) -> Activity:
     data_points: List[DataPoint] = []
     trace_points: List[TracePoint] = []
 
-    with fitdecode.FitReader(fit_file) as fit:
+    with fitdecode.FitReader(fit_file, processor=DataProcessor()) as fit:
         for frame in fit:
             if not isinstance(frame, fitdecode.records.FitDataMessage):
                 continue

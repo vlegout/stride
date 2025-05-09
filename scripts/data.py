@@ -3,7 +3,7 @@ import uuid
 
 from typing import List
 
-from pydantic import BaseModel, Field, field_validator, field_serializer
+from pydantic import BaseModel, Field, field_serializer
 
 
 def to_degrees(value: float) -> float:
@@ -42,21 +42,6 @@ class DataPoint(BaseModel):
     power: int = 0
     enhanced_altitude: float = Field(default=0.0, serialization_alias="altitude")
 
-    @field_validator("enhanced_speed", mode="before")
-    @classmethod
-    def speed_to_kmh(cls, value: float) -> float:
-        return value * 60 * 60 / 1000
-
-    @field_validator("lat", mode="before")
-    @classmethod
-    def lat_to_degrees(cls, value: float) -> float:
-        return to_degrees(value)
-
-    @field_validator("lon", mode="before")
-    @classmethod
-    def lon_to_degrees(cls, value: float) -> float:
-        return to_degrees(value)
-
 
 class Activity(BaseModel):
     id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
@@ -91,11 +76,6 @@ class Activity(BaseModel):
     laps: List[Lap] = []
     data_points: List[DataPoint] = []
     trace_points: List[TracePoint] = []
-
-    @field_validator("enhanced_avg_speed", mode="before")
-    @classmethod
-    def speed_to_kmh(cls, value: float) -> float:
-        return value * 60 * 60 / 1000
 
     @field_serializer("title")
     def serialize_title(self, title: str) -> str:
