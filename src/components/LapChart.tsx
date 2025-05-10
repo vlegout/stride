@@ -35,10 +35,10 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
 
   const dataLaps: LapData[] = [];
 
-  let currentX = 40;
+  let currentX = 30;
 
   laps.forEach((lap, index) => {
-    const lapWidth = (lap.total_distance * (width - 40 - space * laps.length)) / totalDistance;
+    const lapWidth = (lap.total_distance * (width - 30 - space * laps.length)) / totalDistance;
     const lapHeight = (-height * (maxSpeed - (lap.pace.minutes * 60 + lap.pace.seconds))) / speedRange;
 
     dataLaps.push({
@@ -104,7 +104,7 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
               x={0}
               y={height - (height * (maxSpeed - pace)) / speedRange}
               text={`${Math.floor(pace / 60)}:${(pace % 60).toString().padStart(2, "0")}`}
-              fontSize={16}
+              fontSize={14}
             />
           ))}
         </Layer>
