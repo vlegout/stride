@@ -9,6 +9,7 @@ interface LapData {
   total_distance: number;
   pace: { minutes: number; seconds: number };
   x: number;
+  y: number;
   width: number;
   height: number;
   name: string;
@@ -71,7 +72,8 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
     }
   }
 
-  const handleMouseMove = (e) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleMouseMove = (e: any) => {
     const mousePos = e.target.getStage().getPointerPosition();
     setTooltipProps({
       text: `${e.target.name()}`,
