@@ -1,4 +1,4 @@
-import type { Activity } from "./types";
+import type { Activity, Profile } from "./types";
 
 export async function fetchActivities({ queryKey }: { queryKey: [string, number[]] }): Promise<Activity[]> {
   const [sport, distance] = queryKey;
@@ -29,5 +29,10 @@ export async function fetchLastActivities(): Promise<Activity[]> {
 
 export async function fetchActivity(id: string): Promise<Activity> {
   const response = await fetch(`/activities/${id}.json`);
+  return await response.json();
+}
+
+export async function fetchProfile(): Promise<Profile> {
+  const response = await fetch(`/profile.json`);
   return await response.json();
 }

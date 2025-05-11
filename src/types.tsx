@@ -56,3 +56,11 @@ export interface Activity {
   delta_lat: number;
   delta_lon: number;
 }
+
+export interface Profile {
+  n_activities: number;
+  run_n_activities: number;
+  run_total_distance: number;
+  cycling_n_activities: number;
+  cycling_total_distance: number;
+}

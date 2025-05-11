@@ -12,6 +12,9 @@ const Header = () => {
           <Box paddingLeft="20px">
             <Link to="/activities">Activities</Link>
           </Box>
+          <Box paddingLeft="20px">
+            <Link to="/profile">Profile</Link>
+          </Box>
         </HStack>
       </Flex>
     </Box>

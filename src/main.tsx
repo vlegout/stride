@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Home from "./pages/Home";
 import ActivitiesComponent from "./pages/Activities";
 import ActivityComponent from "./pages/Activity";
-
+import Profile from "./pages/Profile";
 import Layout from "./components/Layout";
 
 import "leaflet/dist/leaflet.css";
@@ -28,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/activities/:id",
         element: <ActivityComponent />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
     ],
   },

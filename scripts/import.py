@@ -12,7 +12,7 @@ import fitdecode  # type: ignore
 import yaml
 
 
-from data import Lap, Pace, DataPoint, TracePoint, Activity, Activities
+from data import Activity, Activities, DataPoint, Lap, Pace, Profile, TracePoint
 from utils import get_delta_lat_lon, get_lat_lon
 
 
@@ -196,7 +196,7 @@ def get_activity_from_fit(fit_file: str) -> Activity:
     return activity
 
 
-def dump_actitivities(activities: Activities, full: bool):
+def dump_actitivities(profile: Profile, activities: Activities, full: bool):
     for activity in activities.activities:
         data = activity.model_dump(by_alias=True)
 
@@ -215,6 +215,13 @@ def dump_actitivities(activities: Activities, full: bool):
                     "activities": {"__all__": {"laps", "data_points", "trace_points"}}
                 },
             ),
+            file,
+            default=str,
+        )
+
+    with open("./public/profile.json", "w") as file:
+        json.dump(
+            profile.model_dump(),
             file,
             default=str,
         )
@@ -246,6 +253,34 @@ def get_activity_or_legacy(data_file: str, full: bool) -> Activity:
             activity = Activity.model_validate_json(file.read())
 
     return activity
+
+
+def get_profile(activities: Activities) -> Profile:
+    profile = Profile()
+
+    profile.n_activities = len(activities.activities)
+    profile.run_n_activities = len(
+        [activity for activity in activities.activities if activity.sport == "running"]
+    )
+    profile.run_total_distance = sum(
+        [
+            activity.total_distance
+            for activity in activities.activities
+            if activity.sport == "running"
+        ]
+    )
+    profile.cycling_n_activities = len(
+        [activity for activity in activities.activities if activity.sport == "cycling"]
+    )
+    profile.cycling_total_distance = sum(
+        [
+            activity.total_distance
+            for activity in activities.activities
+            if activity.sport == "cycling"
+        ]
+    )
+
+    return profile
 
 
 @click.command()
@@ -302,7 +337,9 @@ def run(full, partial):
 
     activities.activities.sort(key=lambda x: x.start_time, reverse=True)
 
-    dump_actitivities(activities, full)
+    profile = get_profile(activities)
+
+    dump_actitivities(profile, activities, full)
 
 
 if __name__ == "__main__":

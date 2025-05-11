@@ -94,3 +94,11 @@ class Activity(BaseModel):
 
 class Activities(BaseModel):
     activities: list[Activity]
+
+
+class Profile(BaseModel):
+    n_activities: int = 0
+    run_n_activities: int = 0
+    run_total_distance: float = 0.0
+    cycling_n_activities: int = 0
+    cycling_total_distance: float = 0.0
