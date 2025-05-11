@@ -3,8 +3,6 @@ node_modules
 .vscode/*
 .DS_Store
 
-public/data.json
-
 *.fit
 *.gpx
 
@@ -13,6 +11,5 @@ data/files/
 data/fit/
 
 legacy/
-public/
 
 __pycache__/
