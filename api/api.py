@@ -37,6 +37,9 @@ async def verify_token(request: Request, call_next):
     if request.method == "OPTIONS":
         return await call_next(request)
 
+    if request.url.path == "/":
+        return await call_next(request)
+
     token = request.headers.get("Authorization")
     if not token or token != f"Bearer {TOKEN}":
         return JSONResponse(
@@ -53,8 +56,13 @@ def get_data_from_s3(file_path: str):
     return json.load(data)
 
 
+@app.get("/")
+def route_root():
+    return JSONResponse(content={}, status_code=status.HTTP_200_OK)
+
+
 @app.get("/{route}")
-def route_root(route: str):
+def route_home(route: str):
     return JSONResponse(get_data_from_s3(f"public/{route}.json"))
 
 
