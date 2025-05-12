@@ -1,4 +1,5 @@
-name: Playwright
+name: JS
+
 on:
   push:
 
@@ -6,7 +7,17 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+      - run: npm install --include=dev
+      - run: ./node_modules/prettier/bin/prettier.cjs ./src --check
+      - run: ./node_modules/eslint/bin/eslint.js ./src
+      - run: npm run build
+
+  playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:

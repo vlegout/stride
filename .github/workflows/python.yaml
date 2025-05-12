@@ -1,0 +1,59 @@
+name: Python
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: astral-sh/ruff-action@v3
+        with:
+          src:  >-
+            api
+            scripts
+      - run: ruff format
+      - run: ruff check
+
+  typing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: astral-sh/setup-uv@v5
+      - run: uv run --project api mypy ./api
+      - run: uv run --project scripts mypy ./scripts
+      - run: cd api && uv run pyright .
+      - run: cd scripts && uv run pyright .
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: pre-commit/action@v3.0.1
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [ruff, typing, pre-commit]
+    if: github.ref == 'refs/heads/api'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REPOSITORY:$IMAGE_TAG api
+          docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:latest
+          docker push $REPOSITORY:$IMAGE_TAG
+          docker push $REPOSITORY:latest

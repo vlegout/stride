@@ -1,9 +1,20 @@
+import axios from "axios";
+
 import type { Activity, Profile } from "./types";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const TOKEN = import.meta.env.VITE_API_TOKEN || "";
+
+export async function apiCall(url: string) {
+  const response = await axios.get(`${API_URL}${url}`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  });
+  return response.data;
+}
 
 export async function fetchActivities({ queryKey }: { queryKey: [string, number[]] }): Promise<Activity[]> {
   const [sport, distance] = queryKey;
-  const response = await fetch(`/activities.json`);
-  const data = await response.json();
+  const data = await apiCall("/activities");
 
   if (sport === "all") {
     return data.activities.filter(
@@ -22,17 +33,14 @@ export async function fetchActivities({ queryKey }: { queryKey: [string, number[
 }
 
 export async function fetchLastActivities(): Promise<Activity[]> {
-  const response = await fetch(`/last.json`);
-  const data = await response.json();
+  const data = await apiCall("/last");
   return data.activities;
 }
 
 export async function fetchActivity(id: string): Promise<Activity> {
-  const response = await fetch(`/activities/${id}.json`);
-  return await response.json();
+  return await apiCall("/activities/" + id);
 }
 
 export async function fetchProfile(): Promise<Profile> {
-  const response = await fetch(`/profile.json`);
-  return await response.json();
+  return await apiCall("/profile");
 }
