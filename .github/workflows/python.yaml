@@ -54,4 +54,6 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $REPOSITORY:$IMAGE_TAG api
+          docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:latest
           docker push $REPOSITORY:$IMAGE_TAG
+          docker push $REPOSITORY:latest
