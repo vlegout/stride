@@ -39,7 +39,7 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     needs: [ruff, typing, pre-commit]
-    if: github.ref == 'refs/heads/scaleway'
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Registry
