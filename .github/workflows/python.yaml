@@ -57,4 +57,5 @@ jobs:
         with:
           access-key: ${{ secrets.SCW_ACCESS_KEY }}
           secret-key: ${{ secrets.SCW_SECRET_KEY }}
+          default-organization-id: ${{ secrets.SCW_ORGANIZATION_ID }}
           args: container container update ${{ secrets.SCW_CONTAINER_ID }} registry-image=${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
