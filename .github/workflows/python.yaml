@@ -51,7 +51,6 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR
         run: |
           docker build -t ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }} api
-          docker tag ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
           docker push ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
       - name: Update Scaleway container
         uses: scaleway/action-scw@v0
