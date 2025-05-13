@@ -49,11 +49,13 @@ jobs:
           username: nologin
           password: ${{ secrets.DOCKER_SECRET_KEY }}
       - name: Build, tag, and push docker image to Amazon ECR
-        env:
-          REPOSITORY: ${{ secrets.DOCKER_REPOSITORY }}/api
-          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REPOSITORY:$IMAGE_TAG api
-          docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:latest
-          docker push $REPOSITORY:$IMAGE_TAG
-          docker push $REPOSITORY:latest
+          docker build -t ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }} api
+          docker tag ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
+      - name: Update Scaleway container
+        uses: scaleway/action-scw@v0
+        with:
+          access-key: ${{ secrets.SCW_ACCESS_KEY }}
+          secret-key: ${{ secrets.SCW_SECRET_KEY }}
+          args: container container update ${{ secrets.SCW_CONTAINER_ID }} registry-image=${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
