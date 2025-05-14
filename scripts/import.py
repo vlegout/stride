@@ -196,7 +196,9 @@ def get_activity_from_fit(fit_file: str) -> Activity:
     return activity
 
 
-def dump_actitivities(profile: Profile, activities: Activities, full: bool):
+def dump_actitivities(
+    profile: Profile, activities: Activities, full: bool, output_dir: str
+):
     for activity in activities.activities:
         data = activity.model_dump(by_alias=True)
 
@@ -204,10 +206,12 @@ def dump_actitivities(profile: Profile, activities: Activities, full: bool):
             with open("./legacy/" + str(activity.id) + ".json", "w") as file:
                 json.dump(data, file, default=str)
 
-        with open("./public/activities/" + str(activity.id) + ".json", "w") as file:
+        with open(
+            f"./{output_dir}/activities/" + str(activity.id) + ".json", "w"
+        ) as file:
             json.dump(data, file, default=str)
 
-    with open("./public/activities.json", "w") as file:
+    with open(f"./{output_dir}/activities.json", "w") as file:
         json.dump(
             activities.model_dump(
                 by_alias=True,
@@ -219,7 +223,7 @@ def dump_actitivities(profile: Profile, activities: Activities, full: bool):
             default=str,
         )
 
-    with open("./public/profile.json", "w") as file:
+    with open(f"./{output_dir}/profile.json", "w") as file:
         json.dump(
             profile.model_dump(),
             file,
@@ -228,7 +232,7 @@ def dump_actitivities(profile: Profile, activities: Activities, full: bool):
 
     activities.activities = activities.activities[:10]
 
-    with open("./public/last.json", "w") as file:
+    with open(f"./{output_dir}/last.json", "w") as file:
         json.dump(activities.model_dump(by_alias=True), file, default=str)
 
 
@@ -286,7 +290,10 @@ def get_profile(activities: Activities) -> Profile:
 @click.command()
 @click.option("--full", is_flag=True, help="Full import of all activities.")
 @click.option("--partial", is_flag=True, help="Partial import of activities.")
-def run(full, partial):
+@click.option(
+    "--output-dir", default="public", help="Target directory to dump JSON files."
+)
+def run(full, partial, output_dir):
     print("CPU:", NP_CPUS)
     print("Full import:", full)
     print("Partial import:", partial)
@@ -339,7 +346,7 @@ def run(full, partial):
 
     profile = get_profile(activities)
 
-    dump_actitivities(profile, activities, full)
+    dump_actitivities(profile, activities, full, output_dir)
 
 
 if __name__ == "__main__":

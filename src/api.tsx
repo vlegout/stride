@@ -2,11 +2,17 @@ import axios from "axios";
 
 import type { Activity, Profile } from "./types";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 const TOKEN = import.meta.env.VITE_API_TOKEN || "";
 
 export async function apiCall(url: string) {
-  const response = await axios.get(`${API_URL}${url}`, {
+  url = `${API_URL}${url}`;
+
+  if (import.meta.env.DEV) {
+    url += ".json";
+  }
+
+  const response = await axios.get(url, {
     headers: { Authorization: `Bearer ${TOKEN}` },
   });
   return response.data;

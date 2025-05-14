@@ -11,5 +11,6 @@ data/files/
 data/fit/
 
 legacy/
+pub/
 
 __pycache__/
