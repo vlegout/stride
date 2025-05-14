@@ -8,9 +8,10 @@ permissions:
 
 jobs:
   lint:
-    runs-on: node:alpine
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
       - run: npm install --include=dev
       - run: npx prettier ./src --check
       - run: npx eslint ./src
