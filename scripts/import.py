@@ -284,6 +284,16 @@ def get_profile(activities: Activities) -> Profile:
         ]
     )
 
+    profile.years = [
+        {"year": year, "running": 0.0, "cycling": 0.0, "swimming": 0.0}
+        for year in range(2013, datetime.datetime.now().year + 1)
+    ]
+    for activity in activities.activities:
+        for year in profile.years:
+            if year["year"] == activity.start_time.year:
+                year[activity.sport] += activity.total_distance
+                break
+
     return profile
 
 
