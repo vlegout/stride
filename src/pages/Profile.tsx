@@ -6,7 +6,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Chart as ChartJS, BarElement, ChartOptions, LinearScale, CategoryScale } from "chart.js";
+import { Chart as ChartJS, BarElement, ChartOptions, LinearScale, CategoryScale, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
 import { fetchProfile } from "../api";
@@ -21,11 +21,20 @@ const Profile = () => {
 
   if (isPending || isFetching || error) return "Loading...";
 
-  ChartJS.register(CategoryScale, LinearScale, BarElement);
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
   const weekOptions: ChartOptions<"bar"> = {
     responsive: true,
     animation: false,
+    plugins: {
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          label: (context: any) => formatDistance(context.raw),
+        },
+      },
+    },
   };
 
   const weekData = {
