@@ -13,7 +13,7 @@ import yaml
 
 
 from data import Activity, Activities, DataPoint, Lap, Pace, Profile, TracePoint
-from utils import get_delta_lat_lon, get_lat_lon
+from utils import get_delta_lat_lon, get_lat_lon, get_uuid
 
 
 NP_CPUS = multiprocessing.cpu_count()
@@ -164,6 +164,7 @@ def get_activity_from_fit(fit_file: str) -> Activity:
     if not activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
+    activity.id = get_uuid(activity.fit)
     activity.device = device
     activity.laps = laps
     activity.data_points = data_points

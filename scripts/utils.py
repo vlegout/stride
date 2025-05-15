@@ -1,4 +1,5 @@
 import math
+import uuid
 
 from typing import List, Tuple
 
@@ -41,3 +42,7 @@ def get_delta_lat_lon(lat: float, max_distance: float) -> Tuple[float, float]:
     )
 
     return (delta_lat, delta_lon)
+
+
+def get_uuid(filename: str) -> uuid.UUID:
+    return uuid.uuid5(uuid.NAMESPACE_DNS, filename)

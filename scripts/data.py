@@ -1,7 +1,7 @@
 import datetime
-import uuid
 
 from typing import List
+from uuid import UUID
 
 from pydantic import BaseModel, Field, field_serializer
 
@@ -44,7 +44,7 @@ class DataPoint(BaseModel):
 
 
 class Activity(BaseModel):
-    id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
+    id: UUID | None = None
 
     fit: str
 
