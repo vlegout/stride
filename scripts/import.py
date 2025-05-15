@@ -21,6 +21,7 @@ from data import (
     Profile,
     Statistic,
     TracePoint,
+    WeeksStatistics,
     YearsStatistics,
 )
 from utils import get_delta_lat_lon, get_lat_lon, get_uuid
@@ -306,10 +307,33 @@ def get_profile(activities: Activities) -> Profile:
             )
         )
 
+    start = datetime.datetime(year=2013, month=1, day=7, tzinfo=datetime.timezone.utc)
+    while start < datetime.datetime.now(datetime.timezone.utc):
+        profile.weeks.append(
+            WeeksStatistics(
+                start=start,
+                statistics=[
+                    Statistic(sport=sport)
+                    for sport in ["running", "cycling", "swimming"]
+                ],
+            )
+        )
+        start += datetime.timedelta(weeks=1)
+
     for activity in activities.activities:
         for yearStatistic in profile.years:
             if yearStatistic.year == activity.start_time.year:
                 for stat in yearStatistic.statistics:
+                    if stat.sport == activity.sport:
+                        stat.n_activities += 1
+                        stat.total_distance += activity.total_distance
+        for weekStatistic in profile.weeks:
+            if (
+                activity.start_time >= weekStatistic.start
+                and activity.start_time
+                < weekStatistic.start + datetime.timedelta(weeks=1)
+            ):
+                for stat in weekStatistic.statistics:
                     if stat.sport == activity.sport:
                         stat.n_activities += 1
                         stat.total_distance += activity.total_distance

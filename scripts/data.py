@@ -107,6 +107,11 @@ class YearsStatistics(BaseModel):
     statistics: List[Statistic]
 
 
+class WeeksStatistics(BaseModel):
+    start: datetime.datetime
+    statistics: List[Statistic]
+
+
 class Profile(BaseModel):
     n_activities: int = 0
     run_n_activities: int = 0
@@ -114,3 +119,4 @@ class Profile(BaseModel):
     cycling_n_activities: int = 0
     cycling_total_distance: float = 0.0
     years: List[YearsStatistics] = []
+    weeks: List[WeeksStatistics] = []
