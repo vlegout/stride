@@ -2,6 +2,8 @@ import json
 import io
 import os
 
+from typing import Any
+
 import boto3
 
 from fastapi import FastAPI, Request, status
@@ -45,7 +47,7 @@ async def verify_token(request: Request, call_next):
     return await call_next(request)
 
 
-def get_data_from_s3(file_path: str):
+def get_data_from_s3(file_path: str) -> dict[Any, Any]:
     data = io.BytesIO()
     s3.download_fileobj(BUCKET, file_path, data)
     data.seek(0)
@@ -53,15 +55,15 @@ def get_data_from_s3(file_path: str):
 
 
 @app.get("/")
-def route_root():
+def route_root() -> JSONResponse:
     return JSONResponse(content={}, status_code=status.HTTP_200_OK)
 
 
 @app.get("/{route}")
-def route_home(route: str):
+def route_home(route: str) -> JSONResponse:
     return JSONResponse(get_data_from_s3(f"public/{route}.json"))
 
 
 @app.get("/activities/{route}")
-def route_activities(route: str):
+def route_activities(route: str) -> JSONResponse:
     return JSONResponse(get_data_from_s3(f"public/activities/{route}.json"))
