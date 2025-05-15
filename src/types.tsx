@@ -68,6 +68,11 @@ export interface YearsStatistics {
   statistics: Statistic[];
 }
 
+export interface WeeksStatistics {
+  start: string;
+  statistics: Statistic[];
+}
+
 export interface Profile {
   n_activities: number;
   run_n_activities: number;
@@ -75,4 +80,5 @@ export interface Profile {
   cycling_n_activities: number;
   cycling_total_distance: number;
   years: YearsStatistics[];
+  weeks: WeeksStatistics[];
 }

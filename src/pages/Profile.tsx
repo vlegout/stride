@@ -6,6 +6,8 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { Chart as ChartJS, BarElement, ChartOptions, LinearScale, CategoryScale } from "chart.js";
+import { Bar } from "react-chartjs-2";
 
 import { fetchProfile } from "../api";
 import { formatDistance } from "../utils";
@@ -18,6 +20,22 @@ const Profile = () => {
   });
 
   if (isPending || isFetching || error) return "Loading...";
+
+  ChartJS.register(CategoryScale, LinearScale, BarElement);
+
+  const weekOptions: ChartOptions<"bar"> = {
+    responsive: true,
+    animation: false,
+  };
+
+  const weekData = {
+    labels: Array.from({ length: 10 }, (_, i) => i + 1),
+    datasets: [
+      {
+        data: data.weeks.slice(-10).map((week) => week.statistics[0].total_distance),
+      },
+    ],
+  };
 
   return (
     <Flex justifyContent="center">
@@ -49,6 +67,9 @@ const Profile = () => {
               </TableBody>
             </Table>
           </TableContainer>
+        </Box>
+        <Box marginTop="20px">
+          <Bar height={"100px"} options={weekOptions} data={weekData} />
         </Box>
         <Box marginTop="20px">
           <TableContainer component={Paper}>
