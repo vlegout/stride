@@ -96,10 +96,21 @@ class Activities(BaseModel):
     activities: list[Activity]
 
 
+class Statistic(BaseModel):
+    sport: str
+    n_activities: int = 0
+    total_distance: float = 0.0
+
+
+class YearsStatistics(BaseModel):
+    year: int
+    statistics: List[Statistic]
+
+
 class Profile(BaseModel):
     n_activities: int = 0
     run_n_activities: int = 0
     run_total_distance: float = 0.0
     cycling_n_activities: int = 0
     cycling_total_distance: float = 0.0
-    years: List = []
+    years: List[YearsStatistics] = []

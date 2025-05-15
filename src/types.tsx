@@ -57,11 +57,15 @@ export interface Activity {
   delta_lon: number;
 }
 
-export interface ProfileYear {
+export interface Statistic {
+  sport: string;
+  n_activities: number;
+  total_distance: number;
+}
+
+export interface YearsStatistics {
   year: number;
-  running: number;
-  cycling: number;
-  swimming: number;
+  statistics: Statistic[];
 }
 
 export interface Profile {
@@ -70,5 +74,5 @@ export interface Profile {
   run_total_distance: number;
   cycling_n_activities: number;
   cycling_total_distance: number;
-  years: ProfileYear[];
+  years: YearsStatistics[];
 }

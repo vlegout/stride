@@ -12,7 +12,17 @@ import fitdecode  # type: ignore
 import yaml
 
 
-from data import Activity, Activities, DataPoint, Lap, Pace, Profile, TracePoint
+from data import (
+    Activity,
+    Activities,
+    DataPoint,
+    Lap,
+    Pace,
+    Profile,
+    Statistic,
+    TracePoint,
+    YearsStatistics,
+)
 from utils import get_delta_lat_lon, get_lat_lon, get_uuid
 
 
@@ -285,15 +295,24 @@ def get_profile(activities: Activities) -> Profile:
         ]
     )
 
-    profile.years = [
-        {"year": year, "running": 0.0, "cycling": 0.0, "swimming": 0.0}
-        for year in range(2013, datetime.datetime.now().year + 1)
-    ]
+    for year in range(2013, datetime.datetime.now().year + 1):
+        profile.years.append(
+            YearsStatistics(
+                year=year,
+                statistics=[
+                    Statistic(sport=sport)
+                    for sport in ["running", "cycling", "swimming"]
+                ],
+            )
+        )
+
     for activity in activities.activities:
-        for year in profile.years:
-            if year["year"] == activity.start_time.year:
-                year[activity.sport] += activity.total_distance
-                break
+        for yearStatistic in profile.years:
+            if yearStatistic.year == activity.start_time.year:
+                for stat in yearStatistic.statistics:
+                    if stat.sport == activity.sport:
+                        stat.n_activities += 1
+                        stat.total_distance += activity.total_distance
 
     return profile
 

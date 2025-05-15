@@ -56,16 +56,32 @@ const Profile = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Year</TableCell>
-                  <TableCell>Running</TableCell>
-                  <TableCell>Cycling</TableCell>
+                  <TableCell colSpan={2}>Running</TableCell>
+                  <TableCell colSpan={2}>Cycling</TableCell>
+                  <TableCell colSpan={2}>Swimming</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Activities</TableCell>
+                  <TableCell>Distance</TableCell>
+                  <TableCell>Activities</TableCell>
+                  <TableCell>Distance</TableCell>
+                  <TableCell>Activities</TableCell>
+                  <TableCell>Distance</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {data.years.map((year) => (
                   <TableRow>
                     <TableCell>{year.year}</TableCell>
-                    <TableCell>{formatDistance(year.running)}</TableCell>
-                    <TableCell>{formatDistance(year.cycling)}</TableCell>
+                    <>
+                      {year.statistics.map((stat) => (
+                        <>
+                          <TableCell>{stat.n_activities}</TableCell>
+                          <TableCell>{formatDistance(stat.total_distance)}</TableCell>
+                        </>
+                      ))}
+                    </>
                   </TableRow>
                 ))}
               </TableBody>
