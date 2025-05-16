@@ -58,6 +58,7 @@ export interface Activity {
   lon: number;
   delta_lat: number;
   delta_lon: number;
+  location: string;
 }
 
 export interface Statistic {

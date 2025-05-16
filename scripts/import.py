@@ -24,7 +24,7 @@ from data import (
     WeeksStatistics,
     YearsStatistics,
 )
-from utils import get_delta_lat_lon, get_lat_lon, get_uuid
+from utils import get_delta_lat_lon, get_distance, get_lat_lon, get_uuid
 
 
 NP_CPUS = multiprocessing.cpu_count()
@@ -135,7 +135,7 @@ class DataProcessor(fitdecode.DefaultDataProcessor):
         field_data.units = "deg"
 
 
-def get_activity_from_fit(fit_file: str) -> Activity:
+def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
     activity: Optional[Activity] = None
     device: str = ""
     index: int = 0
@@ -181,6 +181,14 @@ def get_activity_from_fit(fit_file: str) -> Activity:
     activity.data_points = data_points
     activity.trace_points = trace_points
     activity.lat, activity.lon = get_lat_lon(activity.trace_points)
+
+    if len(activity.trace_points) > 0:
+        lat = activity.trace_points[0].lat
+        lon = activity.trace_points[0].lon
+
+        for loc in locations:
+            if get_distance(loc.get("lat"), loc.get("lon"), lat, lon) < 500:
+                activity.location = loc.get("location")
 
     while len(activity.data_points) > MAX_DATA_POINTS:
         activity.data_points = [
@@ -261,10 +269,10 @@ def dump_actitivities(
         json.dump(activities.model_dump(by_alias=True), file, default=str)
 
 
-def get_activity_from_yaml(yaml_file: str) -> Activity:
+def get_activity_from_yaml(locations: List[Any], yaml_file: str) -> Activity:
     with open(yaml_file, "r") as file:
         config = yaml.safe_load(file)
-        activity = get_activity_from_fit("data/fit/" + config["fit"])
+        activity = get_activity_from_fit(locations, "data/fit/" + config["fit"])
 
         if config.get("title"):
             activity.title = config["title"]
@@ -276,9 +284,11 @@ def get_activity_from_yaml(yaml_file: str) -> Activity:
     return activity
 
 
-def get_activity_or_legacy(data_file: str, full: bool) -> Activity:
+def get_activity_or_legacy(
+    locations: List[Any], data_file: str, full: bool
+) -> Activity:
     if full:
-        activity = get_activity_from_fit(data_file)
+        activity = get_activity_from_fit(locations, data_file)
     else:
         with open(data_file, "r") as file:
             activity = Activity.model_validate_json(file.read())
@@ -371,6 +381,8 @@ def run(full, partial, output_dir):
     print("Full import:", full)
     print("Partial import:", partial)
 
+    locations = json.load(open("data/locations.json")).get("locations")
+
     activities = Activities(activities=[])
 
     data_files = []
@@ -384,7 +396,9 @@ def run(full, partial, output_dir):
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=NP_CPUS) as executor:
         future_activities = {
-            executor.submit(get_activity_or_legacy, data_file, full): data_file
+            executor.submit(
+                get_activity_or_legacy, locations, data_file, full
+            ): data_file
             for data_file in data_files
         }
         for future in concurrent.futures.as_completed(future_activities):
@@ -404,7 +418,7 @@ def run(full, partial, output_dir):
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=NP_CPUS) as executor:
         future_activities = {
-            executor.submit(get_activity_from_yaml, input_file): input_file
+            executor.submit(get_activity_from_yaml, locations, input_file): input_file
             for input_file in input_files
         }
         for future in concurrent.futures.as_completed(future_activities):

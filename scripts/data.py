@@ -74,6 +74,7 @@ class Activity(BaseModel):
     lon: float = 0.0
     delta_lat: float = 0.0
     delta_lon: float = 0.0
+    location: str = ""
 
     laps: List[Lap] = []
     data_points: List[DataPoint] = []

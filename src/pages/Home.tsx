@@ -32,8 +32,11 @@ const Home = () => {
                   </Box>
                   <Center h="40px">{formatDateTime(activity.start_time)}</Center>
                 </Flex>
-                <Table.Root paddingTop="20px">
+                <Table.Root marginTop="10px">
                   <Table.Body>
+                    <Table.Row>
+                      <Table.Cell colSpan={2}>{activity.location}</Table.Cell>
+                    </Table.Row>
                     <Table.Row>
                       <Table.Cell>Timer Time: {formatDuration(activity.total_timer_time)}</Table.Cell>
                       <Table.Cell>Elapsed Time: {formatDuration(activity.total_elapsed_time)}</Table.Cell>

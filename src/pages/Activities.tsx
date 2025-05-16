@@ -37,7 +37,7 @@ const ActivitiesComponent = () => {
 
   return (
     <Flex justifyContent="center">
-      <Box maxWidth="1200px">
+      <Box>
         <Flex marginBottom="10px">
           <Box flex="1" marginRight="10px">
             <FormControl fullWidth>
@@ -73,6 +73,7 @@ const ActivitiesComponent = () => {
               <TableRow>
                 <TableCell>Sport</TableCell>
                 <TableCell>Title</TableCell>
+                <TableCell>Location</TableCell>
                 <TableCell>Start Time</TableCell>
                 <TableCell>Distance</TableCell>
                 <TableCell>Average Speed</TableCell>
@@ -91,6 +92,7 @@ const ActivitiesComponent = () => {
                   <TableCell>
                     <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
                   </TableCell>
+                  <TableCell>{activity.location}</TableCell>
                   <TableCell>{formatDateTime(activity.start_time)}</TableCell>
                   <TableCell>{formatDistance(activity.total_distance)}</TableCell>
                   <TableCell>{formatSpeed(activity.average_speed)}</TableCell>

@@ -6,10 +6,7 @@ node_modules
 *.fit
 *.gpx
 
-data/2025/
-data/files/
-data/fit/
-
+data/
 legacy/
 pub/
 

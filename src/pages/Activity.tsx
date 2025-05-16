@@ -43,8 +43,11 @@ const ActivityComponent = () => {
                 </Box>
                 <Center h="40px">{formatDateTime(data.start_time)}</Center>
               </Flex>
-              <Table.Root paddingTop="20px">
+              <Table.Root marginTop="10px">
                 <Table.Body>
+                  <Table.Row>
+                    <Table.Cell colSpan={2}>{data.location}</Table.Cell>
+                  </Table.Row>
                   <Table.Row>
                     <Table.Cell>Timer Time: {formatDuration(data.total_timer_time)}</Table.Cell>
                     <Table.Cell>Elapsed Time: {formatDuration(data.total_elapsed_time)}</Table.Cell>
