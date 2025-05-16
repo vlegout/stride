@@ -47,7 +47,7 @@ const Home = () => {
                     </Table.Row>
                     <Table.Row>
                       <Table.Cell>Device: {activity.device}</Table.Cell>
-                      <Table.Cell>Ascent: {activity.total_ascent}m</Table.Cell>
+                      <Table.Cell>Ascent: {activity.total_ascent} m</Table.Cell>
                     </Table.Row>
                   </Table.Body>
                 </Table.Root>
