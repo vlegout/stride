@@ -70,6 +70,7 @@ export interface YearsStatistics {
 
 export interface WeeksStatistics {
   start: string;
+  week: number;
   statistics: Statistic[];
 }
 
