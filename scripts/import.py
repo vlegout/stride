@@ -312,6 +312,7 @@ def get_profile(activities: Activities) -> Profile:
         profile.weeks.append(
             WeeksStatistics(
                 start=start,
+                week=start.isocalendar().week,
                 statistics=[
                     Statistic(sport=sport)
                     for sport in ["running", "cycling", "swimming"]
@@ -337,6 +338,9 @@ def get_profile(activities: Activities) -> Profile:
                     if stat.sport == activity.sport:
                         stat.n_activities += 1
                         stat.total_distance += activity.total_distance
+
+    # Only keep last 20 weeks
+    profile.weeks = profile.weeks[-20:]
 
     return profile
 

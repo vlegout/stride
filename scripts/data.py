@@ -109,6 +109,7 @@ class YearsStatistics(BaseModel):
 
 class WeeksStatistics(BaseModel):
     start: datetime.datetime
+    week: int
     statistics: List[Statistic]
 
 
