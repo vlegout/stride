@@ -15,6 +15,9 @@ const Header = () => {
           <Box paddingLeft="20px">
             <Link to="/profile">Profile</Link>
           </Box>
+          <Box paddingLeft="20px">
+            <Link to="/races">Races</Link>
+          </Box>
         </HStack>
       </Flex>
     </Box>

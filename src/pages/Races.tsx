@@ -7,7 +7,7 @@ import { fetchRaces } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 import SportLogo from "../components/SportLogo";
 
-const Home = () => {
+const Races = () => {
   const { data, error, isPending, isFetching } = useQuery({
     queryKey: ["lastActivitiesId"],
     queryFn: async () => fetchRaces(),
@@ -73,4 +73,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Races;

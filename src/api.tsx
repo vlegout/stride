@@ -50,3 +50,8 @@ export async function fetchActivity(id: string): Promise<Activity> {
 export async function fetchProfile(): Promise<Profile> {
   return await apiCall("/profile");
 }
+
+export async function fetchRaces(): Promise<Activity[]> {
+  const data = await apiCall("/races");
+  return data.activities;
+}

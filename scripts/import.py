@@ -235,6 +235,19 @@ def dump_actitivities(
             default=str,
         )
 
+    with open(f"./{output_dir}/races.json", "w") as file:
+        races = activities.model_copy()
+        races.activities = [
+            activity for activity in races.activities if activity.race is True
+        ]
+        json.dump(
+            races.model_dump(
+                by_alias=True,
+            ),
+            file,
+            default=str,
+        )
+
     with open(f"./{output_dir}/profile.json", "w") as file:
         json.dump(
             profile.model_dump(),
@@ -257,6 +270,8 @@ def get_activity_from_yaml(yaml_file: str) -> Activity:
             activity.title = config["title"]
         if config.get("description"):
             activity.description = config["description"]
+        if config.get("race"):
+            activity.race = config["race"]
 
     return activity
 

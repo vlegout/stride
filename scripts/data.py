@@ -54,6 +54,8 @@ class Activity(BaseModel):
     sport: str
     device: str = ""
 
+    race: bool = False
+
     start_time: datetime.datetime
     timestamp: datetime.datetime
     total_timer_time: float

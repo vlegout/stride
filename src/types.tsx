@@ -29,11 +29,14 @@ export interface Activity {
   id: string;
 
   fit: string;
-  sport: string;
-  device: string;
 
   title: string;
   description: string;
+
+  sport: string;
+  device: string;
+
+  race: boolean;
 
   start_time: string;
   total_timer_time: number;
