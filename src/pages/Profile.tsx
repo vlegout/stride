@@ -38,10 +38,10 @@ const Profile = () => {
   };
 
   const weekData = {
-    labels: Array.from({ length: 10 }, (_, i) => i + 1),
+    labels: data.weeks.map((week) => week.week),
     datasets: [
       {
-        data: data.weeks.slice(-10).map((week) => week.statistics[0].total_distance),
+        data: data.weeks.map((week) => week.statistics[0].total_distance),
       },
     ],
   };
