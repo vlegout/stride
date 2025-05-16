@@ -1,10 +1,11 @@
 import { Box, Center, Flex, Heading, Separator, Table } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 
 import { fetchLastActivities } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
+
+import Map from "../components/Map";
 import SportLogo from "../components/SportLogo";
 
 const Home = () => {
@@ -53,16 +54,13 @@ const Home = () => {
                 </Table.Root>
               </Box>
               <Box padding="10px">
-                <MapContainer
+                <Map
                   bounds={[
                     [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
                     [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
                   ]}
-                  style={{ height: "400px", width: "400px" }}
-                >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <Polyline positions={activity.trace_points} />
-                </MapContainer>
+                  points={activity.trace_points}
+                />
               </Box>
             </Flex>
             <Separator size="lg" />

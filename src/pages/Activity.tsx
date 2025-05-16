@@ -1,13 +1,13 @@
 import { Box, Center, Flex, Heading, Table } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
 
 import { fetchActivity } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 import { DataPoint } from "../types";
 
+import Map from "../components/Map";
 import LineChart from "../components/LineChart";
 import LapChart from "../components/LapChart";
 import SportLogo from "../components/SportLogo";
@@ -70,16 +70,13 @@ const ActivityComponent = () => {
           </Box>
 
           <Box padding="10px" width="50vw">
-            <MapContainer
+            <Map
               bounds={[
                 [data.lat - data.delta_lat, data.lon - data.delta_lon],
                 [data.lat + data.delta_lat, data.lon + data.delta_lon],
               ]}
-              style={{ height: "500px", width: "500px" }}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Polyline positions={data.trace_points} />
-            </MapContainer>
+              points={data.trace_points}
+            />
           </Box>
         </Flex>
         <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
