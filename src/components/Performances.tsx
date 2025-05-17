@@ -5,6 +5,10 @@ import { Performance } from "../types";
 import { formatDistance } from "../utils";
 
 const Performances = ({ performances }: { performances: Performance[] }) => {
+  if (performances.length === 0) {
+    return null;
+  }
+
   return (
     <Box>
       <TableContainer component={Paper}>
