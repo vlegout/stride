@@ -408,6 +408,7 @@ def run(full, partial, output_dir):
     activities = Activities(activities=[])
 
     data_files = []
+    input_files = []
     for root, _, files in os.walk("data/files" if full else "legacy"):
         for data_file in files:
             data_files.append(os.path.join(root, data_file))
@@ -415,6 +416,11 @@ def run(full, partial, output_dir):
             if full and partial:
                 if len(data_files) >= 20:
                     break
+    for root, _, files in os.walk("./data/"):
+        for yaml_file in files:
+            if not yaml_file.endswith(".yaml"):
+                continue
+            input_files.append(os.path.join(root, yaml_file))
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=NP_CPUS) as executor:
         future_activities = {
@@ -424,21 +430,13 @@ def run(full, partial, output_dir):
             for data_file in data_files
         }
         for future in concurrent.futures.as_completed(future_activities):
-            yaml_file = future_activities[future]
+            data_file = future_activities[future]
             try:
                 activity = future.result()
                 activities.activities.append(activity)
             except Exception as e:
-                print(f"Error processing {yaml_file}: {e}")
+                print(f"Error processing {data_file}: {e}")
 
-    input_files = []
-    for root, _, files in os.walk("./data/"):
-        for yaml_file in files:
-            if not yaml_file.endswith(".yaml"):
-                continue
-            input_files.append(os.path.join(root, yaml_file))
-
-    with concurrent.futures.ProcessPoolExecutor(max_workers=NP_CPUS) as executor:
         future_activities = {
             executor.submit(get_activity_from_yaml, locations, input_file): input_file
             for input_file in input_files
