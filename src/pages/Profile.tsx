@@ -106,12 +106,9 @@ const Profile = () => {
                   <TableCell>Year</TableCell>
                   <TableCell colSpan={2}>Running</TableCell>
                   <TableCell colSpan={2}>Cycling</TableCell>
-                  <TableCell colSpan={2}>Swimming</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell></TableCell>
-                  <TableCell>Activities</TableCell>
-                  <TableCell>Distance</TableCell>
                   <TableCell>Activities</TableCell>
                   <TableCell>Distance</TableCell>
                   <TableCell>Activities</TableCell>

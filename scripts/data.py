@@ -96,8 +96,6 @@ class Activity(BaseModel):
             return "Run"
         elif self.sport == "cycling":
             return "Ride"
-        elif self.sport == "swimming":
-            return "Swim"
 
         return "Activity"
 

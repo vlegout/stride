@@ -46,7 +46,6 @@ const ActivitiesComponent = () => {
                 <MenuItem value={"all"}>All</MenuItem>
                 <MenuItem value={"cycling"}>Cycling</MenuItem>
                 <MenuItem value={"running"}>Running</MenuItem>
-                <MenuItem value={"swimming"}>Swimming</MenuItem>
               </Select>
             </FormControl>
           </Box>

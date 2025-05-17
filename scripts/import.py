@@ -335,10 +335,7 @@ def get_profile(activities: Activities) -> Profile:
         profile.years.append(
             YearsStatistics(
                 year=year,
-                statistics=[
-                    Statistic(sport=sport)
-                    for sport in ["running", "cycling", "swimming"]
-                ],
+                statistics=[Statistic(sport=sport) for sport in ["running", "cycling"]],
             )
         )
 
@@ -348,10 +345,7 @@ def get_profile(activities: Activities) -> Profile:
             WeeksStatistics(
                 start=start,
                 week=start.isocalendar().week,
-                statistics=[
-                    Statistic(sport=sport)
-                    for sport in ["running", "cycling", "swimming"]
-                ],
+                statistics=[Statistic(sport=sport) for sport in ["running", "cycling"]],
             )
         )
         start += datetime.timedelta(weeks=1)
