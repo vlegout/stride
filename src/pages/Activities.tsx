@@ -59,7 +59,7 @@ const ActivitiesComponent = () => {
                   onChangeCommitted={handleDistanceChange}
                   valueLabelDisplay="auto"
                   disableSwap
-                  min={5}
+                  min={2}
                   max={100}
                 />
               </Box>
