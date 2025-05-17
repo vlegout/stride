@@ -71,6 +71,9 @@ def get_best_performances(data_points: List[DataPoint]) -> List[Performance]:
         if data_points[-1].distance >= distance
     ]
 
+    if len(performances) == 0:
+        return []
+
     for idx, dp in enumerate(data_points):
         index = 0
         performance = performances[index]
