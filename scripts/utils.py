@@ -3,7 +3,7 @@ import uuid
 
 from typing import List, Tuple
 
-from data import TracePoint
+from data import DataPoint, Performance, TracePoint
 
 
 def get_lat_lon(points: List[TracePoint]) -> Tuple[float, float]:
@@ -62,3 +62,28 @@ def get_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 def get_uuid(filename: str) -> uuid.UUID:
     return uuid.uuid5(uuid.NAMESPACE_DNS, filename)
+
+
+def get_best_performances(data_points: List[DataPoint]) -> List[Performance]:
+    performances: List[Performance] = [
+        Performance(distance=distance)
+        for distance in [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+        if data_points[-1].distance >= distance
+    ]
+
+    for idx, dp in enumerate(data_points):
+        index = 0
+        performance = performances[index]
+        for dp2 in data_points[idx:]:
+            if dp2.distance - dp.distance > performance.distance:
+                if (
+                    not performance.time
+                    or dp2.timestamp - dp.timestamp < performance.time
+                ):
+                    performance.time = dp2.timestamp - dp.timestamp
+                index += 1
+            if index == len(performances):
+                break
+            performance = performances[index]
+
+    return performances

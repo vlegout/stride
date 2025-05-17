@@ -1,5 +1,10 @@
 import { LatLngExpression } from "leaflet";
 
+export interface Performance {
+  distance: number;
+  time: string;
+}
+
 export interface Pace {
   minutes: number;
   seconds: number;
@@ -59,6 +64,8 @@ export interface Activity {
   delta_lat: number;
   delta_lon: number;
   location: string;
+
+  performances: Performance[];
 }
 
 export interface Statistic {
@@ -86,4 +93,5 @@ export interface Profile {
   cycling_total_distance: number;
   years: YearsStatistics[];
   weeks: WeeksStatistics[];
+  running_performances: Performance[];
 }

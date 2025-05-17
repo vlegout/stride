@@ -83,6 +83,24 @@ const ActivityComponent = () => {
           </Box>
         </Flex>
         <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
+          <Box>
+            <Table.Root marginTop="10px">
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell>Distance</Table.Cell>
+                  <Table.Cell>Time</Table.Cell>
+                </Table.Row>
+                {data.performances.map((performance) => (
+                  <Table.Row>
+                    <Table.Cell>{formatDistance(performance.distance)}</Table.Cell>
+                    <Table.Cell>{performance.time}</Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </Box>
+        </Flex>
+        <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
           <Box width="80%" margin="40px" maxWidth="800px">
             <LineChart labels={labels} data={speedData} />
           </Box>

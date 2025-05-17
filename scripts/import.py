@@ -18,13 +18,20 @@ from data import (
     DataPoint,
     Lap,
     Pace,
+    Performance,
     Profile,
     Statistic,
     TracePoint,
     WeeksStatistics,
     YearsStatistics,
 )
-from utils import get_delta_lat_lon, get_distance, get_lat_lon, get_uuid
+from utils import (
+    get_best_performances,
+    get_delta_lat_lon,
+    get_distance,
+    get_lat_lon,
+    get_uuid,
+)
 
 
 NP_CPUS = multiprocessing.cpu_count()
@@ -181,6 +188,9 @@ def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
     activity.data_points = data_points
     activity.trace_points = trace_points
     activity.lat, activity.lon = get_lat_lon(activity.trace_points)
+
+    if len(activity.data_points) > 0 and activity.sport == "running":
+        activity.performances = get_best_performances(activity.data_points)
 
     if len(activity.trace_points) > 0:
         lat = activity.trace_points[0].lat
@@ -364,8 +374,26 @@ def get_profile(activities: Activities) -> Profile:
                         stat.n_activities += 1
                         stat.total_distance += activity.total_distance
 
-    # Only keep last 20 weeks
     profile.weeks = profile.weeks[-20:]
+
+    profile.running_performances = [
+        Performance(distance=distance)
+        for distance in [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+    ]
+
+    for activity in activities.activities:
+        if not activity.sport == "running":
+            continue
+
+        for performance in activity.performances:
+            for perf in profile.running_performances:
+                if perf.distance == performance.distance and (
+                    not perf.time
+                    or not performance.time
+                    or performance.time < perf.time
+                ):
+                    perf.time = performance.time
+                    break
 
     return profile
 

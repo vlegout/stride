@@ -80,6 +80,24 @@ const Profile = () => {
         <Box marginTop="20px">
           <Bar height={"100px"} options={weekOptions} data={weekData} />
         </Box>
+        <Box marginTop="20px" maxWidth="180px">
+          <TableContainer component={Paper}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Distance</TableCell>
+                <TableCell>Time</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.running_performances.map((performance) => (
+                <TableRow>
+                  <TableCell>{formatDistance(performance.distance)}</TableCell>
+                  <TableCell>{performance.time}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </TableContainer>
+        </Box>
         <Box marginTop="20px">
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">

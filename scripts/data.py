@@ -10,6 +10,11 @@ def to_degrees(value: float) -> float:
     return value / ((2**32) / 360)
 
 
+class Performance(BaseModel):
+    distance: float
+    time: datetime.timedelta | None = None
+
+
 class Pace(BaseModel):
     minutes: int = 0
     seconds: int = 0
@@ -80,6 +85,8 @@ class Activity(BaseModel):
     data_points: List[DataPoint] = []
     trace_points: List[TracePoint] = []
 
+    performances: List[Performance] = []
+
     @field_serializer("title")
     def serialize_title(self, title: str) -> str:
         if title:
@@ -124,3 +131,4 @@ class Profile(BaseModel):
     cycling_total_distance: float = 0.0
     years: List[YearsStatistics] = []
     weeks: List[WeeksStatistics] = []
+    running_performances: List[Performance] = []
