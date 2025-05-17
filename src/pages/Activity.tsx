@@ -10,6 +10,7 @@ import { DataPoint } from "../types";
 import Map from "../components/Map";
 import LineChart from "../components/LineChart";
 import LapChart from "../components/LapChart";
+import Performances from "../components/Performances";
 import SportLogo from "../components/SportLogo";
 
 const ActivityComponent = () => {
@@ -84,20 +85,7 @@ const ActivityComponent = () => {
         </Flex>
         <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
           <Box>
-            <Table.Root marginTop="10px">
-              <Table.Body>
-                <Table.Row>
-                  <Table.Cell>Distance</Table.Cell>
-                  <Table.Cell>Time</Table.Cell>
-                </Table.Row>
-                {data.performances.map((performance) => (
-                  <Table.Row>
-                    <Table.Cell>{formatDistance(performance.distance)}</Table.Cell>
-                    <Table.Cell>{performance.time}</Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table.Root>
+            <Performances performances={data.performances} />
           </Box>
         </Flex>
         <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">

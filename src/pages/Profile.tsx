@@ -4,6 +4,7 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Chart as ChartJS, BarElement, ChartOptions, LinearScale, CategoryScale, Tooltip } from "chart.js";
@@ -11,7 +12,8 @@ import { Bar } from "react-chartjs-2";
 
 import { fetchProfile } from "../api";
 import { formatDistance } from "../utils";
-import { TableHead } from "@mui/material";
+
+import Performances from "../components/Performances";
 
 const Profile = () => {
   const { data, error, isPending, isFetching } = useQuery({
@@ -80,24 +82,11 @@ const Profile = () => {
         <Box marginTop="20px">
           <Bar height={"100px"} options={weekOptions} data={weekData} />
         </Box>
-        <Box marginTop="20px" maxWidth="180px">
-          <TableContainer component={Paper}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Distance</TableCell>
-                <TableCell>Time</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.running_performances.map((performance) => (
-                <TableRow>
-                  <TableCell>{formatDistance(performance.distance)}</TableCell>
-                  <TableCell>{performance.time}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </TableContainer>
-        </Box>
+        <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
+          <Box>
+            <Performances performances={data.running_performances} />
+          </Box>
+        </Flex>
         <Box marginTop="20px">
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
