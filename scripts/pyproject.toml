@@ -11,10 +11,16 @@ dependencies = [
 
 [tool.uv]
 dev-dependencies = [
+    "maturin>=1.8.6",
     "mypy>=1.15.0",
     "pydantic-settings>=2.9.1",
-    "pyright>=1.1.400",
-    "pytest-cov>=6.1.1",
-    "pytest>=8.3.5",
     "types-pyyaml>=6.0.12.20250402",
 ]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "python"
