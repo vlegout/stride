@@ -1,7 +1,7 @@
-use pyo3::prelude::*;
-use fit_rust::protocol::message_type::MessageType;
-use fit_rust::protocol::FitMessage;
 use fit_rust::Fit;
+use fit_rust::protocol::FitMessage;
+use fit_rust::protocol::message_type::MessageType;
+use pyo3::prelude::*;
 use std::fs;
 
 #[pyfunction]
@@ -13,27 +13,20 @@ fn get_device_info(file_name: &str) -> u16 {
 
     for data in &fit.data {
         match data {
-            FitMessage::Data(msg) => {
-                match msg.data.message_type {
-                    MessageType::DeviceInfo => {
-                        for value in &msg.data.values {
-                            if value.field_num == 4 && device == 0 {
-                                device = value.value.clone().try_into().unwrap_or(device);
-                            }
+            FitMessage::Data(msg) => match msg.data.message_type {
+                MessageType::DeviceInfo => {
+                    for value in &msg.data.values {
+                        if value.field_num == 4 && device == 0 {
+                            device = value.value.clone().try_into().unwrap_or(device);
                         }
                     }
-                    MessageType::Lap => {
-                    }
-                    MessageType::Record => {
-                    }
-                    MessageType::Session => {
-                    }
-                    _ => {
-                    }
                 }
-            }
-            _ => {
-            }
+                MessageType::Lap => {}
+                MessageType::Record => {}
+                MessageType::Session => {}
+                _ => {}
+            },
+            _ => {}
         }
     }
 
