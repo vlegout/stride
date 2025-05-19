@@ -11,6 +11,8 @@ import click
 import fitdecode  # type: ignore
 import yaml
 
+import scripts
+
 
 from data import (
     Activity,
@@ -39,15 +41,13 @@ NP_CPUS = multiprocessing.cpu_count()
 MAX_DATA_POINTS = 500
 
 DEVICE_MAP = {
-    "edge_530": "Edge 530",
-    "fr10": "FR 10",
-    "fr110": "FR 110",
-    "fr235": "FR 235",
-    "fr745": "FR 745",
-    "3121": "Edge 530",
-    "3589": "FR 745",
-    "4062": "Edge 840",
-    "4315": "FR 965",
+    1124: "FR 110",
+    1482: "FR 10",
+    2431: "FR 235",
+    3121: "Edge 530",
+    3589: "FR 745",
+    4062: "Edge 840",
+    4315: "FR 965",
 }
 
 
@@ -144,11 +144,13 @@ class DataProcessor(fitdecode.DefaultDataProcessor):
 
 def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
     activity: Optional[Activity] = None
-    device: str = ""
+    device: int
     index: int = 0
     laps: List[Lap] = []
     data_points: List[DataPoint] = []
     trace_points: List[TracePoint] = []
+
+    device = scripts.get_device_info(fit_file)
 
     with fitdecode.FitReader(fit_file, processor=DataProcessor()) as fit:
         for frame in fit:
@@ -171,19 +173,11 @@ def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
                         TracePoint(lat=data_point.lat, lon=data_point.lon)
                     )
 
-            elif frame.name == "device_info":
-                if frame.has_field("garmin_product") and frame.get_value(
-                    "garmin_product"
-                ):
-                    value = str(frame.get_value("garmin_product"))
-                    if value in DEVICE_MAP:
-                        device = DEVICE_MAP[value]
-
     if not activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
+    activity.device = DEVICE_MAP[device]
     activity.id = get_uuid(activity.fit)
-    activity.device = device
     activity.laps = laps
     activity.data_points = data_points
     activity.trace_points = trace_points

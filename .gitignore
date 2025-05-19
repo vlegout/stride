@@ -6,8 +6,11 @@ node_modules
 *.fit
 *.gpx
 
-data/
-legacy/
-pub/
+/data/
+/legacy/
+/pub/
 
 __pycache__/
+
+scripts/target
+scripts/python/scripts/scripts.abi3.so
