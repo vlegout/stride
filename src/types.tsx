@@ -1,97 +1,112 @@
-import { LatLngExpression } from "leaflet";
+import { type } from "arktype";
 
-export interface Performance {
-  distance: number;
-  time: string;
-}
+export const Performance = type({
+  distance: "number",
+  time: "string",
+});
+export type Performance = typeof Performance.infer;
 
-export interface Pace {
-  minutes: number;
-  seconds: number;
-}
+export const Pace = type({
+  minutes: "number",
+  seconds: "number",
+});
+export type Pace = typeof Pace.infer;
 
-export interface Lap {
-  index: number;
-  start_time: string;
-  total_elapsed_time: number;
-  total_distance: number;
-  max_heart_rate: number;
-  avg_heart_rate: number;
-  max_speed: number;
-  pace: Pace;
-}
+export const Lap = type({
+  index: "number",
+  start_time: "string",
+  total_elapsed_time: "number",
+  total_distance: "number",
+  max_heart_rate: "number",
+  avg_heart_rate: "number",
+  max_speed: "number",
+  pace: Pace,
+});
+export type Lap = typeof Lap.infer;
 
-export interface DataPoint {
-  timestamp: string;
-  distance: number;
-  heart_rate: number;
-  speed: number;
-  power: number;
-  altitude: number;
-}
+export const DataPoint = type({
+  timestamp: "string",
+  distance: "number",
+  heart_rate: "number",
+  speed: "number",
+  power: "number",
+  altitude: "number",
+});
+export type DataPoint = typeof DataPoint.infer;
 
-export interface Activity {
-  id: string;
+export const TracePoint = type({
+  lat: "number",
+  lon: "number",
+})
+export type TracePoint = typeof TracePoint.infer;
 
-  fit: string;
+export const Activity = type({
+  id: "string",
 
-  title: string;
-  description: string;
+  fit: "string",
 
-  sport: string;
-  device: string;
+  title: "string",
+  description: "string",
 
-  race: boolean;
+  sport: "string",
+  device: "string",
 
-  start_time: string;
-  total_timer_time: number;
-  total_elapsed_time: number;
+  race: "boolean",
 
-  total_distance: number;
-  total_ascent: number;
+  start_time: "string",
+  total_timer_time: "number",
+  total_elapsed_time: "number",
 
-  average_speed: number;
+  total_distance: "number",
+  total_ascent: "number",
 
-  total_calories: number;
+  average_speed: "number",
 
-  total_training_effect: number;
+  total_calories: "number",
 
-  laps: Lap[];
-  data_points: DataPoint[];
-  trace_points: LatLngExpression[];
-  lat: number;
-  lon: number;
-  delta_lat: number;
-  delta_lon: number;
-  location: string;
+  total_training_effect: "number",
 
-  performances: Performance[];
-}
+  laps: [Lap],
+  data_points: [DataPoint],
+  trace_points: [TracePoint],
+  lat: "number",
+  lon: "number",
+  delta_lat: "number",
+  delta_lon: "number",
+  location: "string",
 
-export interface Statistic {
-  sport: string;
-  n_activities: number;
-  total_distance: number;
-}
+  performances: [Performance],
+});
+export type Activity = typeof Activity.infer;
 
-export interface YearsStatistics {
-  year: number;
-  statistics: Statistic[];
-}
+export const Statistic = type({
+  sport: "string",
+  n_activities: "number",
+  total_distance: "number",
+});
+export type Statistic = typeof Statistic.infer;
 
-export interface WeeksStatistics {
-  start: string;
-  week: number;
-  statistics: Statistic[];
-}
+export const YearsStatistics = type({
+  year: "number",
+  statistics: [Statistic],
+});
+export type YearsStatistics = typeof YearsStatistics.infer;
 
-export interface Profile {
-  n_activities: number;
-  run_n_activities: number;
-  run_total_distance: number;
-  cycling_n_activities: number;
-  cycling_total_distance: number;
-  years: YearsStatistics[];
-  weeks: WeeksStatistics[];
-  running_performances: Performance[];
-}
+export const WeeksStatistics = type({
+  start: "string",
+  week: "number",
+  statistics: [Statistic],
+});
+export type WeeksStatistics = typeof WeeksStatistics.infer;
+
+export const Profile = type({
+  n_activities: "number",
+  run_n_activities: "number",
+  run_total_distance: "number",
+  cycling_n_activities: "number",
+  cycling_total_distance: "number",
+  years: [YearsStatistics],
+  weeks: [WeeksStatistics],
+  running_performances: [Performance],
+});
+export type Profile = typeof Profile.infer;
