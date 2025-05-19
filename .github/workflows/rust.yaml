@@ -1,0 +1,19 @@
+name: Rust
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: astral-sh/setup-uv@v5
+      - run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup.sh
+          sh rustup.sh -y
+      - run: cd scripts && cargo fmt
+      - run: cd scripts && uv run maturin develop
