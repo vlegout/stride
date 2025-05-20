@@ -21,7 +21,7 @@ const Performances = ({ performances }: { performances: Performance[] }) => {
           </TableHead>
           <TableBody>
             {performances.map((performance) => (
-              <TableRow>
+              <TableRow key={performance.distance}>
                 <TableCell>{formatDistance(performance.distance)}</TableCell>
                 <TableCell>{performance.time}</TableCell>
               </TableRow>

@@ -88,14 +88,14 @@ export type Statistic = typeof Statistic.infer;
 
 export const YearsStatistics = type({
   year: "number",
-  statistics: [Statistic],
+  statistics: Statistic.array().atLeastLength(2),
 });
 export type YearsStatistics = typeof YearsStatistics.infer;
 
 export const WeeksStatistics = type({
   start: "string",
   week: "number",
-  statistics: [Statistic],
+  statistics: Statistic.array().atLeastLength(2),
 });
 export type WeeksStatistics = typeof WeeksStatistics.infer;
 
