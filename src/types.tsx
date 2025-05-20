@@ -41,7 +41,7 @@ export const TracePoint = type({
 export type TracePoint = typeof TracePoint.infer;
 
 export const Activity = type({
-  id: "string",
+  id: "string.uuid.v5",
 
   fit: "string",
 
