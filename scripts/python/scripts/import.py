@@ -40,16 +40,6 @@ NP_CPUS = multiprocessing.cpu_count()
 
 MAX_DATA_POINTS = 500
 
-DEVICE_MAP = {
-    1124: "FR 110",
-    1482: "FR 10",
-    2431: "FR 235",
-    3121: "Edge 530",
-    3589: "FR 745",
-    4062: "Edge 840",
-    4315: "FR 965",
-}
-
 
 def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
     data: Dict[str, Any] = {}
@@ -66,16 +56,6 @@ def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]
             minutes=math.floor(pace.total_seconds() / 60),
             seconds=int(pace.total_seconds() % 60),
         )
-
-    return data
-
-
-def get_session(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
-    data: Dict[str, Any] = {}
-
-    for field in list(Activity.model_fields.keys())[4:]:
-        if frame.has_field(field) and frame.get_value(field):
-            data[field] = frame.get_value(field)
 
     return data
 
@@ -144,22 +124,18 @@ class DataProcessor(fitdecode.DefaultDataProcessor):
 
 def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
     activity: Optional[Activity] = None
-    device: int
     index: int = 0
     laps: List[Lap] = []
     data_points: List[DataPoint] = []
     trace_points: List[TracePoint] = []
 
-    device = scripts.get_device_info(fit_file)
+    session = scripts.get_device_info(fit_file)
 
     with fitdecode.FitReader(fit_file, processor=DataProcessor()) as fit:
         for frame in fit:
             if not isinstance(frame, fitdecode.records.FitDataMessage):
                 continue
 
-            if frame.name == "session":
-                if session := get_session(frame):
-                    activity = Activity(**session, fit=fit_file)
             elif frame.name == "lap":
                 if lap := get_lap(frame):
                     laps.append(Lap(**lap))
@@ -173,11 +149,13 @@ def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
                         TracePoint(lat=data_point.lat, lon=data_point.lon)
                     )
 
+    activity = Activity(**session)
+
     if not activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
-    activity.device = DEVICE_MAP[device]
-    activity.id = get_uuid(activity.fit)
+    activity.id = get_uuid(fit_file)
+    activity.fit = fit_file
     activity.laps = laps
     activity.data_points = data_points
     activity.trace_points = trace_points
