@@ -3,7 +3,23 @@ import datetime
 from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_serializer
+from pydantic import BaseModel, Field, field_serializer, field_validator
+
+
+DEVICE_MAP = {
+    1124: "FR 110",
+    1482: "FR 10",
+    2431: "FR 235",
+    3121: "Edge 530",
+    3589: "FR 745",
+    4062: "Edge 840",
+    4315: "FR 965",
+}
+
+SPORTS = {
+    1: "running",
+    2: "cycling",
+}
 
 
 def to_degrees(value: float) -> float:
@@ -51,7 +67,7 @@ class DataPoint(BaseModel):
 class Activity(BaseModel):
     id: UUID | None = None
 
-    fit: str
+    fit: str = ""
 
     title: str = ""
     description: str = ""
@@ -86,6 +102,26 @@ class Activity(BaseModel):
     trace_points: List[TracePoint] = []
 
     performances: List[Performance] = []
+
+    @field_validator("device", mode="before")
+    @classmethod
+    def device_string(cls, value: int) -> str:
+        return DEVICE_MAP[value]
+
+    @field_validator("sport", mode="before")
+    @classmethod
+    def sport_string(cls, value: int) -> str:
+        return SPORTS[value]
+
+    @field_validator("total_training_effect", mode="before")
+    @classmethod
+    def tte(cls, value: int) -> float:
+        return value / 10.0
+
+    @field_validator("enhanced_avg_speed", mode="before")
+    @classmethod
+    def avg_speed(cls, value: int) -> float:
+        return value * 3.6 / 1000
 
     @field_serializer("title")
     def serialize_title(self, title: str) -> str:
