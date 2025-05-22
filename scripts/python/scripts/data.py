@@ -1,9 +1,10 @@
 import datetime
+import math
 
 from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_serializer, field_validator
+from pydantic import BaseModel, Field, computed_field, field_serializer, field_validator
 
 
 DEVICE_MAP = {
@@ -45,7 +46,17 @@ class Lap(BaseModel):
     max_speed: float = 0.0
     max_heart_rate: int = 0
     avg_heart_rate: int = 0
-    pace: Pace = Pace()
+
+    @property
+    @computed_field
+    def pace(self) -> Pace:
+        pace = datetime.timedelta(
+            seconds=self.total_timer_time * 1000 / self.total_distance
+        )
+        return Pace(
+            minutes=math.floor(pace.total_seconds() / 60),
+            seconds=int(pace.total_seconds() % 60),
+        )
 
 
 class TracePoint(BaseModel):
@@ -62,6 +73,16 @@ class DataPoint(BaseModel):
     enhanced_speed: float = Field(default=0.0, serialization_alias="speed")
     power: int = 0
     enhanced_altitude: float = Field(default=0.0, serialization_alias="altitude")
+
+    @field_validator("enhanced_speed", mode="before")
+    @classmethod
+    def speed_ms(cls, value: int) -> float:
+        return value * 60.0 * 60.0 / 1000.0
+
+    @field_validator("enhanced_altitude", mode="before")
+    @classmethod
+    def altitude_m(cls, value: int) -> float:
+        return value / 5 - 500.0
 
 
 class Activity(BaseModel):
