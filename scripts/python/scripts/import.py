@@ -88,15 +88,9 @@ def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
     return activity
 
 
-def dump_actitivities(
-    profile: Profile, activities: Activities, full: bool, output_dir: str
-):
+def dump_actitivities(profile: Profile, activities: Activities, output_dir: str):
     for activity in activities.activities:
         data = activity.model_dump(by_alias=True)
-
-        if full and activity.fit.startswith("data/files"):
-            with open("./legacy/" + str(activity.id) + ".json", "w") as file:
-                json.dump(data, file, default=str)
 
         with open(
             f"./{output_dir}/activities/" + str(activity.id) + ".json", "w"
@@ -152,18 +146,6 @@ def get_activity_from_yaml(locations: List[Any], yaml_file: str) -> Activity:
             activity.description = config["description"]
         if config.get("race"):
             activity.race = config["race"]
-
-    return activity
-
-
-def get_activity_or_legacy(
-    locations: List[Any], data_file: str, full: bool
-) -> Activity:
-    if full:
-        activity = get_activity_from_fit(locations, data_file)
-    else:
-        with open(data_file, "r") as file:
-            activity = Activity.model_validate_json(file.read())
 
     return activity
 
@@ -255,14 +237,12 @@ def get_profile(activities: Activities) -> Profile:
 
 
 @click.command()
-@click.option("--full", is_flag=True, help="Full import of all activities.")
 @click.option("--partial", is_flag=True, help="Partial import of activities.")
 @click.option(
     "--output-dir", default="public", help="Target directory to dump JSON files."
 )
-def run(full, partial, output_dir):
+def run(partial, output_dir):
     print("CPU:", NP_CPUS)
-    print("Full import:", full)
     print("Partial import:", partial)
 
     locations = json.load(open("data/locations.json")).get("locations")
@@ -271,11 +251,11 @@ def run(full, partial, output_dir):
 
     data_files = []
     input_files = []
-    for root, _, files in os.walk("data/files" if full else "legacy"):
+    for root, _, files in os.walk("data/files"):
         for data_file in files:
             data_files.append(os.path.join(root, data_file))
 
-            if full and partial:
+            if partial:
                 if len(data_files) >= 20:
                     break
     for root, _, files in os.walk("./data/"):
@@ -286,9 +266,7 @@ def run(full, partial, output_dir):
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=NP_CPUS) as executor:
         future_activities = {
-            executor.submit(
-                get_activity_or_legacy, locations, data_file, full
-            ): data_file
+            executor.submit(get_activity_from_fit, locations, data_file): data_file
             for data_file in data_files
         }
         for future in concurrent.futures.as_completed(future_activities):
@@ -315,7 +293,7 @@ def run(full, partial, output_dir):
 
     profile = get_profile(activities)
 
-    dump_actitivities(profile, activities, full, output_dir)
+    dump_actitivities(profile, activities, output_dir)
 
 
 if __name__ == "__main__":
