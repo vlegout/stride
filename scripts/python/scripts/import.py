@@ -5,10 +5,9 @@ import math
 import multiprocessing
 import os
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List
 
 import click
-import fitdecode  # type: ignore
 import yaml
 
 import scripts
@@ -17,9 +16,6 @@ import scripts
 from data import (
     Activity,
     Activities,
-    DataPoint,
-    Lap,
-    Pace,
     Performance,
     Profile,
     Statistic,
@@ -41,124 +37,18 @@ NP_CPUS = multiprocessing.cpu_count()
 MAX_DATA_POINTS = 500
 
 
-def get_lap(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
-    data: Dict[str, Any] = {}
-
-    for field in list(Lap.model_fields.keys()):
-        if frame.has_field(field) and frame.get_value(field):
-            data[field] = frame.get_value(field)
-
-    if data.get("total_timer_time") and data.get("total_distance"):
-        pace = datetime.timedelta(
-            seconds=data.get("total_timer_time") * 1000 / data.get("total_distance")  # type: ignore
-        )
-        data["pace"] = Pace(
-            minutes=math.floor(pace.total_seconds() / 60),
-            seconds=int(pace.total_seconds() % 60),
-        )
-
-    return data
-
-
-def get_record(frame: fitdecode.records.FitDataMessage) -> Optional[Dict[str, Any]]:
-    data: Dict[str, Any] = {}
-
-    if not frame.has_field("position_lat") or not frame.get_value("position_lat"):
-        return None
-    elif not frame.has_field("position_long") or not frame.get_value("position_long"):
-        return None
-
-    data["lat"] = frame.get_value("position_lat")
-    data["lon"] = frame.get_value("position_long")
-
-    for field in list(DataPoint.model_fields.keys())[2:]:
-        if frame.has_field(field) and frame.get_value(field):
-            data[field] = frame.get_value(field)
-
-    return data
-
-
-class DataProcessor(fitdecode.DefaultDataProcessor):
-    """
-    A `DefaultDataProcessor` that also:
-
-    * Converts all ``speed`` and ``*_speeds`` fields (by name) to ``km/h``
-      (standard's default is ``m/s``)
-    * Converts GPS coordinates (i.e. FIT's semicircles type) to ``deg``
-
-    From https://github.com/polyvertex/fitdecode/blob/master/fitdecode/processors.py
-    """
-
-    def __init__(self):
-        super().__init__()
-
-    def on_process_field(self, reader, field_data):
-        """
-        Convert all ``*_speed`` fields using `process_field_speed`.
-
-        All other units will use the default method.
-        """
-        if field_data.name and field_data.name.endswith("_speed"):
-            self.process_field_speed(reader, field_data)
-        else:
-            super().on_process_field(reader, field_data)
-
-    def process_field_speed(self, reader, field_data):
-        if field_data.value is not None:
-            factor = 60.0 * 60.0 / 1000.0
-
-            # record.enhanced_speed field can be a tuple...
-            # see https://github.com/dtcooper/python-fitparse/issues/62
-            if isinstance(field_data.value, (tuple, list)):
-                field_data.value = tuple(x * factor for x in field_data.value)
-            else:
-                field_data.value *= factor
-
-        field_data.units = "km/h"
-
-    def process_units_semicircles(self, reader, field_data):
-        if field_data.value is not None:
-            field_data.value *= 180.0 / (2**31)
-        field_data.units = "deg"
-
-
 def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
-    activity: Optional[Activity] = None
-    index: int = 0
-    laps: List[Lap] = []
-    data_points: List[DataPoint] = []
-    trace_points: List[TracePoint] = []
-
     session = scripts.get_device_info(fit_file)
-
-    with fitdecode.FitReader(fit_file, processor=DataProcessor()) as fit:
-        for frame in fit:
-            if not isinstance(frame, fitdecode.records.FitDataMessage):
-                continue
-
-            elif frame.name == "lap":
-                if lap := get_lap(frame):
-                    laps.append(Lap(**lap))
-                    index += 1
-                    laps[-1].index = index
-            elif frame.name == "record":
-                if point := get_record(frame):
-                    data_point = DataPoint(**point)
-                    data_points.append(data_point)
-                    trace_points.append(
-                        TracePoint(lat=data_point.lat, lon=data_point.lon)
-                    )
-
     activity = Activity(**session)
 
     if not activity:
         raise ValueError("Cannot find activity in file " + fit_file)
 
+    for point in activity.data_points:
+        activity.trace_points.append(TracePoint(lat=point.lat, lon=point.lon))
+
     activity.id = get_uuid(fit_file)
     activity.fit = fit_file
-    activity.laps = laps
-    activity.data_points = data_points
-    activity.trace_points = trace_points
     activity.lat, activity.lon = get_lat_lon(activity.trace_points)
 
     if len(activity.data_points) > 0 and activity.sport == "running":
@@ -179,7 +69,7 @@ def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
 
     values = []
     max_distance = 1.0
-    for dp in data_points:
+    for dp in activity.data_points:
         values.append(dp.enhanced_speed)
         if len(values) >= 10:
             dp.enhanced_speed = sum(values) / len(values)
