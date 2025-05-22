@@ -47,8 +47,8 @@ class Lap(BaseModel):
     max_heart_rate: int = 0
     avg_heart_rate: int = 0
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
-    @computed_field
     def pace(self) -> Pace:
         pace = datetime.timedelta(
             seconds=self.total_timer_time * 1000 / self.total_distance
@@ -77,7 +77,7 @@ class DataPoint(BaseModel):
     @field_validator("enhanced_speed", mode="before")
     @classmethod
     def speed_ms(cls, value: int) -> float:
-        return value * 60.0 * 60.0 / 1000.0
+        return value * 60.0 * 60.0 / 1000.0 / 1000.0
 
     @field_validator("enhanced_altitude", mode="before")
     @classmethod
