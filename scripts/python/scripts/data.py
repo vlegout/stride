@@ -7,16 +7,6 @@ from uuid import UUID
 from pydantic import BaseModel, Field, computed_field, field_serializer, field_validator
 
 
-DEVICE_MAP = {
-    1124: "FR 110",
-    1482: "FR 10",
-    2431: "FR 235",
-    3121: "Edge 530",
-    3589: "FR 745",
-    4062: "Edge 840",
-    4315: "FR 965",
-}
-
 SPORTS = {
     1: "running",
     2: "cycling",
@@ -123,11 +113,6 @@ class Activity(BaseModel):
     trace_points: List[TracePoint] = []
 
     performances: List[Performance] = []
-
-    @field_validator("device", mode="before")
-    @classmethod
-    def device_string(cls, value: int) -> str:
-        return DEVICE_MAP[value]
 
     @field_validator("sport", mode="before")
     @classmethod

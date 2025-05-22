@@ -8,6 +8,45 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use std::fs;
 
+enum Device {
+    FR110,
+    FR10,
+    FR235,
+    Edge530,
+    FR745,
+    Edge840,
+    FR965,
+    Unknown,
+}
+
+impl Device {
+    fn from_id(id: u16) -> Device {
+        match id {
+            1124 => Device::FR110,
+            1482 => Device::FR10,
+            2431 => Device::FR235,
+            3121 => Device::Edge530,
+            3589 => Device::FR745,
+            4062 => Device::Edge840,
+            4315 => Device::FR965,
+            _ => Device::Unknown,
+        }
+    }
+
+    fn as_str(&self) -> &str {
+        match self {
+            Device::FR110 => "FR 110",
+            Device::FR10 => "FR 10",
+            Device::FR235 => "FR 235",
+            Device::Edge530 => "Edge 530",
+            Device::FR745 => "FR 745",
+            Device::Edge840 => "Edge 840",
+            Device::FR965 => "FR 965",
+            Device::Unknown => "Unknown",
+        }
+    }
+}
+
 struct Lap {
     index: u16,
     start_time: u32,
@@ -32,7 +71,7 @@ struct Point {
 struct Session {
     sport: u8,
 
-    device: u16,
+    device: String,
 
     start_time: u32,
     timestamp: u32,
@@ -131,7 +170,7 @@ fn get_device_info(file_name: &str) -> Session {
     let mut session = Session {
         sport: 0,
 
-        device: 0,
+        device: String::new(),
 
         start_time: 0,
         timestamp: 0,
@@ -158,8 +197,9 @@ fn get_device_info(file_name: &str) -> Session {
             FitMessage::Data(msg) => match msg.data.message_type {
                 MessageType::DeviceInfo => {
                     for value in &msg.data.values {
-                        if value.field_num == 4 && session.device == 0 {
-                            session.device = value.value.clone().try_into().unwrap_or(0);
+                        if value.field_num == 4 && session.device == "" {
+                            let device_id: u16 = value.value.clone().try_into().unwrap_or(0);
+                            session.device = Device::from_id(device_id).as_str().to_string();
                         }
                     }
                 }
