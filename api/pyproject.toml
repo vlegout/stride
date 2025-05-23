@@ -10,6 +10,5 @@ dependencies = [
 [tool.uv]
 dev-dependencies = [
     "mypy>=1.15.0",
-    "pyright>=1.1.400",
     "types-boto3>=1.38.13",
 ]
