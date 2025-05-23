@@ -1,3 +1,4 @@
+import datetime
 import math
 import uuid
 
@@ -65,28 +66,35 @@ def get_uuid(filename: str) -> uuid.UUID:
 
 
 def get_best_performances(data_points: List[DataPoint]) -> List[Performance]:
-    performances: List[Performance] = [
-        Performance(distance=distance)
-        for distance in [1000, 1609.344, 5000, 10000, 21097.5, 42195]
-        if data_points[-1].distance >= distance
-    ]
-
-    if len(performances) == 0:
+    if not data_points:
         return []
 
-    for idx, dp in enumerate(data_points):
-        index = 0
-        performance = performances[index]
-        for dp2 in data_points[idx:]:
-            if dp2.distance - dp.distance > performance.distance:
-                if (
-                    not performance.time
-                    or dp2.timestamp - dp.timestamp < performance.time
-                ):
-                    performance.time = dp2.timestamp - dp.timestamp
-                index += 1
-            if index == len(performances):
-                break
-            performance = performances[index]
+    distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+    max_distance = data_points[-1].distance
+    performances = [Performance(distance=d) for d in distances if max_distance >= d]
+    if not performances:
+        return []
+
+    best_times = [datetime.timedelta.max] * len(performances)
+    n = len(data_points)
+
+    for i, perf in enumerate(performances):
+        start = 0
+        end = 0
+        while start < n and data_points[start].distance <= max_distance - perf.distance:
+            while (
+                end < n
+                and data_points[end].distance - data_points[start].distance
+                < perf.distance
+            ):
+                end += 1
+            if end < n:
+                time = data_points[end].timestamp - data_points[start].timestamp
+                if not best_times[i] or time < best_times[i]:
+                    best_times[i] = time
+            start += 1
+
+    for perf, t in zip(performances, best_times):
+        perf.time = t
 
     return performances
