@@ -34,6 +34,12 @@ class Lap(BaseModel):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def pace(self) -> Pace:
+        if self.total_distance == 0:
+            return Pace(
+                minutes=0,
+                seconds=0,
+            )
+
         pace = datetime.timedelta(
             seconds=self.total_timer_time * 1000 / self.total_distance
         )
