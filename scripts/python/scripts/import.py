@@ -61,6 +61,7 @@ def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
         for loc in locations:
             if get_distance(loc.get("lat"), loc.get("lon"), lat, lon) < 500:
                 activity.location = loc.get("location")
+                break
 
     while len(activity.data_points) > MAX_DATA_POINTS:
         activity.data_points = [
@@ -269,25 +270,21 @@ def run(partial, output_dir):
             executor.submit(get_activity_from_fit, locations, data_file): data_file
             for data_file in data_files
         }
+        future_activities.update(
+            {
+                executor.submit(
+                    get_activity_from_yaml, locations, input_file
+                ): input_file
+                for input_file in input_files
+            }
+        )
         for future in concurrent.futures.as_completed(future_activities):
-            data_file = future_activities[future]
+            input_file = future_activities[future]
             try:
                 activity = future.result()
                 activities.activities.append(activity)
             except Exception as e:
-                print(f"Error processing {data_file}: {e}")
-
-        future_activities = {
-            executor.submit(get_activity_from_yaml, locations, input_file): input_file
-            for input_file in input_files
-        }
-        for future in concurrent.futures.as_completed(future_activities):
-            yaml_file = future_activities[future]
-            try:
-                activity = future.result()
-                activities.activities.append(activity)
-            except Exception as e:
-                print(f"Error processing {yaml_file}: {e}")
+                print(f"Error processing {input_file}: {e}")
 
     activities.activities.sort(key=lambda x: x.start_time, reverse=True)
 
