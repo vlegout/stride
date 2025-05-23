@@ -7,12 +7,6 @@ from uuid import UUID
 from pydantic import BaseModel, Field, computed_field, field_serializer, field_validator
 
 
-SPORTS = {
-    1: "running",
-    2: "cycling",
-}
-
-
 def to_degrees(value: float) -> float:
     return value / ((2**32) / 360)
 
@@ -113,11 +107,6 @@ class Activity(BaseModel):
     trace_points: List[TracePoint] = []
 
     performances: List[Performance] = []
-
-    @field_validator("sport", mode="before")
-    @classmethod
-    def sport_string(cls, value: int) -> str:
-        return SPORTS[value]
 
     @field_validator("total_training_effect", mode="before")
     @classmethod

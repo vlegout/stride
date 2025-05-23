@@ -69,7 +69,7 @@ struct Point {
 }
 
 struct Session {
-    sport: u8,
+    sport: String,
 
     device: String,
 
@@ -168,7 +168,7 @@ fn get_activity(file_name: &str) -> Session {
     let mut lap: u16 = 0;
 
     let mut session = Session {
-        sport: 0,
+        sport: String::new(),
 
         device: String::new(),
 
@@ -303,10 +303,10 @@ fn get_activity(file_name: &str) -> Session {
                             }
                             5 => match value.value {
                                 fit_rust::protocol::value::Value::Enum("running") => {
-                                    session.sport = 1
+                                    session.sport = "running".to_string()
                                 }
                                 fit_rust::protocol::value::Value::Enum("cycling") => {
-                                    session.sport = 2
+                                    session.sport = "cycling".to_string()
                                 }
                                 _ => {}
                             },
