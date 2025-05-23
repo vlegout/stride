@@ -58,6 +58,10 @@ const ActivityComponent = () => {
                     <Table.Cell>Average Speed: {formatSpeed(data.average_speed)}</Table.Cell>
                   </Table.Row>
                   <Table.Row>
+                    <Table.Cell>Avg Heart Rate: {data.avg_heart_rate}</Table.Cell>
+                    <Table.Cell>Max Heart Rate: {data.max_heart_rate}</Table.Cell>
+                  </Table.Row>
+                  <Table.Row>
                     <Table.Cell>Calories: {data.total_calories}</Table.Cell>
                     <Table.Cell>Training Effect: {data.total_training_effect}</Table.Cell>
                   </Table.Row>

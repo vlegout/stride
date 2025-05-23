@@ -46,6 +46,10 @@ const Races = () => {
                       <Table.Cell>Average Speed: {formatSpeed(activity.average_speed)}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
+                      <Table.Cell>Avg Heart Rate: {activity.avg_heart_rate}</Table.Cell>
+                      <Table.Cell>Max Heart Rate: {activity.max_heart_rate}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
                       <Table.Cell>Calories: {activity.total_calories}</Table.Cell>
                       <Table.Cell>Training Effect: {activity.total_training_effect}</Table.Cell>
                     </Table.Row>

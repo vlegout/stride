@@ -92,6 +92,9 @@ class Activity(BaseModel):
 
     enhanced_avg_speed: float = Field(default=0.0, serialization_alias="average_speed")
 
+    avg_heart_rate: float = 0.0
+    max_heart_rate: float = 0.0
+
     total_calories: float = 0.0
 
     total_training_effect: float = 0.0

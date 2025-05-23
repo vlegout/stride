@@ -62,6 +62,9 @@ export const Activity = type({
 
   average_speed: "number",
 
+  avg_heart_rate: "number",
+  max_heart_rate: "number",
+
   total_calories: "number",
 
   total_training_effect: "number",
