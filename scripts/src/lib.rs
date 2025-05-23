@@ -275,6 +275,9 @@ fn get_activity(file_name: &str) -> Session {
                             }
                             7 => {
                                 point.power = value.value.clone().try_into().unwrap_or(0);
+                                if point.power == 65535 {
+                                    point.power = 0;
+                                }
                             }
                             73 => {
                                 point.enhanced_speed = value.value.clone().try_into().unwrap_or(0);
