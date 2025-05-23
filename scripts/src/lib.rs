@@ -161,7 +161,7 @@ impl IntoPy<PyObject> for Session {
 }
 
 #[pyfunction]
-fn get_device_info(file_name: &str) -> Session {
+fn get_activity(file_name: &str) -> Session {
     let file = fs::read(file_name).unwrap();
     let fit: Fit = Fit::read(file).unwrap();
 
@@ -361,7 +361,7 @@ fn get_device_info(file_name: &str) -> Session {
 
 #[pymodule]
 fn scripts(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(get_device_info, m)?)?;
+    m.add_function(wrap_pyfunction!(get_activity, m)?)?;
 
     Ok(())
 }

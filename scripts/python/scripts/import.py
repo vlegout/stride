@@ -38,7 +38,7 @@ MAX_DATA_POINTS = 500
 
 
 def get_activity_from_fit(locations: List[Any], fit_file: str) -> Activity:
-    session = scripts.get_device_info(fit_file)
+    session = scripts.get_activity(fit_file)
     activity = Activity(**session)
 
     if not activity:
