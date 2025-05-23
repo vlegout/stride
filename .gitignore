@@ -7,7 +7,6 @@ node_modules
 *.gpx
 
 /data/
-/legacy/
 /pub/
 
 __pycache__/
