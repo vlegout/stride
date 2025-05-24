@@ -5,8 +5,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Home from "./pages/Home";
-import ActivitiesComponent from "./pages/Activities";
-import ActivityComponent from "./pages/Activity";
+import ActivitiesPage from "./pages/Activities";
+import ActivityPage from "./pages/Activity";
 import Profile from "./pages/Profile";
 import Races from "./pages/Races";
 import Layout from "./components/Layout";
@@ -24,11 +24,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/activities",
-        element: <ActivitiesComponent />,
+        element: <ActivitiesPage />,
       },
       {
         path: "/activities/:id",
-        element: <ActivityComponent />,
+        element: <ActivityPage />,
       },
       {
         path: "/profile",

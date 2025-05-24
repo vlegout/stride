@@ -13,7 +13,7 @@ import LapChart from "../components/LapChart";
 import Performances from "../components/Performances";
 import SportLogo from "../components/SportLogo";
 
-const ActivityComponent = () => {
+const ActivityPage = () => {
   const params = useParams();
 
   const { data, error, isPending, isFetching } = useQuery({
@@ -111,4 +111,4 @@ const ActivityComponent = () => {
   );
 };
 
-export default ActivityComponent;
+export default ActivityPage;

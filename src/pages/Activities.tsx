@@ -16,7 +16,7 @@ import { fetchActivities } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import SportLogo from "../components/SportLogo";
 
-const ActivitiesComponent = () => {
+const ActivitiesPage = () => {
   const [sport, setSport] = useState("all");
   const [distance, setDistance] = useState<number[]>([1, 100]);
 
@@ -109,4 +109,4 @@ const ActivitiesComponent = () => {
   );
 };
 
-export default ActivitiesComponent;
+export default ActivitiesPage;
