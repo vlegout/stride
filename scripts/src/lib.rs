@@ -263,6 +263,9 @@ fn get_activity(file_name: &str) -> Session {
                         match value.field_num {
                             0 => {
                                 point.lat = value.value.clone().try_into().unwrap_or(0.0);
+                                if point.lat == 180.0 {
+                                    point.lat = 0.0;
+                                }
                             }
                             1 => {
                                 point.lon = value.value.clone().try_into().unwrap_or(0.0);
@@ -291,6 +294,10 @@ fn get_activity(file_name: &str) -> Session {
                             }
                             _ => {}
                         }
+                    }
+
+                    if point.lat == 0.0 {
+                        continue;
                     }
 
                     session.data_points.push(point);
