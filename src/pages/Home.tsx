@@ -43,7 +43,7 @@ const Home = () => {
                     </Table.Row>
                     <Table.Row>
                       <Table.Cell>Distance: {formatDistance(activity.total_distance)}</Table.Cell>
-                      <Table.Cell>Average Speed: {formatSpeed(activity.average_speed)}</Table.Cell>
+                      <Table.Cell>Average Speed: {formatSpeed(activity.avg_speed)}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
                       <Table.Cell>Avg Heart Rate: {activity.avg_heart_rate}</Table.Cell>

@@ -94,7 +94,7 @@ const ActivitiesPage = () => {
                   <TableCell>{activity.location}</TableCell>
                   <TableCell>{formatDateTime(activity.start_time)}</TableCell>
                   <TableCell>{formatDistance(activity.total_distance)}</TableCell>
-                  <TableCell>{formatSpeed(activity.average_speed)}</TableCell>
+                  <TableCell>{formatSpeed(activity.avg_speed)}</TableCell>
                   <TableCell>{activity.total_ascent}</TableCell>
                   <TableCell>{activity.total_calories}</TableCell>
                   <TableCell>{activity.total_training_effect}</TableCell>

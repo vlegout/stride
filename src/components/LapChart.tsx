@@ -17,7 +17,7 @@ interface LapData {
 }
 
 const LineChart = ({ laps }: { laps: Lap[] }) => {
-  if (laps.some(lap => lap.minutes == null || lap.seconds == null)) {
+  if (laps.some((lap) => lap.minutes == null || lap.seconds == null)) {
     return null;
   }
 

@@ -81,7 +81,7 @@ struct Activity {
     total_distance: u32,
     total_ascent: u16,
 
-    enhanced_avg_speed: u32,
+    avg_speed: u32,
 
     avg_heart_rate: u8,
     max_heart_rate: u8,
@@ -144,8 +144,7 @@ impl IntoPy<PyObject> for Activity {
         dict.set_item("total_distance", self.total_distance)
             .unwrap();
         dict.set_item("total_ascent", self.total_ascent).unwrap();
-        dict.set_item("enhanced_avg_speed", self.enhanced_avg_speed)
-            .unwrap();
+        dict.set_item("avg_speed", self.avg_speed).unwrap();
         dict.set_item("avg_heart_rate", self.avg_heart_rate)
             .unwrap();
         dict.set_item("max_heart_rate", self.max_heart_rate)
@@ -187,7 +186,7 @@ fn get_fit(file_name: &str) -> FitStruct {
             total_elapsed_time: 0,
             total_distance: 0,
             total_ascent: 0,
-            enhanced_avg_speed: 0,
+            avg_speed: 0,
             avg_heart_rate: 0,
             max_heart_rate: 0,
             total_calories: 0,
@@ -356,7 +355,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             124 => {
-                                fit.activity.enhanced_avg_speed =
+                                fit.activity.avg_speed =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             253 => {

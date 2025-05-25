@@ -1,14 +1,13 @@
-import os
 import uuid
 
 from typing import List
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Session, select
 
 from db import engine
-from model import Activity, ActivityPublic, Tracepoint
+from model import Activity, ActivityPublic
 
 
 app = FastAPI()

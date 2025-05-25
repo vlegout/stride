@@ -56,7 +56,7 @@ const ActivityPage = () => {
                   </Table.Row>
                   <Table.Row>
                     <Table.Cell>Distance: {formatDistance(data.total_distance)}</Table.Cell>
-                    <Table.Cell>Average Speed: {formatSpeed(data.average_speed)}</Table.Cell>
+                    <Table.Cell>Average Speed: {formatSpeed(data.avg_speed)}</Table.Cell>
                   </Table.Row>
                   <Table.Row>
                     <Table.Cell>Avg Heart Rate: {data.avg_heart_rate}</Table.Cell>

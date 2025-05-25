@@ -1,7 +1,6 @@
 import datetime
 import uuid
 
-from pydantic import field_validator
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -26,7 +25,7 @@ class ActivityBase(SQLModel):
     total_distance: float
     total_ascent: float
 
-    enhanced_avg_speed: float
+    avg_speed: float
 
     avg_heart_rate: float | None = None
     max_heart_rate: float | None = None
@@ -54,27 +53,23 @@ class ActivityPublic(ActivityBase):
     tracepoints: list["Tracepoint"] = []
 
 
-class ActivityCreate(ActivityBase):
-    @field_validator("total_training_effect", mode="before")
-    @classmethod
-    def tte(cls, value: int) -> float:
-        return value / 10.0
-
-
-class Lap(SQLModel, table=True):
+class LapBase(SQLModel):
     id: uuid.UUID = Field(primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
-    activity: Activity = Relationship()
     index: int
     start_time: int
     total_elapsed_time: float
     total_timer_time: float
-    minutes: int | None = None
-    seconds: int | None = None
     total_distance: float
     max_speed: float | None = None
     max_heart_rate: int | None = None
     avg_heart_rate: int | None = None
+    minutes: int
+    seconds: int
+
+
+class Lap(LapBase, table=True):
+    activity: Activity = Relationship()
 
 
 class Performance(SQLModel, table=True):
@@ -85,15 +80,18 @@ class Performance(SQLModel, table=True):
     time: datetime.timedelta | None = None
 
 
-class Tracepoint(SQLModel, table=True):
+class TracepointBase(SQLModel):
     id: uuid.UUID = Field(primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
-    activity: Activity = Relationship(back_populates="tracepoints")
     lat: float
     lon: float
-    timestamp: int
+    timestamp: datetime.datetime
     distance: float
     heart_rate: int | None
     speed: float
     power: int | None = None
     altitude: float | None = None
+
+
+class Tracepoint(TracepointBase, table=True):
+    activity: Activity = Relationship(back_populates="tracepoints")

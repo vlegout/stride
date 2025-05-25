@@ -55,7 +55,7 @@ export const Activity = type({
   total_distance: "number",
   total_ascent: "number",
 
-  average_speed: "number",
+  avg_speed: "number",
 
   avg_heart_rate: "number",
   max_heart_rate: "number",
