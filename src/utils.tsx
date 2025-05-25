@@ -1,6 +1,8 @@
 import { DateTime, Duration } from "luxon";
 
 export function formatSpeed(speed: number): string {
+  if (speed == null) return "";
+
   return `${speed.toFixed(2)} km/h`;
 }
 

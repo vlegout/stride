@@ -63,12 +63,12 @@ struct Point {
     timestamp: u32,
     distance: u32,
     heart_rate: u8,
-    enhanced_speed: u32,
+    speed: u32,
     power: u16,
-    enhanced_altitude: u32,
+    altitude: u32,
 }
 
-struct Session {
+struct Activity {
     sport: String,
 
     device: String,
@@ -88,7 +88,10 @@ struct Session {
 
     total_calories: u16,
     total_training_effect: u8,
+}
 
+struct FitStruct {
+    activity: Activity,
     laps: Vec<Lap>,
     data_points: Vec<Point>,
 }
@@ -120,16 +123,14 @@ impl IntoPy<PyObject> for Point {
         dict.set_item("timestamp", self.timestamp).unwrap();
         dict.set_item("distance", self.distance).unwrap();
         dict.set_item("heart_rate", self.heart_rate).unwrap();
-        dict.set_item("enhanced_speed", self.enhanced_speed)
-            .unwrap();
+        dict.set_item("speed", self.speed).unwrap();
         dict.set_item("power", self.power).unwrap();
-        dict.set_item("enhanced_altitude", self.enhanced_altitude)
-            .unwrap();
+        dict.set_item("altitude", self.altitude).unwrap();
         dict.into()
     }
 }
 
-impl IntoPy<PyObject> for Session {
+impl IntoPy<PyObject> for Activity {
     fn into_py(self, py: Python<'_>) -> PyObject {
         let dict = PyDict::new(py);
         dict.set_item("sport", self.sport).unwrap();
@@ -153,6 +154,15 @@ impl IntoPy<PyObject> for Session {
             .unwrap();
         dict.set_item("total_training_effect", self.total_training_effect)
             .unwrap();
+        dict.into()
+    }
+}
+
+impl IntoPy<PyObject> for FitStruct {
+    fn into_py(self, py: Python<'_>) -> PyObject {
+        let dict = PyDict::new(py);
+        dict.set_item("activity", self.activity.into_py(py))
+            .unwrap();
         dict.set_item("laps", self.laps.into_py(py)).unwrap();
         dict.set_item("data_points", self.data_points.into_py(py))
             .unwrap();
@@ -161,45 +171,40 @@ impl IntoPy<PyObject> for Session {
 }
 
 #[pyfunction]
-fn get_activity(file_name: &str) -> Session {
+fn get_fit(file_name: &str) -> FitStruct {
     let file = fs::read(file_name).unwrap();
-    let fit: Fit = Fit::read(file).unwrap();
+    let fit_file: Fit = Fit::read(file).unwrap();
 
     let mut lap: u16 = 0;
 
-    let mut session = Session {
-        sport: String::new(),
-
-        device: String::new(),
-
-        start_time: 0,
-        timestamp: 0,
-        total_timer_time: 0,
-        total_elapsed_time: 0,
-
-        total_distance: 0,
-        total_ascent: 0,
-
-        enhanced_avg_speed: 0,
-
-        avg_heart_rate: 0,
-        max_heart_rate: 0,
-
-        total_calories: 0,
-        total_training_effect: 0,
-
+    let mut fit = FitStruct {
+        activity: Activity {
+            sport: String::new(),
+            device: String::new(),
+            start_time: 0,
+            timestamp: 0,
+            total_timer_time: 0,
+            total_elapsed_time: 0,
+            total_distance: 0,
+            total_ascent: 0,
+            enhanced_avg_speed: 0,
+            avg_heart_rate: 0,
+            max_heart_rate: 0,
+            total_calories: 0,
+            total_training_effect: 0,
+        },
         laps: Vec::new(),
         data_points: Vec::new(),
     };
 
-    for data in &fit.data {
+    for data in &fit_file.data {
         match data {
             FitMessage::Data(msg) => match msg.data.message_type {
                 MessageType::DeviceInfo => {
                     for value in &msg.data.values {
-                        if value.field_num == 4 && session.device == "" {
+                        if value.field_num == 4 && fit.activity.device == "" {
                             let device_id: u16 = value.value.clone().try_into().unwrap_or(0);
-                            session.device = Device::from_id(device_id).as_str().to_string();
+                            fit.activity.device = Device::from_id(device_id).as_str().to_string();
                         }
                     }
                 }
@@ -244,7 +249,7 @@ fn get_activity(file_name: &str) -> Session {
                         }
                     }
 
-                    session.laps.push(new_lap);
+                    fit.laps.push(new_lap);
                     lap += 1;
                 }
                 MessageType::Record => {
@@ -254,9 +259,9 @@ fn get_activity(file_name: &str) -> Session {
                         timestamp: 0,
                         distance: 0,
                         heart_rate: 0,
-                        enhanced_speed: 0,
+                        speed: 0,
                         power: 0,
-                        enhanced_altitude: 0,
+                        altitude: 0,
                     };
 
                     for value in &msg.data.values {
@@ -283,11 +288,10 @@ fn get_activity(file_name: &str) -> Session {
                                 }
                             }
                             73 => {
-                                point.enhanced_speed = value.value.clone().try_into().unwrap_or(0);
+                                point.speed = value.value.clone().try_into().unwrap_or(0);
                             }
                             78 => {
-                                point.enhanced_altitude =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                point.altitude = value.value.clone().try_into().unwrap_or(0);
                             }
                             253 => {
                                 point.timestamp = value.value.clone().try_into().unwrap_or(0);
@@ -300,61 +304,64 @@ fn get_activity(file_name: &str) -> Session {
                         continue;
                     }
 
-                    session.data_points.push(point);
+                    fit.data_points.push(point);
                 }
                 MessageType::Session => {
                     for value in &msg.data.values {
                         match value.field_num {
                             2 => {
-                                session.start_time = value.value.clone().try_into().unwrap_or(0);
+                                fit.activity.start_time =
+                                    value.value.clone().try_into().unwrap_or(0);
                             }
                             5 => match value.value {
                                 fit_rust::protocol::value::Value::Enum("running") => {
-                                    session.sport = "running".to_string()
+                                    fit.activity.sport = "running".to_string()
                                 }
                                 fit_rust::protocol::value::Value::Enum("cycling") => {
-                                    session.sport = "cycling".to_string()
+                                    fit.activity.sport = "cycling".to_string()
                                 }
                                 _ => {}
                             },
                             7 => {
-                                session.total_elapsed_time =
+                                fit.activity.total_elapsed_time =
                                     value.value.clone().try_into().unwrap_or(0) / 1000;
                             }
                             8 => {
-                                session.total_timer_time =
+                                fit.activity.total_timer_time =
                                     value.value.clone().try_into().unwrap_or(0) / 1000;
                             }
                             9 => {
-                                session.total_distance =
+                                fit.activity.total_distance =
                                     value.value.clone().try_into().unwrap_or(0);
-                                session.total_distance = session.total_distance / 100;
+                                fit.activity.total_distance = fit.activity.total_distance / 100;
                             }
                             11 => {
-                                session.total_calories =
+                                fit.activity.total_calories =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             16 => {
-                                session.avg_heart_rate =
+                                fit.activity.avg_heart_rate =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             17 => {
-                                session.max_heart_rate =
+                                fit.activity.max_heart_rate =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             22 => {
-                                session.total_ascent = value.value.clone().try_into().unwrap_or(0);
+                                fit.activity.total_ascent =
+                                    value.value.clone().try_into().unwrap_or(0);
                             }
                             24 => {
-                                session.total_training_effect =
+                                fit.activity.total_training_effect =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             124 => {
-                                session.enhanced_avg_speed =
+                                fit.activity.enhanced_avg_speed =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             253 => {
-                                session.timestamp = value.value.clone().try_into().unwrap_or(0);
+                                fit.activity.timestamp =
+                                    value.value.clone().try_into().unwrap_or(0);
                             }
                             _ => {}
                         }
@@ -366,12 +373,12 @@ fn get_activity(file_name: &str) -> Session {
         }
     }
 
-    session
+    fit
 }
 
 #[pymodule]
 fn scripts(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(get_activity, m)?)?;
+    m.add_function(wrap_pyfunction!(get_fit, m)?)?;
 
     Ok(())
 }

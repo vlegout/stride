@@ -25,11 +25,12 @@ const ActivityPage = () => {
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
-  const labels = data.data_points.map((point: DataPoint) => point.distance / 1000);
-  const speedData = data.data_points.map((point: DataPoint) => point.speed);
-  const hrData = data.data_points.map((point: DataPoint) => point.heart_rate);
-  const altitudeData = data.data_points.map((point: DataPoint) => point.altitude);
-  const powerData = data.data_points.map((point: DataPoint) => point.power);
+  const dataPoints: DataPoint[] = data?.tracepoints ?? [];
+  const labels = dataPoints.map((point: DataPoint) => point.distance / 1000);
+  const speedData = dataPoints.map((point: DataPoint) => point.speed);
+  const hrData = dataPoints.map((point: DataPoint) => point.heart_rate);
+  const altitudeData = dataPoints.map((point: DataPoint) => point.altitude);
+  const powerData = dataPoints.map((point: DataPoint) => point.power);
 
   return (
     <Flex justifyContent="center">
@@ -83,7 +84,7 @@ const ActivityPage = () => {
                 [data.lat - data.delta_lat, data.lon - data.delta_lon],
                 [data.lat + data.delta_lat, data.lon + data.delta_lon],
               ]}
-              points={data.trace_points}
+              points={data.tracepoints}
             />
           </Box>
         </Flex>

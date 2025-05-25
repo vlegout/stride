@@ -4,10 +4,10 @@ import uuid
 
 from typing import List, Tuple
 
-from data import DataPoint, Performance, TracePoint
+from model import Performance, Tracepoint
 
 
-def get_lat_lon(points: List[TracePoint]) -> Tuple[float, float]:
+def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
     x = y = z = 0.0
 
     if len(points) == 0:
@@ -65,31 +65,37 @@ def get_uuid(filename: str) -> uuid.UUID:
     return uuid.uuid5(uuid.NAMESPACE_DNS, filename)
 
 
-def get_best_performances(data_points: List[DataPoint]) -> List[Performance]:
-    if not data_points:
+def get_best_performances(
+    activity_id: uuid.uuid4, tracepoints: List[Tracepoint]
+) -> List[Performance]:
+    if not tracepoints:
         return []
 
     distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
-    max_distance = data_points[-1].distance
-    performances = [Performance(distance=d) for d in distances if max_distance >= d]
+    max_distance = tracepoints[-1].distance
+    performances = [
+        Performance(id=uuid.uuid4(), activity_id=activity_id, distance=d)
+        for d in distances
+        if max_distance >= d
+    ]
     if not performances:
         return []
 
     best_times = [datetime.timedelta.max] * len(performances)
-    n = len(data_points)
+    n = len(tracepoints)
 
     for i, perf in enumerate(performances):
         start = 0
         end = 0
-        while start < n and data_points[start].distance <= max_distance - perf.distance:
+        while start < n and tracepoints[start].distance <= max_distance - perf.distance:
             while (
                 end < n
-                and data_points[end].distance - data_points[start].distance
+                and tracepoints[end].distance - tracepoints[start].distance
                 < perf.distance
             ):
                 end += 1
             if end < n:
-                time = data_points[end].timestamp - data_points[start].timestamp
+                time = tracepoints[end].timestamp - tracepoints[start].timestamp
                 if not best_times[i] or time < best_times[i]:
                     best_times[i] = time
             start += 1

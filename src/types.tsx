@@ -6,12 +6,6 @@ export const Performance = type({
 });
 export type Performance = typeof Performance.infer;
 
-export const Pace = type({
-  minutes: "number",
-  seconds: "number",
-});
-export type Pace = typeof Pace.infer;
-
 export const Lap = type({
   index: "number",
   start_time: "string",
@@ -20,7 +14,8 @@ export const Lap = type({
   max_heart_rate: "number",
   avg_heart_rate: "number",
   max_speed: "number",
-  pace: Pace,
+  minutes: "number",
+  seconds: "number",
 });
 export type Lap = typeof Lap.infer;
 
@@ -69,15 +64,14 @@ export const Activity = type({
 
   total_training_effect: "number",
 
-  laps: [Lap],
-  data_points: [DataPoint],
-  trace_points: [TracePoint],
   lat: "number",
   lon: "number",
   delta_lat: "number",
   delta_lon: "number",
   location: "string",
 
+  laps: [Lap],
+  tracepoints: [DataPoint],
   performances: [Performance],
 });
 export type Activity = typeof Activity.infer;
