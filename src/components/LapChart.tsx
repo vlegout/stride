@@ -17,16 +17,16 @@ interface LapData {
 }
 
 const LineChart = ({ laps }: { laps: Lap[] }) => {
-  if (laps.some((lap) => lap.minutes == null || lap.seconds == null)) {
-    return null;
-  }
-
   const [tooltipProps, setTooltipProps] = useState({
     text: "",
     visible: false,
     x: 0,
     y: 0,
   });
+
+  if (laps.some((lap) => lap.minutes == null || lap.seconds == null)) {
+    return null;
+  }
 
   const width = 500;
   const height = 200;

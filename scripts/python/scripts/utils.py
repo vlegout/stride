@@ -66,7 +66,7 @@ def get_uuid(filename: str) -> uuid.UUID:
 
 
 def get_best_performances(
-    activity_id: uuid.uuid4, tracepoints: List[Tracepoint]
+    activity_id: uuid.UUID, tracepoints: List[Tracepoint]
 ) -> List[Performance]:
     if not tracepoints:
         return []

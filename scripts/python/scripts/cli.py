@@ -34,7 +34,7 @@ class ActivityCreate(ActivityBase):
 
     @field_validator("avg_speed", mode="before")
     @classmethod
-    def avg_speed(cls, value: int) -> float:
+    def avg_speed_validator(cls, value: float) -> float:
         return value * 3.6 / 1000
 
 
@@ -104,7 +104,7 @@ def get_activity_from_yaml(locations: List[Any], yaml_file: str):
     with open(yaml_file, "r") as file:
         config = yaml.safe_load(file)
 
-    activity, laps, tracepoints = get_activity_from_fit(
+    activity_create, laps_create, tracepoints_create = get_activity_from_fit(
         locations,
         "data/fit/" + config["fit"],
         config.get("title", ""),
@@ -112,10 +112,10 @@ def get_activity_from_yaml(locations: List[Any], yaml_file: str):
         config.get("race", False),
     )
 
-    activity = Activity(**activity.model_dump())
+    activity = Activity(**activity_create.model_dump())
 
-    laps = [Lap(**lap.model_dump()) for lap in laps]
-    tracepoints = [Tracepoint(**point.model_dump()) for point in tracepoints]
+    laps = [Lap(**lap.model_dump()) for lap in laps_create]
+    tracepoints = [Tracepoint(**point.model_dump()) for point in tracepoints_create]
 
     activity.lat, activity.lon = get_lat_lon(tracepoints)
 

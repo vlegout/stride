@@ -27,15 +27,12 @@ def get_session():
 
 
 @app.get("/activities/", response_model=List[ActivityPublic])
-def read_activities(session: Session = Depends(get_session)) -> List[ActivityPublic]:
-    activities = session.exec(select(Activity)).all()
-    return activities
+def read_activities(session: Session = Depends(get_session)):
+    return session.exec(select(Activity)).all()
 
 
 @app.get("/activities/{activity_id}", response_model=ActivityPublic)
-def read_activity(
-    activity_id: uuid.UUID, session: Session = Depends(get_session)
-) -> ActivityPublic:
+def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session)):
     activity = session.get(Activity, activity_id)
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
