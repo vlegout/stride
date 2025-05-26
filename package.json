@@ -25,7 +25,7 @@
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
-    "react-konva": "^19.0.3",
+    "react-konva": "^19.0.4",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.6.0"
   },
