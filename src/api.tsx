@@ -15,7 +15,11 @@ export async function apiCall(url: string) {
   return response.data;
 }
 
-export async function fetchActivities({ queryKey }: { queryKey: [string, number[], boolean, number] }): Promise<Activity[]> {
+export async function fetchActivities({
+  queryKey,
+}: {
+  queryKey: [string, number[], boolean, number];
+}): Promise<Activity[]> {
   const [sport, distance, fetchMap, limit] = queryKey;
   const params = [];
   if (fetchMap) params.push("map=true");
