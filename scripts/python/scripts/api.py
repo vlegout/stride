@@ -36,7 +36,7 @@ def read_activities(
 ):
     query = select(Activity).order_by(Activity.start_time.desc()).limit(limit)  # type: ignore
     if race is True:
-        query = query.where(Activity.race == True)
+        query = query.where(Activity.race)
     activities = session.exec(query).all()
     if map:
         return activities
