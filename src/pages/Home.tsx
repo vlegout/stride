@@ -2,7 +2,7 @@ import { Box, Center, Flex, Heading, Separator, Table } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchLastActivities } from "../api";
+import { fetchActivities } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 
 import Map from "../components/Map";
@@ -10,8 +10,8 @@ import SportLogo from "../components/SportLogo";
 
 const Home = () => {
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: ["lastActivitiesId"],
-    queryFn: async () => fetchLastActivities(),
+    queryKey: ["all", [0, 10000], true, 5],
+    queryFn: fetchActivities,
   });
 
   if (isPending || isFetching || error) return "Loading...";

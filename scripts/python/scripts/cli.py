@@ -1,6 +1,9 @@
+import concurrent.futures
 import datetime
 import json
 import math
+import multiprocessing
+import os
 import uuid
 
 from typing import Any, List
@@ -22,6 +25,9 @@ from utils import (
 )
 
 import scripts
+
+MAX_DATA_POINTS = 500
+NB_CPUS = multiprocessing.cpu_count()
 
 app = typer.Typer()
 
@@ -77,7 +83,7 @@ class TracepointCreate(TracepointBase):
 def get_activity_from_fit(
     locations: List[Any], fit_file: str, title: str, description: str, race: bool
 ) -> tuple[ActivityCreate, List[LapCreate], List[TracepointCreate]]:
-    fit = scripts.get_fit("../" + fit_file)
+    fit = scripts.get_fit(fit_file)
 
     activity = ActivityCreate(
         id=get_uuid(fit_file),
@@ -106,7 +112,7 @@ def get_activity_from_yaml(locations: List[Any], yaml_file: str):
 
     activity_create, laps_create, tracepoints_create = get_activity_from_fit(
         locations,
-        "data/fit/" + config["fit"],
+        "./data/fit/" + config["fit"],
         config.get("title", ""),
         config.get("description", ""),
         config.get("race", False),
@@ -149,22 +155,18 @@ def get_activity_from_yaml(locations: List[Any], yaml_file: str):
     return activity, laps, tracepoints
 
 
-@app.command()
-def create_db():
-    SQLModel.metadata.drop_all(bind=engine)
-    SQLModel.metadata.create_all(bind=engine)
-
-    session = Session(engine)
-
-    locations = json.load(open("../data/locations.json")).get("locations")
-
+def process_file(locations: List[Any], input_file: str) -> None:
     activity, laps, tracepoints = get_activity_from_yaml(
         locations,
-        "../data/2025/05/24.yaml",
+        input_file,
     )
 
     performances = get_best_performances(activity.id, tracepoints)
 
+    while len(tracepoints) > MAX_DATA_POINTS:
+        tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
+
+    session = Session(engine)
     session.add(activity)
 
     for lap in laps:
@@ -177,6 +179,33 @@ def create_db():
         session.add(performance)
 
     session.commit()
+
+
+@app.command()
+def create_db():
+    SQLModel.metadata.drop_all(bind=engine)
+    SQLModel.metadata.create_all(bind=engine)
+
+    locations = json.load(open("./data/locations.json")).get("locations")
+
+    input_files = []
+    for root, _, files in os.walk("./data/"):
+        for yaml_file in files:
+            if not yaml_file.endswith(".yaml"):
+                continue
+            input_files.append(os.path.join(root, yaml_file))
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=NB_CPUS) as executor:
+        future_activities = {
+            executor.submit(process_file, locations, input_file): input_file
+            for input_file in input_files
+        }
+        for future in concurrent.futures.as_completed(future_activities):
+            input_file = future_activities[future]
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Error processing {input_file}: {e}")
 
 
 if __name__ == "__main__":

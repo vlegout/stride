@@ -47,6 +47,11 @@ class Activity(ActivityBase, table=True):
     tracepoints: list["Tracepoint"] = Relationship(back_populates="activity")
 
 
+class ActivityPublicNoTracepoints(ActivityBase):
+    laps: list["Lap"] = []
+    performances: list["Performance"] = []
+
+
 class ActivityPublic(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []

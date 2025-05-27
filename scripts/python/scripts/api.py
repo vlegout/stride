@@ -7,7 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
 
 from db import engine
-from model import Activity, ActivityPublic
+from model import Activity, ActivityPublic, ActivityPublicNoTracepoints
+from fastapi import Query
 
 
 app = FastAPI()
@@ -27,8 +28,17 @@ def get_session():
 
 
 @app.get("/activities/", response_model=List[ActivityPublic])
-def read_activities(session: Session = Depends(get_session)):
-    return session.exec(select(Activity)).all()
+def read_activities(
+    session: Session = Depends(get_session),
+    map: bool = Query(default=False),
+    limit: int = Query(default=10, ge=1, le=100),
+):
+    activities = session.exec(
+        select(Activity).order_by(Activity.start_time.desc()).limit(limit)  # type: ignore
+    ).all()
+    if map:
+        return activities
+    return [ActivityPublicNoTracepoints.model_validate(a) for a in activities]
 
 
 @app.get("/activities/{activity_id}", response_model=ActivityPublic)
