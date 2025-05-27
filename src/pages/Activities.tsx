@@ -21,7 +21,7 @@ const ActivitiesPage = () => {
   const [distance, setDistance] = useState<number[]>([1, 100]);
 
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport, distance, false, null, false],
+    queryKey: [sport, distance, false, 10, false],
     queryFn: fetchActivities,
   });
 
