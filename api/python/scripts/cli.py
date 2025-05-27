@@ -24,7 +24,7 @@ from utils import (
     get_distance,
 )
 
-import scripts
+import api
 
 MAX_DATA_POINTS = 500
 NB_CPUS = multiprocessing.cpu_count()
@@ -83,7 +83,7 @@ class TracepointCreate(TracepointBase):
 def get_activity_from_fit(
     locations: List[Any], fit_file: str, title: str, description: str, race: bool
 ) -> tuple[ActivityCreate, List[LapCreate], List[TracepointCreate]]:
-    fit = scripts.get_fit(fit_file)
+    fit = api.get_fit(fit_file)
 
     activity = ActivityCreate(
         id=get_uuid(fit_file),

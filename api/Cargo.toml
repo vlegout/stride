@@ -1,10 +1,10 @@
 [package]
-name = "scripts"
+name = "api"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "scripts"
+name = "api"
 crate-type = ["cdylib"]
 
 [dependencies]

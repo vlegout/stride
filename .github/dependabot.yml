@@ -8,7 +8,3 @@ updates:
   directory: "/api"
   schedule:
     interval: "daily"
-- package-ecosystem: "uv"
-  directory: "/scripts"
-  schedule:
-    interval: "daily"

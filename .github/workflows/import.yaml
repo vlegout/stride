@@ -15,7 +15,7 @@ jobs:
       - run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup.sh
           sh rustup.sh -y
-      - run: cd scripts && uv run maturin develop
+      - run: cd api && uv run maturin develop
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -23,6 +23,6 @@ jobs:
           aws-region: eu-west-1
       - run: aws s3 cp --recursive s3://vlegout-sport/data data
       - run: mkdir -p public/activities
-      - run: uv run --project scripts scripts/python/scripts/import.py
+      - run: uv run --project api api/python/api/import.py
       - run: aws s3 rm --recursive s3://vlegout-sport/public
       - run: aws s3 cp --recursive public s3://vlegout-sport/public/

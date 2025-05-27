@@ -498,7 +498,7 @@ wheels = [
 ]
 
 [[package]]
-name = "scripts"
+name = "api"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

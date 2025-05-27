@@ -376,7 +376,7 @@ fn get_fit(file_name: &str) -> FitStruct {
 }
 
 #[pymodule]
-fn scripts(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn api(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_fit, m)?)?;
 
     Ok(())
