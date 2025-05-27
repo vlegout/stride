@@ -8,7 +8,7 @@ export type Performance = typeof Performance.infer;
 
 export const Lap = type({
   index: "number",
-  start_time: "string",
+  start_time: "number",
   total_elapsed_time: "number",
   total_distance: "number",
   max_heart_rate: "number",
@@ -19,19 +19,15 @@ export const Lap = type({
 });
 export type Lap = typeof Lap.infer;
 
-export const DataPoint = type({
+export const TracePoint = type({
+  lat: "number",
+  lng: "number",
   timestamp: "string",
   distance: "number",
   heart_rate: "number",
   speed: "number",
   power: "number",
   altitude: "number",
-});
-export type DataPoint = typeof DataPoint.infer;
-
-export const TracePoint = type({
-  lat: "number",
-  lng: "number",
 });
 export type TracePoint = typeof TracePoint.infer;
 
@@ -48,7 +44,7 @@ export const Activity = type({
 
   race: "boolean",
 
-  start_time: "string",
+  start_time: "number",
   total_timer_time: "number",
   total_elapsed_time: "number",
 
@@ -71,7 +67,7 @@ export const Activity = type({
   location: "string",
 
   laps: [Lap],
-  tracepoints: [DataPoint],
+  tracepoints: [TracePoint],
   performances: [Performance],
 });
 export type Activity = typeof Activity.infer;

@@ -66,7 +66,7 @@ const Home = () => {
                     [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
                     [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
                   ]}
-                  points={activity.trace_points}
+                  points={activity.tracepoints}
                 />
               </Box>
             </Flex>

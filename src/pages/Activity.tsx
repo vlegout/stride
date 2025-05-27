@@ -5,7 +5,7 @@ import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, Line
 
 import { fetchActivity } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
-import { DataPoint } from "../types";
+import { TracePoint } from "../types";
 
 import Map from "../components/Map";
 import LineChart from "../components/LineChart";
@@ -25,12 +25,12 @@ const ActivityPage = () => {
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
-  const dataPoints: DataPoint[] = data?.tracepoints ?? [];
-  const labels = dataPoints.map((point: DataPoint) => point.distance / 1000);
-  const speedData = dataPoints.map((point: DataPoint) => point.speed);
-  const hrData = dataPoints.map((point: DataPoint) => point.heart_rate);
-  const altitudeData = dataPoints.map((point: DataPoint) => point.altitude);
-  const powerData = dataPoints.map((point: DataPoint) => point.power);
+  const tracePoints: TracePoint[] = data?.tracepoints ?? [];
+  const labels = tracePoints.map((point: TracePoint) => point.distance / 1000);
+  const speedData = tracePoints.map((point: TracePoint) => point.speed);
+  const hrData = tracePoints.map((point: TracePoint) => point.heart_rate);
+  const altitudeData = tracePoints.map((point: TracePoint) => point.altitude);
+  const powerData = tracePoints.map((point: TracePoint) => point.power);
 
   return (
     <Flex justifyContent="center">
