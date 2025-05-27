@@ -3,6 +3,14 @@
 version = 4
 
 [[package]]
+name = "api"
+version = "0.1.0"
+dependencies = [
+ "fit-rust",
+ "pyo3",
+]
+
+[[package]]
 name = "array-init"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -202,14 +210,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1885c039570dc00dcb4ff087a89e185fd56bae234ddc7f056a945bf36467248d"
 dependencies = [
  "proc-macro2",
-]
-
-[[package]]
-name = "api"
-version = "0.1.0"
-dependencies = [
- "fit-rust",
- "pyo3",
 ]
 
 [[package]]
