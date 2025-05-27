@@ -46,7 +46,3 @@ export async function fetchActivity(id: string): Promise<Activity> {
 export async function fetchProfile(): Promise<Profile> {
   return await apiCall("/profile");
 }
-
-export async function fetchRaces(): Promise<Activity[]> {
-  return await apiCall("/activities/");
-}

@@ -8,7 +8,6 @@ import Home from "./pages/Home";
 import ActivitiesPage from "./pages/Activities";
 import ActivityPage from "./pages/Activity";
 import Profile from "./pages/Profile";
-import Races from "./pages/Races";
 import Layout from "./components/Layout";
 
 import "leaflet/dist/leaflet.css";
@@ -36,7 +35,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/races",
-        element: <Races />,
+        element: <Home />,
       },
     ],
   },
