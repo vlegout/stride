@@ -8,9 +8,9 @@ import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../
 import Map from "../components/Map";
 import SportLogo from "../components/SportLogo";
 
-const Home = () => {
+const Home = ({ race = false }: { race?: boolean }) => {
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: ["all", [0, 10000], true, 5],
+    queryKey: ["all", [0, 10000], true, 5, race],
     queryFn: fetchActivities,
   });
 

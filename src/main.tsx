@@ -35,7 +35,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/races",
-        element: <Home />,
+        element: <Home race={true} />,
       },
     ],
   },

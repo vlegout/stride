@@ -32,10 +32,12 @@ def read_activities(
     session: Session = Depends(get_session),
     map: bool = Query(default=False),
     limit: int = Query(default=10, ge=1, le=100),
+    race: bool = Query(default=None),
 ):
-    activities = session.exec(
-        select(Activity).order_by(Activity.start_time.desc()).limit(limit)  # type: ignore
-    ).all()
+    query = select(Activity).order_by(Activity.start_time.desc()).limit(limit)  # type: ignore
+    if race is True:
+        query = query.where(Activity.race == True)
+    activities = session.exec(query).all()
     if map:
         return activities
     return [ActivityPublicNoTracepoints.model_validate(a) for a in activities]
