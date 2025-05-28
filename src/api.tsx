@@ -24,24 +24,16 @@ export async function fetchActivities({
   const params = [];
   if (fetchMap) params.push("map=true");
   if (race) params.push("race=true");
+  if (sport !== "") params.push(`sport=${sport}`);
   if (limit) params.push(`limit=${limit}`);
-  const queryString = params.length ? "?" + params.join("&") : "";
-  const data = await apiCall("/activities/" + queryString);
-
-  if (sport === "all") {
-    return data.filter(
-      (activity: Activity) =>
-        activity.total_distance >= distance[0] * 1000 &&
-        (distance[1] === 100 || activity.total_distance <= distance[1] * 1000),
-    );
+  if (distance && distance.length === 2) {
+    const [min, max] = distance;
+    if (min !== undefined && min != 0) params.push(`min_distance=${min}`);
+    if (max !== undefined && max != 100) params.push(`max_distance=${max}`);
   }
+  const queryString = params.length ? "?" + params.join("&") : "";
 
-  return data.filter(
-    (activity: Activity) =>
-      activity.sport === sport &&
-      activity.total_distance >= distance[0] * 1000 &&
-      (distance[1] === 100 || activity.total_distance <= distance[1] * 1000),
-  );
+  return await apiCall("/activities/" + queryString);
 }
 
 export async function fetchLastActivities(): Promise<Activity[]> {

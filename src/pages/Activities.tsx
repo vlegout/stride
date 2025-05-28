@@ -17,8 +17,8 @@ import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import SportLogo from "../components/SportLogo";
 
 const ActivitiesPage = () => {
-  const [sport, setSport] = useState("all");
-  const [distance, setDistance] = useState<number[]>([1, 100]);
+  const [sport, setSport] = useState("");
+  const [distance, setDistance] = useState<number[]>([0, 100]);
 
   const { data, error, isPending, isFetching } = useQuery({
     queryKey: [sport, distance, false, 10, false],
@@ -41,9 +41,9 @@ const ActivitiesPage = () => {
         <Flex marginBottom="10px">
           <Box flex="1" marginRight="10px">
             <FormControl fullWidth>
-              <InputLabel id="activities-sport">Age</InputLabel>
-              <Select labelId="activities-sport" value={sport} label="Age" onChange={handleChange}>
-                <MenuItem value={"all"}>All</MenuItem>
+              <InputLabel id="activities-sport">Sport</InputLabel>
+              <Select labelId="activities-sport" value={sport} label="Sport" onChange={handleChange}>
+                <MenuItem value={""}>All</MenuItem>
                 <MenuItem value={"cycling"}>Cycling</MenuItem>
                 <MenuItem value={"running"}>Running</MenuItem>
               </Select>
@@ -59,7 +59,7 @@ const ActivitiesPage = () => {
                   onChangeCommitted={handleDistanceChange}
                   valueLabelDisplay="auto"
                   disableSwap
-                  min={2}
+                  min={0}
                   max={100}
                 />
               </Box>

@@ -57,10 +57,19 @@ def read_activities(
     map: bool = Query(default=False),
     limit: int = Query(default=10, ge=1, le=100),
     race: bool = Query(default=None),
+    sport: str = Query(default=None),
+    min_distance: float = Query(default=None, ge=0),
+    max_distance: float = Query(default=None, ge=0),
 ):
     query = select(Activity).order_by(Activity.start_time.desc()).limit(limit)  # type: ignore
     if race is True:
         query = query.where(Activity.race)
+    if sport is not None:
+        query = query.where(Activity.sport == sport)
+    if min_distance is not None:
+        query = query.where(Activity.total_distance >= min_distance * 1000)
+    if max_distance is not None:
+        query = query.where(Activity.total_distance <= max_distance * 1000)
     activities = session.exec(query).all()
     if map:
         return activities
