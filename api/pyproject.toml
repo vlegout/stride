@@ -17,6 +17,7 @@ dev-dependencies = [
     "maturin>=1.8.6",
     "mypy>=1.15.0",
     "pydantic-settings>=2.9.1",
+    "ruff>=0.11.11",
     "types-pyyaml>=6.0.12.20250402",
 ]
 
