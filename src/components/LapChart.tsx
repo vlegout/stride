@@ -7,7 +7,8 @@ import { Lap } from "../types";
 interface LapData {
   index: number;
   total_distance: number;
-  pace: { minutes: number; seconds: number };
+  minutes: number;
+  seconds: number;
   x: number;
   y: number;
   width: number;
@@ -23,12 +24,16 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
     y: 0,
   });
 
+  if (laps.some((lap) => lap.minutes == null || lap.seconds == null)) {
+    return null;
+  }
+
   const width = 500;
   const height = 200;
   const space = 2;
 
-  const minSpeed = Math.min(...laps.map((lap) => lap.pace.minutes * 60 + lap.pace.seconds)) - 10;
-  const maxSpeed = Math.max(...laps.map((lap) => lap.pace.minutes * 60 + lap.pace.seconds)) + 10;
+  const minSpeed = Math.min(...laps.map((lap) => lap.minutes * 60 + lap.seconds)) - 10;
+  const maxSpeed = Math.max(...laps.map((lap) => lap.minutes * 60 + lap.seconds)) + 10;
   const speedRange = maxSpeed - minSpeed;
 
   const totalDistance = laps.reduce((sum, lap) => sum + lap.total_distance, 0);
@@ -39,17 +44,18 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
 
   laps.forEach((lap, index) => {
     const lapWidth = (lap.total_distance * (width - 30 - space * laps.length)) / totalDistance;
-    const lapHeight = (-height * (maxSpeed - (lap.pace.minutes * 60 + lap.pace.seconds))) / speedRange;
+    const lapHeight = (-height * (maxSpeed - (lap.minutes * 60 + lap.seconds))) / speedRange;
 
     dataLaps.push({
       index: index,
       total_distance: lap.total_distance,
-      pace: lap.pace,
+      minutes: lap.minutes,
+      seconds: lap.seconds,
       x: currentX,
       y: height + 10,
       width: lapWidth,
       height: lapHeight,
-      name: `${lap.pace.minutes}:${lap.pace.seconds.toString().padStart(2, "0")}`,
+      name: `${lap.minutes}:${lap.seconds.toString().padStart(2, "0")}`,
     });
 
     currentX += lapWidth + space;

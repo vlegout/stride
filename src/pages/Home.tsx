@@ -2,16 +2,16 @@ import { Box, Center, Flex, Heading, Separator, Table } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchLastActivities } from "../api";
+import { fetchActivities } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 
 import Map from "../components/Map";
 import SportLogo from "../components/SportLogo";
 
-const Home = () => {
+const Home = ({ race = false }: { race?: boolean }) => {
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: ["lastActivitiesId"],
-    queryFn: async () => fetchLastActivities(),
+    queryKey: ["all", [0, 10000], true, 5, race],
+    queryFn: fetchActivities,
   });
 
   if (isPending || isFetching || error) return "Loading...";
@@ -43,7 +43,7 @@ const Home = () => {
                     </Table.Row>
                     <Table.Row>
                       <Table.Cell>Distance: {formatDistance(activity.total_distance)}</Table.Cell>
-                      <Table.Cell>Average Speed: {formatSpeed(activity.average_speed)}</Table.Cell>
+                      <Table.Cell>Average Speed: {formatSpeed(activity.avg_speed)}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
                       <Table.Cell>Avg Heart Rate: {activity.avg_heart_rate}</Table.Cell>
@@ -66,7 +66,7 @@ const Home = () => {
                     [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
                     [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
                   ]}
-                  points={activity.trace_points}
+                  points={activity.tracepoints}
                 />
               </Box>
             </Flex>

@@ -21,7 +21,7 @@ const ActivitiesPage = () => {
   const [distance, setDistance] = useState<number[]>([1, 100]);
 
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport, distance],
+    queryKey: [sport, distance, false, 10, false],
     queryFn: fetchActivities,
   });
 
@@ -94,7 +94,7 @@ const ActivitiesPage = () => {
                   <TableCell>{activity.location}</TableCell>
                   <TableCell>{formatDateTime(activity.start_time)}</TableCell>
                   <TableCell>{formatDistance(activity.total_distance)}</TableCell>
-                  <TableCell>{formatSpeed(activity.average_speed)}</TableCell>
+                  <TableCell>{formatSpeed(activity.avg_speed)}</TableCell>
                   <TableCell>{activity.total_ascent}</TableCell>
                   <TableCell>{activity.total_calories}</TableCell>
                   <TableCell>{activity.total_training_effect}</TableCell>

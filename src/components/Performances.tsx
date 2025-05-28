@@ -2,7 +2,7 @@ import { Box } from "@chakra-ui/react";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
 import { Performance } from "../types";
-import { formatDistance } from "../utils";
+import { formatDistance, formatInterval } from "../utils";
 
 const Performances = ({ performances }: { performances: Performance[] }) => {
   if (performances.length === 0) {
@@ -23,7 +23,7 @@ const Performances = ({ performances }: { performances: Performance[] }) => {
             {performances.map((performance) => (
               <TableRow key={performance.distance}>
                 <TableCell>{formatDistance(performance.distance)}</TableCell>
-                <TableCell>{performance.time}</TableCell>
+                <TableCell>{formatInterval(performance.time)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

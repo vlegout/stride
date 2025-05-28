@@ -1,6 +1,8 @@
 import { DateTime, Duration } from "luxon";
 
 export function formatSpeed(speed: number): string {
+  if (speed == null) return "";
+
   return `${speed.toFixed(2)} km/h`;
 }
 
@@ -14,6 +16,10 @@ export function formatDuration(seconds: number): string {
     .toHuman({ unitDisplay: "narrow" });
 }
 
-export function formatDateTime(datetime: string): string {
-  return DateTime.fromSQL(datetime).toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
+export function formatDateTime(datetime: number): string {
+  return DateTime.fromSeconds(datetime).toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
+}
+
+export function formatInterval(timedelta: string): string {
+  return Duration.fromISO(timedelta).toFormat("hh:mm:ss");
 }

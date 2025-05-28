@@ -5,7 +5,7 @@ import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, Line
 
 import { fetchActivity } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
-import { DataPoint } from "../types";
+import { TracePoint } from "../types";
 
 import Map from "../components/Map";
 import LineChart from "../components/LineChart";
@@ -25,11 +25,12 @@ const ActivityPage = () => {
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
-  const labels = data.data_points.map((point: DataPoint) => point.distance / 1000);
-  const speedData = data.data_points.map((point: DataPoint) => point.speed);
-  const hrData = data.data_points.map((point: DataPoint) => point.heart_rate);
-  const altitudeData = data.data_points.map((point: DataPoint) => point.altitude);
-  const powerData = data.data_points.map((point: DataPoint) => point.power);
+  const tracePoints: TracePoint[] = data?.tracepoints ?? [];
+  const labels = tracePoints.map((point: TracePoint) => point.distance / 1000);
+  const speedData = tracePoints.map((point: TracePoint) => point.speed);
+  const hrData = tracePoints.map((point: TracePoint) => point.heart_rate);
+  const altitudeData = tracePoints.map((point: TracePoint) => point.altitude);
+  const powerData = tracePoints.map((point: TracePoint) => point.power);
 
   return (
     <Flex justifyContent="center">
@@ -55,7 +56,7 @@ const ActivityPage = () => {
                   </Table.Row>
                   <Table.Row>
                     <Table.Cell>Distance: {formatDistance(data.total_distance)}</Table.Cell>
-                    <Table.Cell>Average Speed: {formatSpeed(data.average_speed)}</Table.Cell>
+                    <Table.Cell>Average Speed: {formatSpeed(data.avg_speed)}</Table.Cell>
                   </Table.Row>
                   <Table.Row>
                     <Table.Cell>Avg Heart Rate: {data.avg_heart_rate}</Table.Cell>
@@ -83,7 +84,7 @@ const ActivityPage = () => {
                 [data.lat - data.delta_lat, data.lon - data.delta_lon],
                 [data.lat + data.delta_lat, data.lon + data.delta_lon],
               ]}
-              points={data.trace_points}
+              points={data.tracepoints}
             />
           </Box>
         </Flex>

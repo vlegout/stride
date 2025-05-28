@@ -8,4 +8,4 @@ COPY . /code
 
 RUN uv sync --locked
 
-CMD ["uv", "run", "fastapi", "run", "api.py", "--port", "8080"]
+CMD ["uv", "run", "fastapi", "run", "python/api/app.py", "--port", "8080"]
