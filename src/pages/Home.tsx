@@ -10,7 +10,7 @@ import SportLogo from "../components/SportLogo";
 
 const Home = ({ race = false }: { race?: boolean }) => {
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: ["all", [0, 10000], true, 5, race],
+    queryKey: ["", [0, 100], true, 5, race],
     queryFn: fetchActivities,
   });
 
