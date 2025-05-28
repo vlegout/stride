@@ -29,7 +29,6 @@ name = "api"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "click" },
     { name = "fastapi", extra = ["standard"] },
     { name = "psycopg2" },
     { name = "pydantic" },
@@ -49,7 +48,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "click", specifier = ">=8.1.8" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.12" },
     { name = "psycopg2", specifier = ">=2.9.10" },
     { name = "pydantic", specifier = ">=2.11.4" },
