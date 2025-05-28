@@ -2,6 +2,8 @@ FROM python:3.12-alpine
 
 WORKDIR /code
 
+RUN apk add --no-cache postgresql-dev
+
 RUN pip install uv
 
 COPY . /code
