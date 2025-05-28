@@ -1,9 +1,11 @@
+import os
 import uuid
 
 from typing import List
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlmodel import Session, select
 
 from db import engine
@@ -20,6 +22,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if "TOKEN" not in os.environ:
+    raise ValueError("Missing environment variables: TOKEN")
+
+TOKEN = os.environ.get("TOKEN")
+
+
+@app.middleware("http")
+async def verify_token(request: Request, call_next):
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
+    if request.url.path == "/":
+        return await call_next(request)
+
+    token = request.headers.get("Authorization")
+    if not token or token != f"Bearer {TOKEN}":
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"detail": "Unauthorized"},
+        )
+    return await call_next(request)
 
 
 def get_session():
