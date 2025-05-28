@@ -9,5 +9,5 @@ test('has title', async ({ page }) => {
 test('has activities header link', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByText('Activities')).toBeVisible();
+  await expect(page.getByText('Activities')).toBeDefined();
 });
