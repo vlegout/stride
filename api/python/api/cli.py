@@ -81,11 +81,15 @@ class TracepointCreate(TracepointBase):
 
 
 def get_activity_from_fit(
-    locations: List[Any], fit_file: str, title: str, description: str, race: bool
-) -> tuple[ActivityCreate, List[LapCreate], List[TracepointCreate]]:
+    locations: List[Any],
+    fit_file: str,
+    title: str = "Activity",
+    description: str = "",
+    race: bool = False,
+) -> tuple[Activity, List[Lap], List[Tracepoint]]:
     fit = api.get_fit(fit_file)
 
-    activity = ActivityCreate(
+    activity_create = ActivityCreate(
         id=get_uuid(fit_file),
         fit=fit_file,
         title=title,
@@ -94,29 +98,16 @@ def get_activity_from_fit(
         **fit.get("activity", {}),
     )
 
-    laps = [
-        LapCreate(id=uuid.uuid4(), activity_id=activity.id, minutes=0, seconds=0, **lap)
+    laps_create = [
+        LapCreate(
+            id=uuid.uuid4(), activity_id=activity_create.id, minutes=0, seconds=0, **lap
+        )
         for lap in fit.get("laps", [])
     ]
-    tracepoints = [
-        TracepointCreate(id=uuid.uuid4(), activity_id=activity.id, **point)
+    tracepoints_create = [
+        TracepointCreate(id=uuid.uuid4(), activity_id=activity_create.id, **point)
         for point in fit.get("data_points", [])
     ]
-
-    return activity, laps, tracepoints
-
-
-def get_activity_from_yaml(locations: List[Any], yaml_file: str):
-    with open(yaml_file, "r") as file:
-        config = yaml.safe_load(file)
-
-    activity_create, laps_create, tracepoints_create = get_activity_from_fit(
-        locations,
-        "./data/fit/" + config["fit"],
-        config.get("title", ""),
-        config.get("description", ""),
-        config.get("race", False),
-    )
 
     activity = Activity(**activity_create.model_dump())
 
@@ -155,11 +146,32 @@ def get_activity_from_yaml(locations: List[Any], yaml_file: str):
     return activity, laps, tracepoints
 
 
-def process_file(locations: List[Any], input_file: str) -> None:
-    activity, laps, tracepoints = get_activity_from_yaml(
+def get_activity_from_yaml(locations: List[Any], yaml_file: str):
+    with open(yaml_file, "r") as file:
+        config = yaml.safe_load(file)
+
+    activity, laps, tracepoints = get_activity_from_fit(
         locations,
-        input_file,
+        "./data/fit/" + config["fit"],
+        config.get("title", ""),
+        config.get("description", ""),
+        config.get("race", False),
     )
+
+    return activity, laps, tracepoints
+
+
+def process_file(locations: List[Any], input_file: str) -> None:
+    if input_file.endswith(".yaml"):
+        activity, laps, tracepoints = get_activity_from_yaml(
+            locations,
+            input_file,
+        )
+    else:
+        activity, laps, tracepoints = get_activity_from_fit(
+            locations,
+            input_file,
+        )
 
     performances = get_best_performances(activity.id, tracepoints)
 
@@ -194,6 +206,11 @@ def create_db():
             if not yaml_file.endswith(".yaml"):
                 continue
             input_files.append(os.path.join(root, yaml_file))
+    for root, _, files in os.walk("./data/files"):
+        for fit_file in files:
+            if not fit_file.endswith(".fit"):
+                continue
+            input_files.append(os.path.join(root, fit_file))
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=NB_CPUS) as executor:
         future_activities = {
