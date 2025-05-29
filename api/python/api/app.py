@@ -15,6 +15,7 @@ from model import (
     Activity,
     ActivityPublic,
     ActivityPublicNoTracepoints,
+    PerformanceProfile,
     Profile,
     Statistic,
     WeeksStatistics,
@@ -93,7 +94,7 @@ def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session
     return activity
 
 
-@app.get("/profile", response_model=Profile)
+@app.get("/profile/", response_model=Profile)
 def read_profile(
     session: Session = Depends(get_session),
 ):
@@ -206,6 +207,16 @@ def read_profile(
             ],
         )
         for year in range(2013, datetime.datetime.now().year + 1)
+    ]
+
+    profile.running_performances = [
+        PerformanceProfile(
+            distance=distance,
+            time=session.exec(
+                text(f"SELECT MIN(time) FROM performance WHERE distance = {distance}")  # type: ignore
+            ).one()[0],
+        )
+        for distance in [1000, 1609.344, 5000, 10000, 21097.5, 42195]
     ]
 
     return profile

@@ -80,12 +80,19 @@ class Lap(LapBase, table=True):
     activity: Activity = Relationship()
 
 
-class Performance(SQLModel, table=True):
+class PerformanceBase(SQLModel):
+    distance: float
+    time: datetime.timedelta | None = None
+
+
+class Performance(PerformanceBase, table=True):
     id: uuid.UUID = Field(primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
     activity: Activity = Relationship()
-    distance: float
-    time: datetime.timedelta | None = None
+
+
+class PerformanceProfile(PerformanceBase):
+    pass
 
 
 class TracepointBase(SQLModel):
