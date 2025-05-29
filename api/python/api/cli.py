@@ -194,7 +194,18 @@ def process_file(locations: List[Any], input_file: str) -> None:
 
 
 @app.command()
+def add_activity(
+    yaml: str = typer.Argument(),
+):
+    """Add a new activity from a YAML file."""
+    locations = json.load(open("./data/locations.json")).get("locations")
+
+    process_file(locations, yaml)
+
+
+@app.command()
 def create_db():
+    """Create tables and add initial data."""
     SQLModel.metadata.drop_all(bind=engine)
     SQLModel.metadata.create_all(bind=engine)
 
