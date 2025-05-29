@@ -9,8 +9,9 @@ from fastapi.responses import JSONResponse
 from sqlmodel import Session, select
 
 from db import engine
-from model import Activity, ActivityPublic, ActivityPublicNoTracepoints
+from model import Activity, ActivityPublic, ActivityPublicNoTracepoints, Profile
 from fastapi import Query
+from sqlalchemy import text
 
 
 app = FastAPI()
@@ -82,3 +83,28 @@ def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
     return activity
+
+
+@app.get("/profile", response_model=Profile)
+def read_profile(
+    session: Session = Depends(get_session),
+):
+    profile = Profile()
+
+    profile.n_activities = session.query(Activity).count()
+
+    profile.run_n_activities = (
+        session.query(Activity).where(Activity.sport == "running").count()  # type: ignore
+    )
+    profile.run_total_distance = session.exec(
+        text("SELECT SUM(total_distance) FROM Activity WHERE sport = 'running'")  # type: ignore
+    ).one()[0]
+
+    profile.cycling_n_activities = (
+        session.query(Activity).where(Activity.sport == "cycling").count()  # type: ignore
+    )
+    profile.cycling_total_distance = session.exec(
+        text("SELECT SUM(total_distance) FROM Activity WHERE sport = 'cycling'")  # type: ignore
+    ).one()[0]
+
+    return profile

@@ -45,5 +45,5 @@ export async function fetchActivity(id: string): Promise<Activity> {
 }
 
 export async function fetchProfile(): Promise<Profile> {
-  return await apiCall("/profile");
+  return await apiCall("/profile/");
 }

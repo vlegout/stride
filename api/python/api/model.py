@@ -1,6 +1,9 @@
 import datetime
 import uuid
 
+from typing import List
+
+from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -100,3 +103,31 @@ class TracepointBase(SQLModel):
 
 class Tracepoint(TracepointBase, table=True):
     activity: Activity = Relationship(back_populates="tracepoints")
+
+
+class Statistic(BaseModel):
+    sport: str
+    n_activities: int = 0
+    total_distance: float = 0.0
+
+
+class YearsStatistics(BaseModel):
+    year: int
+    statistics: List[Statistic]
+
+
+class WeeksStatistics(BaseModel):
+    start: datetime.datetime
+    week: int
+    statistics: List[Statistic]
+
+
+class Profile(BaseModel):
+    n_activities: int = 0
+    run_n_activities: int = 0
+    run_total_distance: float = 0.0
+    cycling_n_activities: int = 0
+    cycling_total_distance: float = 0.0
+    years: List[YearsStatistics] = []
+    weeks: List[WeeksStatistics] = []
+    running_performances: List[Performance] = []
