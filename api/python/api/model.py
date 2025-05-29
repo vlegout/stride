@@ -108,7 +108,7 @@ class Tracepoint(TracepointBase, table=True):
 class Statistic(BaseModel):
     sport: str
     n_activities: int = 0
-    total_distance: float = 0.0
+    total_distance: float | None = None
 
 
 class YearsStatistics(BaseModel):

@@ -1,17 +1,25 @@
+import datetime
 import os
 import uuid
 
 from typing import List
 
-from fastapi import FastAPI, Depends, HTTPException, Request, status
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from sqlmodel import Session, select
 
 from db import engine
-from model import Activity, ActivityPublic, ActivityPublicNoTracepoints, Profile
-from fastapi import Query
-from sqlalchemy import text
+from model import (
+    Activity,
+    ActivityPublic,
+    ActivityPublicNoTracepoints,
+    Profile,
+    Statistic,
+    WeeksStatistics,
+    YearsStatistics,
+)
 
 
 app = FastAPI()
@@ -106,5 +114,98 @@ def read_profile(
     profile.cycling_total_distance = session.exec(
         text("SELECT SUM(total_distance) FROM Activity WHERE sport = 'cycling'")  # type: ignore
     ).one()[0]
+
+    profile.weeks = [
+        WeeksStatistics(
+            start=datetime.datetime.strptime(f"{year}-W{week}-1", "%Y-W%W-%w"),
+            week=week,
+            statistics=[
+                Statistic(
+                    sport="running",
+                    n_activities=session.exec(
+                        text(
+                            "SELECT COUNT(*) FROM activity "
+                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
+                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
+                        )  # type: ignore
+                    ).one()[0],
+                    total_distance=session.exec(
+                        text(
+                            "SELECT SUM(total_distance) FROM activity "
+                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
+                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
+                        )  # type: ignore
+                    ).one()[0],
+                ),
+                Statistic(
+                    sport="cycling",
+                    n_activities=session.exec(
+                        text(
+                            "SELECT COUNT(*) FROM activity "
+                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
+                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
+                        )  # type: ignore
+                    ).one()[0],
+                    total_distance=session.exec(
+                        text(
+                            "SELECT SUM(total_distance) FROM activity "
+                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
+                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
+                        )  # type: ignore
+                    ).one()[0],
+                ),
+            ],
+        )
+        for year, week in [
+            (
+                (datetime.datetime.now() - datetime.timedelta(weeks=i)).isocalendar()[
+                    0
+                ],
+                (datetime.datetime.now() - datetime.timedelta(weeks=i)).isocalendar()[
+                    1
+                ],
+            )
+            for i in range(20)
+        ][::-1]
+    ]
+
+    profile.years = [
+        YearsStatistics(
+            year=year,
+            statistics=[
+                Statistic(
+                    sport="running",
+                    n_activities=session.exec(
+                        text(
+                            "SELECT COUNT(*) FROM activity "
+                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
+                        )  # type: ignore
+                    ).one()[0],
+                    total_distance=session.exec(
+                        text(
+                            "SELECT SUM(total_distance) FROM activity "
+                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
+                        )  # type: ignore
+                    ).one()[0],
+                ),
+                Statistic(
+                    sport="cycling",
+                    n_activities=session.exec(
+                        text(
+                            "SELECT COUNT(*) FROM activity "
+                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
+                        )  # type: ignore
+                    ).one()[0],
+                    total_distance=session.exec(
+                        text(
+                            "SELECT SUM(total_distance) FROM activity "
+                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
+                        )  # type: ignore
+                    ).one()[0],
+                ),
+            ],
+        )
+        for year in range(2013, datetime.datetime.now().year + 1)
+    ]
 
     return profile
