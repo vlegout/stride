@@ -4,7 +4,7 @@ import uuid
 
 from typing import List, Tuple
 
-from model import Performance, Tracepoint
+from model import Activity, Performance, Tracepoint
 
 
 def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
@@ -66,15 +66,18 @@ def get_uuid(filename: str) -> uuid.UUID:
 
 
 def get_best_performances(
-    activity_id: uuid.UUID, tracepoints: List[Tracepoint]
+    activity: Activity, tracepoints: List[Tracepoint]
 ) -> List[Performance]:
     if not tracepoints:
+        return []
+
+    if activity.sport != "running":
         return []
 
     distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
     max_distance = tracepoints[-1].distance
     performances = [
-        Performance(id=uuid.uuid4(), activity_id=activity_id, distance=d)
+        Performance(id=uuid.uuid4(), activity_id=activity.id, distance=d)
         for d in distances
         if max_distance >= d
     ]

@@ -173,7 +173,7 @@ def process_file(locations: List[Any], input_file: str) -> None:
             input_file,
         )
 
-    performances = get_best_performances(activity.id, tracepoints)
+    performances = get_best_performances(activity, tracepoints)
 
     while len(tracepoints) > MAX_DATA_POINTS:
         tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
