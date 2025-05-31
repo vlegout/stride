@@ -2,7 +2,6 @@ import concurrent.futures
 import datetime
 import json
 import math
-import multiprocessing
 import os
 import uuid
 
@@ -27,7 +26,7 @@ from utils import (
 import api
 
 MAX_DATA_POINTS = 500
-NB_CPUS = multiprocessing.cpu_count()
+NB_CPUS = 2
 
 app = typer.Typer()
 
@@ -225,7 +224,7 @@ def create_db():
 
     print(f"Found {len(input_files)} files to process")
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=NB_CPUS) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
         future_activities = {
             executor.submit(process_file, locations, input_file): input_file
             for input_file in input_files
