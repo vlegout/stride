@@ -223,6 +223,8 @@ def create_db():
                 continue
             input_files.append(os.path.join(root, fit_file))
 
+    print(f"Found {len(input_files)} files to process")
+
     with concurrent.futures.ProcessPoolExecutor(max_workers=NB_CPUS) as executor:
         future_activities = {
             executor.submit(process_file, locations, input_file): input_file
@@ -234,6 +236,8 @@ def create_db():
                 future.result()
             except Exception as e:
                 print(f"Error processing {input_file}: {e}")
+
+    print("Done")
 
 
 if __name__ == "__main__":
