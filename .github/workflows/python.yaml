@@ -45,5 +45,5 @@ jobs:
       - run : gcloud auth configure-docker europe-west1-docker.pkg.dev
       - name: Build, tag, and push docker image
         run: |
-          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api:${{ github.sha }} api
-          docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api:${{ github.sha }}
+          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ github.sha }} api
+          docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ github.sha }}
