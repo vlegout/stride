@@ -37,20 +37,13 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
-      - name: Login to Docker Registry
-        uses: docker/login-action@v3
+      - uses: google-github-actions/auth@v2
         with:
-          registry: ${{ secrets.DOCKER_REPOSITORY }}
-          username: nologin
-          password: ${{ secrets.DOCKER_SECRET_KEY }}
-      - name: Build, tag, and push docker image to Amazon ECR
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run : gcloud auth configure-docker europe-west1-docker.pkg.dev
+      - name: Build, tag, and push docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }} api
-          docker push ${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
-      - name: Update Scaleway container
-        uses: scaleway/action-scw@v0
-        with:
-          access-key: ${{ secrets.SCW_ACCESS_KEY }}
-          secret-key: ${{ secrets.SCW_SECRET_KEY }}
-          default-organization-id: ${{ secrets.SCW_ORGANIZATION_ID }}
-          args: container container update ${{ secrets.SCW_CONTAINER_ID }} registry-image=${{ secrets.DOCKER_REPOSITORY }}/api:${{ github.sha }}
+          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api:${{ github.sha }} api
+          docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api:${{ github.sha }}
