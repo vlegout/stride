@@ -47,3 +47,7 @@ jobs:
         run: |
           docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ github.sha }} api
           docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ github.sha }}
+      - uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: api
+          image: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ github.sha }}
