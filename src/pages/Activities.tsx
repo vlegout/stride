@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { FormControl, InputLabel, MenuItem, Slider } from "@mui/material";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Table from "@mui/material/Table";
@@ -38,7 +37,7 @@ const ActivitiesPage = () => {
   if (isPending || isFetching || error) return "Loading...";
 
   return (
-    <Container>
+    <Box paddingLeft={"20px"} paddingRight="20px">
       <Grid container spacing={2} marginTop="20px" marginBottom="20px">
         <Grid size={4}>
           <FormControl fullWidth>
@@ -105,7 +104,7 @@ const ActivitiesPage = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+    </Box>
   );
 };
 
