@@ -3,7 +3,7 @@ import uuid
 
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -59,6 +59,10 @@ class ActivityPublic(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
     tracepoints: list["Tracepoint"] = []
+
+    @field_serializer("tracepoints")
+    def serialize_tp(self, tracepoints: list["Tracepoint"]):
+        return sorted(tracepoints, key=lambda tp: tp.timestamp)
 
 
 class LapBase(SQLModel):
