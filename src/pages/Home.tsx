@@ -1,11 +1,14 @@
-import { Box, Center, Flex, Heading, Separator } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
+import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
 import { fetchActivities } from "../api";
@@ -23,21 +26,23 @@ const Home = ({ race = false }: { race?: boolean }) => {
   if (isPending || isFetching || error) return "Loading...";
 
   return (
-    <Flex justifyContent="center">
-      <Box maxWidth="1000px">
+    <Container>
+      <Box maxWidth="1000px" margin="auto">
         {data.map((activity) => (
-          <Box key={activity.id} paddingTop="10px">
-            <Flex>
-              <Box>
-                <Heading>
+          <Box key={activity.id} marginTop="20px" marginBottom={"20px"}>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <Typography variant="h5">
                   <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
-                </Heading>
-                <Flex paddingTop="20px">
-                  <Box marginRight="10px" marginLeft="10px">
+                </Typography>
+                <Grid container spacing={1} marginTop={"10px"} marginBottom={"10px"}>
+                  <Grid size={1}>
                     <SportLogo sport={activity.sport} />
-                  </Box>
-                  <Center h="40px">{formatDateTime(activity.start_time)}</Center>
-                </Flex>
+                  </Grid>
+                  <Grid size={11} display="flex" alignItems="center">
+                    {formatDateTime(activity.start_time)}
+                  </Grid>
+                </Grid>
                 <TableContainer component={Paper}>
                   <Table>
                     <TableBody>
@@ -67,8 +72,8 @@ const Home = ({ race = false }: { race?: boolean }) => {
                     </TableBody>
                   </Table>
                 </TableContainer>
-              </Box>
-              <Box padding="10px">
+              </Grid>
+              <Grid size={6}>
                 <Map
                   bounds={[
                     [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
@@ -76,13 +81,12 @@ const Home = ({ race = false }: { race?: boolean }) => {
                   ]}
                   points={activity.tracepoints}
                 />
-              </Box>
-            </Flex>
-            <Separator size="lg" />
+              </Grid>
+            </Grid>
           </Box>
         ))}
       </Box>
-    </Flex>
+    </Container>
   );
 };
 

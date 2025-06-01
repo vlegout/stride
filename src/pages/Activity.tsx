@@ -1,12 +1,15 @@
-import { Box, Center, Flex, Heading } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
+import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
 import { fetchActivity } from "../api";
@@ -39,18 +42,20 @@ const ActivityPage = () => {
   const powerData = tracePoints.map((point: TracePoint) => point.power);
 
   return (
-    <Flex justifyContent="center">
-      <Box maxWidth="1000px">
-        <Flex>
-          <Box padding="10px" width="50vw">
+    <Container>
+      <Box maxWidth="1000px" margin="auto">
+        <Grid container spacing={2} marginTop="20px" marginBottom="20px">
+          <Grid size={6}>
             <Box>
-              <Heading>{data.title}</Heading>
-              <Flex paddingTop="20px">
-                <Box marginRight="10px" marginLeft="10px">
+              <Typography variant="h5">{data.title}</Typography>
+              <Grid container spacing={1} marginTop="10px" marginBottom="10px">
+                <Grid size={1}>
                   <SportLogo sport={data.sport} />
-                </Box>
-                <Center h="40px">{formatDateTime(data.start_time)}</Center>
-              </Flex>
+                </Grid>
+                <Grid size={11} display="flex" alignItems="center">
+                  {formatDateTime(data.start_time)}
+                </Grid>
+              </Grid>
               <TableContainer component={Paper}>
                 <Table>
                   <TableBody>
@@ -81,12 +86,12 @@ const ActivityPage = () => {
                 </Table>
               </TableContainer>
             </Box>
-            <Box maxWidth="500px" paddingTop="20px">
+            <Box maxWidth="500px">
               <LapChart laps={data.laps} />
             </Box>
-          </Box>
+          </Grid>
 
-          <Box padding="10px" width="50vw">
+          <Grid size={6}>
             <Map
               bounds={[
                 [data.lat - data.delta_lat, data.lon - data.delta_lon],
@@ -94,14 +99,14 @@ const ActivityPage = () => {
               ]}
               points={data.tracepoints}
             />
-          </Box>
-        </Flex>
-        <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
-          <Box>
+          </Grid>
+        </Grid>
+        <Container>
+          <Box maxWidth="400px">
             <Performances performances={data.performances} />
           </Box>
-        </Flex>
-        <Flex justifyContent="center" paddingTop="20px" flexDirection="column" alignItems="center">
+        </Container>
+        <Container>
           <Box width="80%" margin="40px" maxWidth="800px">
             <LineChart labels={labels} data={speedData} />
           </Box>
@@ -114,9 +119,9 @@ const ActivityPage = () => {
           <Box width="80%" margin="40px" maxWidth="800px">
             <LineChart labels={labels} data={powerData} />
           </Box>
-        </Flex>
+        </Container>
       </Box>
-    </Flex>
+    </Container>
   );
 };
 
