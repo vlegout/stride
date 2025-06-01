@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Box } from "@chakra-ui/react";
 import { Stage, Layer, Rect, Text } from "react-konva";
 
 import { Lap } from "../types";
@@ -94,28 +93,26 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
   };
 
   return (
-    <Box paddingTop="10px">
-      <Stage width={window.innerWidth} height={height + 30}>
-        <Layer onMouseMove={handleMouseMove} onMouseOut={handleMouseOut}>
-          {dataLaps.map((lap) => (
-            <Rect x={lap.x} y={lap.y} width={lap.width} height={lap.height} name={lap.name} fill="lightgrey" />
-          ))}
-        </Layer>
-        <Layer>
-          <Text {...tooltipProps} fontSize={16} padding={5} />
-        </Layer>
-        <Layer>
-          {paces.map((pace) => (
-            <Text
-              x={0}
-              y={height - (height * (maxSpeed - pace)) / speedRange}
-              text={`${Math.floor(pace / 60)}:${(pace % 60).toString().padStart(2, "0")}`}
-              fontSize={14}
-            />
-          ))}
-        </Layer>
-      </Stage>
-    </Box>
+    <Stage width={window.innerWidth} height={height + 30}>
+      <Layer onMouseMove={handleMouseMove} onMouseOut={handleMouseOut}>
+        {dataLaps.map((lap) => (
+          <Rect x={lap.x} y={lap.y} width={lap.width} height={lap.height} name={lap.name} fill="lightgrey" />
+        ))}
+      </Layer>
+      <Layer>
+        <Text {...tooltipProps} fontSize={16} padding={5} />
+      </Layer>
+      <Layer>
+        {paces.map((pace) => (
+          <Text
+            x={0}
+            y={height - (height * (maxSpeed - pace)) / speedRange}
+            text={`${Math.floor(pace / 60)}:${(pace % 60).toString().padStart(2, "0")}`}
+            fontSize={14}
+          />
+        ))}
+      </Layer>
+    </Stage>
   );
 };
 

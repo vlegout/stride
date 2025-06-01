@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { ChartOptions } from "chart.js";
 import { Line } from "react-chartjs-2";
 
@@ -29,9 +28,9 @@ const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
   };
 
   return (
-    <Box>
+    <>
       <Line height={"100px"} options={lineOptions} data={lineData} />
-    </Box>
+    </>
   );
 };
 

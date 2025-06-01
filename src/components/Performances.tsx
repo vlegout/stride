@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
 import { Performance } from "../types";
@@ -10,26 +9,24 @@ const Performances = ({ performances }: { performances: Performance[] }) => {
   }
 
   return (
-    <Box>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Distance</TableCell>
-              <TableCell>Time</TableCell>
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Distance</TableCell>
+            <TableCell>Time</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {performances.map((performance) => (
+            <TableRow key={performance.distance}>
+              <TableCell>{formatDistance(performance.distance)}</TableCell>
+              <TableCell>{formatInterval(performance.time)}</TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {performances.map((performance) => (
-              <TableRow key={performance.distance}>
-                <TableCell>{formatDistance(performance.distance)}</TableCell>
-                <TableCell>{formatInterval(performance.time)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
