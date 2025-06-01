@@ -86,7 +86,7 @@ def read_activities(
     return [ActivityPublicNoTracepoints.model_validate(a) for a in activities]
 
 
-@app.get("/activities/{activity_id}", response_model=ActivityPublic)
+@app.get("/activities/{activity_id}/", response_model=ActivityPublic)
 def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session)):
     activity = session.get(Activity, activity_id)
     if not activity:
