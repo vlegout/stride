@@ -1,19 +1,30 @@
 import { Link } from "react-router-dom";
+import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+
+const menus = [
+  { to: "/", label: "Home" },
+  { to: "/activities", label: "Activities" },
+  { to: "/profile", label: "Profile" },
+  { to: "/races", label: "Races" },
+];
 
 const Header = () => {
   return (
-    <Box sx={{ bgcolor: "#e0e0e0", display: "flex", alignItems: "center", paddingLeft: "10px", height: "64px" }}>
-      <Link to="/" style={{ marginRight: "20px" }}>
-        Home
-      </Link>
-      <Link to="/activities" style={{ marginRight: "20px" }}>
-        Activities
-      </Link>
-      <Link to="/profile" style={{ marginRight: "20px" }}>
-        Profile
-      </Link>
-      <Link to="/races">Races</Link>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static" sx={{ bgcolor: "grey.200", color: "black" }}>
+        <Toolbar>
+          {menus.map(({ to, label }) => (
+            <Link key={to} to={to} style={{ textDecoration: "none", color: "black" }}>
+              <Typography component="div" sx={{ flexGrow: 1 }} paddingRight="15px">
+                {label}
+              </Typography>
+            </Link>
+          ))}
+        </Toolbar>
+      </AppBar>
     </Box>
   );
 };
