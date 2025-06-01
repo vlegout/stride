@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -30,7 +31,7 @@ const Home = ({ race = false }: { race?: boolean }) => {
       <Box maxWidth="1000px" margin="auto">
         {data.map((activity) => (
           <Box key={activity.id} marginTop="20px" marginBottom={"20px"}>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} marginBottom={"20px"}>
               <Grid size={6}>
                 <Typography variant="h5">
                   <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
@@ -83,6 +84,7 @@ const Home = ({ race = false }: { race?: boolean }) => {
                 />
               </Grid>
             </Grid>
+            <Divider />
           </Box>
         ))}
       </Box>
