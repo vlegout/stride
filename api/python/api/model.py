@@ -77,7 +77,7 @@ class LapBase(SQLModel):
 
 
 class Lap(LapBase, table=True):
-    activity: Activity = Relationship()
+    activity: Activity = Relationship(back_populates="laps")
 
 
 class PerformanceBase(SQLModel):
@@ -88,7 +88,7 @@ class PerformanceBase(SQLModel):
 class Performance(PerformanceBase, table=True):
     id: uuid.UUID = Field(primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
-    activity: Activity = Relationship()
+    activity: Activity = Relationship(back_populates="performances")
 
 
 class PerformanceProfile(PerformanceBase):
