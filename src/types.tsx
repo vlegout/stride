@@ -72,6 +72,19 @@ export const Activity = type({
 });
 export type Activity = typeof Activity.infer;
 
+export const Pagination = type({
+  page: "number",
+  per_page: "number",
+  total: "number",
+});
+export type Pagination = typeof Pagination.infer;
+
+export const ActivitiesResponse = type({
+  items: Activity.array(),
+  pagination: Pagination,
+});
+export type ActivitiesResponse = typeof ActivitiesResponse.infer;
+
 export const Statistic = type({
   sport: "string",
   n_activities: "number",

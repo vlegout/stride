@@ -50,19 +50,25 @@ class Activity(ActivityBase, table=True):
     tracepoints: list["Tracepoint"] = Relationship(back_populates="activity")
 
 
-class ActivityPublicNoTracepoints(ActivityBase):
-    laps: list["Lap"] = []
-    performances: list["Performance"] = []
-
-
 class ActivityPublic(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
     tracepoints: list["Tracepoint"] = []
 
     @field_serializer("tracepoints")
-    def serialize_tp(self, tracepoints: list["Tracepoint"]):
-        return sorted(tracepoints, key=lambda tp: tp.timestamp)
+    def serialize_tracepoints(self, tracepoints: List["Tracepoint"]):
+        return sorted(tracepoints, key=lambda a: a.timestamp, reverse=True)
+
+
+class Pagination(BaseModel):
+    page: int = 1
+    per_page: int = 10
+    total: int = 10
+
+
+class ActivityList(BaseModel):
+    activities: List[ActivityPublic] = []
+    pagination: Pagination = Pagination()
 
 
 class LapBase(SQLModel):

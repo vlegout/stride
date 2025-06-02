@@ -29,7 +29,7 @@ const Home = ({ race = false }: { race?: boolean }) => {
   return (
     <Container>
       <Box maxWidth="1000px" margin="auto">
-        {data.map((activity) => (
+        {data.activities.map((activity) => (
           <Box key={activity.id} marginTop="20px" marginBottom={"20px"}>
             <Grid container spacing={2} marginBottom={"20px"}>
               <Grid size={6}>

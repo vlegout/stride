@@ -11,6 +11,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Pagination from "@mui/material/Pagination";
 import Paper from "@mui/material/Paper";
 
 import { fetchActivities } from "../api";
@@ -18,11 +19,12 @@ import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import SportLogo from "../components/SportLogo";
 
 const ActivitiesPage = () => {
+  const [page, setPage] = useState(1);
   const [sport, setSport] = useState("");
   const [distance, setDistance] = useState<number[]>([0, 100]);
 
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport, distance, false, 10, false],
+    queryKey: [sport, distance, false, 10, false, page],
     queryFn: fetchActivities,
   });
 
@@ -83,7 +85,7 @@ const ActivitiesPage = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((activity) => (
+            {data.activities.map((activity) => (
               <TableRow key={activity.id}>
                 <TableCell>
                   <SportLogo sport={activity.sport} width={25} />
@@ -104,6 +106,16 @@ const ActivitiesPage = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Box margin={"auto"} marginTop="20px" display="flex" justifyContent="center">
+        <Pagination
+          count={Math.ceil(data.pagination.total / data.pagination.per_page)}
+          shape="rounded"
+          page={page}
+          onChange={(_event, value) => {
+            setPage(value);
+          }}
+        />
+      </Box>
     </Box>
   );
 };

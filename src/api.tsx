@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import type { Activity, Profile } from "./types";
+import type { Activity, ActivitiesResponse, Profile } from "./types";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 const TOKEN = import.meta.env.VITE_API_TOKEN || "";
@@ -18,13 +18,14 @@ export async function apiCall(url: string) {
 export async function fetchActivities({
   queryKey,
 }: {
-  queryKey: [string, number[], boolean, number, boolean];
-}): Promise<Activity[]> {
-  const [sport, distance, fetchMap, limit, race] = queryKey;
+  queryKey: [string, number[], boolean, number, boolean, number];
+}): Promise<ActivitiesResponse> {
+  const [sport, distance, fetchMap, limit, race, page] = queryKey;
   const params = [];
   if (fetchMap) params.push("map=true");
   if (race) params.push("race=true");
   if (sport !== "") params.push(`sport=${sport}`);
+  if (page) params.push(`page=${page}`);
   if (limit) params.push(`limit=${limit}`);
   if (distance && distance.length === 2) {
     const [min, max] = distance;

@@ -2,8 +2,6 @@ import datetime
 import os
 import uuid
 
-from typing import List
-
 from fastapi import FastAPI, Depends, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -13,8 +11,9 @@ from sqlmodel import Session, select
 from db import engine
 from model import (
     Activity,
+    ActivityList,
     ActivityPublic,
-    ActivityPublicNoTracepoints,
+    Pagination,
     PerformanceProfile,
     Profile,
     Statistic,
@@ -61,7 +60,7 @@ def get_session():
         yield session
 
 
-@app.get("/activities/", response_model=List[ActivityPublic])
+@app.get("/activities/", response_model=ActivityList)
 def read_activities(
     session: Session = Depends(get_session),
     map: bool = Query(default=False),
@@ -70,8 +69,9 @@ def read_activities(
     sport: str = Query(default=None),
     min_distance: float = Query(default=None, ge=0),
     max_distance: float = Query(default=None, ge=0),
+    page: int = Query(default=1, ge=1),
 ):
-    query = select(Activity).order_by(Activity.start_time.desc()).limit(limit)  # type: ignore
+    query = select(Activity).order_by(Activity.start_time.desc())  # type: ignore
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
@@ -80,10 +80,21 @@ def read_activities(
         query = query.where(Activity.total_distance >= min_distance * 1000)
     if max_distance is not None:
         query = query.where(Activity.total_distance <= max_distance * 1000)
+
+    total = len(session.exec(query).all())
+
+    query = query.offset((page - 1) * limit).limit(limit)
+
     activities = session.exec(query).all()
-    if map:
-        return activities
-    return [ActivityPublicNoTracepoints.model_validate(a) for a in activities]
+
+    return ActivityList(
+        activities=[ActivityPublic.model_validate(a) for a in activities],
+        pagination=Pagination(
+            page=page,
+            per_page=limit,
+            total=total,
+        ),
+    )
 
 
 @app.get("/activities/{activity_id}/", response_model=ActivityPublic)
