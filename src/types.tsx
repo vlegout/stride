@@ -80,7 +80,7 @@ export const Pagination = type({
 export type Pagination = typeof Pagination.infer;
 
 export const ActivitiesResponse = type({
-  items: Activity.array(),
+  activities: Activity.array(),
   pagination: Pagination,
 });
 export type ActivitiesResponse = typeof ActivitiesResponse.infer;
