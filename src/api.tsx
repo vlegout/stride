@@ -18,9 +18,9 @@ export async function apiCall(url: string) {
 export async function fetchActivities({
   queryKey,
 }: {
-  queryKey: [string, number[], boolean, number, boolean, number];
+  queryKey: [string, number[], boolean, number, boolean, number, string, string];
 }): Promise<ActivitiesResponse> {
-  const [sport, distance, fetchMap, limit, race, page] = queryKey;
+  const [sport, distance, fetchMap, limit, race, page, order, orderBy] = queryKey;
   const params = [];
   if (fetchMap) params.push("map=true");
   if (race) params.push("race=true");
@@ -32,6 +32,8 @@ export async function fetchActivities({
     if (min !== undefined && min != 0) params.push(`min_distance=${min}`);
     if (max !== undefined && max != 100) params.push(`max_distance=${max}`);
   }
+  if (order) params.push(`order=${order}`);
+  if (orderBy) params.push(`order_by=${orderBy}`);
   const queryString = params.length ? "?" + params.join("&") : "";
 
   return await apiCall("/activities/" + queryString);
