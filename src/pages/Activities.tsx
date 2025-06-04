@@ -19,8 +19,8 @@ import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import SportLogo from "../components/SportLogo";
 
 const ActivitiesPage = () => {
-  const [page, setPage] = useState(1);
-  const [sport, setSport] = useState("");
+  const [page, setPage] = useState<number>(1);
+  const [sport, setSport] = useState<string>("");
   const [distance, setDistance] = useState<number[]>([0, 100]);
 
   const { data, error, isPending, isFetching } = useQuery({
