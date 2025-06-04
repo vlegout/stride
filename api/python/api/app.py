@@ -5,7 +5,7 @@ import uuid
 from fastapi import FastAPI, Depends, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import text
+from sqlalchemy import func, text
 from sqlmodel import Session, select
 
 from db import engine
@@ -95,7 +95,7 @@ def read_activities(
     else:
         query = query.order_by(order_column.desc())  # type: ignore
 
-    total = len(session.exec(query).all())
+    total = session.exec(select(func.count()).select_from(query.subquery())).one()
 
     query = query.offset((page - 1) * limit).limit(limit)
 
