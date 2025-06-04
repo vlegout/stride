@@ -70,8 +70,12 @@ def read_activities(
     min_distance: float = Query(default=None, ge=0),
     max_distance: float = Query(default=None, ge=0),
     page: int = Query(default=1, ge=1),
+    order: str = Query(default="desc", pattern="^(asc|desc)$"),
+    order_by: str = Query(
+        default="start_time", pattern="^(total_distance|start_time)$"
+    ),
 ):
-    query = select(Activity).order_by(Activity.start_time.desc())  # type: ignore
+    query = select(Activity)  # type: ignore
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
@@ -80,6 +84,16 @@ def read_activities(
         query = query.where(Activity.total_distance >= min_distance * 1000)
     if max_distance is not None:
         query = query.where(Activity.total_distance <= max_distance * 1000)
+
+    if order_by == "total_distance":
+        order_column = Activity.total_distance
+    else:
+        order_column = Activity.start_time
+
+    if order == "asc":
+        query = query.order_by(order_column.asc())  # type: ignore
+    else:
+        query = query.order_by(order_column.desc())  # type: ignore
 
     total = len(session.exec(query).all())
 

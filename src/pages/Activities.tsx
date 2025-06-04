@@ -11,22 +11,31 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
 import Pagination from "@mui/material/Pagination";
 import Paper from "@mui/material/Paper";
 
 import { fetchActivities } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
+import { Activity } from "../types";
 import SportLogo from "../components/SportLogo";
 
 const ActivitiesPage = () => {
   const [page, setPage] = useState<number>(1);
   const [sport, setSport] = useState<string>("");
   const [distance, setDistance] = useState<number[]>([0, 100]);
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
+  const [orderBy, setOrderBy] = useState<string>("");
 
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport, distance, false, 10, false, page],
+    queryKey: [sport, distance, false, 10, false, page, order, orderBy],
     queryFn: fetchActivities,
   });
+
+  const sortHandler = (property: keyof Activity) => {
+    setOrderBy(property);
+    setOrder(order === "asc" ? "desc" : "asc");
+  };
 
   const handleChange = (event: SelectChangeEvent) => {
     setSport(event.target.value);
@@ -76,7 +85,15 @@ const ActivitiesPage = () => {
               <TableCell>Title</TableCell>
               <TableCell>Location</TableCell>
               <TableCell>Start Time</TableCell>
-              <TableCell>Distance</TableCell>
+              <TableCell key="total_distance" sortDirection={orderBy === "total_distance" ? order : false}>
+                <TableSortLabel
+                  active={orderBy === "total_distance"}
+                  direction={orderBy === "total_distance" ? order : "asc"}
+                  onClick={() => sortHandler("total_distance")}
+                >
+                  Distance
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Average Speed</TableCell>
               <TableCell>Total Ascent</TableCell>
               <TableCell>Calories</TableCell>
