@@ -14,6 +14,7 @@ import Paper from "@mui/material/Paper";
 
 import { fetchActivities } from "../api";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
+import { Activity } from "../types";
 
 import Map from "../components/Map";
 import SportLogo from "../components/SportLogo";
@@ -29,7 +30,7 @@ const Home = ({ race = false }: { race?: boolean }) => {
   return (
     <Container>
       <Box maxWidth="1000px" margin="auto">
-        {data.activities.map((activity) => (
+        {data.activities.map((activity: Activity) => (
           <Box key={activity.id} marginTop="20px" marginBottom={"20px"}>
             <Grid container spacing={2} marginBottom={"20px"}>
               <Grid size={6}>

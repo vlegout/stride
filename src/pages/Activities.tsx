@@ -102,7 +102,7 @@ const ActivitiesPage = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.activities.map((activity) => (
+            {data.activities.map((activity: Activity) => (
               <TableRow key={activity.id}>
                 <TableCell>
                   <SportLogo sport={activity.sport} width={25} />
