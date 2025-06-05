@@ -56,9 +56,15 @@ export const Activity = type({
   avg_heart_rate: "number",
   max_heart_rate: "number",
 
+  avg_power: "number",
+  max_power: "number",
+  np_power: "number",
+
   total_calories: "number",
 
   total_training_effect: "number",
+  training_stress_score: "number",
+  intensity_factor: "number",
 
   lat: "number",
   lon: "number",

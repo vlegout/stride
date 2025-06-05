@@ -75,6 +75,10 @@ const ActivityPage = () => {
                       <TableCell>Max Heart Rate: {data.max_heart_rate}</TableCell>
                     </TableRow>
                     <TableRow>
+                      <TableCell>Avg Power: {data.avg_power}</TableCell>
+                      <TableCell>Normalized Power: {data.np_power}</TableCell>
+                    </TableRow>
+                    <TableRow>
                       <TableCell>Calories: {data.total_calories}</TableCell>
                       <TableCell>Training Effect: {data.total_training_effect}</TableCell>
                     </TableRow>
