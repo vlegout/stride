@@ -86,8 +86,14 @@ struct Activity {
     avg_heart_rate: u8,
     max_heart_rate: u8,
 
+    avg_power: u16,
+    max_power: u16,
+    np_power: u16,
+
     total_calories: u16,
     total_training_effect: u8,
+    training_stress_score: u16,
+    intensity_factor: u16,
 }
 
 struct FitStruct {
@@ -149,9 +155,16 @@ impl IntoPy<PyObject> for Activity {
             .unwrap();
         dict.set_item("max_heart_rate", self.max_heart_rate)
             .unwrap();
+        dict.set_item("avg_power", self.avg_power).unwrap();
+        dict.set_item("max_power", self.max_power).unwrap();
+        dict.set_item("np_power", self.np_power).unwrap();
         dict.set_item("total_calories", self.total_calories)
             .unwrap();
         dict.set_item("total_training_effect", self.total_training_effect)
+            .unwrap();
+        dict.set_item("training_stress_score", self.training_stress_score)
+            .unwrap();
+        dict.set_item("intensity_factor", self.intensity_factor)
             .unwrap();
         dict.into()
     }
@@ -189,8 +202,13 @@ fn get_fit(file_name: &str) -> FitStruct {
             avg_speed: 0,
             avg_heart_rate: 0,
             max_heart_rate: 0,
+            avg_power: 0,
+            max_power: 0,
+            np_power: 0,
             total_calories: 0,
             total_training_effect: 0,
+            training_stress_score: 0,
+            intensity_factor: 0,
         },
         laps: Vec::new(),
         data_points: Vec::new(),
@@ -346,12 +364,31 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 fit.activity.max_heart_rate =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
+                            20 => {
+                                fit.activity.avg_power =
+                                    value.value.clone().try_into().unwrap_or(0);
+                            }
+                            21 => {
+                                fit.activity.max_power =
+                                    value.value.clone().try_into().unwrap_or(0);
+                            }
                             22 => {
                                 fit.activity.total_ascent =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             24 => {
                                 fit.activity.total_training_effect =
+                                    value.value.clone().try_into().unwrap_or(0);
+                            }
+                            34 => {
+                                fit.activity.np_power = value.value.clone().try_into().unwrap_or(0);
+                            }
+                            35 => {
+                                fit.activity.training_stress_score =
+                                    value.value.clone().try_into().unwrap_or(0);
+                            }
+                            36 => {
+                                fit.activity.intensity_factor =
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             124 => {

@@ -64,6 +64,10 @@ const Home = ({ race = false }: { race?: boolean }) => {
                         <TableCell>Max Heart Rate: {activity.max_heart_rate}</TableCell>
                       </TableRow>
                       <TableRow>
+                        <TableCell>Avg Power: {activity.avg_power}</TableCell>
+                        <TableCell>Normalized Power: {activity.np_power}</TableCell>
+                      </TableRow>
+                      <TableRow>
                         <TableCell>Calories: {activity.total_calories}</TableCell>
                         <TableCell>Training Effect: {activity.total_training_effect}</TableCell>
                       </TableRow>

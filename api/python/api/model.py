@@ -33,9 +33,15 @@ class ActivityBase(SQLModel):
     avg_heart_rate: float | None = None
     max_heart_rate: float | None = None
 
+    avg_power: float | None = None
+    max_power: float | None = None
+    np_power: float | None = None
+
     total_calories: float | None = None
 
     total_training_effect: float | None = None
+    training_stress_score: float | None = None
+    intensity_factor: float | None = None
 
     lat: float | None = None
     lon: float | None = None
