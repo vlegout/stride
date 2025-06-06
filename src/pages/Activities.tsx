@@ -95,6 +95,7 @@ const ActivitiesPage = () => {
                 </TableSortLabel>
               </TableCell>
               <TableCell>Average Speed</TableCell>
+              <TableCell>Avg Power</TableCell>
               <TableCell>Total Ascent</TableCell>
               <TableCell>Calories</TableCell>
               <TableCell>Training Effect</TableCell>
@@ -114,6 +115,7 @@ const ActivitiesPage = () => {
                 <TableCell>{formatDateTime(activity.start_time)}</TableCell>
                 <TableCell>{formatDistance(activity.total_distance)}</TableCell>
                 <TableCell>{formatSpeed(activity.avg_speed)}</TableCell>
+                <TableCell>{activity.avg_power}</TableCell>
                 <TableCell>{activity.total_ascent}</TableCell>
                 <TableCell>{activity.total_calories}</TableCell>
                 <TableCell>{activity.total_training_effect}</TableCell>
