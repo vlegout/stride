@@ -1,9 +1,8 @@
 import datetime
-import math
 import unittest
 import uuid
 
-from api.model import Activity, Performance, Tracepoint
+from api.model import Activity, Tracepoint
 from api.utils import (
     get_lat_lon,
     get_delta_lat_lon,
@@ -30,7 +29,7 @@ class TestUtils(unittest.TestCase):
             timestamp=datetime.datetime.now(),
             distance=0.0,
             heart_rate=150,
-            speed=5.0
+            speed=5.0,
         )
         lat, lon = get_lat_lon([tracepoint])
         # Should be approximately the same coordinates (with some floating point precision)
@@ -48,7 +47,7 @@ class TestUtils(unittest.TestCase):
                 timestamp=datetime.datetime.now(),
                 distance=0.0,
                 heart_rate=150,
-                speed=5.0
+                speed=5.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
@@ -58,8 +57,8 @@ class TestUtils(unittest.TestCase):
                 timestamp=datetime.datetime.now(),
                 distance=100.0,
                 heart_rate=155,
-                speed=5.2
-            )
+                speed=5.2,
+            ),
         ]
         lat, lon = get_lat_lon(points)
         # Should be somewhere between the two points
@@ -70,16 +69,16 @@ class TestUtils(unittest.TestCase):
         """Test get_delta_lat_lon calculates correct deltas"""
         lat = 47.2183
         max_distance = 1000.0  # 1km
-        
+
         delta_lat, delta_lon = get_delta_lat_lon(lat, max_distance)
-        
+
         # Should be positive values
         self.assertGreater(delta_lat, 0)
         self.assertGreater(delta_lon, 0)
-        
+
         # Delta lat should be approximately 0.009 degrees for 1km
         self.assertAlmostEqual(delta_lat, 0.009, places=3)
-        
+
         # Delta lon should be slightly larger due to latitude adjustment
         self.assertGreater(delta_lon, delta_lat)
 
@@ -94,9 +93,9 @@ class TestUtils(unittest.TestCase):
         # Approximately 1km apart
         lat1, lon1 = 47.2183, -1.5536
         lat2, lon2 = 47.2273, -1.5536  # About 1km north
-        
+
         distance = get_distance(lat1, lon1, lat2, lon2)
-        
+
         # Should be approximately 1000 meters
         self.assertAlmostEqual(distance, 1000, delta=50)
 
@@ -104,10 +103,10 @@ class TestUtils(unittest.TestCase):
         """Test get_distance is symmetric"""
         lat1, lon1 = 47.2183, -1.5536
         lat2, lon2 = 47.2273, -1.5636
-        
+
         distance1 = get_distance(lat1, lon1, lat2, lon2)
         distance2 = get_distance(lat2, lon2, lat1, lon1)
-        
+
         self.assertAlmostEqual(distance1, distance2, places=5)
 
     def test_get_uuid_deterministic(self):
@@ -115,7 +114,7 @@ class TestUtils(unittest.TestCase):
         filename = "test_activity.fit"
         uuid1 = get_uuid(filename)
         uuid2 = get_uuid(filename)
-        
+
         self.assertEqual(uuid1, uuid2)
         self.assertIsInstance(uuid1, uuid.UUID)
 
@@ -123,7 +122,7 @@ class TestUtils(unittest.TestCase):
         """Test get_uuid generates different UUIDs for different filenames"""
         uuid1 = get_uuid("file1.fit")
         uuid2 = get_uuid("file2.fit")
-        
+
         self.assertNotEqual(uuid1, uuid2)
 
     def test_get_best_performances_empty_tracepoints(self):
@@ -142,9 +141,9 @@ class TestUtils(unittest.TestCase):
             total_elapsed_time=1800.0,
             total_distance=5000.0,
             total_ascent=50.0,
-            avg_speed=2.78
+            avg_speed=2.78,
         )
-        
+
         performances = get_best_performances(activity, [])
         self.assertEqual(performances, [])
 
@@ -164,9 +163,9 @@ class TestUtils(unittest.TestCase):
             total_elapsed_time=1800.0,
             total_distance=15000.0,
             total_ascent=100.0,
-            avg_speed=8.33
+            avg_speed=8.33,
         )
-        
+
         tracepoints = [
             Tracepoint(
                 id=uuid.uuid4(),
@@ -176,10 +175,10 @@ class TestUtils(unittest.TestCase):
                 timestamp=datetime.datetime.now(),
                 distance=5000.0,
                 heart_rate=150,
-                speed=5.0
+                speed=5.0,
             )
         ]
-        
+
         performances = get_best_performances(activity, tracepoints)
         self.assertEqual(performances, [])
 
@@ -199,9 +198,9 @@ class TestUtils(unittest.TestCase):
             total_elapsed_time=1800.0,
             total_distance=10000.0,
             total_ascent=50.0,
-            avg_speed=5.56
+            avg_speed=5.56,
         )
-        
+
         # Create tracepoints for a 10km run
         base_time = datetime.datetime.now()
         tracepoints = []
@@ -213,18 +212,19 @@ class TestUtils(unittest.TestCase):
                     activity_id=activity.id,
                     lat=47.2183 + i * 0.001,
                     lon=-1.5536 + i * 0.001,
-                    timestamp=base_time + datetime.timedelta(seconds=i * 300),  # 5 min per km
+                    timestamp=base_time
+                    + datetime.timedelta(seconds=i * 300),  # 5 min per km
                     distance=distance,
                     heart_rate=150 + i,
-                    speed=5.0
+                    speed=5.0,
                 )
             )
-        
+
         performances = get_best_performances(activity, tracepoints)
-        
+
         # Should have performances for 1km, mile, 5km, and 10km
         self.assertGreater(len(performances), 0)
-        
+
         # Check that all performances have the correct activity_id
         for perf in performances:
             self.assertEqual(perf.activity_id, activity.id)
@@ -247,9 +247,9 @@ class TestUtils(unittest.TestCase):
             total_elapsed_time=300.0,
             total_distance=500.0,
             total_ascent=10.0,
-            avg_speed=1.67
+            avg_speed=1.67,
         )
-        
+
         tracepoints = [
             Tracepoint(
                 id=uuid.uuid4(),
@@ -259,10 +259,10 @@ class TestUtils(unittest.TestCase):
                 timestamp=datetime.datetime.now(),
                 distance=500.0,
                 heart_rate=150,
-                speed=1.67
+                speed=1.67,
             )
         ]
-        
+
         performances = get_best_performances(activity, tracepoints)
         # Should be empty since activity is shorter than 1km
         self.assertEqual(performances, [])
