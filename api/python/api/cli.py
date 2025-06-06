@@ -47,7 +47,7 @@ class ActivityCreate(ActivityBase):
     @field_validator("avg_speed", mode="before")
     @classmethod
     def avg_speed_validator(cls, value: float) -> float:
-        return value * 3.6 / 1000
+        return round(value * 3.6 / 1000, 2)
 
 
 class LapCreate(LapBase):
