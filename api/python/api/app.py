@@ -8,8 +8,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import func, text
 from sqlmodel import Session, select
 
-from db import engine
-from model import (
+from api.db import engine
+from api.model import (
     Activity,
     ActivityList,
     ActivityPublic,

@@ -13,9 +13,16 @@ import yaml
 from pydantic import field_validator, ValidationInfo
 from sqlmodel import Session, SQLModel
 
-from db import engine
-from model import Activity, ActivityBase, Lap, LapBase, Tracepoint, TracepointBase
-from utils import (
+from api.db import engine
+from api.model import (
+    Activity,
+    ActivityBase,
+    Lap,
+    LapBase,
+    Tracepoint,
+    TracepointBase,
+)
+from api.utils import (
     get_best_performances,
     get_lat_lon,
     get_uuid,
@@ -23,7 +30,7 @@ from utils import (
     get_distance,
 )
 
-import api
+import api.api
 
 MAX_DATA_POINTS = 500
 NB_CPUS = 2
@@ -86,7 +93,7 @@ def get_activity_from_fit(
     description: str = "",
     race: bool = False,
 ) -> tuple[Activity, List[Lap], List[Tracepoint]]:
-    fit = api.get_fit(fit_file)
+    fit = api.api.get_fit(fit_file)
 
     activity_create = ActivityCreate(
         id=get_uuid(fit_file),
@@ -145,7 +152,9 @@ def get_activity_from_fit(
     return activity, laps, tracepoints
 
 
-def get_activity_from_yaml(locations: List[Any], yaml_file: str):
+def get_activity_from_yaml(
+    locations: List[Any], yaml_file: str
+) -> tuple[Activity, List[Lap], List[Tracepoint]]:
     with open(yaml_file, "r") as file:
         config = yaml.safe_load(file)
 
@@ -160,7 +169,9 @@ def get_activity_from_yaml(locations: List[Any], yaml_file: str):
     return activity, laps, tracepoints
 
 
-def process_file(locations: List[Any], input_file: str) -> None:
+def get_data(
+    locations: List[Any], input_file: str
+) -> tuple[Activity, List[Lap], List[Tracepoint], list]:
     if input_file.endswith(".yaml"):
         activity, laps, tracepoints = get_activity_from_yaml(
             locations,
@@ -176,6 +187,12 @@ def process_file(locations: List[Any], input_file: str) -> None:
 
     while len(tracepoints) > MAX_DATA_POINTS:
         tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
+
+    return activity, laps, tracepoints, performances
+
+
+def process_file(locations: List[Any], input_file: str) -> None:
+    activity, laps, tracepoints, performances = get_data(locations, input_file)
 
     session = Session(engine)
     session.add(activity)
@@ -242,16 +259,26 @@ def create_db():
 @app.command()
 def read_fit(
     fit_file: str = typer.Argument(),
+    out_file: str = typer.Option(None),
 ):
-    """Read a .fit file and print parsed activity, laps, and tracepoints."""
+    """Read a .fit file and parse activity, laps, and tracepoints."""
     locations = json.load(open("./data/locations.json")).get("locations")
-    activity, laps, tracepoints = get_activity_from_fit(
+    activity, laps, tracepoints, performances = get_data(
         locations,
         fit_file,
-        "",
-        "",
-        False,
     )
+
+    if out_file:
+        with open(out_file, "w") as f:
+            json.dump(
+                {
+                    "activity": activity.model_dump(),
+                },
+                f,
+                default=str,
+            )
+        return
+
     print("Activity:")
     print(activity)
     print("\nLaps:")

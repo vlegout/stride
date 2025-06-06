@@ -4,7 +4,7 @@ import uuid
 
 from typing import List, Tuple
 
-from model import Activity, Performance, Tracepoint
+from api.model import Activity, Performance, Tracepoint
 
 
 def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
