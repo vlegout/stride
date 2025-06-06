@@ -239,5 +239,30 @@ def create_db():
     print("Done")
 
 
+@app.command()
+def read_fit(
+    fit_file: str = typer.Argument(),
+):
+    """Read a .fit file and print parsed activity, laps, and tracepoints."""
+    locations = json.load(open("./data/locations.json")).get("locations")
+    activity, laps, tracepoints = get_activity_from_fit(
+        locations,
+        fit_file,
+        "",
+        "",
+        False,
+    )
+    print("Activity:")
+    print(activity)
+    print("\nLaps:")
+    for lap in laps:
+        print(lap)
+    print("\nTracepoints:")
+    for tp in tracepoints[:10]:
+        print(tp)
+    if len(tracepoints) > 10:
+        print(f"... ({len(tracepoints) - 10} more tracepoints)")
+
+
 if __name__ == "__main__":
     app()
