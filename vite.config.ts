@@ -8,7 +8,8 @@ export default defineConfig(() => {
     plugins: [react(), svgr()],
     test: {
       environment: 'jsdom',
-      exclude: ['**/node_modules/**', '**/tests/**/*.spec.ts'],
+      exclude: ['**/node_modules/**', '**/e2e/**'],
+      globals: false,
     },
   };
 });
