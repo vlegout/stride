@@ -1,5 +1,5 @@
 {
-    "id": "42eb73ed-08c0-5fd9-988a-6d1728423e83",
+    "id": "ea0dbfe5-49c1-5e48-b889-66009d69db7d",
     "fit": "ride.fit",
     "title": "Activity",
     "description": "",
@@ -22,9 +22,9 @@
     "total_training_effect": 4.0,
     "training_stress_score": 1785.0,
     "intensity_factor": 971.0,
-    "lat": 47.1789863370052,
-    "lon": -1.44393453812559,
-    "delta_lat": 0.105070786216759,
-    "delta_lon": 0.154581704894763,
+    "lat": 47.178986337005206,
+    "lon": -1.4439345381255881,
+    "delta_lat": 0.10507078621675933,
+    "delta_lon": 0.15458170489476342,
     "location": "Nantes, France"
 }

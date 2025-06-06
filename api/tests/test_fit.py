@@ -5,7 +5,7 @@ from api.cli import get_data
 
 
 class TestFit(unittest.TestCase):
-    def test_run(self):
+    def test_fit(self):
         locations = [
             {
                 "lat": 47.21133481711149,
@@ -14,16 +14,17 @@ class TestFit(unittest.TestCase):
             },
         ]
 
-        activity, _, _, _ = get_data(
-            locations,
-            "./tests/data/run.fit",
-        )
+        for sport in ["run", "ride"]:
+            activity, _, _, _ = get_data(
+                locations,
+                f"./tests/data/{sport}.fit",
+            )
 
-        with open("./tests/data/run.json", "r") as f:
-            data = json.load(f)
+            with open(f"./tests/data/{sport}.json", "r") as f:
+                data = json.load(f)
 
-        self.maxDiff = None
-        self.assertEqual(activity.model_dump(mode="json"), data)
+            self.maxDiff = None
+            self.assertEqual(activity.model_dump(mode="json"), data)
 
 
 if __name__ == "__main__":
