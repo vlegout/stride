@@ -90,7 +90,7 @@ def get_activity_from_fit(
 
     activity_create = ActivityCreate(
         id=get_uuid(fit_file),
-        fit=fit_file,
+        fit=os.path.basename(fit_file),
         title=title,
         description=description,
         race=race,
