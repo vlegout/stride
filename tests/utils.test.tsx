@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatSpeed, formatDistance, formatDuration, formatDateTime, formatInterval } from './utils';
+import { formatSpeed, formatDistance, formatDuration, formatDateTime, formatInterval } from '../src/utils';
 
 describe('utils', () => {
   describe('formatSpeed', () => {
