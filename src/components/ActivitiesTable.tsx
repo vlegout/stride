@@ -20,16 +20,17 @@ import SportLogo from "./SportLogo";
 interface ActivitiesTableProps {
   sport: string;
   distance: number[];
+  race: boolean;
   page: number;
   onPageChange: (page: number) => void;
 }
 
-const ActivitiesTable = ({ sport, distance, page, onPageChange }: ActivitiesTableProps) => {
+const ActivitiesTable = ({ sport, distance, race, page, onPageChange }: ActivitiesTableProps) => {
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [orderBy, setOrderBy] = useState<string>("");
 
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport, distance, false, 10, false, page, order, orderBy],
+    queryKey: [sport, distance, false, 10, race, page, order, orderBy],
     queryFn: fetchActivities,
   });
 
@@ -65,6 +66,7 @@ const ActivitiesTable = ({ sport, distance, page, onPageChange }: ActivitiesTabl
               <TableCell>Total Ascent</TableCell>
               <TableCell>Calories</TableCell>
               <TableCell>Training Effect</TableCell>
+              <TableCell>Race</TableCell>
               <TableCell>Device</TableCell>
             </TableRow>
           </TableHead>
@@ -85,6 +87,7 @@ const ActivitiesTable = ({ sport, distance, page, onPageChange }: ActivitiesTabl
                 <TableCell>{activity.total_ascent}</TableCell>
                 <TableCell>{activity.total_calories}</TableCell>
                 <TableCell>{activity.total_training_effect}</TableCell>
+                <TableCell>{activity.race ? "Yes" : "No"}</TableCell>
                 <TableCell>{activity.device}</TableCell>
               </TableRow>
             ))}
