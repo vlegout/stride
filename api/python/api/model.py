@@ -66,6 +66,11 @@ class ActivityPublic(ActivityBase):
         return sorted(tracepoints, key=lambda a: a.timestamp, reverse=True)
 
 
+class ActivityPublicWithoutTracepoints(ActivityBase):
+    laps: list["Lap"] = []
+    performances: list["Performance"] = []
+
+
 class Pagination(BaseModel):
     page: int = 1
     per_page: int = 10
@@ -73,7 +78,7 @@ class Pagination(BaseModel):
 
 
 class ActivityList(BaseModel):
-    activities: List[ActivityPublic] = []
+    activities: List[ActivityPublic | ActivityPublicWithoutTracepoints] = []
     pagination: Pagination = Pagination()
 
 

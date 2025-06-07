@@ -13,6 +13,7 @@ from api.model import (
     Activity,
     ActivityList,
     ActivityPublic,
+    ActivityPublicWithoutTracepoints,
     Pagination,
     PerformanceProfile,
     Profile,
@@ -101,8 +102,16 @@ def read_activities(
 
     activities = session.exec(query).all()
 
+    activity_models: list[ActivityPublic | ActivityPublicWithoutTracepoints] = []
+    if map:
+        activity_models = [ActivityPublic.model_validate(a) for a in activities]
+    else:
+        activity_models = [
+            ActivityPublicWithoutTracepoints.model_validate(a) for a in activities
+        ]
+
     return ActivityList(
-        activities=[ActivityPublic.model_validate(a) for a in activities],
+        activities=activity_models,
         pagination=Pagination(
             page=page,
             per_page=limit,
