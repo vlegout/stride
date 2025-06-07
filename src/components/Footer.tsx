@@ -1,13 +1,15 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
+import { colors } from "../colors";
+
 const Footer = () => {
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: "grey.200",
-        color: "black",
+        bgcolor: colors.primaryLighter,
+        color: colors.text.onLight,
         py: 2,
         px: 3,
         mt: "auto",

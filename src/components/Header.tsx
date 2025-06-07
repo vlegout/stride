@@ -4,6 +4,8 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 
+import { colors } from "../colors";
+
 const menus = [
   { to: "/", label: "Home" },
   { to: "/activities", label: "Activities" },
@@ -14,13 +16,13 @@ const menus = [
 const Header = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ bgcolor: "grey.200", color: "black" }}>
+      <AppBar position="static" sx={{ bgcolor: colors.primarySoft, color: colors.text.onLight }}>
         <Toolbar>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <img src="/logo.svg" alt="Logo" style={{ height: "32px", width: "auto" }} />
           </Box>
           {menus.map(({ to, label }) => (
-            <Link key={to} to={to} style={{ textDecoration: "none", color: "black" }}>
+            <Link key={to} to={to} style={{ textDecoration: "none", color: colors.text.onLight }}>
               <Typography component="div" sx={{ flexGrow: 1 }} paddingRight="15px">
                 {label}
               </Typography>
