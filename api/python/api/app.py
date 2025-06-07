@@ -73,7 +73,8 @@ def read_activities(
     page: int = Query(default=1, ge=1),
     order: str = Query(default="desc", pattern="^(asc|desc)$"),
     order_by: str = Query(
-        default="start_time", pattern="^(total_distance|start_time)$"
+        default="start_time",
+        pattern="^(total_distance|start_time|avg_speed|avg_power|total_ascent|total_calories)$",
     ),
 ):
     query = select(Activity)  # type: ignore
@@ -88,6 +89,14 @@ def read_activities(
 
     if order_by == "total_distance":
         order_column = Activity.total_distance
+    elif order_by == "avg_speed":
+        order_column = Activity.avg_speed
+    elif order_by == "avg_power":
+        order_column = Activity.avg_power  # type: ignore
+    elif order_by == "total_ascent":
+        order_column = Activity.total_ascent
+    elif order_by == "total_calories":
+        order_column = Activity.total_calories  # type: ignore
     else:
         order_column = Activity.start_time
 

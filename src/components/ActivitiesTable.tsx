@@ -72,10 +72,42 @@ const ActivitiesTable = ({ sport, distance, race, page, onPageChange }: Activiti
                   Distance
                 </TableSortLabel>
               </TableCell>
-              <TableCell>Average Speed</TableCell>
-              <TableCell>Avg Power</TableCell>
-              <TableCell>Total Ascent</TableCell>
-              <TableCell>Calories</TableCell>
+              <TableCell key="avg_speed" sortDirection={orderBy === "avg_speed" ? order : false}>
+                <TableSortLabel
+                  active={orderBy === "avg_speed"}
+                  direction={orderBy === "avg_speed" ? order : "asc"}
+                  onClick={() => sortHandler("avg_speed")}
+                >
+                  Average Speed
+                </TableSortLabel>
+              </TableCell>
+              <TableCell key="avg_power" sortDirection={orderBy === "avg_power" ? order : false}>
+                <TableSortLabel
+                  active={orderBy === "avg_power"}
+                  direction={orderBy === "avg_power" ? order : "asc"}
+                  onClick={() => sortHandler("avg_power")}
+                >
+                  Avg Power
+                </TableSortLabel>
+              </TableCell>
+              <TableCell key="total_ascent" sortDirection={orderBy === "total_ascent" ? order : false}>
+                <TableSortLabel
+                  active={orderBy === "total_ascent"}
+                  direction={orderBy === "total_ascent" ? order : "asc"}
+                  onClick={() => sortHandler("total_ascent")}
+                >
+                  Total Ascent
+                </TableSortLabel>
+              </TableCell>
+              <TableCell key="total_calories" sortDirection={orderBy === "total_calories" ? order : false}>
+                <TableSortLabel
+                  active={orderBy === "total_calories"}
+                  direction={orderBy === "total_calories" ? order : "asc"}
+                  onClick={() => sortHandler("total_calories")}
+                >
+                  Calories
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Training Effect</TableCell>
               <TableCell>Race</TableCell>
               <TableCell>Device</TableCell>
