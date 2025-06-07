@@ -1,19 +1,6 @@
 import axios from "axios";
-import { type } from "arktype";
 
-import type { Activity, ActivitiesResponse, Profile } from "./types";
-
-export const ActivitiesQueryParams = type({
-  sport: "string",
-  distance: "number[]",
-  fetchMap: "boolean",
-  limit: "number",
-  race: "boolean",
-  page: "number",
-  order: "'asc'|'desc'",
-  orderBy: "string",
-});
-export type ActivitiesQueryParams = typeof ActivitiesQueryParams.infer;
+import type { Activity, ActivitiesResponse, ActivitiesQueryParams, Profile } from "./types";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 const TOKEN = import.meta.env.VITE_API_TOKEN || "";

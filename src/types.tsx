@@ -1,5 +1,17 @@
 import { type } from "arktype";
 
+export const ActivitiesQueryParams = type({
+  sport: "string",
+  distance: "number[]",
+  fetchMap: "boolean",
+  limit: "number",
+  race: "boolean",
+  page: "number",
+  order: "'asc'|'desc'",
+  orderBy: "string",
+});
+export type ActivitiesQueryParams = typeof ActivitiesQueryParams.infer;
+
 export const Performance = type({
   distance: "number",
   time: "string",
