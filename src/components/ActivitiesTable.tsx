@@ -12,7 +12,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Pagination from "@mui/material/Pagination";
 import Paper from "@mui/material/Paper";
 
-import { fetchActivities } from "../api";
+import { fetchActivities, createActivitiesQueryKey, type ActivitiesQueryParams } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import { Activity } from "../types";
 import SportLogo from "./SportLogo";
@@ -29,8 +29,19 @@ const ActivitiesTable = ({ sport, distance, race, page, onPageChange }: Activiti
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [orderBy, setOrderBy] = useState<string>("");
 
+  const queryParams: ActivitiesQueryParams = {
+    sport,
+    distance,
+    fetchMap: false,
+    limit: 10,
+    race,
+    page,
+    order,
+    orderBy,
+  };
+
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport, distance, false, 10, race, page, order, orderBy],
+    queryKey: createActivitiesQueryKey(queryParams),
     queryFn: fetchActivities,
   });
 

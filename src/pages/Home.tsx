@@ -3,14 +3,25 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 
-import { fetchActivities } from "../api";
+import { fetchActivities, createActivitiesQueryKey, type ActivitiesQueryParams } from "../api";
 import { Activity } from "../types";
 
 import ActivityBox from "../components/ActivityBox";
 
 const Home = ({ race = false }: { race?: boolean }) => {
+  const queryParams: ActivitiesQueryParams = {
+    sport: "",
+    distance: [0, 100],
+    fetchMap: true,
+    limit: 5,
+    race,
+    page: 1,
+    order: "desc",
+    orderBy: "",
+  };
+
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: ["", [0, 100], true, 5, race, 1, "", ""],
+    queryKey: createActivitiesQueryKey(queryParams),
     queryFn: fetchActivities,
   });
 

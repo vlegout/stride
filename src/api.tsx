@@ -2,6 +2,17 @@ import axios from "axios";
 
 import type { Activity, ActivitiesResponse, Profile } from "./types";
 
+export interface ActivitiesQueryParams {
+  sport: string;
+  distance: number[];
+  fetchMap: boolean;
+  limit: number;
+  race: boolean;
+  page: number;
+  order: "asc" | "desc";
+  orderBy: string;
+}
+
 const API_URL = import.meta.env.VITE_API_URL || "";
 const TOKEN = import.meta.env.VITE_API_TOKEN || "";
 
@@ -15,26 +26,32 @@ export async function apiCall(url: string) {
   return response.data;
 }
 
+export function createActivitiesQueryKey(params: ActivitiesQueryParams): [string, ActivitiesQueryParams] {
+  return ["activities", params];
+}
+
 export async function fetchActivities({
   queryKey,
 }: {
-  queryKey: [string, number[], boolean, number, boolean, number, string, string];
+  queryKey: [string, ActivitiesQueryParams];
 }): Promise<ActivitiesResponse> {
-  const [sport, distance, fetchMap, limit, race, page, order, orderBy] = queryKey;
-  const params = [];
-  if (fetchMap) params.push("map=true");
-  if (race) params.push("race=true");
-  if (sport !== "") params.push(`sport=${sport}`);
-  if (page) params.push(`page=${page}`);
-  if (limit) params.push(`limit=${limit}`);
+  const [, params] = queryKey;
+  const { sport, distance, fetchMap, limit, race, page, order, orderBy } = params;
+
+  const urlParams = [];
+  if (fetchMap) urlParams.push("map=true");
+  if (race) urlParams.push("race=true");
+  if (sport !== "") urlParams.push(`sport=${sport}`);
+  if (page) urlParams.push(`page=${page}`);
+  if (limit) urlParams.push(`limit=${limit}`);
   if (distance && distance.length === 2) {
     const [min, max] = distance;
-    if (min !== undefined && min != 0) params.push(`min_distance=${min}`);
-    if (max !== undefined && max != 100) params.push(`max_distance=${max}`);
+    if (min !== undefined && min != 0) urlParams.push(`min_distance=${min}`);
+    if (max !== undefined && max != 100) urlParams.push(`max_distance=${max}`);
   }
-  if (order) params.push(`order=${order}`);
-  if (orderBy) params.push(`order_by=${orderBy}`);
-  const queryString = params.length ? "?" + params.join("&") : "";
+  if (order) urlParams.push(`order=${order}`);
+  if (orderBy) urlParams.push(`order_by=${orderBy}`);
+  const queryString = urlParams.length ? "?" + urlParams.join("&") : "";
 
   return await apiCall("/activities/" + queryString);
 }
