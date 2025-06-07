@@ -12,9 +12,9 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Pagination from "@mui/material/Pagination";
 import Paper from "@mui/material/Paper";
 
-import { fetchActivities, createActivitiesQueryKey, type ActivitiesQueryParams } from "../api";
+import { fetchActivities, createActivitiesQueryKey } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
-import { Activity } from "../types";
+import { Activity, ActivitiesQueryParams } from "../types";
 import SportLogo from "./SportLogo";
 
 interface ActivitiesTableProps {

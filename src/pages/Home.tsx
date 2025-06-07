@@ -3,8 +3,8 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 
-import { fetchActivities, createActivitiesQueryKey, type ActivitiesQueryParams } from "../api";
-import { Activity } from "../types";
+import { fetchActivities, createActivitiesQueryKey } from "../api";
+import { Activity, ActivitiesQueryParams } from "../types";
 
 import ActivityBox from "../components/ActivityBox";
 
