@@ -1,0 +1,54 @@
+<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle for contrast -->
+  <circle cx="80" cy="40" r="45" fill="#FF6B35" opacity="0.08"/>
+  <circle cx="80" cy="40" r="35" fill="#FF6B35" opacity="0.12"/>
+  
+  <!-- Enhanced runner silhouette -->
+  <g transform="translate(80, 15)">
+    <!-- Head with subtle shading -->
+    <circle cx="0" cy="0" r="6" fill="#FF6B35"/>
+    <circle cx="1" cy="-1" r="2" fill="#FF8C60" opacity="0.8"/>
+    
+    <!-- Torso with athletic build -->
+    <path d="M0 6 L2 12 L4 28 L-2 28 Z" fill="#FF6B35"/>
+    <path d="M2 10 L6 8 L8 16 L4 18 Z" fill="#FF6B35"/>
+    
+    <!-- Arms in dynamic running motion -->
+    <!-- Forward arm (left) -->
+    <path d="M2 12 Q8 8 12 2" stroke="#FF6B35" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M2 12 Q6 10 8 8" stroke="#FF6B35" stroke-width="3" stroke-linecap="round" fill="none"/>
+    
+    <!-- Back arm (right) -->
+    <path d="M-2 14 Q-8 18 -12 25" stroke="#FF6B35" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M-2 14 Q-6 16 -8 20" stroke="#FF6B35" stroke-width="3" stroke-linecap="round" fill="none"/>
+    
+    <!-- Legs in powerful stride -->
+    <!-- Forward leg (right) -->
+    <path d="M2 28 Q8 32 14 28" stroke="#FF6B35" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M2 28 Q6 30 10 30" stroke="#FF6B35" stroke-width="4" stroke-linecap="round" fill="none"/>
+    
+    <!-- Back leg (left) -->
+    <path d="M-2 28 Q-6 35 -8 45" stroke="#FF6B35" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M-2 28 Q-4 32 -6 38" stroke="#FF6B35" stroke-width="4" stroke-linecap="round" fill="none"/>
+    
+    <!-- Enhanced feet with running shoes -->
+    <ellipse cx="13" cy="29" rx="5" ry="2.5" fill="#FF6B35"/>
+    <ellipse cx="15" cy="28" rx="2" ry="1" fill="#FF8C60"/>
+    <ellipse cx="-9" cy="46" rx="5" ry="2.5" fill="#FF6B35"/>
+    <ellipse cx="-7" cy="45" rx="2" ry="1" fill="#FF8C60"/>
+    
+    <!-- Hair/movement detail -->
+    <path d="M-4 -2 Q-8 -4 -10 -2" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </g>
+  
+  <!-- Enhanced motion lines for speed effect -->
+  <g opacity="0.6">
+    <path d="M50 30 L35 30" stroke="#FF6B35" stroke-width="2" stroke-linecap="round"/>
+    <path d="M48 35 L30 35" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M52 40 L38 40" stroke="#FF6B35" stroke-width="2" stroke-linecap="round"/>
+    <path d="M45 25 L32 25" stroke="#FF6B35" stroke-width="1" stroke-linecap="round"/>
+    <path d="M55 45 L42 45" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  
+
+</svg>

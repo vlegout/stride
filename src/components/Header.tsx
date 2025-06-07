@@ -16,6 +16,9 @@ const Header = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ bgcolor: "grey.200", color: "black" }}>
         <Toolbar>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <img src="/logo.svg" alt="Logo" style={{ height: "32px", width: "auto" }} />
+          </Box>
           {menus.map(({ to, label }) => (
             <Link key={to} to={to} style={{ textDecoration: "none", color: "black" }}>
               <Typography component="div" sx={{ flexGrow: 1 }} paddingRight="15px">
