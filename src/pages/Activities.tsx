@@ -1,31 +1,15 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { FormControl, InputLabel, MenuItem, Slider } from "@mui/material";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Pagination from "@mui/material/Pagination";
 
-import { fetchActivities } from "../api";
-import { Activity } from "../types";
 import ActivitiesTable from "../components/ActivitiesTable";
 
 const ActivitiesPage = () => {
   const [page, setPage] = useState<number>(1);
   const [sport, setSport] = useState<string>("");
   const [distance, setDistance] = useState<number[]>([0, 100]);
-  const [order, setOrder] = useState<"asc" | "desc">("desc");
-  const [orderBy, setOrderBy] = useState<string>("");
-
-  const { data, error, isPending, isFetching } = useQuery({
-    queryKey: [sport, distance, false, 10, false, page, order, orderBy],
-    queryFn: fetchActivities,
-  });
-
-  const sortHandler = (property: keyof Activity) => {
-    setOrderBy(property);
-    setOrder(order === "asc" ? "desc" : "asc");
-  };
 
   const handleChange = (event: SelectChangeEvent) => {
     setSport(event.target.value);
@@ -35,7 +19,9 @@ const ActivitiesPage = () => {
     setDistance(value);
   };
 
-  if (isPending || isFetching || error) return "Loading...";
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
     <Box paddingLeft={"20px"} paddingRight="20px">
@@ -67,17 +53,7 @@ const ActivitiesPage = () => {
           </FormControl>
         </Grid>
       </Grid>
-      <ActivitiesTable activities={data.activities} order={order} orderBy={orderBy} onSort={sortHandler} />
-      <Box margin={"auto"} marginTop="20px" display="flex" justifyContent="center">
-        <Pagination
-          count={Math.ceil(data.pagination.total / data.pagination.per_page)}
-          shape="rounded"
-          page={page}
-          onChange={(_event, value) => {
-            setPage(value);
-          }}
-        />
-      </Box>
+      <ActivitiesTable sport={sport} distance={distance} page={page} onPageChange={handlePageChange} />
     </Box>
   );
 };
