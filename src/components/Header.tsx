@@ -28,6 +28,11 @@ const Header = () => {
               </Typography>
             </Link>
           ))}
+          <Box sx={{ marginLeft: "auto" }}>
+            <Typography variant="body2" sx={{ color: colors.text.onLight }}>
+              Version: {__APP_VERSION__}
+            </Typography>
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>
