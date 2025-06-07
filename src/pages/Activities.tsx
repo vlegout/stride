@@ -29,9 +29,16 @@ const ActivitiesPage = () => {
   };
 
   return (
-    <Box paddingLeft={"20px"} paddingRight="20px">
-      <Grid container spacing={2} marginTop="20px" marginBottom="20px">
-        <Grid size={3}>
+    <Box sx={{ width: "100%" }}>
+      <Grid
+        container
+        spacing={{ xs: 2, sm: 2, md: 2 }}
+        sx={{
+          mb: { xs: 2, sm: 3 },
+          flexDirection: { xs: "column", sm: "column", md: "row" },
+        }}
+      >
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <FormControl fullWidth>
             <InputLabel id="activities-sport">Sport</InputLabel>
             <Select labelId="activities-sport" value={sport} label="Sport" onChange={handleChange}>
@@ -41,13 +48,17 @@ const ActivitiesPage = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid size={2} display="flex" alignItems="center">
-          <FormControlLabel control={<Checkbox checked={race} onChange={handleRaceChange} />} label="Race" />
+        <Grid size={{ xs: 12, sm: 6, md: 2 }} sx={{ display: "flex", alignItems: "center" }}>
+          <FormControlLabel
+            control={<Checkbox checked={race} onChange={handleRaceChange} />}
+            label="Race"
+            sx={{ width: "100%" }}
+          />
         </Grid>
-        <Grid size={7}>
+        <Grid size={{ xs: 12, sm: 12, md: 7 }}>
           <FormControl fullWidth>
-            Distance
-            <Box marginLeft="10px" marginRight="10px">
+            <Box sx={{ mb: 1, fontSize: "0.875rem", color: "text.secondary" }}>Distance</Box>
+            <Box sx={{ px: { xs: 2, sm: 3 } }}>
               <Slider
                 getAriaLabel={() => "Minimum distance"}
                 value={distance}
@@ -56,12 +67,20 @@ const ActivitiesPage = () => {
                 disableSwap
                 min={0}
                 max={100}
+                sx={{
+                  "& .MuiSlider-thumb": {
+                    width: { xs: 20, sm: 24 },
+                    height: { xs: 20, sm: 24 },
+                  },
+                }}
               />
             </Box>
           </FormControl>
         </Grid>
       </Grid>
-      <ActivitiesTable sport={sport} distance={distance} race={race} page={page} onPageChange={handlePageChange} />
+      <Box sx={{ overflowX: "auto", width: "100%" }}>
+        <ActivitiesTable sport={sport} distance={distance} race={race} page={page} onPageChange={handlePageChange} />
+      </Box>
     </Box>
   );
 };
