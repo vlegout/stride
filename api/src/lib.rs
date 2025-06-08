@@ -367,10 +367,16 @@ fn get_fit(file_name: &str) -> FitStruct {
                             20 => {
                                 fit.activity.avg_power =
                                     value.value.clone().try_into().unwrap_or(0);
+                                if fit.activity.avg_power == 65535 {
+                                    fit.activity.avg_power = 0;
+                                }
                             }
                             21 => {
                                 fit.activity.max_power =
                                     value.value.clone().try_into().unwrap_or(0);
+                                if fit.activity.max_power == 65535 {
+                                    fit.activity.max_power = 0;
+                                }
                             }
                             22 => {
                                 fit.activity.total_ascent =
@@ -382,18 +388,30 @@ fn get_fit(file_name: &str) -> FitStruct {
                             }
                             34 => {
                                 fit.activity.np_power = value.value.clone().try_into().unwrap_or(0);
+                                if fit.activity.np_power == 65535 {
+                                    fit.activity.np_power = 0;
+                                }
                             }
                             35 => {
                                 fit.activity.training_stress_score =
                                     value.value.clone().try_into().unwrap_or(0);
+                                if fit.activity.training_stress_score == 65535 {
+                                    fit.activity.training_stress_score = 0;
+                                }
                             }
                             36 => {
                                 fit.activity.intensity_factor =
                                     value.value.clone().try_into().unwrap_or(0);
+                                if fit.activity.intensity_factor == 65535 {
+                                    fit.activity.intensity_factor = 0;
+                                }
                             }
                             124 => {
                                 fit.activity.avg_speed =
                                     value.value.clone().try_into().unwrap_or(0);
+                                if fit.activity.avg_speed == 65535 {
+                                    fit.activity.avg_speed = 0;
+                                }
                             }
                             253 => {
                                 fit.activity.timestamp =
