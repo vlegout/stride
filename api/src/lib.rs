@@ -8,6 +8,22 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use std::fs;
 
+fn extract_u8(value: &fit_rust::protocol::value::Value) -> u8 {
+    value.clone().try_into().unwrap_or(0)
+}
+
+fn extract_u16(value: &fit_rust::protocol::value::Value) -> u16 {
+    value.clone().try_into().unwrap_or(0)
+}
+
+fn extract_u32(value: &fit_rust::protocol::value::Value) -> u32 {
+    value.clone().try_into().unwrap_or(0)
+}
+
+fn extract_f32(value: &fit_rust::protocol::value::Value) -> f32 {
+    value.clone().try_into().unwrap_or(0.0)
+}
+
 fn sanitize_u16(value: u16) -> u16 {
     if value == u16::MAX { 0 } else { value }
 }
@@ -228,7 +244,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                 MessageType::DeviceInfo => {
                     for value in &msg.data.values {
                         if value.field_num == 4 && fit.activity.device == "" {
-                            let device_id: u16 = value.value.clone().try_into().unwrap_or(0);
+                            let device_id: u16 = extract_u16(&value.value);
                             fit.activity.device = Device::from_id(device_id).as_str().to_string();
                         }
                     }
@@ -248,27 +264,27 @@ fn get_fit(file_name: &str) -> FitStruct {
                         new_lap.index = lap;
                         match value.field_num {
                             2 => {
-                                new_lap.start_time = value.value.clone().try_into().unwrap_or(0);
+                                new_lap.start_time = extract_u32(&value.value);
                             }
                             7 => {
                                 new_lap.total_elapsed_time =
-                                    value.value.clone().try_into().unwrap_or(0) / 1000;
+                                    extract_u32(&value.value) / 1000;
                             }
                             8 => {
                                 new_lap.total_timer_time =
-                                    value.value.clone().try_into().unwrap_or(0) / 1000;
+                                    extract_u32(&value.value) / 1000;
                             }
                             9 => {
                                 new_lap.total_distance =
-                                    value.value.clone().try_into().unwrap_or(0) / 100;
+                                    extract_u32(&value.value) / 100;
                             }
                             15 => {
                                 new_lap.avg_heart_rate =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u8(&value.value);
                             }
                             16 => {
                                 new_lap.max_heart_rate =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u8(&value.value);
                             }
                             _ => {}
                         }
@@ -292,32 +308,32 @@ fn get_fit(file_name: &str) -> FitStruct {
                     for value in &msg.data.values {
                         match value.field_num {
                             0 => {
-                                point.lat = value.value.clone().try_into().unwrap_or(0.0);
+                                point.lat = extract_f32(&value.value);
                                 if point.lat == 180.0 {
                                     point.lat = 0.0;
                                 }
                             }
                             1 => {
-                                point.lon = value.value.clone().try_into().unwrap_or(0.0);
+                                point.lon = extract_f32(&value.value);
                             }
                             3 => {
-                                point.heart_rate = value.value.clone().try_into().unwrap_or(0);
+                                point.heart_rate = extract_u8(&value.value);
                             }
                             5 => {
-                                point.distance = value.value.clone().try_into().unwrap_or(0) / 100;
+                                point.distance = extract_u32(&value.value) / 100;
                             }
                             7 => {
-                                let raw_power: u16 = value.value.clone().try_into().unwrap_or(0);
+                                let raw_power: u16 = extract_u16(&value.value);
                                 point.power = sanitize_u16(raw_power);
                             }
                             73 => {
-                                point.speed = value.value.clone().try_into().unwrap_or(0);
+                                point.speed = extract_u32(&value.value);
                             }
                             78 => {
-                                point.altitude = value.value.clone().try_into().unwrap_or(0);
+                                point.altitude = extract_u32(&value.value);
                             }
                             253 => {
-                                point.timestamp = value.value.clone().try_into().unwrap_or(0);
+                                point.timestamp = extract_u32(&value.value);
                             }
                             _ => {}
                         }
@@ -334,7 +350,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                         match value.field_num {
                             2 => {
                                 fit.activity.start_time =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u32(&value.value);
                             }
                             5 => match value.value {
                                 fit_rust::protocol::value::Value::Enum("running") => {
@@ -347,67 +363,67 @@ fn get_fit(file_name: &str) -> FitStruct {
                             },
                             7 => {
                                 fit.activity.total_elapsed_time =
-                                    value.value.clone().try_into().unwrap_or(0) / 1000;
+                                    extract_u32(&value.value) / 1000;
                             }
                             8 => {
                                 fit.activity.total_timer_time =
-                                    value.value.clone().try_into().unwrap_or(0) / 1000;
+                                    extract_u32(&value.value) / 1000;
                             }
                             9 => {
                                 fit.activity.total_distance =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u32(&value.value);
                                 fit.activity.total_distance = fit.activity.total_distance / 100;
                             }
                             11 => {
                                 fit.activity.total_calories =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u16(&value.value);
                             }
                             16 => {
                                 fit.activity.avg_heart_rate =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u8(&value.value);
                             }
                             17 => {
                                 fit.activity.max_heart_rate =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u8(&value.value);
                             }
                             20 => {
                                 let raw_avg_power: u16 =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u16(&value.value);
                                 fit.activity.avg_power = sanitize_u16(raw_avg_power);
                             }
                             21 => {
                                 let raw_max_power: u16 =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u16(&value.value);
                                 fit.activity.max_power = sanitize_u16(raw_max_power);
                             }
                             22 => {
                                 fit.activity.total_ascent =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u16(&value.value);
                             }
                             24 => {
                                 fit.activity.total_training_effect =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u8(&value.value);
                             }
                             34 => {
-                                let raw_np_power: u16 = value.value.clone().try_into().unwrap_or(0);
+                                let raw_np_power: u16 = extract_u16(&value.value);
                                 fit.activity.np_power = sanitize_u16(raw_np_power);
                             }
                             35 => {
-                                let raw_tss: u16 = value.value.clone().try_into().unwrap_or(0);
+                                let raw_tss: u16 = extract_u16(&value.value);
                                 fit.activity.training_stress_score = sanitize_u16(raw_tss);
                             }
                             36 => {
-                                let raw_if: u16 = value.value.clone().try_into().unwrap_or(0);
+                                let raw_if: u16 = extract_u16(&value.value);
                                 fit.activity.intensity_factor = sanitize_u16(raw_if);
                             }
                             124 => {
                                 let raw_avg_speed: u32 =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u32(&value.value);
                                 fit.activity.avg_speed = sanitize_u32(raw_avg_speed);
                             }
                             253 => {
                                 fit.activity.timestamp =
-                                    value.value.clone().try_into().unwrap_or(0);
+                                    extract_u32(&value.value);
                             }
                             _ => {}
                         }
