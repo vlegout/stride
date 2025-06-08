@@ -37,6 +37,7 @@ impl Device {
     }
 }
 
+#[derive(pyo3::IntoPyObject)]
 pub struct Lap {
     pub index: u16,
     pub start_time: u32,
@@ -47,6 +48,7 @@ pub struct Lap {
     pub max_heart_rate: u8,
 }
 
+#[derive(pyo3::IntoPyObject)]
 pub struct Point {
     pub lat: f32,
     pub lon: f32,
@@ -58,6 +60,7 @@ pub struct Point {
     pub altitude: u32,
 }
 
+#[derive(pyo3::IntoPyObject)]
 pub struct Activity {
     pub sport: String,
     pub device: String,
@@ -79,6 +82,7 @@ pub struct Activity {
     pub intensity_factor: u16,
 }
 
+#[derive(pyo3::IntoPyObject)]
 pub struct FitStruct {
     pub activity: Activity,
     pub laps: Vec<Lap>,
