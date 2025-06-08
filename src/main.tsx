@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import ActivitiesPage from "./pages/Activities";
 import ActivityPage from "./pages/Activity";
 import Profile from "./pages/Profile";
+import Upload from "./pages/Upload";
 import Layout from "./components/Layout";
 
 import "leaflet/dist/leaflet.css";
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/upload",
+        element: <Upload />,
       },
       {
         path: "/races",

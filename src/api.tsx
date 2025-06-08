@@ -56,3 +56,19 @@ export async function fetchActivity(id: string): Promise<Activity> {
 export async function fetchProfile(): Promise<Profile> {
   return await apiCall("/profile/");
 }
+
+export async function uploadActivity(fitFile: File, title: string, race: boolean): Promise<Activity> {
+  const formData = new FormData();
+  formData.append("fit_file", fitFile);
+  formData.append("title", title);
+  formData.append("race", race.toString());
+
+  const response = await axios.post(`${API_URL}/activities/`, formData, {
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+}

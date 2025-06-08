@@ -18,6 +18,7 @@ const menus = [
   { to: "/activities", label: "Activities" },
   { to: "/profile", label: "Profile" },
   { to: "/races", label: "Races" },
+  { to: "/upload", label: "Upload" },
 ];
 
 const Header = () => {
