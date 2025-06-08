@@ -56,7 +56,7 @@ const ActivitiesTable = ({ sport, distance, race, page, onPageChange }: Activiti
   return (
     <>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table sx={{ minWidth: 650, "& .MuiTableCell-root": { whiteSpace: "nowrap" } }} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Sport</TableCell>
