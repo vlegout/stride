@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
@@ -16,18 +15,10 @@ import { fetchActivities, createActivitiesQueryKey } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import { Activity, ActivitiesQueryParams } from "../types";
 import SportLogo from "./SportLogo";
+import { useActivitiesStore } from "../store";
 
-interface ActivitiesTableProps {
-  sport: string;
-  distance: number[];
-  race: boolean;
-  page: number;
-  onPageChange: (page: number) => void;
-}
-
-const ActivitiesTable = ({ sport, distance, race, page, onPageChange }: ActivitiesTableProps) => {
-  const [order, setOrder] = useState<"asc" | "desc">("desc");
-  const [orderBy, setOrderBy] = useState<string>("");
+const ActivitiesTable = () => {
+  const { sport, distance, race, page, order, orderBy, setPage, setOrder, setOrderBy } = useActivitiesStore();
 
   const queryParams: ActivitiesQueryParams = {
     sport,
@@ -143,7 +134,7 @@ const ActivitiesTable = ({ sport, distance, race, page, onPageChange }: Activiti
           shape="rounded"
           page={page}
           onChange={(_event, value) => {
-            onPageChange(value);
+            setPage(value);
           }}
         />
       </Box>
