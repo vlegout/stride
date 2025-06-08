@@ -1,27 +1,20 @@
-import { useState } from "react";
 import { FormControl, InputLabel, MenuItem, Slider, FormControlLabel, Checkbox } from "@mui/material";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 
 import ActivitiesTable from "../components/ActivitiesTable";
+import { useActivitiesStore } from "../store";
 
 const ActivitiesPage = () => {
-  const [page, setPage] = useState<number>(1);
-  const [sport, setSport] = useState<string>("");
-  const [distance, setDistance] = useState<number[]>([0, 100]);
-  const [race, setRace] = useState<boolean>(false);
+  const { sport, distance, race, setSport, setDistance, setRace } = useActivitiesStore();
 
   const handleChange = (event: SelectChangeEvent) => {
     setSport(event.target.value);
   };
 
   const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number[]) => {
-    setDistance(value);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    setDistance(value as number[]);
   };
 
   const handleRaceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +72,7 @@ const ActivitiesPage = () => {
         </Grid>
       </Grid>
       <Box sx={{ overflowX: "auto", width: "100%" }}>
-        <ActivitiesTable sport={sport} distance={distance} race={race} page={page} onPageChange={handlePageChange} />
+        <ActivitiesTable />
       </Box>
     </Box>
   );
