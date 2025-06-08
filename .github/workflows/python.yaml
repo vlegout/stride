@@ -34,6 +34,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: [ruff, typing, pre-commit]
+    permissions:
+      contents: read
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
       - uses: astral-sh/setup-uv@v5
@@ -41,7 +45,17 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup.sh
           sh rustup.sh -y
       - run: cd api && uv run maturin develop
-      - run: cd api && DATABASE_URL=${{ secrets.DATABASE_URL }} uv run python -m pytest
+      - run: cd api && DATABASE_URL=${{ secrets.DATABASE_URL }} uv run python -m pytest --cov=api --cov-report=html --cov-report=term --cov-report=xml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: api/htmlcov/
+      - name: Coverage comment
+        id: coverage_comment
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          COVERAGE_DATA_PATH: api/coverage.xml
 
   docker:
     runs-on: ubuntu-latest
