@@ -17,6 +17,7 @@ dev-dependencies = [
     "mypy>=1.15.0",
     "pydantic-settings>=2.9.1",
     "pytest>=8.4.0",
+    "pytest-cov>=6.0.0",
     "ruff>=0.11.11",
     "types-pyyaml>=6.0.12.20250402",
 ]
@@ -24,6 +25,9 @@ dev-dependencies = [
 [build-system]
 requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
+
+[tool.coverage.run]
+relative_files = true
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
