@@ -267,24 +267,19 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 new_lap.start_time = extract_u32(&value.value);
                             }
                             7 => {
-                                new_lap.total_elapsed_time =
-                                    extract_u32(&value.value) / 1000;
+                                new_lap.total_elapsed_time = extract_u32(&value.value) / 1000;
                             }
                             8 => {
-                                new_lap.total_timer_time =
-                                    extract_u32(&value.value) / 1000;
+                                new_lap.total_timer_time = extract_u32(&value.value) / 1000;
                             }
                             9 => {
-                                new_lap.total_distance =
-                                    extract_u32(&value.value) / 100;
+                                new_lap.total_distance = extract_u32(&value.value) / 100;
                             }
                             15 => {
-                                new_lap.avg_heart_rate =
-                                    extract_u8(&value.value);
+                                new_lap.avg_heart_rate = extract_u8(&value.value);
                             }
                             16 => {
-                                new_lap.max_heart_rate =
-                                    extract_u8(&value.value);
+                                new_lap.max_heart_rate = extract_u8(&value.value);
                             }
                             _ => {}
                         }
@@ -349,8 +344,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                     for value in &msg.data.values {
                         match value.field_num {
                             2 => {
-                                fit.activity.start_time =
-                                    extract_u32(&value.value);
+                                fit.activity.start_time = extract_u32(&value.value);
                             }
                             5 => match value.value {
                                 fit_rust::protocol::value::Value::Enum("running") => {
@@ -362,47 +356,37 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 _ => {}
                             },
                             7 => {
-                                fit.activity.total_elapsed_time =
-                                    extract_u32(&value.value) / 1000;
+                                fit.activity.total_elapsed_time = extract_u32(&value.value) / 1000;
                             }
                             8 => {
-                                fit.activity.total_timer_time =
-                                    extract_u32(&value.value) / 1000;
+                                fit.activity.total_timer_time = extract_u32(&value.value) / 1000;
                             }
                             9 => {
-                                fit.activity.total_distance =
-                                    extract_u32(&value.value);
+                                fit.activity.total_distance = extract_u32(&value.value);
                                 fit.activity.total_distance = fit.activity.total_distance / 100;
                             }
                             11 => {
-                                fit.activity.total_calories =
-                                    extract_u16(&value.value);
+                                fit.activity.total_calories = extract_u16(&value.value);
                             }
                             16 => {
-                                fit.activity.avg_heart_rate =
-                                    extract_u8(&value.value);
+                                fit.activity.avg_heart_rate = extract_u8(&value.value);
                             }
                             17 => {
-                                fit.activity.max_heart_rate =
-                                    extract_u8(&value.value);
+                                fit.activity.max_heart_rate = extract_u8(&value.value);
                             }
                             20 => {
-                                let raw_avg_power: u16 =
-                                    extract_u16(&value.value);
+                                let raw_avg_power: u16 = extract_u16(&value.value);
                                 fit.activity.avg_power = sanitize_u16(raw_avg_power);
                             }
                             21 => {
-                                let raw_max_power: u16 =
-                                    extract_u16(&value.value);
+                                let raw_max_power: u16 = extract_u16(&value.value);
                                 fit.activity.max_power = sanitize_u16(raw_max_power);
                             }
                             22 => {
-                                fit.activity.total_ascent =
-                                    extract_u16(&value.value);
+                                fit.activity.total_ascent = extract_u16(&value.value);
                             }
                             24 => {
-                                fit.activity.total_training_effect =
-                                    extract_u8(&value.value);
+                                fit.activity.total_training_effect = extract_u8(&value.value);
                             }
                             34 => {
                                 let raw_np_power: u16 = extract_u16(&value.value);
@@ -417,13 +401,11 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 fit.activity.intensity_factor = sanitize_u16(raw_if);
                             }
                             124 => {
-                                let raw_avg_speed: u32 =
-                                    extract_u32(&value.value);
+                                let raw_avg_speed: u32 = extract_u32(&value.value);
                                 fit.activity.avg_speed = sanitize_u32(raw_avg_speed);
                             }
                             253 => {
-                                fit.activity.timestamp =
-                                    extract_u32(&value.value);
+                                fit.activity.timestamp = extract_u32(&value.value);
                             }
                             _ => {}
                         }
