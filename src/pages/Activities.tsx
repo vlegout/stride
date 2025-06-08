@@ -14,7 +14,7 @@ const ActivitiesPage = () => {
   };
 
   const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number[]) => {
-    setDistance(value as number[]);
+    setDistance(value as [number, number]);
   };
 
   const handleRaceChange = (event: React.ChangeEvent<HTMLInputElement>) => {

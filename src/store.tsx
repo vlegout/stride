@@ -1,14 +1,19 @@
 import { create } from "zustand";
+import { type } from "arktype";
 
-interface ActivitiesFilterState {
-  sport: string;
-  distance: number[];
-  race: boolean;
-  page: number;
-  order: "asc" | "desc";
-  orderBy: string;
+const ActivitiesFilterData = type({
+  sport: "string",
+  distance: ["number", "number"],
+  race: "boolean",
+  page: "number",
+  order: "'asc'|'desc'",
+  orderBy: "string",
+});
+type ActivitiesFilterData = typeof ActivitiesFilterData.infer;
+
+interface ActivitiesFilterState extends ActivitiesFilterData {
   setSport: (sport: string) => void;
-  setDistance: (distance: number[]) => void;
+  setDistance: (distance: [number, number]) => void;
   setRace: (race: boolean) => void;
   setPage: (page: number) => void;
   setOrder: (order: "asc" | "desc") => void;
@@ -16,12 +21,12 @@ interface ActivitiesFilterState {
   resetFilters: () => void;
 }
 
-const initialState = {
+const initialState: ActivitiesFilterData = {
   sport: "",
-  distance: [0, 100],
+  distance: [0, 100] as [number, number],
   race: false,
   page: 1,
-  order: "desc" as const,
+  order: "desc",
   orderBy: "",
 };
 
