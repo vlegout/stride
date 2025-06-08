@@ -46,7 +46,15 @@ class ActivityCreate(ActivityBase):
 
     @field_validator("avg_speed", mode="before")
     @classmethod
-    def avg_speed_validator(cls, value: float) -> float:
+    def avg_speed_validator(cls, value: float, info: ValidationInfo) -> float:
+        if (
+            value == 0
+            and info.data.get("total_distance", 0) > 0
+            and info.data.get("total_timer_time", 0) > 0
+        ):
+            avg_speed = info.data["total_distance"] / info.data["total_timer_time"]
+            return round(avg_speed * 3.6, 2)
+
         return round(value * 3.6 / 1000, 2)
 
 

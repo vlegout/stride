@@ -49,18 +49,6 @@ class ActivityBase(SQLModel):
     delta_lon: float | None = None
     location: str | None = None
 
-    @field_serializer("avg_speed")
-    def serialize_avg_speed(self, avg_speed: float) -> float:
-        if avg_speed > 0 and avg_speed < 65535:
-            return avg_speed
-
-        if self.total_distance > 0 and self.total_timer_time > 0:
-            distance = self.total_distance / 1000.0
-            time = self.total_timer_time / 3600.0
-            return round(distance / time, 2)
-
-        return 0.0
-
 
 class Activity(ActivityBase, table=True):
     laps: list["Lap"] = Relationship()
