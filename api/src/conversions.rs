@@ -6,21 +6,24 @@ use pyo3::Python;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
+fn set_dict_item<'py, T: pyo3::IntoPyObject<'py>>(
+    dict: &pyo3::Bound<'py, PyDict>,
+    key: &str,
+    value: T,
+) {
+    dict.set_item(key, value).unwrap();
+}
+
 impl IntoPy<PyObject> for Lap {
     fn into_py(self, py: Python<'_>) -> PyObject {
         let dict = PyDict::new(py);
-        dict.set_item("index", self.index).unwrap();
-        dict.set_item("start_time", self.start_time).unwrap();
-        dict.set_item("total_elapsed_time", self.total_elapsed_time)
-            .unwrap();
-        dict.set_item("total_timer_time", self.total_timer_time)
-            .unwrap();
-        dict.set_item("total_distance", self.total_distance)
-            .unwrap();
-        dict.set_item("avg_heart_rate", self.avg_heart_rate)
-            .unwrap();
-        dict.set_item("max_heart_rate", self.max_heart_rate)
-            .unwrap();
+        set_dict_item(&dict, "index", self.index);
+        set_dict_item(&dict, "start_time", self.start_time);
+        set_dict_item(&dict, "total_elapsed_time", self.total_elapsed_time);
+        set_dict_item(&dict, "total_timer_time", self.total_timer_time);
+        set_dict_item(&dict, "total_distance", self.total_distance);
+        set_dict_item(&dict, "avg_heart_rate", self.avg_heart_rate);
+        set_dict_item(&dict, "max_heart_rate", self.max_heart_rate);
         dict.into()
     }
 }
@@ -28,14 +31,14 @@ impl IntoPy<PyObject> for Lap {
 impl IntoPy<PyObject> for Point {
     fn into_py(self, py: Python<'_>) -> PyObject {
         let dict = PyDict::new(py);
-        dict.set_item("lat", self.lat).unwrap();
-        dict.set_item("lon", self.lon).unwrap();
-        dict.set_item("timestamp", self.timestamp).unwrap();
-        dict.set_item("distance", self.distance).unwrap();
-        dict.set_item("heart_rate", self.heart_rate).unwrap();
-        dict.set_item("speed", self.speed).unwrap();
-        dict.set_item("power", self.power).unwrap();
-        dict.set_item("altitude", self.altitude).unwrap();
+        set_dict_item(&dict, "lat", self.lat);
+        set_dict_item(&dict, "lon", self.lon);
+        set_dict_item(&dict, "timestamp", self.timestamp);
+        set_dict_item(&dict, "distance", self.distance);
+        set_dict_item(&dict, "heart_rate", self.heart_rate);
+        set_dict_item(&dict, "speed", self.speed);
+        set_dict_item(&dict, "power", self.power);
+        set_dict_item(&dict, "altitude", self.altitude);
         dict.into()
     }
 }
@@ -43,33 +46,24 @@ impl IntoPy<PyObject> for Point {
 impl IntoPy<PyObject> for Activity {
     fn into_py(self, py: Python<'_>) -> PyObject {
         let dict = PyDict::new(py);
-        dict.set_item("sport", self.sport).unwrap();
-        dict.set_item("device", self.device).unwrap();
-        dict.set_item("start_time", self.start_time).unwrap();
-        dict.set_item("timestamp", self.timestamp).unwrap();
-        dict.set_item("total_timer_time", self.total_timer_time)
-            .unwrap();
-        dict.set_item("total_elapsed_time", self.total_elapsed_time)
-            .unwrap();
-        dict.set_item("total_distance", self.total_distance)
-            .unwrap();
-        dict.set_item("total_ascent", self.total_ascent).unwrap();
-        dict.set_item("avg_speed", self.avg_speed).unwrap();
-        dict.set_item("avg_heart_rate", self.avg_heart_rate)
-            .unwrap();
-        dict.set_item("max_heart_rate", self.max_heart_rate)
-            .unwrap();
-        dict.set_item("avg_power", self.avg_power).unwrap();
-        dict.set_item("max_power", self.max_power).unwrap();
-        dict.set_item("np_power", self.np_power).unwrap();
-        dict.set_item("total_calories", self.total_calories)
-            .unwrap();
-        dict.set_item("total_training_effect", self.total_training_effect)
-            .unwrap();
-        dict.set_item("training_stress_score", self.training_stress_score)
-            .unwrap();
-        dict.set_item("intensity_factor", self.intensity_factor)
-            .unwrap();
+        set_dict_item(&dict, "sport", self.sport);
+        set_dict_item(&dict, "device", self.device);
+        set_dict_item(&dict, "start_time", self.start_time);
+        set_dict_item(&dict, "timestamp", self.timestamp);
+        set_dict_item(&dict, "total_timer_time", self.total_timer_time);
+        set_dict_item(&dict, "total_elapsed_time", self.total_elapsed_time);
+        set_dict_item(&dict, "total_distance", self.total_distance);
+        set_dict_item(&dict, "total_ascent", self.total_ascent);
+        set_dict_item(&dict, "avg_speed", self.avg_speed);
+        set_dict_item(&dict, "avg_heart_rate", self.avg_heart_rate);
+        set_dict_item(&dict, "max_heart_rate", self.max_heart_rate);
+        set_dict_item(&dict, "avg_power", self.avg_power);
+        set_dict_item(&dict, "max_power", self.max_power);
+        set_dict_item(&dict, "np_power", self.np_power);
+        set_dict_item(&dict, "total_calories", self.total_calories);
+        set_dict_item(&dict, "total_training_effect", self.total_training_effect);
+        set_dict_item(&dict, "training_stress_score", self.training_stress_score);
+        set_dict_item(&dict, "intensity_factor", self.intensity_factor);
         dict.into()
     }
 }
@@ -77,11 +71,9 @@ impl IntoPy<PyObject> for Activity {
 impl IntoPy<PyObject> for FitStruct {
     fn into_py(self, py: Python<'_>) -> PyObject {
         let dict = PyDict::new(py);
-        dict.set_item("activity", self.activity.into_py(py))
-            .unwrap();
-        dict.set_item("laps", self.laps.into_py(py)).unwrap();
-        dict.set_item("data_points", self.data_points.into_py(py))
-            .unwrap();
+        set_dict_item(&dict, "activity", self.activity.into_py(py));
+        set_dict_item(&dict, "laps", self.laps.into_py(py));
+        set_dict_item(&dict, "data_points", self.data_points.into_py(py));
         dict.into()
     }
 }
