@@ -57,7 +57,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           GITHUB_TOKEN: ${{ github.token }}
-          COVERAGE_DATA_PATH: api/coverage.xml
+          COVERAGE_PATH: api/
 
   docker:
     runs-on: ubuntu-latest
