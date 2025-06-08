@@ -8,6 +8,14 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use std::fs;
 
+fn sanitize_u16(value: u16) -> u16 {
+    if value == u16::MAX { 0 } else { value }
+}
+
+fn sanitize_u32(value: u32) -> u32 {
+    if value == u32::MAX { 0 } else { value }
+}
+
 enum Device {
     FR110,
     FR10,
@@ -299,10 +307,8 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 point.distance = value.value.clone().try_into().unwrap_or(0) / 100;
                             }
                             7 => {
-                                point.power = value.value.clone().try_into().unwrap_or(0);
-                                if point.power == 65535 {
-                                    point.power = 0;
-                                }
+                                let raw_power: u16 = value.value.clone().try_into().unwrap_or(0);
+                                point.power = sanitize_u16(raw_power);
                             }
                             73 => {
                                 point.speed = value.value.clone().try_into().unwrap_or(0);
@@ -365,18 +371,14 @@ fn get_fit(file_name: &str) -> FitStruct {
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             20 => {
-                                fit.activity.avg_power =
+                                let raw_avg_power: u16 =
                                     value.value.clone().try_into().unwrap_or(0);
-                                if fit.activity.avg_power == 65535 {
-                                    fit.activity.avg_power = 0;
-                                }
+                                fit.activity.avg_power = sanitize_u16(raw_avg_power);
                             }
                             21 => {
-                                fit.activity.max_power =
+                                let raw_max_power: u16 =
                                     value.value.clone().try_into().unwrap_or(0);
-                                if fit.activity.max_power == 65535 {
-                                    fit.activity.max_power = 0;
-                                }
+                                fit.activity.max_power = sanitize_u16(raw_max_power);
                             }
                             22 => {
                                 fit.activity.total_ascent =
@@ -387,31 +389,21 @@ fn get_fit(file_name: &str) -> FitStruct {
                                     value.value.clone().try_into().unwrap_or(0);
                             }
                             34 => {
-                                fit.activity.np_power = value.value.clone().try_into().unwrap_or(0);
-                                if fit.activity.np_power == 65535 {
-                                    fit.activity.np_power = 0;
-                                }
+                                let raw_np_power: u16 = value.value.clone().try_into().unwrap_or(0);
+                                fit.activity.np_power = sanitize_u16(raw_np_power);
                             }
                             35 => {
-                                fit.activity.training_stress_score =
-                                    value.value.clone().try_into().unwrap_or(0);
-                                if fit.activity.training_stress_score == 65535 {
-                                    fit.activity.training_stress_score = 0;
-                                }
+                                let raw_tss: u16 = value.value.clone().try_into().unwrap_or(0);
+                                fit.activity.training_stress_score = sanitize_u16(raw_tss);
                             }
                             36 => {
-                                fit.activity.intensity_factor =
-                                    value.value.clone().try_into().unwrap_or(0);
-                                if fit.activity.intensity_factor == 65535 {
-                                    fit.activity.intensity_factor = 0;
-                                }
+                                let raw_if: u16 = value.value.clone().try_into().unwrap_or(0);
+                                fit.activity.intensity_factor = sanitize_u16(raw_if);
                             }
                             124 => {
-                                fit.activity.avg_speed =
+                                let raw_avg_speed: u32 =
                                     value.value.clone().try_into().unwrap_or(0);
-                                if fit.activity.avg_speed == 65535 {
-                                    fit.activity.avg_speed = 0;
-                                }
+                                fit.activity.avg_speed = sanitize_u32(raw_avg_speed);
                             }
                             253 => {
                                 fit.activity.timestamp =
