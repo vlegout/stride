@@ -1,10 +1,10 @@
 use crate::types::{Activity, FitStruct, Lap, Point};
 
-use pyo3::IntoPy;
-use pyo3::PyObject;
+use pyo3::IntoPyObject;
+use pyo3::PyErr;
 use pyo3::Python;
 use pyo3::prelude::*;
-use pyo3::types::PyDict;
+use pyo3::types::{PyAny, PyDict};
 
 fn set_dict_item<'py, T: pyo3::IntoPyObject<'py>>(
     dict: &pyo3::Bound<'py, PyDict>,
@@ -14,8 +14,12 @@ fn set_dict_item<'py, T: pyo3::IntoPyObject<'py>>(
     dict.set_item(key, value).unwrap();
 }
 
-impl IntoPy<PyObject> for Lap {
-    fn into_py(self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for Lap {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         let dict = PyDict::new(py);
         set_dict_item(&dict, "index", self.index);
         set_dict_item(&dict, "start_time", self.start_time);
@@ -24,12 +28,16 @@ impl IntoPy<PyObject> for Lap {
         set_dict_item(&dict, "total_distance", self.total_distance);
         set_dict_item(&dict, "avg_heart_rate", self.avg_heart_rate);
         set_dict_item(&dict, "max_heart_rate", self.max_heart_rate);
-        dict.into()
+        Ok(dict.into_any())
     }
 }
 
-impl IntoPy<PyObject> for Point {
-    fn into_py(self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for Point {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         let dict = PyDict::new(py);
         set_dict_item(&dict, "lat", self.lat);
         set_dict_item(&dict, "lon", self.lon);
@@ -39,12 +47,16 @@ impl IntoPy<PyObject> for Point {
         set_dict_item(&dict, "speed", self.speed);
         set_dict_item(&dict, "power", self.power);
         set_dict_item(&dict, "altitude", self.altitude);
-        dict.into()
+        Ok(dict.into_any())
     }
 }
 
-impl IntoPy<PyObject> for Activity {
-    fn into_py(self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for Activity {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         let dict = PyDict::new(py);
         set_dict_item(&dict, "sport", self.sport);
         set_dict_item(&dict, "device", self.device);
@@ -64,16 +76,20 @@ impl IntoPy<PyObject> for Activity {
         set_dict_item(&dict, "total_training_effect", self.total_training_effect);
         set_dict_item(&dict, "training_stress_score", self.training_stress_score);
         set_dict_item(&dict, "intensity_factor", self.intensity_factor);
-        dict.into()
+        Ok(dict.into_any())
     }
 }
 
-impl IntoPy<PyObject> for FitStruct {
-    fn into_py(self, py: Python<'_>) -> PyObject {
+impl<'py> IntoPyObject<'py> for FitStruct {
+    type Target = PyAny;
+    type Output = Bound<'py, Self::Target>;
+    type Error = PyErr;
+
+    fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         let dict = PyDict::new(py);
-        set_dict_item(&dict, "activity", self.activity.into_py(py));
-        set_dict_item(&dict, "laps", self.laps.into_py(py));
-        set_dict_item(&dict, "data_points", self.data_points.into_py(py));
-        dict.into()
+        set_dict_item(&dict, "activity", self.activity.into_pyobject(py)?);
+        set_dict_item(&dict, "laps", self.laps.into_pyobject(py)?);
+        set_dict_item(&dict, "data_points", self.data_points.into_pyobject(py)?);
+        Ok(dict.into_any())
     }
 }
