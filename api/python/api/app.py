@@ -1,8 +1,25 @@
 import datetime
+import json
 import os
+import random
+import string
+import tempfile
 import uuid
 
-from fastapi import FastAPI, Depends, HTTPException, Query, Request, status
+import boto3
+import yaml
+from botocore.exceptions import ClientError
+from fastapi import (
+    FastAPI,
+    Depends,
+    HTTPException,
+    Query,
+    Request,
+    status,
+    UploadFile,
+    File,
+    Form,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, text
@@ -21,6 +38,8 @@ from api.model import (
     WeeksStatistics,
     YearsStatistics,
 )
+from api.cli import get_activity_from_fit
+from api.utils import get_best_performances
 
 
 app = FastAPI()
@@ -35,8 +54,14 @@ app.add_middleware(
 
 if "TOKEN" not in os.environ:
     raise ValueError("Missing environment variables: TOKEN")
+if "BUCKET" not in os.environ:
+    raise ValueError("Missing environment variables: BUCKET")
 
 TOKEN = os.environ.get("TOKEN")
+BUCKET = os.environ.get("BUCKET")
+
+# Initialize S3 client
+s3_client = boto3.client("s3")
 
 
 @app.middleware("http")
@@ -59,6 +84,36 @@ async def verify_token(request: Request, call_next):
 def get_session():
     with Session(engine) as session:
         yield session
+
+
+def generate_random_string(length: int = 8) -> str:
+    """Generate a random string for file naming."""
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
+
+
+def upload_file_to_s3(file_path: str, s3_key: str) -> None:
+    """Upload a file to S3."""
+    try:
+        s3_client.upload_file(file_path, BUCKET, s3_key)
+    except ClientError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to upload file to S3: {str(e)}"
+        )
+
+
+def upload_content_to_s3(content: str, s3_key: str) -> None:
+    """Upload string content to S3."""
+    try:
+        s3_client.put_object(
+            Bucket=BUCKET,
+            Key=s3_key,
+            Body=content.encode("utf-8"),
+            ContentType="text/yaml",
+        )
+    except ClientError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to upload content to S3: {str(e)}"
+        )
 
 
 @app.get("/activities/", response_model=ActivityList)
@@ -135,6 +190,93 @@ def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
     return activity
+
+
+@app.post(
+    "/activities/", response_model=ActivityPublic, status_code=status.HTTP_201_CREATED
+)
+def create_activity(
+    fit_file: UploadFile = File(...),
+    title: str = Form(...),
+    race: bool = Form(False),
+    session: Session = Depends(get_session),
+):
+    if not fit_file.filename or not fit_file.filename.endswith(".fit"):
+        raise HTTPException(status_code=400, detail="File must be a .fit file")
+
+    try:
+        with open("./data/locations.json", "r") as f:
+            locations = json.load(f).get("locations", [])
+    except FileNotFoundError:
+        locations = []
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".fit") as temp_file:
+        temp_file.write(fit_file.file.read())
+        temp_fit_path = temp_file.name
+
+    try:
+        activity, laps, tracepoints = get_activity_from_fit(
+            locations=locations,
+            fit_file=temp_fit_path,
+            title=title,
+            description="",
+            race=race,
+        )
+
+        performances = get_best_performances(activity, tracepoints)
+
+        MAX_DATA_POINTS = 500
+        while len(tracepoints) > MAX_DATA_POINTS:
+            tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
+
+        existing_activity = session.get(Activity, activity.id)
+        if existing_activity:
+            raise HTTPException(
+                status_code=409, detail="Activity with this FIT file already exists"
+            )
+
+        fit_filename = fit_file.filename or f"{activity.id}.fit"
+        fit_s3_key = f"data/fit/{fit_filename}"
+
+        now = datetime.datetime.now()
+        year = now.year
+        month = f"{now.month:02d}"
+        random_suffix = generate_random_string()
+        yaml_filename = f"{random_suffix}.yaml"
+        yaml_s3_key = f"data/{year}/{month}/{yaml_filename}"
+
+        yaml_content = {"fit": fit_filename, "title": title, "race": race}
+        yaml_string = yaml.dump(yaml_content, default_flow_style=False)
+
+        upload_file_to_s3(temp_fit_path, fit_s3_key)
+        upload_content_to_s3(yaml_string, yaml_s3_key)
+
+        session.add(activity)
+
+        for lap in laps:
+            session.add(lap)
+
+        for tracepoint in tracepoints:
+            session.add(tracepoint)
+
+        for performance in performances:
+            session.add(performance)
+
+        session.commit()
+        session.refresh(activity)
+
+        return ActivityPublic.model_validate(activity)
+
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=500, detail=f"Error processing FIT file: {str(e)}"
+        )
+    finally:
+        try:
+            os.unlink(temp_fit_path)
+        except OSError:
+            pass
 
 
 @app.get("/profile/", response_model=Profile)

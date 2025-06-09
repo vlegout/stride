@@ -6,12 +6,11 @@ import Header from "../components/Header";
 
 const Layout = () => {
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box>
       <Header />
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
           width: "100%",
           px: { xs: 1, sm: 2, md: 3 },
           py: { xs: 2, sm: 3 },
