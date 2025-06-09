@@ -89,10 +89,6 @@ const Upload = () => {
             Upload Activity
           </Typography>
 
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Upload a FIT file to create a new activity
-          </Typography>
-
           {error && (
             <Alert severity="error" sx={{ mb: 3 }}>
               {error}
