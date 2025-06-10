@@ -13,6 +13,7 @@ Web app to visualize run & ride activities from FIT files with charts, maps, and
 ```bash
 JWT_SECRET_KEY=your-super-secret-jwt-key-here-make-it-long-and-random
 DATABASE_URL=postgresql://username:password@localhost:5432/sport_db
+BUCKET=your-s3-bucket-name
 ```
 
 ### Frontend
