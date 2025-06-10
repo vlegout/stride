@@ -3,6 +3,7 @@ import json
 import os
 import tempfile
 import uuid
+from typing import List
 
 import yaml
 from fastapi import (
@@ -16,11 +17,13 @@ from fastapi import (
     File,
     Form,
 )
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, text
 from sqlmodel import Session, select
 
+from api.auth import verify_token, create_token_response, Token
 from api.cli import get_activity_from_fit
 from api.db import engine
 from api.model import (
@@ -32,6 +35,9 @@ from api.model import (
     PerformanceProfile,
     Profile,
     Statistic,
+    User,
+    UserCreate,
+    UserPublic,
     WeeksStatistics,
     YearsStatistics,
 )
@@ -53,26 +59,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if "TOKEN" not in os.environ:
-    raise ValueError("Missing environment variables: TOKEN")
-
-TOKEN = os.environ.get("TOKEN")
+if "JWT_SECRET_KEY" not in os.environ:
+    raise ValueError("Missing environment variables: JWT_SECRET_KEY")
 
 
 @app.middleware("http")
-async def verify_token(request: Request, call_next):
+async def verify_jwt_token(request: Request, call_next):
     if request.method == "OPTIONS":
         return await call_next(request)
 
-    if request.url.path == "/":
+    if request.url.path == "/" or request.url.path.startswith("/auth/"):
         return await call_next(request)
 
-    token = request.headers.get("Authorization")
-    if not token or token != f"Bearer {TOKEN}":
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Unauthorized"},
+            content={"detail": "Missing or invalid authorization header"},
         )
+
+    token = auth_header.replace("Bearer ", "")
+    try:
+        token_data = verify_token(token)
+        # Add user info to request state for use in endpoints
+        request.state.user_id = token_data.user_id
+        request.state.user_email = token_data.email
+    except HTTPException:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"detail": "Invalid or expired token"},
+        )
+
     return await call_next(request)
 
 
@@ -161,6 +178,7 @@ def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session
     "/activities/", response_model=ActivityPublic, status_code=status.HTTP_201_CREATED
 )
 def create_activity(
+    request: Request,
     fit_file: UploadFile = File(...),
     title: str = Form(...),
     race: bool = Form(False),
@@ -209,6 +227,9 @@ def create_activity(
 
         upload_file_to_s3(temp_fit_path, fit_s3_key)
         upload_content_to_s3(yaml_string, yaml_s3_key)
+
+        # Set user_id from JWT token
+        activity.user_id = request.state.user_id
 
         session.add(activity)
 
@@ -364,3 +385,80 @@ def read_profile(
     ]
 
     return profile
+
+
+@app.get("/users/me/", response_model=UserPublic)
+def read_current_user(
+    request: Request,
+    session: Session = Depends(get_session),
+):
+    user_id = request.state.user_id
+
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return UserPublic.model_validate(user)
+
+
+@app.get("/users/", response_model=List[UserPublic])
+def list_users(session: Session = Depends(get_session)):
+    users = session.exec(select(User)).all()
+    return [UserPublic.model_validate(user) for user in users]
+
+
+class GoogleAuthResponse(BaseModel):
+    user: UserPublic
+    token: Token
+
+
+@app.post("/auth/google/", response_model=GoogleAuthResponse)
+def google_auth(
+    user_data: UserCreate,
+    session: Session = Depends(get_session),
+):
+    try:
+        # Check if user exists by Google ID
+        existing_user = session.exec(
+            select(User).where(User.google_id == user_data.google_id)
+        ).first()
+
+        if existing_user:
+            # Update existing user info
+            existing_user.first_name = user_data.first_name
+            existing_user.last_name = user_data.last_name
+            existing_user.email = user_data.email
+            existing_user.google_picture = user_data.google_picture
+            existing_user.updated_at = datetime.datetime.now(datetime.timezone.utc)
+
+            session.add(existing_user)
+            session.commit()
+            session.refresh(existing_user)
+
+            user_public = UserPublic.model_validate(existing_user)
+            token = create_token_response(existing_user.id, existing_user.email)
+
+            return GoogleAuthResponse(user=user_public, token=token)
+        else:
+            # Create new user
+            user = User(
+                id=str(uuid.uuid4()),
+                first_name=user_data.first_name,
+                last_name=user_data.last_name,
+                email=user_data.email,
+                google_id=user_data.google_id,
+                google_picture=user_data.google_picture,
+            )
+
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+
+            user_public = UserPublic.model_validate(user)
+            token = create_token_response(user.id, user.email)
+
+            return GoogleAuthResponse(user=user_public, token=token)
+
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

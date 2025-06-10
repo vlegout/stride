@@ -7,11 +7,15 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Avatar from "@mui/material/Avatar";
 import MenuIcon from "@mui/icons-material/Menu";
+import LogoutIcon from "@mui/icons-material/Logout";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
 import { colors } from "../colors";
+import { useAuthStore } from "../store";
 
 const menus = [
   { to: "/", label: "Home" },
@@ -25,6 +29,7 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { logout, user } = useAuthStore();
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -32,6 +37,11 @@ const Header = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
   };
 
   return (
@@ -82,6 +92,10 @@ const Header = () => {
                     </Link>
                   </MenuItem>
                 ))}
+                <MenuItem onClick={handleLogout}>
+                  <LogoutIcon sx={{ mr: 1 }} />
+                  Logout
+                </MenuItem>
               </Menu>
             </>
           ) : (
@@ -113,7 +127,33 @@ const Header = () => {
                   </Link>
                 ))}
               </Box>
-              <Box sx={{ marginLeft: "auto" }}>
+              <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 2 }}>
+                {user && (
+                  <>
+                    {user.google_picture && (
+                      <Avatar
+                        src={user.google_picture}
+                        alt={user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email}
+                        sx={{ width: 32, height: 32 }}
+                      />
+                    )}
+                    <Typography variant="body2" sx={{ color: colors.text.onLight }}>
+                      {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email}
+                    </Typography>
+                  </>
+                )}
+                <Button
+                  onClick={handleLogout}
+                  startIcon={<LogoutIcon />}
+                  sx={{
+                    color: colors.text.onLight,
+                    "&:hover": {
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    },
+                  }}
+                >
+                  Logout
+                </Button>
                 <Typography
                   variant="body2"
                   sx={{

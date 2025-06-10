@@ -1,15 +1,40 @@
 import axios from "axios";
 
-import type { Activity, ActivitiesResponse, ActivitiesQueryParams, Profile } from "./types";
+import type {
+  Activity,
+  ActivitiesResponse,
+  ActivitiesQueryParams,
+  Profile,
+  User,
+  UserCreate,
+  GoogleAuthResponse,
+} from "./types";
+import { useAuthStore } from "./store";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
-const TOKEN = import.meta.env.VITE_API_TOKEN || "";
+
+function getAuthToken(): string | null {
+  const authStore = useAuthStore.getState();
+
+  // Check if we have a valid JWT token
+  if (authStore.isTokenValid() && authStore.token) {
+    return authStore.token;
+  }
+
+  // No valid token available
+  return null;
+}
 
 export async function apiCall(url: string) {
   url = `${API_URL}${url}`;
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error("No valid authentication token available");
+  }
 
   const response = await axios.get(url, {
-    headers: { Authorization: `Bearer ${TOKEN}` },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   return response.data;
@@ -63,10 +88,35 @@ export async function uploadActivity(fitFile: File, title: string, race: boolean
   formData.append("title", title);
   formData.append("race", race.toString());
 
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error("No valid authentication token available");
+  }
+
   const response = await axios.post(`${API_URL}/activities/`, formData, {
     headers: {
-      Authorization: `Bearer ${TOKEN}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+}
+
+export async function fetchCurrentUser(): Promise<User> {
+  return await apiCall("/users/me/");
+}
+
+export async function fetchUsers(): Promise<User[]> {
+  return await apiCall("/users/");
+}
+
+export async function authenticateWithGoogle(userData: UserCreate): Promise<GoogleAuthResponse> {
+  // No token needed for auth endpoint
+  const response = await axios.post(`${API_URL}/auth/google/`, userData, {
+    headers: {
+      "Content-Type": "application/json",
     },
   });
 

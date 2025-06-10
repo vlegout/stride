@@ -9,7 +9,9 @@ import ActivitiesPage from "./pages/Activities";
 import ActivityPage from "./pages/Activity";
 import Profile from "./pages/Profile";
 import Upload from "./pages/Upload";
+import Login from "./pages/Login";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import "leaflet/dist/leaflet.css";
 
@@ -20,8 +22,16 @@ import "@fontsource/roboto/700.css";
 
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "",

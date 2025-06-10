@@ -7,6 +7,37 @@ from pydantic import BaseModel, field_serializer
 from sqlmodel import Field, Relationship, SQLModel
 
 
+class UserBase(SQLModel):
+    id: str = Field(primary_key=True)
+    first_name: str
+    last_name: str
+    email: str = Field(unique=True)
+    google_id: str = Field(unique=True)
+    google_picture: str | None = None
+    created_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+    updated_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+
+
+class User(UserBase, table=True):
+    activities: list["Activity"] = Relationship(back_populates="user")
+
+
+class UserPublic(UserBase):
+    pass
+
+
+class UserCreate(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    google_id: str
+    google_picture: str | None = None
+
+
 class ActivityBase(SQLModel):
     id: uuid.UUID = Field(default=None, primary_key=True)
 
@@ -49,11 +80,14 @@ class ActivityBase(SQLModel):
     delta_lon: float | None = None
     location: str | None = None
 
+    user_id: str | None = Field(foreign_key="user.id", default=None)
+
 
 class Activity(ActivityBase, table=True):
     laps: list["Lap"] = Relationship()
     performances: list["Performance"] = Relationship()
     tracepoints: list["Tracepoint"] = Relationship(back_populates="activity")
+    user: User = Relationship(back_populates="activities")
 
 
 class ActivityPublic(ActivityBase):

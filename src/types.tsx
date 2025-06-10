@@ -134,3 +134,37 @@ export const Profile = type({
   running_performances: [Performance],
 });
 export type Profile = typeof Profile.infer;
+
+export const User = type({
+  id: "string",
+  first_name: "string",
+  last_name: "string",
+  email: "string",
+  google_id: "string",
+  google_picture: "string?",
+  created_at: "string",
+  updated_at: "string",
+});
+export type User = typeof User.infer;
+
+export const UserCreate = type({
+  first_name: "string",
+  last_name: "string",
+  email: "string",
+  google_id: "string",
+  google_picture: "string?",
+});
+export type UserCreate = typeof UserCreate.infer;
+
+export const Token = type({
+  access_token: "string",
+  token_type: "string",
+  expires_in: "number",
+});
+export type Token = typeof Token.infer;
+
+export const GoogleAuthResponse = type({
+  user: User,
+  token: Token,
+});
+export type GoogleAuthResponse = typeof GoogleAuthResponse.infer;
