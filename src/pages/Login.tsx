@@ -89,13 +89,19 @@ export default function Login() {
     if (window.google) {
       initializeGoogleSignIn();
     } else {
-      // Wait for Google script to load
-      const checkGoogle = setInterval(() => {
+      // Wait for Google script to load using onload callback
+      const handleGoogleScriptLoad = () => {
         if (window.google) {
           initializeGoogleSignIn();
-          clearInterval(checkGoogle);
         }
-      }, 100);
+      };
+
+      window.addEventListener("googleScriptLoaded", handleGoogleScriptLoad);
+
+      // Cleanup listener
+      return () => {
+        window.removeEventListener("googleScriptLoaded", handleGoogleScriptLoad);
+      };
     }
   }, [initializeGoogleSignIn]);
 
