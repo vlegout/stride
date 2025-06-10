@@ -108,10 +108,6 @@ export async function fetchCurrentUser(): Promise<User> {
   return await apiCall("/users/me/");
 }
 
-export async function fetchUsers(): Promise<User[]> {
-  return await apiCall("/users/");
-}
-
 export async function authenticateWithGoogle(userData: UserCreate): Promise<GoogleAuthResponse> {
   // No token needed for auth endpoint
   const response = await axios.post(`${API_URL}/auth/google/`, userData, {

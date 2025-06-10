@@ -3,7 +3,6 @@ import json
 import os
 import tempfile
 import uuid
-from typing import List
 
 import yaml
 from fastapi import (
@@ -399,12 +398,6 @@ def read_current_user(
         raise HTTPException(status_code=404, detail="User not found")
 
     return UserPublic.model_validate(user)
-
-
-@app.get("/users/", response_model=List[UserPublic])
-def list_users(session: Session = Depends(get_session)):
-    users = session.exec(select(User)).all()
-    return [UserPublic.model_validate(user) for user in users]
 
 
 class GoogleAuthResponse(BaseModel):
