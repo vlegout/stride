@@ -6,7 +6,7 @@ RUN apk add --no-cache postgresql-dev
 
 RUN pip install uv
 
-COPY pyproject.toml uv.lock ./
+COPY Cargo.lock Cargo.toml pyproject.toml uv.lock ./
 
 RUN uv sync --locked --no-dev
 
