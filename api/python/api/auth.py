@@ -20,7 +20,7 @@ class Token(BaseModel):
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-here")
 JWT_ALGORITHM = "HS256"
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 
 def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None):
@@ -67,5 +67,5 @@ def create_token_response(user_id: str, email: str) -> Token:
     return Token(
         access_token=access_token,
         token_type="bearer",
-        expires_in=JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+        expires_in=JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )

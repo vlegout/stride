@@ -411,13 +411,11 @@ def google_auth(
     session: Session = Depends(get_session),
 ):
     try:
-        # Check if user exists by Google ID
         existing_user = session.exec(
             select(User).where(User.google_id == user_data.google_id)
         ).first()
 
         if existing_user:
-            # Update existing user info
             existing_user.first_name = user_data.first_name
             existing_user.last_name = user_data.last_name
             existing_user.email = user_data.email
@@ -433,7 +431,6 @@ def google_auth(
 
             return GoogleAuthResponse(user=user_public, token=token)
         else:
-            # Create new user
             user = User(
                 id=str(uuid.uuid4()),
                 first_name=user_data.first_name,
