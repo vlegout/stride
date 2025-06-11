@@ -17,6 +17,7 @@ import { fetchProfile } from "../api";
 import { formatDistance } from "../utils";
 
 import Performances from "../components/Performances";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const Profile = () => {
   const { data, error, isPending, isFetching } = useQuery({
@@ -27,7 +28,9 @@ const Profile = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  if (isPending || isFetching || error) return "Loading...";
+  if (isPending || isFetching || error) {
+    return <LoadingIndicator message="Loading profile..." />;
+  }
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 

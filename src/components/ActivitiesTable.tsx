@@ -16,6 +16,7 @@ import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import { Activity, ActivitiesQueryParams } from "../types";
 import SportLogo from "./SportLogo";
 import { useActivitiesStore } from "../store";
+import LoadingIndicator from "./LoadingIndicator";
 
 const ActivitiesTable = () => {
   const { sport, distance, race, page, order, orderBy, setPage, setOrder, setOrderBy } = useActivitiesStore();
@@ -43,8 +44,8 @@ const ActivitiesTable = () => {
     setOrder(newOrder);
   };
 
-  if (isPending || error) return <div>Loading...</div>;
-  if (!data) return <div>Loading...</div>;
+  if (isPending || error) return <LoadingIndicator message="Loading activities..." />;
+  if (!data) return <LoadingIndicator message="Loading activities..." />;
 
   return (
     <>
