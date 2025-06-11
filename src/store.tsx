@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { type } from "arktype";
+import { persist } from "zustand/middleware";
+import type { User, Token } from "./types";
 
 const ActivitiesFilterData = type({
   sport: "string",
@@ -40,3 +42,58 @@ export const useActivitiesStore = create<ActivitiesFilterState>((set) => ({
   setOrderBy: (orderBy) => set({ orderBy }),
   resetFilters: () => set(initialState),
 }));
+
+interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  token: string | null;
+  tokenExpiry: number | null;
+  logout: () => void;
+  setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
+  setAuth: (user: User, token: Token) => void;
+  isTokenValid: () => boolean;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      isAuthenticated: false,
+      user: null,
+      token: null,
+      tokenExpiry: null,
+      logout: () => {
+        set({
+          isAuthenticated: false,
+          user: null,
+          token: null,
+          tokenExpiry: null,
+        });
+      },
+      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setToken: (token) => set({ token }),
+      setAuth: (user: User, token: Token) => {
+        const expiry = Date.now() + token.expires_in * 1000;
+        set({
+          user,
+          token: token.access_token,
+          tokenExpiry: expiry,
+          isAuthenticated: true,
+        });
+      },
+      isTokenValid: () => {
+        const state = get();
+        return !!(state.token && state.tokenExpiry && Date.now() < state.tokenExpiry);
+      },
+    }),
+    {
+      name: "auth-storage",
+      partialize: (state) => ({
+        isAuthenticated: state.isAuthenticated,
+        user: state.user,
+        token: state.token,
+        tokenExpiry: state.tokenExpiry,
+      }),
+    },
+  ),
+);

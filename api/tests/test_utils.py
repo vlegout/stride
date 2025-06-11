@@ -142,6 +142,7 @@ class TestUtils(unittest.TestCase):
             total_distance=5000.0,
             total_ascent=50.0,
             avg_speed=2.78,
+            user_id=None,
         )
 
         performances = get_best_performances(activity, [])
@@ -164,6 +165,7 @@ class TestUtils(unittest.TestCase):
             total_distance=15000.0,
             total_ascent=100.0,
             avg_speed=8.33,
+            user_id="test-user-id",
         )
 
         tracepoints = [
@@ -199,6 +201,7 @@ class TestUtils(unittest.TestCase):
             total_distance=10000.0,
             total_ascent=50.0,
             avg_speed=5.56,
+            user_id="test-user-id",
         )
 
         # Create tracepoints for a 10km run
@@ -248,6 +251,7 @@ class TestUtils(unittest.TestCase):
             total_distance=500.0,
             total_ascent=10.0,
             avg_speed=1.67,
+            user_id="test-user-id",
         )
 
         tracepoints = [
