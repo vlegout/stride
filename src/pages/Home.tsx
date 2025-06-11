@@ -7,6 +7,7 @@ import { fetchActivities, createActivitiesQueryKey } from "../api";
 import { Activity, ActivitiesQueryParams } from "../types";
 
 import ActivityBox from "../components/ActivityBox";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const Home = ({ race = false }: { race?: boolean }) => {
   const queryParams: ActivitiesQueryParams = {
@@ -25,7 +26,9 @@ const Home = ({ race = false }: { race?: boolean }) => {
     queryFn: fetchActivities,
   });
 
-  if (isPending || isFetching || error) return "Loading...";
+  if (isPending || isFetching || error) {
+    return <LoadingIndicator message="Loading activities..." />;
+  }
 
   return (
     <Container>

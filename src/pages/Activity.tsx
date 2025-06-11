@@ -10,6 +10,7 @@ import LineChart from "../components/LineChart";
 import LapChart from "../components/LapChart";
 import Performances from "../components/Performances";
 import ActivityBox from "../components/ActivityBox";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const ActivityPage = () => {
   const params = useParams();
@@ -19,7 +20,9 @@ const ActivityPage = () => {
     queryFn: async () => fetchActivity(params.id as string),
   });
 
-  if (isPending || isFetching || error) return "Loading...";
+  if (isPending || isFetching || error) {
+    return <LoadingIndicator message="Loading activity..." />;
+  }
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
