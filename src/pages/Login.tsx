@@ -127,10 +127,6 @@ export default function Login() {
           Welcome to Sport
         </Typography>
 
-        <Typography variant="body1" sx={{ mb: 3, textAlign: "center", color: "text.secondary" }}>
-          Sign in to access your fitness data
-        </Typography>
-
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
