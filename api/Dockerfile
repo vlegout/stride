@@ -2,7 +2,7 @@ FROM python:3.12-alpine
 
 WORKDIR /code
 
-RUN apk add --no-cache postgresql-dev && apt install uv
+RUN apk add --no-cache postgresql-dev && pip install uv
 
 COPY . /code
 
