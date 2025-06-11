@@ -71,16 +71,9 @@ async def verify_jwt_token(request: Request, call_next):
         return await call_next(request)
 
     auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Missing or invalid authorization header"},
-        )
-
     token = auth_header.replace("Bearer ", "")
     try:
         token_data = verify_token(token)
-        # Add user info to request state for use in endpoints
         request.state.user_id = token_data.user_id
         request.state.user_email = token_data.email
     except HTTPException:
