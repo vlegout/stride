@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -31,9 +31,10 @@ const ActivitiesTable = () => {
     orderBy,
   };
 
-  const { data, error, isPending, isFetching } = useQuery({
+  const { data, error, isPending } = useQuery({
     queryKey: createActivitiesQueryKey(queryParams),
     queryFn: fetchActivities,
+    placeholderData: keepPreviousData,
   });
 
   const sortHandler = (property: keyof Activity) => {
@@ -42,7 +43,8 @@ const ActivitiesTable = () => {
     setOrder(newOrder);
   };
 
-  if (isPending || isFetching || error) return <div>Loading...</div>;
+  if (isPending || error) return <div>Loading...</div>;
+  if (!data) return <div>Loading...</div>;
 
   return (
     <>
