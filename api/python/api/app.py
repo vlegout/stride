@@ -265,128 +265,179 @@ def create_activity(
 def read_profile(
     session: Session = Depends(get_session),
 ):
-    profile = Profile()
+    # Single query for overall statistics
+    overall_stats = session.execute(
+        text("""
+            SELECT
+                COUNT(*) as total_activities,
+                COUNT(CASE WHEN sport = 'running' THEN 1 END) as run_activities,
+                COALESCE(SUM(CASE WHEN sport = 'running' THEN total_distance END), 0) as run_distance,
+                COUNT(CASE WHEN sport = 'cycling' THEN 1 END) as cycling_activities,
+                COALESCE(SUM(CASE WHEN sport = 'cycling' THEN total_distance END), 0) as cycling_distance
+            FROM activity
+        """)
+    ).one()
 
-    profile.n_activities = session.query(Activity).count()
+    # Single query for weekly statistics (last 20 weeks)
+    current_date = datetime.datetime.now()
+    weeks_data = []
+    week_periods = [
+        (current_date - datetime.timedelta(weeks=i)).isocalendar()[:2]
+        for i in range(20)
+    ][::-1]
 
-    profile.run_n_activities = (
-        session.query(Activity).where(Activity.sport == "running").count()  # type: ignore
-    )
-    profile.run_total_distance = session.exec(
-        text("SELECT SUM(total_distance) FROM Activity WHERE sport = 'running'")  # type: ignore
-    ).one()[0]
+    # Get unique years and weeks for filtering
+    unique_years = list(set(year for year, _ in week_periods))
+    unique_weeks = list(set(week for _, week in week_periods))
 
-    profile.cycling_n_activities = (
-        session.query(Activity).where(Activity.sport == "cycling").count()  # type: ignore
-    )
-    profile.cycling_total_distance = session.exec(
-        text("SELECT SUM(total_distance) FROM Activity WHERE sport = 'cycling'")  # type: ignore
-    ).one()[0]
+    # Create SQL-safe IN clauses
+    years_clause = ",".join(str(y) for y in unique_years)
+    weeks_clause = ",".join(str(w) for w in unique_weeks)
 
-    profile.weeks = [
-        WeeksStatistics(
-            start=datetime.datetime.strptime(f"{year}-W{week}-1", "%Y-W%W-%w"),
-            week=week,
-            statistics=[
-                Statistic(
-                    sport="running",
-                    n_activities=session.exec(
-                        text(
-                            "SELECT COUNT(*) FROM activity "
-                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
-                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
-                        )  # type: ignore
-                    ).one()[0],
-                    total_distance=session.exec(
-                        text(
-                            "SELECT SUM(total_distance) FROM activity "
-                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
-                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
-                        )  # type: ignore
-                    ).one()[0],
-                ),
-                Statistic(
-                    sport="cycling",
-                    n_activities=session.exec(
-                        text(
-                            "SELECT COUNT(*) FROM activity "
-                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
-                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
-                        )  # type: ignore
-                    ).one()[0],
-                    total_distance=session.exec(
-                        text(
-                            "SELECT SUM(total_distance) FROM activity "
-                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year} "
-                            f"AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) = {week}"
-                        )  # type: ignore
-                    ).one()[0],
-                ),
-            ],
-        )
-        for year, week in [
-            (
-                (datetime.datetime.now() - datetime.timedelta(weeks=i)).isocalendar()[
-                    0
-                ],
-                (datetime.datetime.now() - datetime.timedelta(weeks=i)).isocalendar()[
-                    1
+    weekly_stats = session.execute(
+        text(f"""
+            SELECT
+                EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
+                EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) as week,
+                sport,
+                COUNT(*) as n_activities,
+                COALESCE(SUM(total_distance), 0) as total_distance
+            FROM activity
+            WHERE EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) IN ({years_clause})
+            AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) IN ({weeks_clause})
+            GROUP BY year, week, sport
+            ORDER BY year, week, sport
+        """)
+    ).all()
+
+    # Organize weekly data
+    weekly_dict: dict[tuple[int, int], dict[str, dict[str, int | float]]] = {}
+    for row in weekly_stats:
+        key = (int(row[0]), int(row[1]))
+        if key not in weekly_dict:
+            weekly_dict[key] = {}
+        weekly_dict[key][row[2]] = {
+            "n_activities": row[3],
+            "total_distance": row[4] or 0,
+        }
+
+    for year, week in week_periods:
+        week_data = weekly_dict.get((year, week), {})
+        weeks_data.append(
+            WeeksStatistics(
+                start=datetime.datetime.strptime(f"{year}-W{week}-1", "%Y-W%W-%w"),
+                week=week,
+                statistics=[
+                    Statistic(
+                        sport="running",
+                        n_activities=int(
+                            week_data.get("running", {}).get("n_activities", 0)
+                        ),
+                        total_distance=week_data.get("running", {}).get(
+                            "total_distance", 0.0
+                        ),
+                    ),
+                    Statistic(
+                        sport="cycling",
+                        n_activities=int(
+                            week_data.get("cycling", {}).get("n_activities", 0)
+                        ),
+                        total_distance=week_data.get("cycling", {}).get(
+                            "total_distance", 0.0
+                        ),
+                    ),
                 ],
             )
-            for i in range(20)
-        ][::-1]
-    ]
-
-    profile.years = [
-        YearsStatistics(
-            year=year,
-            statistics=[
-                Statistic(
-                    sport="running",
-                    n_activities=session.exec(
-                        text(
-                            "SELECT COUNT(*) FROM activity "
-                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
-                        )  # type: ignore
-                    ).one()[0],
-                    total_distance=session.exec(
-                        text(
-                            "SELECT SUM(total_distance) FROM activity "
-                            f"WHERE sport = 'running' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
-                        )  # type: ignore
-                    ).one()[0],
-                ),
-                Statistic(
-                    sport="cycling",
-                    n_activities=session.exec(
-                        text(
-                            "SELECT COUNT(*) FROM activity "
-                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
-                        )  # type: ignore
-                    ).one()[0],
-                    total_distance=session.exec(
-                        text(
-                            "SELECT SUM(total_distance) FROM activity "
-                            f"WHERE sport = 'cycling' AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) = {year}"
-                        )  # type: ignore
-                    ).one()[0],
-                ),
-            ],
         )
-        for year in range(2013, datetime.datetime.now().year + 1)
-    ]
 
-    profile.running_performances = [
+    # Single query for yearly statistics
+    yearly_stats = session.execute(
+        text("""
+            SELECT
+                EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
+                sport,
+                COUNT(*) as n_activities,
+                COALESCE(SUM(total_distance), 0) as total_distance
+            FROM activity
+            WHERE EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
+            GROUP BY year, sport
+            ORDER BY year, sport
+        """)
+    ).all()
+
+    # Organize yearly data
+    yearly_dict: dict[int, dict[str, dict[str, int | float]]] = {}
+    for row in yearly_stats:
+        year = int(row[0])
+        if year not in yearly_dict:
+            yearly_dict[year] = {}
+        yearly_dict[year][row[1]] = {
+            "n_activities": row[2],
+            "total_distance": row[3] or 0,
+        }
+
+    years_data = []
+    for year in range(2013, current_date.year + 1):
+        year_data = yearly_dict.get(year, {})
+        years_data.append(
+            YearsStatistics(
+                year=year,
+                statistics=[
+                    Statistic(
+                        sport="running",
+                        n_activities=int(
+                            year_data.get("running", {}).get("n_activities", 0)
+                        ),
+                        total_distance=year_data.get("running", {}).get(
+                            "total_distance", 0.0
+                        ),
+                    ),
+                    Statistic(
+                        sport="cycling",
+                        n_activities=int(
+                            year_data.get("cycling", {}).get("n_activities", 0)
+                        ),
+                        total_distance=year_data.get("cycling", {}).get(
+                            "total_distance", 0.0
+                        ),
+                    ),
+                ],
+            )
+        )
+
+    # Single query for running performances
+    performance_distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+    distances_clause = ",".join(str(d) for d in performance_distances)
+    performance_stats = session.execute(
+        text(f"""
+            SELECT distance, MIN(time) as best_time
+            FROM performance
+            WHERE distance IN ({distances_clause})
+            GROUP BY distance
+            ORDER BY distance
+        """)
+    ).all()
+
+    performance_dict = {row[0]: row[1] for row in performance_stats}
+    running_performances = [
         PerformanceProfile(
             distance=distance,
-            time=session.exec(
-                text(f"SELECT MIN(time) FROM performance WHERE distance = {distance}")  # type: ignore
-            ).one()[0],
+            time=performance_dict.get(distance),
         )
-        for distance in [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+        for distance in performance_distances
+        if performance_dict.get(distance) is not None
     ]
 
-    return profile
+    return Profile(
+        n_activities=overall_stats[0],
+        run_n_activities=overall_stats[1],
+        run_total_distance=overall_stats[2] or 0.0,
+        cycling_n_activities=overall_stats[3],
+        cycling_total_distance=overall_stats[4] or 0.0,
+        weeks=weeks_data,
+        years=years_data,
+        running_performances=running_performances,
+    )
 
 
 @app.get("/weeks/", response_model=WeeksResponse)

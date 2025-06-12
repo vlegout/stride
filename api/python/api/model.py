@@ -192,7 +192,7 @@ class Profile(BaseModel):
     cycling_total_distance: float = 0.0
     years: List[YearsStatistics] = []
     weeks: List[WeeksStatistics] = []
-    running_performances: List[Performance] = []
+    running_performances: List[PerformanceProfile] = []
 
 
 class WeeklyActivitySummary(BaseModel):
