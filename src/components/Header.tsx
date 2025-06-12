@@ -11,6 +11,7 @@ import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AddIcon from "@mui/icons-material/Add";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
@@ -20,9 +21,7 @@ import { useAuthStore } from "../store";
 const menus = [
   { to: "/", label: "Home" },
   { to: "/activities", label: "Activities" },
-  { to: "/profile", label: "Profile" },
   { to: "/races", label: "Races" },
-  { to: "/upload", label: "Upload" },
 ];
 
 const Header = () => {
@@ -62,6 +61,11 @@ const Header = () => {
           {isMobile ? (
             <>
               <Box sx={{ flexGrow: 1 }} />
+              <Link to="/upload" style={{ textDecoration: "none" }}>
+                <IconButton edge="end" color="inherit" aria-label="upload" sx={{ color: colors.text.onLight, mr: 1 }}>
+                  <AddIcon />
+                </IconButton>
+              </Link>
               <IconButton
                 edge="end"
                 color="inherit"
@@ -128,6 +132,20 @@ const Header = () => {
                 ))}
               </Box>
               <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 2 }}>
+                <Link to="/upload" style={{ textDecoration: "none" }}>
+                  <IconButton
+                    color="inherit"
+                    aria-label="upload"
+                    sx={{
+                      color: colors.text.onLight,
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      },
+                    }}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Link>
                 {user && (
                   <>
                     {user.google_picture && (
@@ -137,9 +155,20 @@ const Header = () => {
                         sx={{ width: 32, height: 32 }}
                       />
                     )}
-                    <Typography variant="body2" sx={{ color: colors.text.onLight }}>
-                      {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email}
-                    </Typography>
+                    <Link to="/profile" style={{ textDecoration: "none" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: colors.text.onLight,
+                          cursor: "pointer",
+                          "&:hover": {
+                            textDecoration: "underline",
+                          },
+                        }}
+                      >
+                        {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email}
+                      </Typography>
+                    </Link>
                   </>
                 )}
                 <Button
