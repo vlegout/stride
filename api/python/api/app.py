@@ -37,6 +37,9 @@ from api.model import (
     User,
     UserCreate,
     UserPublic,
+    WeeklyActivitySummary,
+    WeeklySummary,
+    WeeksResponse,
     WeeksStatistics,
     YearsStatistics,
 )
@@ -384,6 +387,80 @@ def read_profile(
     ]
 
     return profile
+
+
+@app.get("/weeks/", response_model=WeeksResponse)
+def read_weeks(
+    session: Session = Depends(get_session),
+):
+    weeks_data = []
+
+    # Get last 5 weeks
+    for i in range(5):
+        week_start = datetime.datetime.now() - datetime.timedelta(weeks=i)
+        week_start = week_start - datetime.timedelta(
+            days=week_start.weekday()
+        )  # Start of week (Monday)
+        week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+        week_end = week_start + datetime.timedelta(days=7)
+
+        year, week_number, _ = week_start.isocalendar()
+
+        # Get activities for this week
+        activities = session.exec(
+            select(Activity)
+            .where(Activity.start_time >= int(week_start.timestamp()))
+            .where(Activity.start_time < int(week_end.timestamp()))
+            .order_by(Activity.start_time.desc())  # type: ignore
+        ).all()
+
+        # Create activity summaries
+        activity_summaries = [
+            WeeklyActivitySummary(
+                id=activity.id,
+                title=activity.title,
+                sport=activity.sport,
+                start_time=activity.start_time,
+                total_distance=activity.total_distance,
+                total_timer_time=activity.total_timer_time,
+                avg_speed=activity.avg_speed,
+                avg_heart_rate=activity.avg_heart_rate,
+                avg_power=activity.avg_power,
+                race=activity.race,
+            )
+            for activity in activities
+        ]
+
+        # Calculate week summary statistics
+        total_activities = len(activities)
+        total_distance = sum(activity.total_distance for activity in activities)
+        total_time = sum(activity.total_timer_time for activity in activities)
+
+        # Calculate sports breakdown
+        sports_breakdown = {}
+        for activity in activities:
+            sport = activity.sport
+            if sport not in sports_breakdown:
+                sports_breakdown[sport] = {"distance": 0.0, "time": 0.0, "count": 0}
+
+            sports_breakdown[sport]["distance"] += activity.total_distance
+            sports_breakdown[sport]["time"] += activity.total_timer_time
+            sports_breakdown[sport]["count"] += 1
+
+        week_summary = WeeklySummary(
+            week_start=week_start,
+            week_number=week_number,
+            year=year,
+            activities=activity_summaries,
+            total_activities=total_activities,
+            total_distance=total_distance,
+            total_time=total_time,
+            sports_breakdown=sports_breakdown,
+        )
+
+        weeks_data.append(week_summary)
+
+    return WeeksResponse(weeks=weeks_data)
 
 
 @app.get("/users/me/", response_model=UserPublic)

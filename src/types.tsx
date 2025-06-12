@@ -168,3 +168,34 @@ export const GoogleAuthResponse = type({
   token: Token,
 });
 export type GoogleAuthResponse = typeof GoogleAuthResponse.infer;
+
+export const WeeklyActivitySummary = type({
+  id: "string.uuid.v5",
+  title: "string",
+  sport: "string",
+  start_time: "number",
+  total_distance: "number",
+  total_timer_time: "number",
+  avg_speed: "number",
+  avg_heart_rate: "number?",
+  avg_power: "number?",
+  race: "boolean",
+});
+export type WeeklyActivitySummary = typeof WeeklyActivitySummary.infer;
+
+export const WeeklySummary = type({
+  week_start: "string",
+  week_number: "number",
+  year: "number",
+  activities: WeeklyActivitySummary.array(),
+  total_activities: "number",
+  total_distance: "number",
+  total_time: "number",
+  sports_breakdown: "unknown",
+});
+export type WeeklySummary = typeof WeeklySummary.infer;
+
+export const WeeksResponse = type({
+  weeks: WeeklySummary.array(),
+});
+export type WeeksResponse = typeof WeeksResponse.infer;
