@@ -8,6 +8,7 @@ import type {
   User,
   UserCreate,
   GoogleAuthResponse,
+  WeeksResponse,
 } from "./types";
 import { useAuthStore } from "./store";
 
@@ -80,6 +81,10 @@ export async function fetchActivity(id: string): Promise<Activity> {
 
 export async function fetchProfile(): Promise<Profile> {
   return await apiCall("/profile/");
+}
+
+export async function fetchWeeks(): Promise<WeeksResponse> {
+  return await apiCall("/weeks/");
 }
 
 export async function uploadActivity(fitFile: File, title: string, race: boolean): Promise<Activity> {

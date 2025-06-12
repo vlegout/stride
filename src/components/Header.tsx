@@ -21,6 +21,7 @@ import { useAuthStore } from "../store";
 const menus = [
   { to: "/", label: "Home" },
   { to: "/activities", label: "Activities" },
+  { to: "/weeks", label: "Weeks" },
   { to: "/races", label: "Races" },
 ];
 

@@ -7,6 +7,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Home from "./pages/Home";
 import ActivitiesPage from "./pages/Activities";
 import ActivityPage from "./pages/Activity";
+import WeeksPage from "./pages/Weeks";
 import Profile from "./pages/Profile";
 import Upload from "./pages/Upload";
 import Login from "./pages/Login";
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "/activities/:id",
         element: <ActivityPage />,
+      },
+      {
+        path: "/weeks",
+        element: <WeeksPage />,
       },
       {
         path: "/profile",

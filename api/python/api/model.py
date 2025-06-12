@@ -193,3 +193,33 @@ class Profile(BaseModel):
     years: List[YearsStatistics] = []
     weeks: List[WeeksStatistics] = []
     running_performances: List[Performance] = []
+
+
+class WeeklyActivitySummary(BaseModel):
+    id: uuid.UUID
+    title: str
+    sport: str
+    start_time: int
+    total_distance: float
+    total_timer_time: float
+    avg_speed: float
+    avg_heart_rate: float | None = None
+    avg_power: float | None = None
+    race: bool
+
+
+class WeeklySummary(BaseModel):
+    week_start: datetime.datetime
+    week_number: int
+    year: int
+    activities: List[WeeklyActivitySummary]
+    total_activities: int
+    total_distance: float
+    total_time: float
+    sports_breakdown: dict[
+        str, dict[str, float]
+    ]  # {sport: {distance: float, time: float, count: int}}
+
+
+class WeeksResponse(BaseModel):
+    weeks: List[WeeklySummary]
