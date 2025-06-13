@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Paper, Alert } from "@mui/material";
+import { Box, Typography, Alert, CircularProgress } from "@mui/material";
 import { useAuthStore } from "../store";
 import { authenticateWithGoogle } from "../api";
 import type { UserCreate } from "../types";
+import { PageHeader, SectionContainer } from "../components/ui";
 
 interface GoogleCredentialResponse {
   credential: string;
@@ -110,25 +111,27 @@ export default function Login() {
       sx={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "#f5f5f5",
+        px: { xs: 2, sm: 3 },
+        py: { xs: 3, sm: 4 },
       }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          padding: 4,
-          width: "100%",
-          maxWidth: 400,
-        }}
-      >
-        <Typography variant="h4" component="h1" gutterBottom align="center">
-          Welcome to Sport
-        </Typography>
+      <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+        <PageHeader
+          title="Welcome to Sport"
+          subtitle="Track your fitness journey"
+          centered
+          variant="h4"
+          spacing="compact"
+        />
+      </Box>
 
+      <SectionContainer maxWidth="400px" centered variant="paper" elevation={3} spacing="normal">
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
             {error}
           </Alert>
         )}
@@ -138,11 +141,14 @@ export default function Login() {
         </Box>
 
         {loading && (
-          <Typography variant="body2" sx={{ textAlign: "center", color: "text.secondary" }}>
-            Signing you in...
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, mt: 2 }}>
+            <CircularProgress size={32} />
+            <Typography variant="body2" sx={{ textAlign: "center", color: "text.secondary" }}>
+              Signing you in...
+            </Typography>
+          </Box>
         )}
-      </Paper>
+      </SectionContainer>
     </Box>
   );
 }

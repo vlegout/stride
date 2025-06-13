@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 
 import { fetchActivities, createActivitiesQueryKey } from "../api";
@@ -8,6 +7,7 @@ import { Activity, ActivitiesQueryParams } from "../types";
 
 import ActivityBox from "../components/ActivityBox";
 import LoadingIndicator from "../components/LoadingIndicator";
+import { PageHeader, SectionContainer } from "../components/ui";
 
 const Home = ({ race = false }: { race?: boolean }) => {
   const queryParams: ActivitiesQueryParams = {
@@ -31,16 +31,22 @@ const Home = ({ race = false }: { race?: boolean }) => {
   }
 
   return (
-    <Container>
-      <Box maxWidth="1000px" margin="auto">
+    <Box sx={{ width: "100%" }}>
+      <PageHeader
+        title={race ? "Recent Races" : "Recent Activities"}
+        subtitle="Your latest fitness activities"
+        centered
+      />
+
+      <SectionContainer maxWidth="1000px" centered>
         {data.activities.map((activity: Activity) => (
-          <Box key={activity.id} marginTop="20px" marginBottom={"20px"}>
+          <Box key={activity.id} sx={{ mb: 3 }}>
             <ActivityBox activity={activity} />
-            <Divider />
+            <Divider sx={{ mt: 2 }} />
           </Box>
         ))}
-      </Box>
-    </Container>
+      </SectionContainer>
+    </Box>
   );
 };
 
