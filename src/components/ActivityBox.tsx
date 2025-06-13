@@ -1,12 +1,7 @@
 import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
@@ -15,6 +10,7 @@ import { Activity } from "../types";
 
 import Map from "./Map";
 import SportLogo from "./SportLogo";
+import { StatsCard } from "./ui";
 
 interface ActivityBoxProps {
   activity: Activity;
@@ -46,65 +42,47 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             <Typography variant={isSmall ? "body2" : "body1"}>{formatDateTime(activity.start_time)}</Typography>
           </Grid>
         </Grid>
-        <TableContainer component={Paper}>
-          <Table size={isMobile ? "small" : "medium"}>
-            <TableBody>
-              <TableRow>
-                <TableCell colSpan={2} sx={{ fontSize: isSmall ? "0.875rem" : "inherit" }}>
-                  {activity.location}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Timer Time: {formatDuration(activity.total_timer_time)}
-                </TableCell>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Elapsed Time: {formatDuration(activity.total_elapsed_time)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Distance: {formatDistance(activity.total_distance)}
-                </TableCell>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Average Speed: {formatSpeed(activity.avg_speed)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Avg Heart Rate: {activity.avg_heart_rate}
-                </TableCell>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Max Heart Rate: {activity.max_heart_rate}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Avg Power: {activity.avg_power}
-                </TableCell>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Normalized Power: {activity.np_power}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Calories: {activity.total_calories}
-                </TableCell>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Training Effect: {activity.total_training_effect}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Device: {activity.device}
-                </TableCell>
-                <TableCell sx={{ fontSize: isSmall ? "0.75rem" : "inherit", padding: isSmall ? "8px" : "inherit" }}>
-                  Ascent: {activity.total_ascent} m
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+            {activity.location}
+          </Typography>
+        </Box>
+
+        <Grid container spacing={1}>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard title="Distance" value={formatDistance(activity.total_distance)} size="small" />
+          </Grid>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard title="Timer Time" value={formatDuration(activity.total_timer_time)} size="small" />
+          </Grid>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard title="Avg Speed" value={formatSpeed(activity.avg_speed)} size="small" />
+          </Grid>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard title="Avg HR" value={activity.avg_heart_rate || "N/A"} size="small" />
+          </Grid>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard title="Max HR" value={activity.max_heart_rate || "N/A"} size="small" />
+          </Grid>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard title="Calories" value={activity.total_calories || "N/A"} size="small" />
+          </Grid>
+          {activity.avg_power && (
+            <Grid size={{ xs: 6, sm: 4 }}>
+              <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
+            </Grid>
+          )}
+          {activity.total_ascent && (
+            <Grid size={{ xs: 6, sm: 4 }}>
+              <StatsCard title="Ascent" value={`${activity.total_ascent} m`} size="small" />
+            </Grid>
+          )}
+          {activity.device && (
+            <Grid size={{ xs: 6, sm: 4 }}>
+              <StatsCard title="Device" value={activity.device} size="small" />
+            </Grid>
+          )}
+        </Grid>
       </Grid>
       <Grid size={{ xs: 12, md: 6 }} sx={{ minHeight: isMobile ? "250px" : "auto" }}>
         <Map

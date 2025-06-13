@@ -11,6 +11,7 @@ import LapChart from "../components/LapChart";
 import Performances from "../components/Performances";
 import ActivityBox from "../components/ActivityBox";
 import LoadingIndicator from "../components/LoadingIndicator";
+import { SectionContainer } from "../components/ui";
 
 const ActivityPage = () => {
   const params = useParams();
@@ -35,31 +36,17 @@ const ActivityPage = () => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+      <SectionContainer spacing="compact">
         <ActivityBox activity={data} isDetailed={true} />
-      </Box>
+      </SectionContainer>
 
-      <Box
-        sx={{
-          mb: { xs: 3, sm: 4 },
-          width: "100%",
-          maxWidth: { xs: "100%", sm: "600px", md: "500px" },
-          mx: "auto",
-        }}
-      >
+      <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
         <LapChart laps={data.laps} />
-      </Box>
+      </SectionContainer>
 
-      <Box
-        sx={{
-          mb: { xs: 3, sm: 4 },
-          width: "100%",
-          maxWidth: { xs: "100%", sm: "500px", md: "400px" },
-          mx: "auto",
-        }}
-      >
+      <SectionContainer maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
         <Performances performances={data.performances} />
-      </Box>
+      </SectionContainer>
 
       <Box
         sx={{
@@ -69,42 +56,21 @@ const ActivityPage = () => {
           alignItems: "center",
         }}
       >
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: { xs: "100%", sm: "90%", md: "800px" },
-            px: { xs: 0, sm: 2 },
-          }}
-        >
+        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
           <LineChart labels={labels} data={speedData} />
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: { xs: "100%", sm: "90%", md: "800px" },
-            px: { xs: 0, sm: 2 },
-          }}
-        >
+        </SectionContainer>
+
+        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
           <LineChart labels={labels} data={hrData} />
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: { xs: "100%", sm: "90%", md: "800px" },
-            px: { xs: 0, sm: 2 },
-          }}
-        >
+        </SectionContainer>
+
+        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
           <LineChart labels={labels} data={altitudeData} />
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: { xs: "100%", sm: "90%", md: "800px" },
-            px: { xs: 0, sm: 2 },
-          }}
-        >
+        </SectionContainer>
+
+        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
           <LineChart labels={labels} data={powerData} />
-        </Box>
+        </SectionContainer>
       </Box>
     </Box>
   );

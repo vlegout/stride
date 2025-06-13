@@ -1,27 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Alert,
-} from "@mui/material";
+import { Box, Card, CardContent, Grid, Chip, Alert, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
 import { fetchWeeks } from "../api";
 import { formatDate, formatDuration, formatDistance, formatPace } from "../utils";
 import SportLogo from "../components/SportLogo";
 import LoadingIndicator from "../components/LoadingIndicator";
-import { colors } from "../colors";
+import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../components/ui";
+
+interface ActivityRow {
+  id: string;
+  race?: boolean;
+  sport: string;
+}
 
 const WeeksPage = () => {
   const {
@@ -53,11 +44,68 @@ const WeeksPage = () => {
     );
   }
 
+  const activityColumns: Column<ActivityRow>[] = [
+    {
+      id: "start_time",
+      label: "Date",
+      render: (value) => formatDate(new Date((value as number) * 1000)),
+    },
+    {
+      id: "title",
+      label: "Activity",
+      render: (value, row) => (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Link to={`/activities/${row.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+            <Typography
+              variant="body2"
+              sx={{
+                "&:hover": {
+                  textDecoration: "underline",
+                },
+              }}
+            >
+              {value as string}
+            </Typography>
+          </Link>
+          {row.race && <Chip label="Race" size="small" color="primary" />}
+        </Box>
+      ),
+    },
+    {
+      id: "sport",
+      label: "Sport",
+      render: (value) => (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <SportLogo sport={value as string} width={20} />
+          <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+            {value as string}
+          </Typography>
+        </Box>
+      ),
+    },
+    {
+      id: "total_distance",
+      label: "Distance",
+      align: "right" as const,
+      format: (value) => formatDistance(value as number),
+    },
+    {
+      id: "total_timer_time",
+      label: "Time",
+      align: "right" as const,
+      format: (value) => formatDuration(value as number),
+    },
+    {
+      id: "avg_speed",
+      label: "Pace",
+      align: "right" as const,
+      render: (value, row) => formatPace(value as number, row.sport),
+    },
+  ];
+
   return (
     <Box sx={{ width: "100%" }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Weekly Summary
-      </Typography>
+      <PageHeader title="Weekly Summary" />
 
       {weeksData.weeks.map((week) => {
         const sportsBreakdown =
@@ -77,34 +125,23 @@ const WeeksPage = () => {
 
               <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid size={{ xs: 12, sm: 4 }}>
-                  <Box sx={{ textAlign: "center", p: 2, bgcolor: colors.primarySoft, borderRadius: 1 }}>
-                    <Typography variant="h4" component="div" sx={{ fontWeight: "bold" }}>
-                      {week.total_activities}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Activities
-                    </Typography>
-                  </Box>
+                  <StatsCard title="Activities" value={week.total_activities} variant="primary" size="large" />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 4 }}>
-                  <Box sx={{ textAlign: "center", p: 2, bgcolor: colors.primarySoft, borderRadius: 1 }}>
-                    <Typography variant="h4" component="div" sx={{ fontWeight: "bold" }}>
-                      {formatDistance(week.total_distance)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Distance
-                    </Typography>
-                  </Box>
+                  <StatsCard
+                    title="Total Distance"
+                    value={formatDistance(week.total_distance)}
+                    variant="primary"
+                    size="large"
+                  />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 4 }}>
-                  <Box sx={{ textAlign: "center", p: 2, bgcolor: colors.primarySoft, borderRadius: 1 }}>
-                    <Typography variant="h4" component="div" sx={{ fontWeight: "bold" }}>
-                      {formatDuration(week.total_time)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Time
-                    </Typography>
-                  </Box>
+                  <StatsCard
+                    title="Total Time"
+                    value={formatDuration(week.total_time)}
+                    variant="primary"
+                    size="large"
+                  />
                 </Grid>
               </Grid>
 
@@ -129,63 +166,9 @@ const WeeksPage = () => {
 
               {/* Activities Table */}
               {week.activities.length > 0 && (
-                <Box>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Activities
-                  </Typography>
-                  <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-                    <Table stickyHeader>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Date</TableCell>
-                          <TableCell>Activity</TableCell>
-                          <TableCell>Sport</TableCell>
-                          <TableCell align="right">Distance</TableCell>
-                          <TableCell align="right">Time</TableCell>
-                          <TableCell align="right">Pace</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {week.activities.map((activity) => (
-                          <TableRow key={activity.id} hover>
-                            <TableCell>{formatDate(new Date(activity.start_time * 1000))}</TableCell>
-                            <TableCell>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <Link
-                                  to={`/activities/${activity.id}`}
-                                  style={{ textDecoration: "none", color: "inherit" }}
-                                >
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      "&:hover": {
-                                        textDecoration: "underline",
-                                      },
-                                    }}
-                                  >
-                                    {activity.title}
-                                  </Typography>
-                                </Link>
-                                {activity.race && <Chip label="Race" size="small" color="primary" />}
-                              </Box>
-                            </TableCell>
-                            <TableCell>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <SportLogo sport={activity.sport} width={20} />
-                                <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-                                  {activity.sport}
-                                </Typography>
-                              </Box>
-                            </TableCell>
-                            <TableCell align="right">{formatDistance(activity.total_distance)}</TableCell>
-                            <TableCell align="right">{formatDuration(activity.total_timer_time)}</TableCell>
-                            <TableCell align="right">{formatPace(activity.avg_speed, activity.sport)}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
+                <SectionContainer title="Activities">
+                  <DataTable columns={activityColumns} rows={week.activities} maxHeight={400} stickyHeader responsive />
+                </SectionContainer>
               )}
             </CardContent>
           </Card>

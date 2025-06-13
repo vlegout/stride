@@ -1,12 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { Chart as ChartJS, BarElement, ChartOptions, LinearScale, CategoryScale, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
@@ -18,6 +11,7 @@ import { formatDistance } from "../utils";
 
 import Performances from "../components/Performances";
 import LoadingIndicator from "../components/LoadingIndicator";
+import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
 
 const Profile = () => {
   const { data, error, isPending, isFetching } = useQuery({
@@ -74,153 +68,77 @@ const Profile = () => {
     ],
   };
 
+  const profileStatsColumns: Column[] = [
+    {
+      id: "metric",
+      label: "Metric",
+      width: "60%",
+    },
+    {
+      id: "value",
+      label: "Value",
+      width: "40%",
+    },
+  ];
+
+  const profileStatsRows = [
+    { id: 1, metric: "Total Activities", value: data.n_activities },
+    { id: 2, metric: "Run Total Activities", value: data.run_n_activities },
+    { id: 3, metric: "Run Total Distance", value: formatDistance(data.run_total_distance) },
+    { id: 4, metric: "Cycling Total Activities", value: data.cycling_n_activities },
+    { id: 5, metric: "Cycling Total Distance", value: formatDistance(data.cycling_total_distance) },
+  ];
+
+  const yearlyStatsColumns: Column[] = [
+    { id: "year", label: "Year" },
+    { id: "run_activities", label: "Activities", align: "center" as const },
+    { id: "run_distance", label: "Distance", align: "center" as const },
+    { id: "cycling_activities", label: "Activities", align: "center" as const },
+    { id: "cycling_distance", label: "Distance", align: "center" as const },
+  ];
+
+  const yearlyStatsRows = data.years.map((year) => ({
+    id: year.year,
+    year: year.year,
+    run_activities: year.statistics[0].n_activities,
+    run_distance: formatDistance(year.statistics[0].total_distance),
+    cycling_activities: year.statistics[1].n_activities,
+    cycling_distance: formatDistance(year.statistics[1].total_distance),
+  }));
+
   return (
     <Box sx={{ width: "100%" }}>
-      <Typography variant={isMobile ? "h6" : "h5"} sx={{ mb: { xs: 2, sm: 3 }, textAlign: "center" }}>
-        Profile Statistics
-      </Typography>
+      <PageHeader title="Profile Statistics" centered />
 
-      <Box
-        sx={{
-          mb: { xs: 3, sm: 4 },
-          maxWidth: { xs: "100%", sm: "600px", md: "800px" },
-          mx: "auto",
-        }}
-      >
-        <TableContainer
-          component={Paper}
-          sx={{
-            overflowX: "auto",
-            "& .MuiTable-root": {
-              minWidth: isMobile ? "300px" : "650px",
-            },
-          }}
-        >
-          <Table size={isMobile ? "small" : "medium"} aria-label="profile statistics">
-            <TableBody>
-              <TableRow>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>Total Activities</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>{data.n_activities}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>Run Total Activities</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>{data.run_n_activities}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>Run Total Distance</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>
-                  {formatDistance(data.run_total_distance)}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>Cycling Total Activities</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>{data.cycling_n_activities}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>Cycling Total Distance</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.8rem" : "inherit" }}>
-                  {formatDistance(data.cycling_total_distance)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+      <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "800px" }} centered variant="paper">
+        <DataTable columns={profileStatsColumns} rows={profileStatsRows} minWidth={isMobile ? 300 : 650} responsive />
+      </SectionContainer>
 
-      <Box
-        sx={{
-          mb: { xs: 3, sm: 4 },
-          maxWidth: { xs: "100%", sm: "90%", md: "800px" },
-          mx: "auto",
-          height: { xs: "200px", sm: "250px", md: "300px" },
-        }}
-      >
-        <Typography variant={isMobile ? "subtitle2" : "subtitle1"} sx={{ mb: 2, textAlign: "center" }}>
-          Weekly Distance
-        </Typography>
-        <Bar options={weekOptions} data={weekData} />
-      </Box>
+      <SectionContainer title="Weekly Distance" maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
+        <Box sx={{ height: { xs: "200px", sm: "250px", md: "300px" } }}>
+          <Bar options={weekOptions} data={weekData} />
+        </Box>
+      </SectionContainer>
 
-      <Box
-        sx={{
-          mb: { xs: 3, sm: 4 },
-          maxWidth: { xs: "100%", sm: "500px", md: "400px" },
-          mx: "auto",
-        }}
-      >
-        <Typography variant={isMobile ? "subtitle2" : "subtitle1"} sx={{ mb: 2, textAlign: "center" }}>
-          Running Performances
-        </Typography>
+      <SectionContainer title="Running Performances" maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
         <Performances performances={data.running_performances} />
-      </Box>
+      </SectionContainer>
 
-      <Box
-        sx={{
-          maxWidth: { xs: "100%", sm: "90%", md: "800px" },
-          mx: "auto",
-        }}
+      <SectionContainer
+        title="Yearly Statistics"
+        maxWidth={{ xs: "100%", sm: "90%", md: "800px" }}
+        centered
+        variant="paper"
       >
-        <Typography variant={isMobile ? "subtitle2" : "subtitle1"} sx={{ mb: 2, textAlign: "center" }}>
-          Yearly Statistics
-        </Typography>
-        <TableContainer
-          component={Paper}
-          sx={{
-            overflowX: "auto",
-            "& .MuiTable-root": {
-              minWidth: isMobile ? "400px" : "650px",
-            },
-          }}
-        >
-          <Table size={isMobile ? "small" : "medium"} aria-label="yearly statistics">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontSize: isMobile ? "0.75rem" : "inherit", fontWeight: "bold" }}>Year</TableCell>
-                <TableCell
-                  colSpan={2}
-                  align="center"
-                  sx={{ fontSize: isMobile ? "0.75rem" : "inherit", fontWeight: "bold" }}
-                >
-                  Running
-                </TableCell>
-                <TableCell
-                  colSpan={2}
-                  align="center"
-                  sx={{ fontSize: isMobile ? "0.75rem" : "inherit", fontWeight: "bold" }}
-                >
-                  Cycling
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ fontSize: isMobile ? "0.7rem" : "inherit" }}></TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.7rem" : "inherit" }}>Activities</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.7rem" : "inherit" }}>Distance</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.7rem" : "inherit" }}>Activities</TableCell>
-                <TableCell sx={{ fontSize: isMobile ? "0.7rem" : "inherit" }}>Distance</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.years.map((year) => (
-                <TableRow key={year.year}>
-                  <TableCell sx={{ fontSize: isMobile ? "0.75rem" : "inherit" }}>{year.year}</TableCell>
-                  <TableCell sx={{ fontSize: isMobile ? "0.75rem" : "inherit" }}>
-                    {year.statistics[0].n_activities}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: isMobile ? "0.75rem" : "inherit" }}>
-                    {formatDistance(year.statistics[0].total_distance)}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: isMobile ? "0.75rem" : "inherit" }}>
-                    {year.statistics[1].n_activities}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: isMobile ? "0.75rem" : "inherit" }}>
-                    {formatDistance(year.statistics[1].total_distance)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "bold" }}>
+              Running &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cycling
+            </Typography>
+          </Box>
+        </Box>
+        <DataTable columns={yearlyStatsColumns} rows={yearlyStatsRows} minWidth={isMobile ? 400 : 650} responsive />
+      </SectionContainer>
     </Box>
   );
 };

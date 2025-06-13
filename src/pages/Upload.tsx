@@ -1,34 +1,11 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Alert,
-  CircularProgress,
-} from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { styled } from "@mui/material/styles";
+import { Box, Button, Alert, CircularProgress } from "@mui/material";
 
 import { uploadActivity } from "../api";
 import { AxiosError } from "axios";
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+import { PageHeader, FormField, SectionContainer } from "../components/ui";
 
 const Upload = () => {
   const [title, setTitle] = useState("");
@@ -83,78 +60,66 @@ const Upload = () => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ maxWidth: "600px", mx: "auto" }}>
-        <Paper sx={{ p: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Upload Activity
-          </Typography>
+      <PageHeader title="Upload Activity" />
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
+      <SectionContainer maxWidth="600px" centered variant="paper" elevation={2}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            <TextField
-              label="Activity Title"
-              variant="outlined"
-              fullWidth
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={uploadMutation.isPending}
-            />
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <FormField
+            type="text"
+            label="Activity Title"
+            value={title}
+            onChange={(value) => setTitle(value as string)}
+            required
+            disabled={uploadMutation.isPending}
+            placeholder="Enter activity title"
+          />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={race}
-                  onChange={(e) => setRace(e.target.checked)}
-                  disabled={uploadMutation.isPending}
-                />
-              }
-              label="Race"
-            />
+          <FormField
+            type="checkbox"
+            label="Race"
+            checkboxProps={{
+              checked: race,
+              onChange: (e) => setRace(e.target.checked),
+            }}
+            disabled={uploadMutation.isPending}
+          />
 
-            <Box>
-              <Button
-                component="label"
-                variant="outlined"
-                startIcon={<CloudUploadIcon />}
-                sx={{ mb: 1 }}
-                disabled={uploadMutation.isPending}
-              >
-                Select FIT File
-                <VisuallyHiddenInput type="file" accept=".fit" onChange={handleFileChange} />
-              </Button>
+          <FormField
+            type="file"
+            label="Select FIT File"
+            onChange={(value) => handleFileChange(value as React.ChangeEvent<HTMLInputElement>)}
+            disabled={uploadMutation.isPending}
+            error={!!error && error.includes("file")}
+            fileProps={{
+              accept: ".fit",
+              ...(fitFile && { fileName: fitFile.name }),
+            }}
+          />
 
-              {fitFile && (
-                <Typography variant="body2" color="text.secondary">
-                  Selected: {fitFile.name}
-                </Typography>
-              )}
-            </Box>
-
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              disabled={uploadMutation.isPending || !fitFile || !title.trim()}
-              sx={{ alignSelf: "flex-start" }}
-            >
-              {uploadMutation.isPending ? (
-                <>
-                  <CircularProgress size={20} sx={{ mr: 1 }} />
-                  Uploading...
-                </>
-              ) : (
-                "Upload Activity"
-              )}
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={uploadMutation.isPending || !fitFile || !title.trim()}
+            sx={{ alignSelf: "flex-start" }}
+          >
+            {uploadMutation.isPending ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Uploading...
+              </>
+            ) : (
+              "Upload Activity"
+            )}
+          </Button>
+        </Box>
+      </SectionContainer>
     </Box>
   );
 };

@@ -1,28 +1,27 @@
-import { FormControl, InputLabel, MenuItem, Slider, FormControlLabel, Checkbox } from "@mui/material";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
 
 import ActivitiesTable from "../components/ActivitiesTable";
 import { useActivitiesStore } from "../store";
+import { PageHeader, FormField, SelectOption } from "../components/ui";
 
 const ActivitiesPage = () => {
   const { sport, distance, race, setSport, setDistance, setRace } = useActivitiesStore();
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setSport(event.target.value);
-  };
+  const sportOptions: SelectOption[] = [
+    { value: "", label: "All" },
+    { value: "cycling", label: "Cycling" },
+    { value: "running", label: "Running" },
+  ];
 
-  const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number[]) => {
+  const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number | number[]) => {
     setDistance(value as [number, number]);
-  };
-
-  const handleRaceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRace(event.target.checked);
   };
 
   return (
     <Box sx={{ width: "100%" }}>
+      <PageHeader title="Activities" />
+
       <Grid
         container
         spacing={{ xs: 2, sm: 2, md: 2 }}
@@ -32,43 +31,36 @@ const ActivitiesPage = () => {
         }}
       >
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <FormControl fullWidth>
-            <InputLabel id="activities-sport">Sport</InputLabel>
-            <Select labelId="activities-sport" value={sport} label="Sport" onChange={handleChange}>
-              <MenuItem value={""}>All</MenuItem>
-              <MenuItem value={"cycling"}>Cycling</MenuItem>
-              <MenuItem value={"running"}>Running</MenuItem>
-            </Select>
-          </FormControl>
+          <FormField
+            type="select"
+            label="Sport"
+            value={sport}
+            onChange={(value) => setSport(value as string)}
+            options={sportOptions}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 2 }} sx={{ display: "flex", alignItems: "center" }}>
-          <FormControlLabel
-            control={<Checkbox checked={race} onChange={handleRaceChange} />}
+          <FormField
+            type="checkbox"
             label="Race"
-            sx={{ width: "100%" }}
+            checkboxProps={{
+              checked: race,
+              onChange: (e) => setRace(e.target.checked),
+            }}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 7 }}>
-          <FormControl fullWidth>
-            <Box sx={{ mb: 1, fontSize: "0.875rem", color: "text.secondary" }}>Distance</Box>
-            <Box sx={{ px: { xs: 2, sm: 3 } }}>
-              <Slider
-                getAriaLabel={() => "Minimum distance"}
-                value={distance}
-                onChangeCommitted={handleDistanceChange}
-                valueLabelDisplay="auto"
-                disableSwap
-                min={0}
-                max={100}
-                sx={{
-                  "& .MuiSlider-thumb": {
-                    width: { xs: 20, sm: 24 },
-                    height: { xs: 20, sm: 24 },
-                  },
-                }}
-              />
-            </Box>
-          </FormControl>
+          <FormField
+            type="slider"
+            label="Distance"
+            value={distance}
+            sliderProps={{
+              min: 0,
+              max: 100,
+              valueLabelDisplay: "auto",
+              onChangeCommitted: handleDistanceChange,
+            }}
+          />
         </Grid>
       </Grid>
       <Box sx={{ overflowX: "auto", width: "100%" }}>
