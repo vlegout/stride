@@ -10,7 +10,7 @@ import { Activity } from "../types";
 
 import Map from "./Map";
 import SportLogo from "./SportLogo";
-import { StatsCard } from "./ui";
+import { StatsCard, PageHeader } from "./ui";
 
 interface ActivityBoxProps {
   activity: Activity;
@@ -23,7 +23,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
   const title = isDetailed ? (
-    <Typography variant={isSmall ? "h6" : "h5"}>{activity.title}</Typography>
+    <PageHeader title={activity.title} subtitle={activity.location} />
   ) : (
     <Typography variant={isSmall ? "h6" : "h5"}>
       <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
@@ -33,7 +33,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   return (
     <Grid container spacing={isMobile ? 1 : 2} marginBottom={isMobile ? "16px" : "20px"}>
       <Grid size={{ xs: 12, md: 6 }}>
-        {title}
+        {isDetailed ? <>{title}</> : title}
         <Grid container spacing={1} marginTop={"10px"} marginBottom={"10px"}>
           <Grid size={isSmall ? 2 : 1}>
             <SportLogo sport={activity.sport} />
@@ -42,11 +42,13 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             <Typography variant={isSmall ? "body2" : "body1"}>{formatDateTime(activity.start_time)}</Typography>
           </Grid>
         </Grid>
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-            {activity.location}
-          </Typography>
-        </Box>
+        {!isDetailed && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+              {activity.location}
+            </Typography>
+          </Box>
+        )}
 
         <Grid container spacing={1}>
           <Grid size={{ xs: 6, sm: 4 }}>
