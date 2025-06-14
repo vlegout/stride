@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Alert, CircularProgress } from "@mui/material";
+import JSZip from "jszip";
 
 import { uploadActivity } from "../api";
 import { AxiosError } from "axios";
@@ -28,16 +29,52 @@ const Upload = () => {
     },
   });
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (!file.name.endsWith(".fit")) {
-        setError("Please select a .fit file");
+    if (!file) return;
+
+    try {
+      if (file.name.toLowerCase().endsWith(".fit")) {
+        setFitFile(file);
+        setError(null);
+      } else if (file.name.toLowerCase().endsWith(".zip")) {
+        const zip = new JSZip();
+        const zipContents = await zip.loadAsync(file);
+
+        const fitFiles = Object.keys(zipContents.files).filter(
+          (name) => name.toLowerCase().endsWith(".fit") && !zipContents.files[name].dir,
+        );
+
+        if (fitFiles.length === 0) {
+          setError("Zip file must contain at least one .fit file");
+          setFitFile(null);
+          event.target.value = "";
+          return;
+        }
+
+        if (fitFiles.length > 1) {
+          setError("Zip file must contain only one .fit file");
+          setFitFile(null);
+          event.target.value = "";
+          return;
+        }
+
+        const fitFileData = await zipContents.files[fitFiles[0]].async("blob");
+        const fitFile = new File([fitFileData], fitFiles[0], { type: "application/octet-stream" });
+
+        setFitFile(fitFile);
+        setError(null);
+      } else {
+        setError("Please select a .fit or .zip file");
         setFitFile(null);
+        event.target.value = "";
         return;
       }
-      setFitFile(file);
-      setError(null);
+    } catch (err) {
+      console.error("File processing error:", err);
+      setError("Failed to process file. Please ensure it's a valid .fit or .zip file");
+      setFitFile(null);
+      event.target.value = "";
     }
   };
 
@@ -92,12 +129,12 @@ const Upload = () => {
 
           <FormField
             type="file"
-            label="Select FIT File"
-            onChange={(value) => handleFileChange(value as React.ChangeEvent<HTMLInputElement>)}
+            label="Select FIT File or ZIP Archive"
+            onChange={(_, event) => handleFileChange(event as React.ChangeEvent<HTMLInputElement>)}
             disabled={uploadMutation.isPending}
             error={!!error && error.includes("file")}
             fileProps={{
-              accept: ".fit",
+              accept: ".fit,.zip",
               ...(fitFile && { fileName: fitFile.name }),
             }}
           />
