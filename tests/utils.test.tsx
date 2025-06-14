@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { formatSpeed, formatDistance, formatDuration, formatDateTime, formatInterval } from "../src/utils";
+import {
+  formatSpeed,
+  formatDistance,
+  formatDuration,
+  formatDateTime,
+  formatInterval,
+  formatPace,
+  formatDate,
+} from "../src/utils";
 
 describe("utils", () => {
   describe("formatSpeed", () => {
@@ -69,6 +77,48 @@ describe("utils", () => {
 
     it("should handle zero duration", () => {
       expect(formatInterval("PT0S")).toBe("00:00:00");
+    });
+  });
+
+  describe("formatPace", () => {
+    it("should return '--' for null, undefined, or zero speed", () => {
+      expect(formatPace(null as unknown as number, "running")).toBe("--");
+      expect(formatPace(undefined as unknown as number, "cycling")).toBe("--");
+      expect(formatPace(0, "running")).toBe("--");
+    });
+
+    it("should format running pace as min/km", () => {
+      // 12 km/h = 5:00 /km
+      expect(formatPace(12, "running")).toBe("5:00 /km");
+      // 10 km/h = 6:00 /km
+      expect(formatPace(10, "running")).toBe("6:00 /km");
+      // 15 km/h = 4:00 /km
+      expect(formatPace(15, "running")).toBe("4:00 /km");
+      // 13.5 km/h = 4:27 /km
+      expect(formatPace(13.5, "running")).toBe("4:27 /km");
+    });
+
+    it("should format cycling pace as km/h with 1 decimal", () => {
+      expect(formatPace(25.123, "cycling")).toBe("25.1 km/h");
+      expect(formatPace(30, "cycling")).toBe("30.0 km/h");
+    });
+  });
+
+  describe("formatDate", () => {
+    it("should format a Date object to a readable date with weekday", () => {
+      const date = new Date("2021-01-01T00:00:00Z");
+      const result = formatDate(date);
+      expect(result).toContain("Jan");
+      expect(result).toContain("1");
+      expect(result).toContain("2021");
+    });
+
+    it("should handle different dates", () => {
+      const date = new Date("2022-12-25T12:00:00Z");
+      const result = formatDate(date);
+      expect(result).toContain("Dec");
+      expect(result).toContain("25");
+      expect(result).toContain("2022");
     });
   });
 });
