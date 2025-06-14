@@ -6,7 +6,7 @@ import Pagination from "@mui/material/Pagination";
 import { fetchActivities, createActivitiesQueryKey } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import { Activity, ActivitiesQueryParams } from "../types";
-import SportLogo from "./SportLogo";
+import ActivityLogo from "./ActivityLogo";
 import { useActivitiesStore } from "../store";
 import LoadingIndicator from "./LoadingIndicator";
 import { DataTable, Column } from "./ui";
@@ -41,7 +41,7 @@ const ActivitiesTable = () => {
     {
       id: "sport",
       label: "Sport",
-      render: (value) => <SportLogo sport={value as string} width={25} />,
+      render: (value) => <ActivityLogo sport={value as string} width={25} />,
     },
     {
       id: "title",
