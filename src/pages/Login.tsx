@@ -120,12 +120,7 @@ export default function Login() {
       }}
     >
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-        <PageHeader
-          title="Welcome to Stride"
-          centered
-          variant="h4"
-          spacing="compact"
-        />
+        <PageHeader title="Welcome to Stride" centered variant="h4" spacing="compact" />
       </Box>
 
       <SectionContainer maxWidth="400px" centered variant="paper" elevation={3} spacing="normal">
