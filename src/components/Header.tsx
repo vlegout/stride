@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -98,8 +97,7 @@ const Header = () => {
                   </MenuItem>
                 ))}
                 <MenuItem onClick={handleLogout}>
-                  <LogoutIcon sx={{ mr: 1 }} />
-                  Logout
+                  <LogoutIcon />
                 </MenuItem>
               </Menu>
             </>
@@ -172,9 +170,8 @@ const Header = () => {
                     </Link>
                   </>
                 )}
-                <Button
+                <IconButton
                   onClick={handleLogout}
-                  startIcon={<LogoutIcon />}
                   sx={{
                     color: colors.text.onLight,
                     "&:hover": {
@@ -182,8 +179,8 @@ const Header = () => {
                     },
                   }}
                 >
-                  Logout
-                </Button>
+                  <LogoutIcon />
+                </IconButton>
                 <Typography
                   variant="body2"
                   sx={{
