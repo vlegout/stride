@@ -121,8 +121,7 @@ export default function Login() {
     >
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
         <PageHeader
-          title="Welcome to Sport"
-          subtitle="Track your fitness journey"
+          title="Welcome to Stride"
           centered
           variant="h4"
           spacing="compact"
