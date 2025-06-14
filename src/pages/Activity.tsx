@@ -48,30 +48,21 @@ const ActivityPage = () => {
         <Performances performances={data.performances} />
       </SectionContainer>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: { xs: 3, sm: 4 },
-          alignItems: "center",
-        }}
-      >
-        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
-          <LineChart labels={labels} data={speedData} />
-        </SectionContainer>
+      <SectionContainer spacing="compact">
+        <LineChart labels={labels} data={speedData} />
+      </SectionContainer>
 
-        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
-          <LineChart labels={labels} data={hrData} />
-        </SectionContainer>
+      <SectionContainer spacing="compact">
+        <LineChart labels={labels} data={hrData} />
+      </SectionContainer>
 
-        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
-          <LineChart labels={labels} data={altitudeData} />
-        </SectionContainer>
+      <SectionContainer spacing="compact">
+        <LineChart labels={labels} data={altitudeData} />
+      </SectionContainer>
 
-        <SectionContainer maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
-          <LineChart labels={labels} data={powerData} />
-        </SectionContainer>
-      </Box>
+      <SectionContainer spacing="compact">
+        <LineChart labels={labels} data={powerData} />
+      </SectionContainer>
     </Box>
   );
 };

@@ -22,7 +22,7 @@ const Performances = ({ performances }: { performances: Performance[] }) => {
 
   return (
     <SectionContainer title="Performances">
-      <DataTable columns={columns} rows={performances} emptyMessage="No performances available" />
+      <DataTable columns={columns} rows={performances} emptyMessage="No performances available" minWidth={200} />
     </SectionContainer>
   );
 };
