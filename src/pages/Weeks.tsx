@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import { fetchWeeks } from "../api";
 import { formatDate, formatDuration, formatDistance, formatPace } from "../utils";
-import SportLogo from "../components/SportLogo";
+import ActivityLogo from "../components/ActivityLogo";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../components/ui";
 
@@ -76,7 +76,7 @@ const WeeksPage = () => {
       label: "Sport",
       render: (value) => (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <SportLogo sport={value as string} width={20} />
+          <ActivityLogo sport={value as string} width={20} />
           <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
             {value as string}
           </Typography>
@@ -155,7 +155,7 @@ const WeeksPage = () => {
                     {Object.entries(sportsBreakdown).map(([sport, stats]) => (
                       <Chip
                         key={sport}
-                        icon={<SportLogo sport={sport} width={16} />}
+                        icon={<ActivityLogo sport={sport} width={16} />}
                         label={`${sport}: ${stats.count} (${formatDistance(stats.distance)})`}
                         variant="outlined"
                       />

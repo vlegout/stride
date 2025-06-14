@@ -3,7 +3,7 @@ import LogoBike from "../data/bike.svg?react";
 // @ts-expect-error: no types for SVG
 import LogoRun from "../data/running.svg?react";
 
-const SportLogo = ({ sport, width = 40 }: { sport: string; width?: number }) => {
+const ActivityLogo = ({ sport, width = 40 }: { sport: string; width?: number }) => {
   switch (sport) {
     case "cycling":
       return <LogoBike style={{ width: `${width}px`, height: `${width}px` }} />;
@@ -14,4 +14,4 @@ const SportLogo = ({ sport, width = 40 }: { sport: string; width?: number }) => 
   }
 };
 
-export default SportLogo;
+export default ActivityLogo;

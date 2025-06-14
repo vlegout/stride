@@ -1,4 +1,4 @@
-# Sport
+# Stride
 
 Web app to visualize run & ride activities from FIT files with charts, maps, and performance metrics.
 

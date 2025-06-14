@@ -9,7 +9,7 @@ import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../
 import { Activity } from "../types";
 
 import Map from "./Map";
-import SportLogo from "./SportLogo";
+import ActivityLogo from "./ActivityLogo";
 import { StatsCard, PageHeader } from "./ui";
 
 interface ActivityBoxProps {
@@ -36,7 +36,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
         {isDetailed ? <>{title}</> : title}
         <Grid container spacing={1} marginTop={"10px"} marginBottom={"10px"}>
           <Grid size={isSmall ? 2 : 1}>
-            <SportLogo sport={activity.sport} />
+            <ActivityLogo sport={activity.sport} />
           </Grid>
           <Grid size={isSmall ? 10 : 11} display="flex" alignItems="center">
             <Typography variant={isSmall ? "body2" : "body1"}>{formatDateTime(activity.start_time)}</Typography>
