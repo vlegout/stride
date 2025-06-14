@@ -30,7 +30,7 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
   const getValueVariant = () => {
     switch (size) {
       case "small":
-        return isMobile ? "h6" : "h5";
+        return isMobile ? "body1" : "h6";
       case "large":
         return isMobile ? "h4" : "h3";
       default:
@@ -71,6 +71,9 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
           fontWeight: "bold",
           color: variant === "primary" ? colors.primary : "text.primary",
           mb: 0.5,
+          wordBreak: "break-word",
+          hyphens: "auto",
+          lineHeight: 1.2,
         }}
       >
         {value}

@@ -32,11 +32,7 @@ const Home = ({ race = false }: { race?: boolean }) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <PageHeader
-        title={race ? "Recent Races" : "Recent Activities"}
-        subtitle="Your latest fitness activities"
-        centered
-      />
+      <PageHeader title={race ? "Recent Races" : "Recent Activities"} centered />
 
       <SectionContainer maxWidth="1000px" centered>
         {data.activities.map((activity: Activity) => (

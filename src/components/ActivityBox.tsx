@@ -57,7 +57,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
           <Grid size={{ xs: 6, sm: 4 }}>
             <StatsCard title="Timer Time" value={formatDuration(activity.total_timer_time)} size="small" />
           </Grid>
-          <Grid size={{ xs: 6, sm: 4 }}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <StatsCard title="Avg Speed" value={formatSpeed(activity.avg_speed)} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
