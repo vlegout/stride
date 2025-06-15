@@ -40,9 +40,11 @@ const ActivityPage = () => {
         <ActivityBox activity={data} isDetailed={true} />
       </SectionContainer>
 
-      <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
-        <LapChart laps={data.laps} />
-      </SectionContainer>
+      {data.sport === "running" && (
+        <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
+          <LapChart laps={data.laps} />
+        </SectionContainer>
+      )}
 
       <SectionContainer maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
         <Performances performances={data.performances} />
