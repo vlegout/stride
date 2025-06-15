@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import MuiLink from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -26,7 +27,9 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
     <PageHeader title={activity.title} subtitle={activity.location} />
   ) : (
     <Typography variant={isSmall ? "h6" : "h5"}>
-      <Link to={`/activities/${activity.id}`}>{activity.title}</Link>
+      <MuiLink component={Link} to={`/activities/${activity.id}`}>
+        {activity.title}
+      </MuiLink>
     </Typography>
   );
 
@@ -61,7 +64,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             <StatsCard title="Avg Speed" value={formatSpeed(activity.avg_speed)} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard title="Avg HR" value={activity.avg_heart_rate} size="small" />
+            <StatsCard title="Avg HR" value={activity.avg_heart_rate || 0} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
             <StatsCard title="Max HR" value={activity.max_heart_rate} size="small" />
@@ -73,11 +76,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard
-              title="Ascent"
-              value={activity.total_ascent ? `${activity.total_ascent} m` : undefined}
-              size="small"
-            />
+            <StatsCard title="Ascent" value={activity.total_ascent ? `${activity.total_ascent} m` : "—"} size="small" />
           </Grid>
           {activity.device && (
             <Grid size={{ xs: 6, sm: 4 }}>

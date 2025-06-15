@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Box, Card, CardContent, Grid, Chip, Alert, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import MuiLink from "@mui/material/Link";
 
 import { fetchWeeks } from "../api";
 import { formatDate, formatDuration, formatDistance, formatPace } from "../utils";
@@ -55,18 +56,9 @@ const WeeksPage = () => {
       label: "Activity",
       render: (value, row) => (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Link to={`/activities/${row.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-            <Typography
-              variant="body2"
-              sx={{
-                "&:hover": {
-                  textDecoration: "underline",
-                },
-              }}
-            >
-              {value as string}
-            </Typography>
-          </Link>
+          <MuiLink component={Link} to={`/activities/${row.id}`}>
+            {value as string}
+          </MuiLink>
           {row.race && <Chip label="Race" size="small" color="primary" />}
         </Box>
       ),
