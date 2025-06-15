@@ -100,9 +100,16 @@ def get_session():
         yield session
 
 
+def get_current_user_id(request: Request) -> str:
+    if not hasattr(request.state, "user_id") or not request.state.user_id:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    return request.state.user_id
+
+
 @app.get("/activities/", response_model=ActivityList)
 def read_activities(
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
     map: bool = Query(default=False),
     limit: int = Query(default=10, ge=1, le=100),
     race: bool = Query(default=None),
@@ -116,7 +123,7 @@ def read_activities(
         pattern="^(total_distance|start_time|avg_speed|avg_power|total_ascent|total_calories)$",
     ),
 ):
-    query = select(Activity)  # type: ignore
+    query = select(Activity).where(Activity.user_id == user_id)  # type: ignore
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
@@ -169,8 +176,14 @@ def read_activities(
 
 
 @app.get("/activities/{activity_id}/", response_model=ActivityPublic)
-def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session)):
-    activity = session.get(Activity, activity_id)
+def read_activity(
+    activity_id: uuid.UUID,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    activity = session.exec(
+        select(Activity).where(Activity.id == activity_id, Activity.user_id == user_id)
+    ).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
     return activity
@@ -180,11 +193,11 @@ def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session
     "/activities/", response_model=ActivityPublic, status_code=status.HTTP_201_CREATED
 )
 def create_activity(
-    request: Request,
     fit_file: UploadFile = File(...),
     title: str = Form(...),
     race: bool = Form(False),
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     if not fit_file.filename or not fit_file.filename.endswith(".fit"):
         raise HTTPException(status_code=400, detail="File must be a .fit file")
@@ -232,7 +245,7 @@ def create_activity(
         upload_content_to_s3(yaml_string, yaml_s3_key)
 
         # Set user_id from JWT token
-        activity.user_id = request.state.user_id
+        activity.user_id = user_id
 
         session.add(activity)
 
@@ -265,6 +278,7 @@ def create_activity(
 @app.get("/profile/", response_model=Profile)
 def read_profile(
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     # Single query for overall statistics
     overall_stats = session.execute(
@@ -276,7 +290,9 @@ def read_profile(
                 COUNT(CASE WHEN sport = 'cycling' THEN 1 END) as cycling_activities,
                 COALESCE(SUM(CASE WHEN sport = 'cycling' THEN total_distance END), 0) as cycling_distance
             FROM activity
-        """)
+            WHERE user_id = :user_id
+        """),
+        {"user_id": user_id},
     ).one()
 
     # Single query for weekly statistics (last 20 weeks)
@@ -304,11 +320,13 @@ def read_profile(
                 COUNT(*) as n_activities,
                 COALESCE(SUM(total_distance), 0) as total_distance
             FROM activity
-            WHERE EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) IN ({years_clause})
+            WHERE user_id = :user_id
+            AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) IN ({years_clause})
             AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) IN ({weeks_clause})
             GROUP BY year, week, sport
             ORDER BY year, week, sport
-        """)
+        """),
+        {"user_id": user_id},
     ).all()
 
     # Organize weekly data
@@ -360,10 +378,12 @@ def read_profile(
                 COUNT(*) as n_activities,
                 COALESCE(SUM(total_distance), 0) as total_distance
             FROM activity
-            WHERE EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
+            WHERE user_id = :user_id
+            AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
             GROUP BY year, sport
             ORDER BY year, sport
-        """)
+        """),
+        {"user_id": user_id},
     ).all()
 
     # Organize yearly data
@@ -411,12 +431,15 @@ def read_profile(
     distances_clause = ",".join(str(d) for d in performance_distances)
     performance_stats = session.execute(
         text(f"""
-            SELECT distance, MIN(time) as best_time
-            FROM performance
-            WHERE distance IN ({distances_clause})
-            GROUP BY distance
-            ORDER BY distance
-        """)
+            SELECT p.distance, MIN(p.time) as best_time
+            FROM performance p
+            JOIN activity a ON p.activity_id = a.id
+            WHERE p.distance IN ({distances_clause})
+            AND a.user_id = :user_id
+            GROUP BY p.distance
+            ORDER BY p.distance
+        """),
+        {"user_id": user_id},
     ).all()
 
     performance_dict = {row[0]: row[1] for row in performance_stats}
@@ -444,6 +467,7 @@ def read_profile(
 @app.get("/weeks/", response_model=WeeksResponse)
 def read_weeks(
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     weeks_data = []
 
@@ -461,6 +485,7 @@ def read_weeks(
         # Get activities for this week
         activities = session.exec(
             select(Activity)
+            .where(Activity.user_id == user_id)
             .where(Activity.start_time >= int(week_start.timestamp()))
             .where(Activity.start_time < int(week_end.timestamp()))
             .order_by(Activity.start_time.desc())  # type: ignore
@@ -517,11 +542,9 @@ def read_weeks(
 
 @app.get("/users/me/", response_model=UserPublic)
 def read_current_user(
-    request: Request,
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
-    user_id = request.state.user_id
-
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
