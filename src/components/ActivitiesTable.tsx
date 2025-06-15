@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import MuiLink from "@mui/material/Link";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
@@ -46,7 +47,11 @@ const ActivitiesTable = () => {
     {
       id: "title",
       label: "Title",
-      render: (value, row) => <Link to={`/activities/${row.id}`}>{value as string}</Link>,
+      render: (value, row) => (
+        <MuiLink component={Link} to={`/activities/${row.id}`}>
+          {value as string}
+        </MuiLink>
+      ),
     },
     { id: "location", label: "Location" },
     {
