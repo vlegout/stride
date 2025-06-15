@@ -100,10 +100,16 @@ def get_session():
         yield session
 
 
+def get_current_user_id(request: Request) -> str:
+    if not hasattr(request.state, "user_id") or not request.state.user_id:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+    return request.state.user_id
+
+
 @app.get("/activities/", response_model=ActivityList)
 def read_activities(
-    request: Request,
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
     map: bool = Query(default=False),
     limit: int = Query(default=10, ge=1, le=100),
     race: bool = Query(default=None),
@@ -117,7 +123,7 @@ def read_activities(
         pattern="^(total_distance|start_time|avg_speed|avg_power|total_ascent|total_calories)$",
     ),
 ):
-    query = select(Activity).where(Activity.user_id == request.state.user_id)  # type: ignore
+    query = select(Activity).where(Activity.user_id == user_id)  # type: ignore
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
@@ -171,12 +177,12 @@ def read_activities(
 
 @app.get("/activities/{activity_id}/", response_model=ActivityPublic)
 def read_activity(
-    activity_id: uuid.UUID, request: Request, session: Session = Depends(get_session)
+    activity_id: uuid.UUID,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     activity = session.exec(
-        select(Activity).where(
-            Activity.id == activity_id, Activity.user_id == request.state.user_id
-        )
+        select(Activity).where(Activity.id == activity_id, Activity.user_id == user_id)
     ).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
@@ -187,11 +193,11 @@ def read_activity(
     "/activities/", response_model=ActivityPublic, status_code=status.HTTP_201_CREATED
 )
 def create_activity(
-    request: Request,
     fit_file: UploadFile = File(...),
     title: str = Form(...),
     race: bool = Form(False),
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     if not fit_file.filename or not fit_file.filename.endswith(".fit"):
         raise HTTPException(status_code=400, detail="File must be a .fit file")
@@ -239,7 +245,7 @@ def create_activity(
         upload_content_to_s3(yaml_string, yaml_s3_key)
 
         # Set user_id from JWT token
-        activity.user_id = request.state.user_id
+        activity.user_id = user_id
 
         session.add(activity)
 
@@ -271,10 +277,9 @@ def create_activity(
 
 @app.get("/profile/", response_model=Profile)
 def read_profile(
-    request: Request,
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
-    user_id = request.state.user_id
     # Single query for overall statistics
     overall_stats = session.execute(
         text("""
@@ -461,8 +466,8 @@ def read_profile(
 
 @app.get("/weeks/", response_model=WeeksResponse)
 def read_weeks(
-    request: Request,
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     weeks_data = []
 
@@ -480,7 +485,7 @@ def read_weeks(
         # Get activities for this week
         activities = session.exec(
             select(Activity)
-            .where(Activity.user_id == request.state.user_id)
+            .where(Activity.user_id == user_id)
             .where(Activity.start_time >= int(week_start.timestamp()))
             .where(Activity.start_time < int(week_end.timestamp()))
             .order_by(Activity.start_time.desc())  # type: ignore
@@ -537,11 +542,9 @@ def read_weeks(
 
 @app.get("/users/me/", response_model=UserPublic)
 def read_current_user(
-    request: Request,
     session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
 ):
-    user_id = request.state.user_id
-
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
