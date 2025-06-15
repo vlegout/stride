@@ -16,6 +16,13 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const getDisplayValue = () => {
+    if (value === null || value === undefined || value === 0) {
+      return "—";
+    }
+    return value;
+  };
+
   const getBackgroundColor = () => {
     switch (variant) {
       case "primary":
@@ -76,7 +83,7 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
           lineHeight: 1.2,
         }}
       >
-        {value}
+        {getDisplayValue()}
       </Typography>
       <Typography
         variant="body2"

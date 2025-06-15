@@ -61,24 +61,24 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             <StatsCard title="Avg Speed" value={formatSpeed(activity.avg_speed)} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard title="Avg HR" value={activity.avg_heart_rate || "N/A"} size="small" />
+            <StatsCard title="Avg HR" value={activity.avg_heart_rate} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard title="Max HR" value={activity.max_heart_rate || "N/A"} size="small" />
+            <StatsCard title="Max HR" value={activity.max_heart_rate} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard title="Calories" value={activity.total_calories || "N/A"} size="small" />
+            <StatsCard title="Calories" value={activity.total_calories} size="small" />
           </Grid>
-          {activity.avg_power && (
-            <Grid size={{ xs: 6, sm: 4 }}>
-              <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
-            </Grid>
-          )}
-          {activity.total_ascent && (
-            <Grid size={{ xs: 6, sm: 4 }}>
-              <StatsCard title="Ascent" value={`${activity.total_ascent} m`} size="small" />
-            </Grid>
-          )}
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
+          </Grid>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard
+              title="Ascent"
+              value={activity.total_ascent ? `${activity.total_ascent} m` : undefined}
+              size="small"
+            />
+          </Grid>
           {activity.device && (
             <Grid size={{ xs: 6, sm: 4 }}>
               <StatsCard title="Device" value={activity.device} size="small" />
