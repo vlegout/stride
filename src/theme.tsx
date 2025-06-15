@@ -1,6 +1,28 @@
 import { createTheme } from "@mui/material/styles";
 import { colors } from "./colors";
 
+const baseLinkStyles = {
+  color: colors.text.primary,
+  textDecoration: "none",
+  fontWeight: 400,
+  transition: "all 0.2s ease-in-out",
+  "&:hover": {
+    color: colors.primary,
+    textDecoration: "underline",
+    textDecorationColor: colors.primary,
+    textUnderlineOffset: "3px",
+  },
+  "&:focus": {
+    color: colors.primary,
+    outline: "none",
+    boxShadow: "none",
+  },
+  "&:focus-visible": {
+    outline: "none",
+    boxShadow: "none",
+  },
+};
+
 export const theme = createTheme({
   palette: {
     primary: {
@@ -16,51 +38,13 @@ export const theme = createTheme({
   components: {
     MuiLink: {
       styleOverrides: {
-        root: {
-          color: colors.text.primary,
-          textDecoration: "none",
-          fontWeight: 400,
-          transition: "all 0.2s ease-in-out",
-          "&:hover": {
-            color: colors.primary,
-            textDecoration: "underline",
-            textDecorationColor: colors.primary,
-            textUnderlineOffset: "3px",
-          },
-          "&:focus": {
-            color: colors.primary,
-            outline: "none",
-            boxShadow: "none",
-          },
-          "&:focus-visible": {
-            outline: "none",
-            boxShadow: "none",
-          },
-        },
+        root: baseLinkStyles,
       },
     },
     MuiCssBaseline: {
       styleOverrides: {
         a: {
-          color: colors.text.primary,
-          textDecoration: "none",
-          fontWeight: 400,
-          transition: "all 0.2s ease-in-out",
-          "&:hover": {
-            color: colors.primary,
-            textDecoration: "underline",
-            textDecorationColor: colors.primary,
-            textUnderlineOffset: "3px",
-          },
-          "&:focus": {
-            color: colors.primary,
-            outline: "none",
-            boxShadow: "none",
-          },
-          "&:focus-visible": {
-            outline: "none",
-            boxShadow: "none",
-          },
+          ...baseLinkStyles,
           "&:visited": {
             color: colors.text.primary,
           },
