@@ -102,6 +102,7 @@ def get_session():
 
 @app.get("/activities/", response_model=ActivityList)
 def read_activities(
+    request: Request,
     session: Session = Depends(get_session),
     map: bool = Query(default=False),
     limit: int = Query(default=10, ge=1, le=100),
@@ -116,7 +117,7 @@ def read_activities(
         pattern="^(total_distance|start_time|avg_speed|avg_power|total_ascent|total_calories)$",
     ),
 ):
-    query = select(Activity)  # type: ignore
+    query = select(Activity).where(Activity.user_id == request.state.user_id)  # type: ignore
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
@@ -169,8 +170,14 @@ def read_activities(
 
 
 @app.get("/activities/{activity_id}/", response_model=ActivityPublic)
-def read_activity(activity_id: uuid.UUID, session: Session = Depends(get_session)):
-    activity = session.get(Activity, activity_id)
+def read_activity(
+    activity_id: uuid.UUID, request: Request, session: Session = Depends(get_session)
+):
+    activity = session.exec(
+        select(Activity).where(
+            Activity.id == activity_id, Activity.user_id == request.state.user_id
+        )
+    ).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
     return activity
@@ -264,8 +271,10 @@ def create_activity(
 
 @app.get("/profile/", response_model=Profile)
 def read_profile(
+    request: Request,
     session: Session = Depends(get_session),
 ):
+    user_id = request.state.user_id
     # Single query for overall statistics
     overall_stats = session.execute(
         text("""
@@ -276,7 +285,9 @@ def read_profile(
                 COUNT(CASE WHEN sport = 'cycling' THEN 1 END) as cycling_activities,
                 COALESCE(SUM(CASE WHEN sport = 'cycling' THEN total_distance END), 0) as cycling_distance
             FROM activity
-        """)
+            WHERE user_id = :user_id
+        """),
+        {"user_id": user_id},
     ).one()
 
     # Single query for weekly statistics (last 20 weeks)
@@ -304,11 +315,13 @@ def read_profile(
                 COUNT(*) as n_activities,
                 COALESCE(SUM(total_distance), 0) as total_distance
             FROM activity
-            WHERE EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) IN ({years_clause})
+            WHERE user_id = :user_id
+            AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) IN ({years_clause})
             AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) IN ({weeks_clause})
             GROUP BY year, week, sport
             ORDER BY year, week, sport
-        """)
+        """),
+        {"user_id": user_id},
     ).all()
 
     # Organize weekly data
@@ -360,10 +373,12 @@ def read_profile(
                 COUNT(*) as n_activities,
                 COALESCE(SUM(total_distance), 0) as total_distance
             FROM activity
-            WHERE EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
+            WHERE user_id = :user_id
+            AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
             GROUP BY year, sport
             ORDER BY year, sport
-        """)
+        """),
+        {"user_id": user_id},
     ).all()
 
     # Organize yearly data
@@ -411,12 +426,15 @@ def read_profile(
     distances_clause = ",".join(str(d) for d in performance_distances)
     performance_stats = session.execute(
         text(f"""
-            SELECT distance, MIN(time) as best_time
-            FROM performance
-            WHERE distance IN ({distances_clause})
-            GROUP BY distance
-            ORDER BY distance
-        """)
+            SELECT p.distance, MIN(p.time) as best_time
+            FROM performance p
+            JOIN activity a ON p.activity_id = a.id
+            WHERE p.distance IN ({distances_clause})
+            AND a.user_id = :user_id
+            GROUP BY p.distance
+            ORDER BY p.distance
+        """),
+        {"user_id": user_id},
     ).all()
 
     performance_dict = {row[0]: row[1] for row in performance_stats}
@@ -443,6 +461,7 @@ def read_profile(
 
 @app.get("/weeks/", response_model=WeeksResponse)
 def read_weeks(
+    request: Request,
     session: Session = Depends(get_session),
 ):
     weeks_data = []
@@ -461,6 +480,7 @@ def read_weeks(
         # Get activities for this week
         activities = session.exec(
             select(Activity)
+            .where(Activity.user_id == request.state.user_id)
             .where(Activity.start_time >= int(week_start.timestamp()))
             .where(Activity.start_time < int(week_end.timestamp()))
             .order_by(Activity.start_time.desc())  # type: ignore
