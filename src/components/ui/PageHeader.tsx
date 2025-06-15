@@ -15,19 +15,10 @@ interface PageHeaderProps {
   breadcrumbs?: BreadcrumbItem[];
   actions?: ReactNode;
   variant?: "h4" | "h5" | "h6";
-  centered?: boolean;
   spacing?: "compact" | "normal" | "spacious";
 }
 
-const PageHeader = ({
-  title,
-  subtitle,
-  breadcrumbs,
-  actions,
-  variant = "h4",
-  centered = false,
-  spacing = "normal",
-}: PageHeaderProps) => {
+const PageHeader = ({ title, subtitle, breadcrumbs, actions, variant = "h4", spacing = "normal" }: PageHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -60,7 +51,7 @@ const PageHeader = ({
     <Box
       sx={{
         mb: getSpacing(),
-        textAlign: centered ? "center" : "left",
+        textAlign: "center",
       }}
     >
       {breadcrumbs && breadcrumbs.length > 0 && (
@@ -68,9 +59,9 @@ const PageHeader = ({
           aria-label="breadcrumb"
           sx={{
             mb: 1,
-            justifyContent: centered ? "center" : "flex-start",
+            justifyContent: "center",
             "& .MuiBreadcrumbs-ol": {
-              justifyContent: centered ? "center" : "flex-start",
+              justifyContent: "center",
             },
           }}
         >
@@ -110,13 +101,13 @@ const PageHeader = ({
       <Box
         sx={{
           display: "flex",
-          alignItems: centered ? "center" : "flex-start",
+          alignItems: "center",
           justifyContent: "space-between",
           flexDirection: { xs: "column", sm: actions ? "row" : "column" },
           gap: { xs: 1, sm: 2 },
         }}
       >
-        <Box sx={{ textAlign: centered ? "center" : "left" }}>
+        <Box sx={{ textAlign: "center" }}>
           <Typography
             variant={getTitleVariant()}
             component="h1"
@@ -147,7 +138,7 @@ const PageHeader = ({
           <Box
             sx={{
               flexShrink: 0,
-              alignSelf: { xs: centered ? "center" : "flex-start", sm: "flex-start" },
+              alignSelf: { xs: "center", sm: "flex-start" },
             }}
           >
             {actions}

@@ -108,7 +108,7 @@ const Profile = () => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <PageHeader title="Profile Statistics" centered />
+      <PageHeader title="Profile Statistics" />
 
       <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "800px" }} centered variant="paper">
         <DataTable columns={profileStatsColumns} rows={profileStatsRows} minWidth={isMobile ? 300 : 650} responsive />
