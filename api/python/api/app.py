@@ -206,6 +206,7 @@ def create_activity(
             title=title,
             description="",
             race=race,
+            fit_name=fit_file.filename,
         )
 
         performances = get_best_performances(activity, tracepoints)

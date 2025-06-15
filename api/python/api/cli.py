@@ -100,12 +100,13 @@ def get_activity_from_fit(
     title: str = "Activity",
     description: str = "",
     race: bool = False,
+    fit_name: str | None = None,
 ) -> tuple[Activity, List[Lap], List[Tracepoint]]:
     fit = api.api.get_fit(fit_file)
 
     activity_create = ActivityCreate(
         id=get_uuid(fit_file),
-        fit=os.path.basename(fit_file),
+        fit=fit_name if fit_name is not None else os.path.basename(fit_file),
         title=title,
         description=description,
         race=race,
