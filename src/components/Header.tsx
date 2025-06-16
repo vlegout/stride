@@ -48,14 +48,17 @@ const Header = () => {
       <AppBar position="static" sx={{ bgcolor: colors.primarySoft, color: colors.text.onLight }}>
         <Toolbar sx={{ minHeight: { xs: 56, sm: 64 } }}>
           <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
-            <img
-              src="/logo.svg"
-              alt="Logo"
-              style={{
-                height: isMobile ? "28px" : "32px",
-                width: "auto",
-              }}
-            />
+            <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+              <img
+                src="/logo.svg"
+                alt="Logo"
+                style={{
+                  height: isMobile ? "28px" : "32px",
+                  width: "auto",
+                  cursor: "pointer",
+                }}
+              />
+            </Link>
           </Box>
 
           {isMobile ? (
