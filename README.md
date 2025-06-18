@@ -10,13 +10,17 @@ Web app to visualize run & ride activities from FIT files with charts, maps, and
 ## Environment Variables
 
 ### Backend
+
 ```bash
-JWT_SECRET_KEY=your-super-secret-jwt-key-here-make-it-long-and-random
-DATABASE_URL=postgresql://username:password@localhost:5432/sport_db
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 BUCKET=your-s3-bucket-name
+DATABASE_URL=postgresql://username:password@localhost:5432/sport_db
+JWT_SECRET_KEY=your-super-secret-jwt-key-here-make-it-long-and-random
 ```
 
 ### Frontend
+
 ```bash
 VITE_API_URL=http://localhost:8000
 VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
