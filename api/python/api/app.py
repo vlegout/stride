@@ -23,7 +23,7 @@ from sqlalchemy import func, text
 from sqlmodel import Session, select
 
 from api.auth import verify_token, create_token_response, Token
-from api.cli import get_activity_from_fit
+from api.fit import get_activity_from_fit
 from api.db import engine
 from api.model import (
     Activity,

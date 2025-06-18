@@ -69,7 +69,7 @@ def get_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def get_uuid(filename: str) -> uuid.UUID:
-    return uuid.uuid5(uuid.NAMESPACE_DNS, filename)
+    return uuid.uuid5(uuid.NAMESPACE_DNS, os.path.basename(filename))
 
 
 def get_best_performances(
