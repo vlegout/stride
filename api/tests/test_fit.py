@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 
 from api.cli import get_data
@@ -14,13 +15,18 @@ class TestFit(unittest.TestCase):
             },
         ]
 
+        test_dir = os.path.dirname(os.path.abspath(__file__))
+
         for sport in ["run", "ride"]:
+            fit_path = os.path.join(test_dir, "data", f"{sport}.fit")
+            json_path = os.path.join(test_dir, "data", f"{sport}.json")
+
             activity, _, _, _ = get_data(
                 locations,
-                f"./tests/data/{sport}.fit",
+                fit_path,
             )
 
-            with open(f"./tests/data/{sport}.json", "r") as f:
+            with open(json_path, "r") as f:
                 data = json.load(f)
 
             self.maxDiff = None
