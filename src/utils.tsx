@@ -31,17 +31,12 @@ export function formatDate(date: Date): string {
 export function formatPace(speed: number, sport: string): string {
   if (!speed || speed === 0) return "--";
 
-  // speed is already in km/h from the backend
-  const kmh = speed;
-
   if (sport === "running") {
-    // For running, show min/km
-    const minPerKm = 60 / kmh;
+    const minPerKm = 60 / speed;
     const minutes = Math.floor(minPerKm);
     const seconds = Math.round((minPerKm - minutes) * 60);
     return `${minutes}:${seconds.toString().padStart(2, "0")} /km`;
   } else {
-    // For cycling, show km/h
-    return `${kmh.toFixed(1)} km/h`;
+    return `${speed.toFixed(1)} km/h`;
   }
 }
