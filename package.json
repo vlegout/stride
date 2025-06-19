@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
-    "@playwright/test": "^1.53.0",
+    "@playwright/test": "^1.53.1",
     "@types/leaflet": "^1.9.18",
     "@types/luxon": "^3.6.2",
     "@types/node": "^24.0.3",
