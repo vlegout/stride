@@ -1,3 +1,4 @@
+import asyncio
 import concurrent.futures
 import json
 import os
@@ -78,14 +79,18 @@ async def process_file(locations: List[Any], input_file: str) -> None:
         await session.commit()
 
 
+async def _add_activity_async(yaml: str):
+    """Add a new activity from a YAML file."""
+    locations = json.load(open("./data/locations.json")).get("locations")
+    await process_file(locations, yaml)
+
+
 @app.command()
-async def add_activity(
+def add_activity(
     yaml: str = typer.Argument(),
 ):
     """Add a new activity from a YAML file."""
-    locations = json.load(open("./data/locations.json")).get("locations")
-
-    await process_file(locations, yaml)
+    asyncio.run(_add_activity_async(yaml))
 
 
 @app.command()
@@ -125,10 +130,9 @@ def create_db():
     print("Done")
 
 
-@app.command()
-async def read_fit(
-    fit_file: str = typer.Argument(),
-    out_file: str = typer.Option(None),
+async def _read_fit_async(
+    fit_file: str,
+    out_file: str | None = None,
 ):
     """Read a .fit file and parse activity, laps, and tracepoints."""
     locations = json.load(open("./data/locations.json")).get("locations")
@@ -140,24 +144,22 @@ async def read_fit(
     if out_file:
         with open(out_file, "w") as f:
             json.dump(
-                {
-                    "activity": activity.model_dump(),
-                },
+                activity.model_dump(mode="json"),
                 f,
-                default=str,
+                ensure_ascii=False,
+                indent=2,
             )
-        return
+    else:
+        print(json.dumps(activity.model_dump(mode="json"), indent=2))
 
-    print("Activity:")
-    print(activity)
-    print("\nLaps:")
-    for lap in laps:
-        print(lap)
-    print("\nTracepoints:")
-    for tp in tracepoints[:10]:
-        print(tp)
-    if len(tracepoints) > 10:
-        print(f"... ({len(tracepoints) - 10} more tracepoints)")
+
+@app.command()
+def read_fit(
+    fit_file: str = typer.Argument(),
+    out_file: str = typer.Option(None),
+):
+    """Read a .fit file and parse activity, laps, and tracepoints."""
+    asyncio.run(_read_fit_async(fit_file, out_file))
 
 
 if __name__ == "__main__":

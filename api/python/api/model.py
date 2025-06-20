@@ -15,10 +15,14 @@ class UserBase(SQLModel):
     google_id: str = Field(unique=True)
     google_picture: str | None = None
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).replace(
+            tzinfo=None
+        )
     )
     updated_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).replace(
+            tzinfo=None
+        )
     )
 
 

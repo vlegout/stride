@@ -21,6 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from api.auth import verify_token, create_token_response, Token
@@ -158,6 +159,19 @@ async def read_activities(
 
     query = query.offset((page - 1) * limit).limit(limit)
 
+    # Always load relationships to avoid lazy loading issues
+    if map:
+        query = query.options(
+            selectinload(getattr(Activity, "laps")),
+            selectinload(getattr(Activity, "performances")),
+            selectinload(getattr(Activity, "tracepoints")),
+        )
+    else:
+        query = query.options(
+            selectinload(getattr(Activity, "laps")),
+            selectinload(getattr(Activity, "performances")),
+        )
+
     activities = (await session.execute(query)).scalars().all()
 
     activity_models: list[ActivityPublic | ActivityPublicWithoutTracepoints] = []
@@ -187,8 +201,12 @@ async def read_activity(
     activity = (
         (
             await session.execute(
-                select(Activity).where(
-                    Activity.id == activity_id, Activity.user_id == user_id
+                select(Activity)
+                .where(Activity.id == activity_id, Activity.user_id == user_id)
+                .options(
+                    selectinload(getattr(Activity, "laps")),
+                    selectinload(getattr(Activity, "performances")),
+                    selectinload(getattr(Activity, "tracepoints")),
                 )
             )
         )
@@ -272,7 +290,24 @@ async def create_activity(
         await session.commit()
         await session.refresh(activity)
 
-        return ActivityPublic.model_validate(activity)
+        # Load relationships for ActivityPublic response
+        activity_with_relations = (
+            (
+                await session.execute(
+                    select(Activity)
+                    .where(Activity.id == activity.id)
+                    .options(
+                        selectinload(getattr(Activity, "laps")),
+                        selectinload(getattr(Activity, "performances")),
+                        selectinload(getattr(Activity, "tracepoints")),
+                    )
+                )
+            )
+            .scalars()
+            .first()
+        )
+
+        return ActivityPublic.model_validate(activity_with_relations)
 
     except Exception as e:
         await session.rollback()
@@ -603,7 +638,9 @@ async def google_auth(
             existing_user.last_name = user_data.last_name
             existing_user.email = user_data.email
             existing_user.google_picture = user_data.google_picture
-            existing_user.updated_at = datetime.datetime.now(datetime.timezone.utc)
+            existing_user.updated_at = datetime.datetime.now(
+                datetime.timezone.utc
+            ).replace(tzinfo=None)
 
             session.add(existing_user)
             await session.commit()
@@ -633,5 +670,6 @@ async def google_auth(
             return GoogleAuthResponse(user=user_public, token=token)
 
     except Exception as e:
+        print(f"Error during Google authentication: {str(e)}")
         await session.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
