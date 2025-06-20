@@ -7,7 +7,8 @@ from typing import Any, List
 import typer
 import yaml
 
-from sqlmodel import Session, SQLModel
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import SQLModel
 
 from api.db import engine
 from api.fit import get_activity_from_fit
@@ -20,13 +21,13 @@ NB_CPUS = 2
 app = typer.Typer()
 
 
-def get_activity_from_yaml(
+async def get_activity_from_yaml(
     locations: List[Any], yaml_file: str
 ) -> tuple[Activity, List[Lap], List[Tracepoint]]:
     with open(yaml_file, "r") as file:
         config = yaml.safe_load(file)
 
-    activity, laps, tracepoints = get_activity_from_fit(
+    activity, laps, tracepoints = await get_activity_from_fit(
         locations,
         "./data/fit/" + config["fit"],
         config.get("title", ""),
@@ -37,16 +38,16 @@ def get_activity_from_yaml(
     return activity, laps, tracepoints
 
 
-def get_data(
+async def get_data(
     locations: List[Any], input_file: str
 ) -> tuple[Activity, List[Lap], List[Tracepoint], list]:
     if input_file.endswith(".yaml"):
-        activity, laps, tracepoints = get_activity_from_yaml(
+        activity, laps, tracepoints = await get_activity_from_yaml(
             locations,
             input_file,
         )
     else:
-        activity, laps, tracepoints = get_activity_from_fit(
+        activity, laps, tracepoints = await get_activity_from_fit(
             locations,
             input_file,
         )
@@ -59,32 +60,32 @@ def get_data(
     return activity, laps, tracepoints, performances
 
 
-def process_file(locations: List[Any], input_file: str) -> None:
-    activity, laps, tracepoints, performances = get_data(locations, input_file)
+async def process_file(locations: List[Any], input_file: str) -> None:
+    activity, laps, tracepoints, performances = await get_data(locations, input_file)
 
-    session = Session(engine)
-    session.add(activity)
+    async with AsyncSession(engine) as session:
+        session.add(activity)
 
-    for lap in laps:
-        session.add(lap)
+        for lap in laps:
+            session.add(lap)
 
-    for tracepoint in tracepoints:
-        session.add(tracepoint)
+        for tracepoint in tracepoints:
+            session.add(tracepoint)
 
-    for performance in performances:
-        session.add(performance)
+        for performance in performances:
+            session.add(performance)
 
-    session.commit()
+        await session.commit()
 
 
 @app.command()
-def add_activity(
+async def add_activity(
     yaml: str = typer.Argument(),
 ):
     """Add a new activity from a YAML file."""
     locations = json.load(open("./data/locations.json")).get("locations")
 
-    process_file(locations, yaml)
+    await process_file(locations, yaml)
 
 
 @app.command()
@@ -125,13 +126,13 @@ def create_db():
 
 
 @app.command()
-def read_fit(
+async def read_fit(
     fit_file: str = typer.Argument(),
     out_file: str = typer.Option(None),
 ):
     """Read a .fit file and parse activity, laps, and tracepoints."""
     locations = json.load(open("./data/locations.json")).get("locations")
-    activity, laps, tracepoints, performances = get_data(
+    activity, laps, tracepoints, performances = await get_data(
         locations,
         fit_file,
     )

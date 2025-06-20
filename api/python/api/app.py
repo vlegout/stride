@@ -20,7 +20,8 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, text
-from sqlmodel import Session, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 from api.auth import verify_token, create_token_response, Token
 from api.fit import get_activity_from_fit
@@ -95,8 +96,8 @@ async def verify_jwt_token(request: Request, call_next):
     return await call_next(request)
 
 
-def get_session():
-    with Session(engine) as session:
+async def get_session():
+    async with AsyncSession(engine) as session:
         yield session
 
 
@@ -107,8 +108,8 @@ def get_current_user_id(request: Request) -> str:
 
 
 @app.get("/activities/", response_model=ActivityList)
-def read_activities(
-    session: Session = Depends(get_session),
+async def read_activities(
+    session: AsyncSession = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
     map: bool = Query(default=False),
     limit: int = Query(default=10, ge=1, le=100),
@@ -151,11 +152,13 @@ def read_activities(
     else:
         query = query.order_by(order_column.desc())  # type: ignore
 
-    total = session.exec(select(func.count()).select_from(query.subquery())).one()
+    total = (
+        await session.execute(select(func.count()).select_from(query.subquery()))
+    ).scalar_one()
 
     query = query.offset((page - 1) * limit).limit(limit)
 
-    activities = session.exec(query).all()
+    activities = (await session.execute(query)).scalars().all()
 
     activity_models: list[ActivityPublic | ActivityPublicWithoutTracepoints] = []
     if map:
@@ -176,14 +179,22 @@ def read_activities(
 
 
 @app.get("/activities/{activity_id}/", response_model=ActivityPublic)
-def read_activity(
+async def read_activity(
     activity_id: uuid.UUID,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    activity = session.exec(
-        select(Activity).where(Activity.id == activity_id, Activity.user_id == user_id)
-    ).first()
+    activity = (
+        (
+            await session.execute(
+                select(Activity).where(
+                    Activity.id == activity_id, Activity.user_id == user_id
+                )
+            )
+        )
+        .scalars()
+        .first()
+    )
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
     return activity
@@ -192,11 +203,11 @@ def read_activity(
 @app.post(
     "/activities/", response_model=ActivityPublic, status_code=status.HTTP_201_CREATED
 )
-def create_activity(
+async def create_activity(
     fit_file: UploadFile = File(...),
     title: str = Form(...),
     race: bool = Form(False),
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
     if not fit_file.filename or not fit_file.filename.endswith(".fit"):
@@ -213,7 +224,7 @@ def create_activity(
         temp_fit_path = temp_file.name
 
     try:
-        activity, laps, tracepoints = get_activity_from_fit(
+        activity, laps, tracepoints = await get_activity_from_fit(
             locations=locations,
             fit_file=temp_fit_path,
             title=title,
@@ -228,7 +239,7 @@ def create_activity(
         while len(tracepoints) > MAX_DATA_POINTS:
             tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
 
-        existing_activity = session.get(Activity, activity.id)
+        existing_activity = await session.get(Activity, activity.id)
         if existing_activity:
             raise HTTPException(
                 status_code=409, detail="Activity with this FIT file already exists"
@@ -241,8 +252,8 @@ def create_activity(
         yaml_content = {"fit": fit_file.filename, "title": title, "race": race}
         yaml_string = yaml.dump(yaml_content, default_flow_style=False)
 
-        upload_file_to_s3(temp_fit_path, fit_s3_key)
-        upload_content_to_s3(yaml_string, yaml_s3_key)
+        await upload_file_to_s3(temp_fit_path, fit_s3_key)
+        await upload_content_to_s3(yaml_string, yaml_s3_key)
 
         # Set user_id from JWT token
         activity.user_id = user_id
@@ -258,13 +269,13 @@ def create_activity(
         for performance in performances:
             session.add(performance)
 
-        session.commit()
-        session.refresh(activity)
+        await session.commit()
+        await session.refresh(activity)
 
         return ActivityPublic.model_validate(activity)
 
     except Exception as e:
-        session.rollback()
+        await session.rollback()
         raise HTTPException(
             status_code=500, detail=f"Error processing FIT file: {str(e)}"
         )
@@ -276,13 +287,14 @@ def create_activity(
 
 
 @app.get("/profile/", response_model=Profile)
-def read_profile(
-    session: Session = Depends(get_session),
+async def read_profile(
+    session: AsyncSession = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
     # Single query for overall statistics
-    overall_stats = session.execute(
-        text("""
+    overall_stats = (
+        await session.execute(
+            text("""
             SELECT
                 COUNT(*) as total_activities,
                 COUNT(CASE WHEN sport = 'running' THEN 1 END) as run_activities,
@@ -292,7 +304,8 @@ def read_profile(
             FROM activity
             WHERE user_id = :user_id
         """),
-        {"user_id": user_id},
+            {"user_id": user_id},
+        )
     ).one()
 
     # Single query for weekly statistics (last 20 weeks)
@@ -311,8 +324,9 @@ def read_profile(
     years_clause = ",".join(str(y) for y in unique_years)
     weeks_clause = ",".join(str(w) for w in unique_weeks)
 
-    weekly_stats = session.execute(
-        text(f"""
+    weekly_stats = (
+        await session.execute(
+            text(f"""
             SELECT
                 EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
                 EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) as week,
@@ -326,7 +340,8 @@ def read_profile(
             GROUP BY year, week, sport
             ORDER BY year, week, sport
         """),
-        {"user_id": user_id},
+            {"user_id": user_id},
+        )
     ).all()
 
     # Organize weekly data
@@ -370,8 +385,9 @@ def read_profile(
         )
 
     # Single query for yearly statistics
-    yearly_stats = session.execute(
-        text("""
+    yearly_stats = (
+        await session.execute(
+            text("""
             SELECT
                 EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
                 sport,
@@ -383,7 +399,8 @@ def read_profile(
             GROUP BY year, sport
             ORDER BY year, sport
         """),
-        {"user_id": user_id},
+            {"user_id": user_id},
+        )
     ).all()
 
     # Organize yearly data
@@ -429,8 +446,9 @@ def read_profile(
     # Single query for running performances
     performance_distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
     distances_clause = ",".join(str(d) for d in performance_distances)
-    performance_stats = session.execute(
-        text(f"""
+    performance_stats = (
+        await session.execute(
+            text(f"""
             SELECT p.distance, MIN(p.time) as best_time
             FROM performance p
             JOIN activity a ON p.activity_id = a.id
@@ -439,7 +457,8 @@ def read_profile(
             GROUP BY p.distance
             ORDER BY p.distance
         """),
-        {"user_id": user_id},
+            {"user_id": user_id},
+        )
     ).all()
 
     performance_dict = {row[0]: row[1] for row in performance_stats}
@@ -465,8 +484,8 @@ def read_profile(
 
 
 @app.get("/weeks/", response_model=WeeksResponse)
-def read_weeks(
-    session: Session = Depends(get_session),
+async def read_weeks(
+    session: AsyncSession = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
     weeks_data = []
@@ -483,13 +502,19 @@ def read_weeks(
         year, week_number, _ = week_start.isocalendar()
 
         # Get activities for this week
-        activities = session.exec(
-            select(Activity)
-            .where(Activity.user_id == user_id)
-            .where(Activity.start_time >= int(week_start.timestamp()))
-            .where(Activity.start_time < int(week_end.timestamp()))
-            .order_by(Activity.start_time.desc())  # type: ignore
-        ).all()
+        activities = (
+            (
+                await session.execute(
+                    select(Activity)
+                    .where(Activity.user_id == user_id)
+                    .where(Activity.start_time >= int(week_start.timestamp()))
+                    .where(Activity.start_time < int(week_end.timestamp()))
+                    .order_by(Activity.start_time.desc())  # type: ignore
+                )
+            )
+            .scalars()
+            .all()
+        )
 
         # Create activity summaries
         activity_summaries = [
@@ -541,11 +566,11 @@ def read_weeks(
 
 
 @app.get("/users/me/", response_model=UserPublic)
-def read_current_user(
-    session: Session = Depends(get_session),
+async def read_current_user(
+    session: AsyncSession = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    user = session.get(User, user_id)
+    user = await session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -558,14 +583,20 @@ class GoogleAuthResponse(BaseModel):
 
 
 @app.post("/auth/google/", response_model=GoogleAuthResponse)
-def google_auth(
+async def google_auth(
     user_data: UserCreate,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
 ):
     try:
-        existing_user = session.exec(
-            select(User).where(User.google_id == user_data.google_id)
-        ).first()
+        existing_user = (
+            (
+                await session.execute(
+                    select(User).where(User.google_id == user_data.google_id)
+                )
+            )
+            .scalars()
+            .first()
+        )
 
         if existing_user:
             existing_user.first_name = user_data.first_name
@@ -575,8 +606,8 @@ def google_auth(
             existing_user.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
             session.add(existing_user)
-            session.commit()
-            session.refresh(existing_user)
+            await session.commit()
+            await session.refresh(existing_user)
 
             user_public = UserPublic.model_validate(existing_user)
             token = create_token_response(existing_user.id, existing_user.email)
@@ -593,8 +624,8 @@ def google_auth(
             )
 
             session.add(user)
-            session.commit()
-            session.refresh(user)
+            await session.commit()
+            await session.refresh(user)
 
             user_public = UserPublic.model_validate(user)
             token = create_token_response(user.id, user.email)
@@ -602,5 +633,5 @@ def google_auth(
             return GoogleAuthResponse(user=user_public, token=token)
 
     except Exception as e:
-        session.rollback()
+        await session.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

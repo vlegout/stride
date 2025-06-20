@@ -2,8 +2,9 @@ import datetime
 import math
 import os
 import uuid
+import httpx
 
-from typing import Any, List
+from typing import Any, List, Optional
 
 from pydantic import field_validator, ValidationInfo
 
@@ -81,7 +82,42 @@ class TracepointCreate(TracepointBase):
         return value / 5 - 500.0
 
 
-def get_activity_from_fit(
+async def get_location_from_coordinates(lat: float, lon: float) -> Optional[str]:
+    """
+    Get location name from coordinates using BigDataCloud reverse geocoding API.
+    Returns None if the API call fails or no location is found.
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.bigdatacloud.net/data/reverse-geocode-client",
+                params={"latitude": lat, "longitude": lon, "localityLanguage": "en"},
+                timeout=5.0,
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            # Extract meaningful location from the response
+            # Prefer city, then locality, then administrative area
+            location_parts = []
+            if data.get("city"):
+                location_parts.append(data["city"])
+            elif data.get("locality"):
+                location_parts.append(data["locality"])
+            elif data.get("principalSubdivision"):
+                location_parts.append(data["principalSubdivision"])
+
+            if data.get("countryName"):
+                location_parts.append(data["countryName"])
+
+            return ", ".join(location_parts) if location_parts else None
+
+    except Exception:
+        # Return None if any error occurs (network, timeout, parsing, etc.)
+        return None
+
+
+async def get_activity_from_fit(
     locations: List[Any],
     fit_file: str,
     title: str = "Activity",
@@ -126,6 +162,11 @@ def get_activity_from_fit(
             if get_distance(loc.get("lat"), loc.get("lon"), lat, lon) < 500:
                 activity.location = loc.get("location")
                 break
+
+        if not activity.location:
+            reverse_geocoded_location = await get_location_from_coordinates(lat, lon)
+            if reverse_geocoded_location:
+                activity.location = reverse_geocoded_location
 
     values = []
     max_distance = 1.0
