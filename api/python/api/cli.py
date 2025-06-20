@@ -1,5 +1,4 @@
 import asyncio
-import concurrent.futures
 import json
 import os
 
@@ -93,11 +92,10 @@ def add_activity(
     asyncio.run(_add_activity_async(yaml))
 
 
-@app.command()
-def create_db():
+async def _create_db_async():
     """Create tables and add initial data."""
-    SQLModel.metadata.drop_all(bind=engine)
-    SQLModel.metadata.create_all(bind=engine)
+    # Note: SQLModel.metadata operations need to be done with sync engine
+    # We'll handle this in the sync wrapper
 
     locations = json.load(open("./data/locations.json")).get("locations")
 
@@ -115,19 +113,44 @@ def create_db():
 
     print(f"Found {len(input_files)} files to process")
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
-        future_activities = {
-            executor.submit(process_file, locations, input_file): input_file
-            for input_file in input_files
-        }
-        for future in concurrent.futures.as_completed(future_activities):
-            input_file = future_activities[future]
-            try:
-                future.result()
-            except Exception as e:
-                print(f"Error processing {input_file}: {e}")
+    # Process files concurrently with asyncio.gather
+    # Split into smaller batches to avoid overwhelming the database
+    batch_size = 5
+    for i in range(0, len(input_files), batch_size):
+        batch = input_files[i : i + batch_size]
+        print(
+            f"Processing batch {i // batch_size + 1}/{(len(input_files) + batch_size - 1) // batch_size}"
+        )
+
+        # Create tasks for concurrent processing
+        tasks = [process_file(locations, input_file) for input_file in batch]
+
+        # Process batch concurrently
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Check for exceptions
+        for input_file, result in zip(batch, results):
+            if isinstance(result, Exception):
+                print(f"Error processing {input_file}: {result}")
+            else:
+                print(f"Successfully processed {input_file}")
 
     print("Done")
+
+
+@app.command()
+def create_db():
+    """Create tables and add initial data."""
+    # Handle sync SQLModel operations first
+    from sqlmodel import create_engine
+
+    # Use sync engine for metadata operations
+    sync_engine = create_engine(os.getenv("DATABASE_URL"))
+    SQLModel.metadata.drop_all(bind=sync_engine)
+    SQLModel.metadata.create_all(bind=sync_engine)
+
+    # Run async processing
+    asyncio.run(_create_db_async())
 
 
 async def _read_fit_async(
