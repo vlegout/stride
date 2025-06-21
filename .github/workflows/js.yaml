@@ -31,6 +31,11 @@ jobs:
       - uses: actions/setup-node@v4
       - run: npm install --include=dev
       - run: npm run test
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   playwright:
     timeout-minutes: 60

@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest --reporter=junit --outputFile=test-report.junit.xml",
     "test:ui": "vitest --ui"
   },
   "dependencies": {
