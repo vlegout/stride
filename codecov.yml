@@ -3,9 +3,11 @@ coverage:
     project:
       default: off
       api:
-        flags: api
+        flags:
+          - api
       front:
-        flags: front
+        flags:
+          - front
 
 flags:
   api:
