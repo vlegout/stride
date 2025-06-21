@@ -1,10 +1,10 @@
+import asyncio
 import json
 import os
 import unittest
 import uuid
 from unittest.mock import Mock, patch
 
-import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlmodel import Session
@@ -103,69 +103,82 @@ class TestApp(unittest.TestCase):
         self.assertEqual(context.exception.status_code, 401)
         self.assertEqual(context.exception.detail, "User not authenticated")
 
-    @pytest.mark.asyncio
     @patch("api.app.verify_token")
-    async def test_verify_jwt_token_middleware_options(self, mock_verify):
+    def test_verify_jwt_token_middleware_options(self, mock_verify):
         """Test JWT middleware allows OPTIONS requests"""
+
+        async def mock_call_next(_request):
+            return "options_response"
+
         mock_request = Mock()
         mock_request.method = "OPTIONS"
-        mock_call_next = Mock()
-        mock_call_next.return_value = "options_response"
 
-        result = await verify_jwt_token(mock_request, mock_call_next)
+        result = asyncio.run(verify_jwt_token(mock_request, mock_call_next))
 
         self.assertEqual(result, "options_response")
         mock_verify.assert_not_called()
 
-    @pytest.mark.asyncio
     @patch("api.app.verify_token")
-    async def test_verify_jwt_token_middleware_public_paths(self, mock_verify):
+    def test_verify_jwt_token_middleware_public_paths(self, mock_verify):
         """Test JWT middleware allows public paths"""
+
+        async def mock_call_next(_request):
+            return "public_response"
+
         mock_request = Mock()
         mock_request.method = "GET"
         mock_request.url.path = "/auth/google/"
-        mock_call_next = Mock()
-        mock_call_next.return_value = "public_response"
 
-        result = await verify_jwt_token(mock_request, mock_call_next)
+        result = asyncio.run(verify_jwt_token(mock_request, mock_call_next))
 
         self.assertEqual(result, "public_response")
         mock_verify.assert_not_called()
 
-    @pytest.mark.asyncio
     @patch("api.app.verify_token")
-    async def test_verify_jwt_token_middleware_missing_header(self, _mock_verify):
+    def test_verify_jwt_token_middleware_missing_header(self, mock_verify):
         """Test JWT middleware with missing authorization header"""
+
+        async def mock_call_next(_request):
+            return "should_not_be_called"
+
         mock_request = Mock()
         mock_request.method = "GET"
         mock_request.url.path = "/activities/"
         mock_request.headers.get.return_value = None
 
-        result = await verify_jwt_token(mock_request, Mock())
+        result = asyncio.run(verify_jwt_token(mock_request, mock_call_next))
 
         self.assertEqual(result.status_code, 401)
         content = json.loads(result.body)
         self.assertEqual(content["detail"], "Missing or invalid authorization header")
+        mock_verify.assert_not_called()
 
-    @pytest.mark.asyncio
     @patch("api.app.verify_token")
-    async def test_verify_jwt_token_middleware_invalid_header(self, _mock_verify):
+    def test_verify_jwt_token_middleware_invalid_header(self, mock_verify):
         """Test JWT middleware with invalid authorization header"""
+
+        async def mock_call_next(_request):
+            return "should_not_be_called"
+
         mock_request = Mock()
         mock_request.method = "GET"
         mock_request.url.path = "/activities/"
         mock_request.headers.get.return_value = "Invalid header"
 
-        result = await verify_jwt_token(mock_request, Mock())
+        result = asyncio.run(verify_jwt_token(mock_request, mock_call_next))
 
         self.assertEqual(result.status_code, 401)
         content = json.loads(result.body)
         self.assertEqual(content["detail"], "Missing or invalid authorization header")
+        mock_verify.assert_not_called()
 
-    @pytest.mark.asyncio
     @patch("api.app.verify_token")
-    async def test_verify_jwt_token_middleware_valid_token(self, mock_verify):
+    def test_verify_jwt_token_middleware_valid_token(self, mock_verify):
         """Test JWT middleware with valid token"""
+
+        async def mock_call_next(_request):
+            return "success_response"
+
         mock_token_data = Mock()
         mock_token_data.user_id = self.test_user_id
         mock_token_data.email = self.test_email
@@ -179,19 +192,19 @@ class TestApp(unittest.TestCase):
         )
         mock_request.state = Mock()
 
-        mock_call_next = Mock()
-        mock_call_next.return_value = "success_response"
-
-        result = await verify_jwt_token(mock_request, mock_call_next)
+        result = asyncio.run(verify_jwt_token(mock_request, mock_call_next))
 
         self.assertEqual(result, "success_response")
         self.assertEqual(mock_request.state.user_id, self.test_user_id)
         self.assertEqual(mock_request.state.user_email, self.test_email)
 
-    @pytest.mark.asyncio
     @patch("api.app.verify_token")
-    async def test_verify_jwt_token_middleware_invalid_token(self, mock_verify):
+    def test_verify_jwt_token_middleware_invalid_token(self, mock_verify):
         """Test JWT middleware with invalid token"""
+
+        async def mock_call_next(_request):
+            return "should_not_be_called"
+
         mock_verify.side_effect = HTTPException(status_code=401, detail="Invalid token")
 
         mock_request = Mock()
@@ -199,7 +212,7 @@ class TestApp(unittest.TestCase):
         mock_request.url.path = "/activities/"
         mock_request.headers.get.return_value = "Bearer invalid_token"
 
-        result = await verify_jwt_token(mock_request, Mock())
+        result = asyncio.run(verify_jwt_token(mock_request, mock_call_next))
 
         self.assertEqual(result.status_code, 401)
         content = json.loads(result.body)
