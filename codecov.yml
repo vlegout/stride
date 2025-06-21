@@ -1,0 +1,17 @@
+coverage:
+  status:
+    project:
+      default: off
+      api:
+        flags: api
+      front:
+        flags: front
+
+flags:
+  api:
+    paths:
+      - api/
+  front:
+    paths:
+      - src/
+      - tests
