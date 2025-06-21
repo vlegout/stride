@@ -7,6 +7,8 @@ Web app to visualize run & ride activities from FIT files with charts, maps, and
 - React + TypeScript frontend
 - Rust + Python API backend
 
+[![codecov](https://codecov.io/gh/vlegout/stride/graph/badge.svg?token=KJ5PHYJVFQ)](https://codecov.io/gh/vlegout/stride)
+
 ## Environment Variables
 
 ### Backend
