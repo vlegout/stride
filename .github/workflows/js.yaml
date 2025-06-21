@@ -21,7 +21,7 @@ jobs:
       - run: npm install --include=dev
       - run: npx prettier ./src ./tests --check
       - run: npm run lint
-      - run: npm run build
+      - run: CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} npm run build
 
   test:
     runs-on: ubuntu-latest
