@@ -1,6 +1,5 @@
 import datetime
 import os
-from typing import Optional
 
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
@@ -23,20 +22,6 @@ JWT_ALGORITHM = "HS256"
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 
-def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.datetime.now(datetime.timezone.utc) + expires_delta
-    else:
-        expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
-            minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
-
-
 def verify_token(token: str) -> TokenData:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -52,20 +37,24 @@ def verify_token(token: str) -> TokenData:
         if user_id is None:
             raise credentials_exception
 
-        token_data = TokenData(user_id=user_id, email=email)
-        return token_data
+        return TokenData(user_id=user_id, email=email)
     except JWTError:
-        raise credentials_exception
+        raise credentials_exception from None
 
 
 def create_token_response(user_id: str, email: str) -> Token:
-    access_token_expires = datetime.timedelta(minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user_id, "email": email}, expires_delta=access_token_expires
+    expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+        minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+
+    encoded_jwt = jwt.encode(
+        {"sub": user_id, "email": email, "exp": expire},
+        JWT_SECRET_KEY,
+        algorithm=JWT_ALGORITHM,
     )
 
     return Token(
-        access_token=access_token,
+        access_token=encoded_jwt,
         token_type="bearer",
         expires_in=JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
