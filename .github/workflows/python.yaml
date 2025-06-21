@@ -75,6 +75,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: api
 
   docker:
     runs-on: ubuntu-latest
