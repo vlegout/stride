@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import tempfile
 import uuid
@@ -208,19 +207,13 @@ def create_activity(
     if not fit_file.filename or not fit_file.filename.endswith(".fit"):
         raise HTTPException(status_code=400, detail="File must be a .fit file")
 
-    try:
-        with open("./data/locations.json", "r") as f:
-            locations = json.load(f).get("locations", [])
-    except FileNotFoundError:
-        locations = []
-
     with tempfile.NamedTemporaryFile(delete=False, suffix=".fit") as temp_file:
         temp_file.write(fit_file.file.read())
         temp_fit_path = temp_file.name
 
     try:
         activity, laps, tracepoints = get_activity_from_fit(
-            locations=locations,
+            session=session,
             fit_file=temp_fit_path,
             title=title,
             description="",

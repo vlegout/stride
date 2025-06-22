@@ -1,18 +1,21 @@
 import concurrent.futures
 import json
 import os
+import time
+import uuid
 
-from typing import Any, List
+from typing import List
 
+import httpx
 import typer
 import yaml
 
-from sqlmodel import Session, SQLModel
+from sqlmodel import Session, SQLModel, select
 
 from api.db import engine
 from api.fit import get_activity_from_fit
-from api.model import Activity, Lap, Tracepoint
-from api.utils import get_best_performances
+from api.model import Activity, Lap, Location, Tracepoint
+from api.utils import get_best_performances, get_activity_location
 
 MAX_DATA_POINTS = 500
 NB_CPUS = 2
@@ -21,13 +24,13 @@ app = typer.Typer()
 
 
 def get_activity_from_yaml(
-    locations: List[Any], yaml_file: str
+    session: Session, yaml_file: str
 ) -> tuple[Activity, List[Lap], List[Tracepoint]]:
     with open(yaml_file, "r") as file:
         config = yaml.safe_load(file)
 
     activity, laps, tracepoints = get_activity_from_fit(
-        locations,
+        session,
         "./data/fit/" + config["fit"],
         config.get("title", ""),
         config.get("description", ""),
@@ -38,16 +41,16 @@ def get_activity_from_yaml(
 
 
 def get_data(
-    locations: List[Any], input_file: str
+    session: Session, input_file: str
 ) -> tuple[Activity, List[Lap], List[Tracepoint], list]:
     if input_file.endswith(".yaml"):
         activity, laps, tracepoints = get_activity_from_yaml(
-            locations,
+            session,
             input_file,
         )
     else:
         activity, laps, tracepoints = get_activity_from_fit(
-            locations,
+            session,
             input_file,
         )
 
@@ -59,10 +62,9 @@ def get_data(
     return activity, laps, tracepoints, performances
 
 
-def process_file(locations: List[Any], input_file: str) -> None:
-    activity, laps, tracepoints, performances = get_data(locations, input_file)
-
+def process_file(input_file: str) -> None:
     session = Session(engine)
+    activity, laps, tracepoints, performances = get_data(session, input_file)
     session.add(activity)
 
     for lap in laps:
@@ -82,9 +84,7 @@ def add_activity(
     yaml: str = typer.Argument(),
 ):
     """Add a new activity from a YAML file."""
-    locations = json.load(open("./data/locations.json")).get("locations")
-
-    process_file(locations, yaml)
+    process_file(yaml)
 
 
 @app.command()
@@ -92,8 +92,6 @@ def create_db():
     """Create tables and add initial data."""
     SQLModel.metadata.drop_all(bind=engine)
     SQLModel.metadata.create_all(bind=engine)
-
-    locations = json.load(open("./data/locations.json")).get("locations")
 
     input_files = []
     for root, _, files in os.walk("./data/"):
@@ -111,7 +109,7 @@ def create_db():
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
         future_activities = {
-            executor.submit(process_file, locations, input_file): input_file
+            executor.submit(process_file, input_file): input_file
             for input_file in input_files
         }
         for future in concurrent.futures.as_completed(future_activities):
@@ -130,9 +128,9 @@ def read_fit(
     out_file: str = typer.Option(None),
 ):
     """Read a .fit file and parse activity, laps, and tracepoints."""
-    locations = json.load(open("./data/locations.json")).get("locations")
+    session = Session(engine)
     activity, laps, tracepoints, performances = get_data(
-        locations,
+        session,
         fit_file,
     )
 
@@ -157,6 +155,86 @@ def read_fit(
         print(tp)
     if len(tracepoints) > 10:
         print(f"... ({len(tracepoints) - 10} more tracepoints)")
+
+
+@app.command()
+def update_locations():
+    """Update location fields for all activities using their lat/lon coordinates."""
+    session = Session(engine)
+
+    activities = session.exec(select(Activity)).all()
+    updated_count = 0
+    last_api_call = 0
+
+    print(f"Found {len(activities)} activities to process...")
+
+    for activity in activities:
+        if (
+            activity.city is None
+            and activity.subdivision is None
+            and activity.country is None
+        ):
+            first_tracepoint = session.exec(
+                select(Tracepoint)
+                .where(Tracepoint.activity_id == activity.id)
+                .order_by(Tracepoint.timestamp)
+            ).first()
+
+            if first_tracepoint is None:
+                continue
+
+            city, subdivision, country = get_activity_location(
+                session, first_tracepoint.lat, first_tracepoint.lon
+            )
+
+            if city is None and subdivision is None and country is None:
+                try:
+                    current_time = time.time()
+                    if current_time - last_api_call < 1.0:
+                        time.sleep(1.0 - (current_time - last_api_call))
+
+                    url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={first_tracepoint.lat}&longitude={first_tracepoint.lon}&localityLanguage=en"
+                    response = httpx.get(url, timeout=10.0, follow_redirects=True)
+                    response.raise_for_status()
+                    data = response.json()
+                    last_api_call = time.time()
+
+                    city = data.get("city") or data.get("locality")
+                    subdivision = data.get("principalSubdivision")
+                    country = data.get("countryName")
+
+                    if city or subdivision or country:
+                        location = Location(
+                            id=uuid.uuid4(),
+                            lat=first_tracepoint.lat,
+                            lon=first_tracepoint.lon,
+                            city=city,
+                            subdivision=subdivision,
+                            country=country,
+                        )
+                        session.add(location)
+
+                        activity.city = city
+                        activity.subdivision = subdivision
+                        activity.country = country
+                        updated_count += 1
+                        print(
+                            f"Added location and updated activity {activity.id}: {city}, {subdivision}, {country}"
+                        )
+
+                except Exception as e:
+                    print(f"Error fetching location for activity {activity.id}: {e}")
+            elif city is not None or subdivision is not None or country is not None:
+                activity.city = city
+                activity.subdivision = subdivision
+                activity.country = country
+                updated_count += 1
+                print(
+                    f"Updated activity {activity.id}: {city}, {subdivision}, {country}"
+                )
+
+    session.commit()
+    print(f"Updated {updated_count} activities with location data")
 
 
 if __name__ == "__main__":

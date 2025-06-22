@@ -5,13 +5,14 @@ import random
 import string
 import uuid
 
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import boto3
+from sqlmodel import Session, select
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
 
-from api.model import Activity, Performance, Tracepoint
+from api.model import Activity, Location, Performance, Tracepoint
 
 
 def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
@@ -50,22 +51,6 @@ def get_delta_lat_lon(lat: float, max_distance: float) -> Tuple[float, float]:
     )
 
     return (delta_lat, delta_lon)
-
-
-def get_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    earth_radius = 6371000
-    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    a = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-    )
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    return earth_radius * c
 
 
 def get_uuid(filename: str) -> uuid.UUID:
@@ -159,3 +144,22 @@ def upload_content_to_s3(content: str, s3_key: str) -> None:
         raise HTTPException(
             status_code=500, detail=f"Failed to upload content to S3: {str(e)}"
         )
+
+
+def get_activity_location(
+    session: Session, lat: float, lon: float
+) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    lat_delta = 0.0045
+    lon_delta = 0.0045 / math.cos(math.radians(lat))
+
+    location = session.exec(
+        select(Location).where(
+            (Location.lat >= lat - lat_delta) & (Location.lat <= lat + lat_delta),
+            (Location.lon >= lon - lon_delta) & (Location.lon <= lon + lon_delta),
+        )
+    ).first()
+
+    if location:
+        return location.city, location.subdivision, location.country
+
+    return None, None, None

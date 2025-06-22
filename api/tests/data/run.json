@@ -27,6 +27,8 @@
     "lon": -1.5467374319897398,
     "delta_lat": 0.029992654522151677,
     "delta_lon": 0.044148122036263455,
-    "location": "Nantes, France",
+    "city": "Nantes",
+    "subdivision": null,
+    "country": "France",
     "user_id": null
 }

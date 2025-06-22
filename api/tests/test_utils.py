@@ -1,14 +1,15 @@
 import datetime
 import unittest
 import uuid
+from unittest.mock import Mock
 
-from api.model import Activity, Tracepoint
+from api.model import Activity, Location, Tracepoint
 from api.utils import (
     get_lat_lon,
     get_delta_lat_lon,
-    get_distance,
     get_uuid,
     get_best_performances,
+    get_activity_location,
 )
 
 
@@ -81,33 +82,6 @@ class TestUtils(unittest.TestCase):
 
         # Delta lon should be slightly larger due to latitude adjustment
         self.assertGreater(delta_lon, delta_lat)
-
-    def test_get_distance_same_point(self):
-        """Test get_distance with same coordinates returns 0"""
-        lat, lon = 47.2183, -1.5536
-        distance = get_distance(lat, lon, lat, lon)
-        self.assertAlmostEqual(distance, 0.0, places=1)
-
-    def test_get_distance_known_points(self):
-        """Test get_distance with known coordinates"""
-        # Approximately 1km apart
-        lat1, lon1 = 47.2183, -1.5536
-        lat2, lon2 = 47.2273, -1.5536  # About 1km north
-
-        distance = get_distance(lat1, lon1, lat2, lon2)
-
-        # Should be approximately 1000 meters
-        self.assertAlmostEqual(distance, 1000, delta=50)
-
-    def test_get_distance_symmetry(self):
-        """Test get_distance is symmetric"""
-        lat1, lon1 = 47.2183, -1.5536
-        lat2, lon2 = 47.2273, -1.5636
-
-        distance1 = get_distance(lat1, lon1, lat2, lon2)
-        distance2 = get_distance(lat2, lon2, lat1, lon1)
-
-        self.assertAlmostEqual(distance1, distance2, places=5)
 
     def test_get_uuid_deterministic(self):
         """Test get_uuid generates same UUID for same filename"""
@@ -270,6 +244,53 @@ class TestUtils(unittest.TestCase):
         performances = get_best_performances(activity, tracepoints)
         # Should be empty since activity is shorter than 1km
         self.assertEqual(performances, [])
+
+    def test_get_activity_location_no_location_found(self):
+        """Test get_activity_location when no location is found in database"""
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.first.return_value = None
+        mock_session.exec.return_value = mock_result
+
+        city, subdivision, country = get_activity_location(
+            mock_session, 47.2183, -1.5536
+        )
+
+        # Session should be called
+        mock_session.exec.assert_called_once()
+
+        # Should return None values
+        self.assertIsNone(city)
+        self.assertIsNone(subdivision)
+        self.assertIsNone(country)
+
+    def test_get_activity_location_location_found(self):
+        """Test get_activity_location when location is found in database"""
+        location = Location(
+            id=uuid.uuid4(),
+            lat=47.2180,
+            lon=-1.5540,
+            city="Nantes",
+            subdivision="Loire-Atlantique",
+            country="France",
+        )
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.first.return_value = location
+        mock_session.exec.return_value = mock_result
+
+        city, subdivision, country = get_activity_location(
+            mock_session, 47.2183, -1.5536
+        )
+
+        # Session should be called
+        mock_session.exec.assert_called_once()
+
+        # Should return location data
+        self.assertEqual(city, "Nantes")
+        self.assertEqual(subdivision, "Loire-Atlantique")
+        self.assertEqual(country, "France")
 
 
 if __name__ == "__main__":

@@ -3,9 +3,10 @@ import math
 import os
 import uuid
 
-from typing import Any, List
+from typing import List
 
 from pydantic import field_validator, ValidationInfo
+from sqlmodel import Session
 
 from api.model import (
     Activity,
@@ -19,7 +20,7 @@ from api.utils import (
     get_lat_lon,
     get_uuid,
     get_delta_lat_lon,
-    get_distance,
+    get_activity_location,
 )
 
 import api.api
@@ -82,7 +83,7 @@ class TracepointCreate(TracepointBase):
 
 
 def get_activity_from_fit(
-    locations: List[Any],
+    session: Session,
     fit_file: str,
     title: str = "Activity",
     description: str = "",
@@ -119,13 +120,9 @@ def get_activity_from_fit(
     activity.lat, activity.lon = get_lat_lon(tracepoints)
 
     if len(tracepoints) > 0:
-        lat = tracepoints[0].lat
-        lon = tracepoints[0].lon
-
-        for loc in locations:
-            if get_distance(loc.get("lat"), loc.get("lon"), lat, lon) < 500:
-                activity.location = loc.get("location")
-                break
+        activity.city, activity.subdivision, activity.country = get_activity_location(
+            session, tracepoints[0].lat, tracepoints[0].lon
+        )
 
     values = []
     max_distance = 1.0

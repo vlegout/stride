@@ -3,7 +3,7 @@ import uuid
 
 from typing import List
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, computed_field, field_serializer
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -80,7 +80,9 @@ class ActivityBase(SQLModel):
     lon: float | None = None
     delta_lat: float | None = None
     delta_lon: float | None = None
-    location: str | None = None
+    city: str | None = None
+    subdivision: str | None = None
+    country: str | None = None
 
     user_id: str | None = Field(foreign_key="user.id", default=None)
 
@@ -101,10 +103,20 @@ class ActivityPublic(ActivityBase):
     def serialize_tracepoints(self, tracepoints: List["Tracepoint"]):
         return sorted(tracepoints, key=lambda a: a.timestamp, reverse=True)
 
+    @computed_field
+    def location(self) -> str | None:
+        parts = [part for part in [self.city, self.subdivision, self.country] if part]
+        return ", ".join(parts) if parts else None
+
 
 class ActivityPublicWithoutTracepoints(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
+
+    @computed_field
+    def location(self) -> str | None:
+        parts = [part for part in [self.city, self.subdivision, self.country] if part]
+        return ", ".join(parts) if parts else None
 
 
 class Pagination(BaseModel):
@@ -167,6 +179,15 @@ class TracepointBase(SQLModel):
 
 class Tracepoint(TracepointBase, table=True):
     activity: Activity = Relationship(back_populates="tracepoints")
+
+
+class Location(SQLModel, table=True):
+    id: uuid.UUID = Field(primary_key=True)
+    lat: float
+    lon: float
+    city: str | None = None
+    subdivision: str | None = None
+    country: str | None = None
 
 
 class Statistic(BaseModel):
