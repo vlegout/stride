@@ -3,15 +3,17 @@ import math
 import os
 import uuid
 
-from typing import Any, List
+from typing import List
 
 from pydantic import field_validator, ValidationInfo
+from sqlmodel import Session, select
 
 from api.model import (
     Activity,
     ActivityBase,
     Lap,
     LapBase,
+    Location,
     Tracepoint,
     TracepointBase,
 )
@@ -19,7 +21,6 @@ from api.utils import (
     get_lat_lon,
     get_uuid,
     get_delta_lat_lon,
-    get_distance,
 )
 
 import api.api
@@ -82,7 +83,7 @@ class TracepointCreate(TracepointBase):
 
 
 def get_activity_from_fit(
-    locations: List[Any],
+    session: Session,
     fit_file: str,
     title: str = "Activity",
     description: str = "",
@@ -122,10 +123,24 @@ def get_activity_from_fit(
         lat = tracepoints[0].lat
         lon = tracepoints[0].lon
 
-        for loc in locations:
-            if get_distance(loc.get("lat"), loc.get("lon"), lat, lon) < 500:
-                activity.location = loc.get("location")
-                break
+        # Calculate bounding box for 500m radius
+        # Approximate: 1 degree latitude ≈ 111km, so 500m ≈ 0.0045 degrees
+        # For longitude, adjust by cos(latitude)
+        lat_delta = 0.0045  # ~500m in degrees
+        lon_delta = 0.0045 / math.cos(math.radians(lat))
+
+        # Query locations within bounding box
+        location = session.exec(
+            select(Location).where(
+                (Location.lat >= lat - lat_delta) & (Location.lat <= lat + lat_delta),
+                (Location.lon >= lon - lon_delta) & (Location.lon <= lon + lon_delta),
+            )
+        ).first()
+
+        if location:
+            activity.city = location.city
+            activity.subdivision = location.subdivision
+            activity.country = location.country
 
     values = []
     max_distance = 1.0

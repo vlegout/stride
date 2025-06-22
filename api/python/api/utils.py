@@ -52,22 +52,6 @@ def get_delta_lat_lon(lat: float, max_distance: float) -> Tuple[float, float]:
     return (delta_lat, delta_lon)
 
 
-def get_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    earth_radius = 6371000
-    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    a = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-    )
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    return earth_radius * c
-
-
 def get_uuid(filename: str) -> uuid.UUID:
     return uuid.uuid5(uuid.NAMESPACE_DNS, os.path.basename(filename))
 

@@ -2,7 +2,7 @@ import concurrent.futures
 import json
 import os
 
-from typing import Any, List
+from typing import List
 
 import typer
 import yaml
@@ -21,13 +21,13 @@ app = typer.Typer()
 
 
 def get_activity_from_yaml(
-    locations: List[Any], yaml_file: str
+    session: Session, yaml_file: str
 ) -> tuple[Activity, List[Lap], List[Tracepoint]]:
     with open(yaml_file, "r") as file:
         config = yaml.safe_load(file)
 
     activity, laps, tracepoints = get_activity_from_fit(
-        locations,
+        session,
         "./data/fit/" + config["fit"],
         config.get("title", ""),
         config.get("description", ""),
@@ -38,16 +38,16 @@ def get_activity_from_yaml(
 
 
 def get_data(
-    locations: List[Any], input_file: str
+    session: Session, input_file: str
 ) -> tuple[Activity, List[Lap], List[Tracepoint], list]:
     if input_file.endswith(".yaml"):
         activity, laps, tracepoints = get_activity_from_yaml(
-            locations,
+            session,
             input_file,
         )
     else:
         activity, laps, tracepoints = get_activity_from_fit(
-            locations,
+            session,
             input_file,
         )
 
@@ -59,10 +59,9 @@ def get_data(
     return activity, laps, tracepoints, performances
 
 
-def process_file(locations: List[Any], input_file: str) -> None:
-    activity, laps, tracepoints, performances = get_data(locations, input_file)
-
+def process_file(input_file: str) -> None:
     session = Session(engine)
+    activity, laps, tracepoints, performances = get_data(session, input_file)
     session.add(activity)
 
     for lap in laps:
@@ -82,9 +81,7 @@ def add_activity(
     yaml: str = typer.Argument(),
 ):
     """Add a new activity from a YAML file."""
-    locations = json.load(open("./data/locations.json")).get("locations")
-
-    process_file(locations, yaml)
+    process_file(yaml)
 
 
 @app.command()
