@@ -82,7 +82,8 @@ export const Activity = type({
   lon: "number",
   delta_lat: "number",
   delta_lon: "number",
-  location: "string",
+  city: "string?",
+  country: "string?",
 
   laps: [Lap],
   tracepoints: [TracePoint],

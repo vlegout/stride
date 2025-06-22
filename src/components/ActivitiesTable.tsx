@@ -53,7 +53,11 @@ const ActivitiesTable = () => {
         </MuiLink>
       ),
     },
-    { id: "location", label: "Location" },
+    {
+      id: "location",
+      label: "Location",
+      render: (_, row) => [row.city, row.country].filter(Boolean).join(", ") || "—",
+    },
     {
       id: "start_time",
       label: "Start Time",
