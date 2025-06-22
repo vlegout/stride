@@ -6,7 +6,7 @@ import LogoRun from "../data/running.svg?react";
 const ActivityLogo = ({ sport, width = 40 }: { sport: string; width?: number }) => {
   switch (sport) {
     case "cycling":
-      return <LogoBike style={{ width: `${width}px`, height: `${width}px` }} />;
+      return <LogoBike style={{ width: `20px`, height: `${width}px` }} />;
     case "running":
       return <LogoRun style={{ width: `${width}px`, height: `${width}px` }} />;
     default:
