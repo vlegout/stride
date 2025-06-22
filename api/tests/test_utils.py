@@ -1,13 +1,15 @@
 import datetime
 import unittest
 import uuid
+from unittest.mock import Mock
 
-from api.model import Activity, Tracepoint
+from api.model import Activity, Location, Tracepoint
 from api.utils import (
     get_lat_lon,
     get_delta_lat_lon,
     get_uuid,
     get_best_performances,
+    get_activity_location,
 )
 
 
@@ -242,6 +244,53 @@ class TestUtils(unittest.TestCase):
         performances = get_best_performances(activity, tracepoints)
         # Should be empty since activity is shorter than 1km
         self.assertEqual(performances, [])
+
+    def test_get_activity_location_no_location_found(self):
+        """Test get_activity_location when no location is found in database"""
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.first.return_value = None
+        mock_session.exec.return_value = mock_result
+
+        city, subdivision, country = get_activity_location(
+            mock_session, 47.2183, -1.5536
+        )
+
+        # Session should be called
+        mock_session.exec.assert_called_once()
+
+        # Should return None values
+        self.assertIsNone(city)
+        self.assertIsNone(subdivision)
+        self.assertIsNone(country)
+
+    def test_get_activity_location_location_found(self):
+        """Test get_activity_location when location is found in database"""
+        location = Location(
+            id=uuid.uuid4(),
+            lat=47.2180,
+            lon=-1.5540,
+            city="Nantes",
+            subdivision="Loire-Atlantique",
+            country="France",
+        )
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.first.return_value = location
+        mock_session.exec.return_value = mock_result
+
+        city, subdivision, country = get_activity_location(
+            mock_session, 47.2183, -1.5536
+        )
+
+        # Session should be called
+        mock_session.exec.assert_called_once()
+
+        # Should return location data
+        self.assertEqual(city, "Nantes")
+        self.assertEqual(subdivision, "Loire-Atlantique")
+        self.assertEqual(country, "France")
 
 
 if __name__ == "__main__":

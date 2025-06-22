@@ -5,13 +5,14 @@ import random
 import string
 import uuid
 
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import boto3
+from sqlmodel import Session, select
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
 
-from api.model import Activity, Performance, Tracepoint
+from api.model import Activity, Location, Performance, Tracepoint
 
 
 def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
@@ -143,3 +144,22 @@ def upload_content_to_s3(content: str, s3_key: str) -> None:
         raise HTTPException(
             status_code=500, detail=f"Failed to upload content to S3: {str(e)}"
         )
+
+
+def get_activity_location(
+    session: Session, lat: float, lon: float
+) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    lat_delta = 0.0045
+    lon_delta = 0.0045 / math.cos(math.radians(lat))
+
+    location = session.exec(
+        select(Location).where(
+            (Location.lat >= lat - lat_delta) & (Location.lat <= lat + lat_delta),
+            (Location.lon >= lon - lon_delta) & (Location.lon <= lon + lon_delta),
+        )
+    ).first()
+
+    if location:
+        return location.city, location.subdivision, location.country
+
+    return None, None, None
