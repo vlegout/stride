@@ -34,6 +34,8 @@ export default defineConfig(() => {
       coverage: {
         reporter: ["text", "json", "html", "lcov"],
         reportsDirectory: "./coverage",
+        include: ["src/**/*.tsx"],
+        exclude: ["**/*.stories.tsx"],
       },
     },
   };
