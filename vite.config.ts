@@ -30,6 +30,7 @@ export default defineConfig(() => {
       environment: "jsdom",
       exclude: ["**/node_modules/**", "**/e2e/**"],
       globals: false,
+      setupFiles: ["./tests/setup.ts"],
       coverage: {
         reporter: ["text", "json", "html", "lcov"],
         reportsDirectory: "./coverage",
