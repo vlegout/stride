@@ -7,12 +7,12 @@ from typing import List
 import typer
 import yaml
 
-from sqlmodel import Session, SQLModel
+from sqlmodel import Session, SQLModel, select
 
 from api.db import engine
 from api.fit import get_activity_from_fit
 from api.model import Activity, Lap, Tracepoint
-from api.utils import get_best_performances
+from api.utils import get_best_performances, get_activity_location
 
 MAX_DATA_POINTS = 500
 NB_CPUS = 2
@@ -90,8 +90,6 @@ def create_db():
     SQLModel.metadata.drop_all(bind=engine)
     SQLModel.metadata.create_all(bind=engine)
 
-    locations = json.load(open("./data/locations.json")).get("locations")
-
     input_files = []
     for root, _, files in os.walk("./data/"):
         for yaml_file in files:
@@ -108,7 +106,7 @@ def create_db():
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
         future_activities = {
-            executor.submit(process_file, locations, input_file): input_file
+            executor.submit(process_file, input_file): input_file
             for input_file in input_files
         }
         for future in concurrent.futures.as_completed(future_activities):
@@ -127,9 +125,9 @@ def read_fit(
     out_file: str = typer.Option(None),
 ):
     """Read a .fit file and parse activity, laps, and tracepoints."""
-    locations = json.load(open("./data/locations.json")).get("locations")
+    session = Session(engine)
     activity, laps, tracepoints, performances = get_data(
-        locations,
+        session,
         fit_file,
     )
 
@@ -154,6 +152,41 @@ def read_fit(
         print(tp)
     if len(tracepoints) > 10:
         print(f"... ({len(tracepoints) - 10} more tracepoints)")
+
+
+@app.command()
+def update_locations():
+    """Update location fields for all activities using their lat/lon coordinates."""
+    session = Session(engine)
+
+    activities = session.exec(select(Activity)).all()
+    updated_count = 0
+
+    print(f"Found {len(activities)} activities to process...")
+
+    for activity in activities:
+        if (
+            activity.lat is not None
+            and activity.lon is not None
+            and activity.city is None
+            and activity.subdivision is None
+            and activity.country is None
+        ):
+            city, subdivision, country = get_activity_location(
+                session, activity.lat, activity.lon
+            )
+
+            if city is not None or subdivision is not None or country is not None:
+                activity.city = city
+                activity.subdivision = subdivision
+                activity.country = country
+                updated_count += 1
+                print(
+                    f"Updated activity {activity.id}: {city}, {subdivision}, {country}"
+                )
+
+    session.commit()
+    print(f"Updated {updated_count} activities with location data")
 
 
 if __name__ == "__main__":
