@@ -23,8 +23,10 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const locationText = [activity.city, activity.country].filter(Boolean).join(", ") || "—";
+
   const title = isDetailed ? (
-    <PageHeader title={activity.title} subtitle={activity.location} />
+    <PageHeader title={activity.title} subtitle={locationText} />
   ) : (
     <Typography variant={isSmall ? "h6" : "h5"}>
       <MuiLink component={Link} to={`/activities/${activity.id}`}>
@@ -48,7 +50,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
         {!isDetailed && (
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-              {activity.location}
+              {locationText}
             </Typography>
           </Box>
         )}

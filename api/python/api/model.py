@@ -3,7 +3,7 @@ import uuid
 
 from typing import List
 
-from pydantic import BaseModel, computed_field, field_serializer
+from pydantic import BaseModel, field_serializer
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -103,20 +103,10 @@ class ActivityPublic(ActivityBase):
     def serialize_tracepoints(self, tracepoints: List["Tracepoint"]):
         return sorted(tracepoints, key=lambda a: a.timestamp, reverse=True)
 
-    @computed_field
-    def location(self) -> str | None:
-        parts = [part for part in [self.city, self.subdivision, self.country] if part]
-        return ", ".join(parts) if parts else None
-
 
 class ActivityPublicWithoutTracepoints(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
-
-    @computed_field
-    def location(self) -> str | None:
-        parts = [part for part in [self.city, self.subdivision, self.country] if part]
-        return ", ".join(parts) if parts else None
 
 
 class Pagination(BaseModel):
