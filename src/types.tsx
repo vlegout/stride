@@ -22,12 +22,11 @@ export const Lap = type({
   index: "number",
   start_time: "number",
   total_elapsed_time: "number",
+  total_timer_time: "number",
   total_distance: "number",
   max_heart_rate: "number",
   avg_heart_rate: "number",
   max_speed: "number",
-  minutes: "number",
-  seconds: "number",
 });
 export type Lap = typeof Lap.infer;
 

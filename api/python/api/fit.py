@@ -1,4 +1,3 @@
-import datetime
 import math
 import os
 import uuid
@@ -47,27 +46,7 @@ class ActivityCreate(ActivityBase):
 
 
 class LapCreate(LapBase):
-    @field_validator("minutes", mode="before")
-    @classmethod
-    def minutes_validator(cls, value: int, info: ValidationInfo) -> int:
-        if info.data["total_distance"] == 0:
-            return 0
-
-        pace = datetime.timedelta(
-            seconds=info.data["total_timer_time"] * 1000 / info.data["total_distance"]
-        )
-        return math.floor(pace.total_seconds() / 60)
-
-    @field_validator("seconds", mode="before")
-    @classmethod
-    def seconds_validator(cls, value: int, info: ValidationInfo) -> int:
-        if info.data["total_distance"] == 0:
-            return 0
-
-        pace = datetime.timedelta(
-            seconds=info.data["total_timer_time"] * 1000 / info.data["total_distance"]
-        )
-        return int(pace.total_seconds() % 60)
+    pass
 
 
 class TracepointCreate(TracepointBase):
@@ -102,9 +81,7 @@ def get_activity_from_fit(
     )
 
     laps_create = [
-        LapCreate(
-            id=uuid.uuid4(), activity_id=activity_create.id, minutes=0, seconds=0, **lap
-        )
+        LapCreate(id=uuid.uuid4(), activity_id=activity_create.id, **lap)
         for lap in fit.get("laps", [])
     ]
     tracepoints_create = [

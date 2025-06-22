@@ -9,16 +9,16 @@ import { Lap } from "../types";
 interface LapData {
   index: number;
   total_distance: number;
-  minutes: number;
-  seconds: number;
+  total_timer_time: number;
   x: number;
   y: number;
   width: number;
   height: number;
   name: string;
+  color: string;
 }
 
-const LineChart = ({ laps }: { laps: Lap[] }) => {
+const LineChart = ({ laps, sport }: { laps: Lap[]; sport: string }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
@@ -30,20 +30,54 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
     y: 0,
   });
 
-  if (laps.some((lap) => lap.minutes == null || lap.seconds == null)) {
+  if (laps.some((lap) => lap.total_timer_time == null || lap.total_distance == null)) {
     return null;
   }
 
-  // Responsive dimensions
   const containerWidth = isSmall ? 300 : isMobile ? 400 : 500;
   const width = containerWidth;
   const height = isSmall ? 150 : isMobile ? 180 : 200;
   const space = isSmall ? 1 : 2;
-  const leftMargin = isSmall ? 25 : 30;
+  const leftMargin = isSmall ? 35 : 40;
+  const rightMargin = isSmall ? 30 : 35;
 
-  const minSpeed = Math.min(...laps.map((lap) => lap.minutes * 60 + lap.seconds)) - 10;
-  const maxSpeed = Math.max(...laps.map((lap) => lap.minutes * 60 + lap.seconds)) + 10;
-  const speedRange = maxSpeed - minSpeed;
+  const isCycling = sport === "cycling";
+
+  const getSpeedKmh = (lap: Lap): number => {
+    const timeInSeconds = lap.total_timer_time;
+    const speedMps = lap.total_distance / timeInSeconds;
+    return speedMps * 3.6;
+  };
+
+  const getPaceSecondsPerKm = (lap: Lap): number => {
+    const timeInSeconds = lap.total_timer_time;
+    const distanceInKm = lap.total_distance / 1000;
+    return timeInSeconds / distanceInKm;
+  };
+
+  const values = isCycling ? laps.map(getSpeedKmh) : laps.map(getPaceSecondsPerKm);
+
+  const minValue = Math.min(...values) - (isCycling ? 2 : 10);
+  const maxValue = Math.max(...values) + (isCycling ? 2 : 10);
+  const valueRange = maxValue - minValue;
+
+  const getColor = (value: number): string => {
+    const normalizedValue = isCycling ? (value - minValue) / valueRange : (maxValue - value) / valueRange;
+
+    const intensity = Math.max(0, Math.min(1, normalizedValue));
+
+    if (intensity < 0.7) {
+      const grayVariation = 50 + intensity * 20;
+      return `hsl(0, 0%, ${grayVariation}%)`;
+    }
+
+    const fastRange = (intensity - 0.7) / 0.3;
+    const hue = 180 + fastRange * 60;
+    const saturation = 60 + fastRange * 30;
+    const lightness = 60 - fastRange * 20;
+
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  };
 
   const totalDistance = laps.reduce((sum, lap) => sum + lap.total_distance, 0);
 
@@ -52,38 +86,66 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
   let currentX = leftMargin;
 
   laps.forEach((lap, index) => {
-    const lapWidth = (lap.total_distance * (width - leftMargin - space * laps.length)) / totalDistance;
-    const lapHeight = (-height * (maxSpeed - (lap.minutes * 60 + lap.seconds))) / speedRange;
+    const lapWidth = (lap.total_distance * (width - leftMargin - rightMargin - space * laps.length)) / totalDistance;
+    const currentValue = isCycling ? getSpeedKmh(lap) : getPaceSecondsPerKm(lap);
+    const lapHeight = isCycling
+      ? (-height * (currentValue - minValue)) / valueRange
+      : (-height * (maxValue - currentValue)) / valueRange;
+
+    const displayName = isCycling
+      ? `${currentValue.toFixed(1)}`
+      : (() => {
+          const totalSeconds = Math.round(currentValue);
+          const minutes = Math.floor(totalSeconds / 60);
+          const seconds = totalSeconds % 60;
+          return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+        })();
 
     dataLaps.push({
       index: index,
       total_distance: lap.total_distance,
-      minutes: lap.minutes,
-      seconds: lap.seconds,
+      total_timer_time: lap.total_timer_time,
       x: currentX,
       y: height + 10,
       width: lapWidth,
       height: lapHeight,
-      name: `${lap.minutes}:${lap.seconds.toString().padStart(2, "0")}`,
+      name: displayName,
+      color: getColor(currentValue),
     });
 
     currentX += lapWidth + space;
   });
 
-  let modulo = 15;
-  if (speedRange > 240) {
-    modulo = 60;
-  } else if (speedRange > 120) {
-    modulo = 30;
+  let modulo = isCycling ? 5 : 15;
+  if (!isCycling) {
+    if (valueRange > 240) {
+      modulo = 60;
+    } else if (valueRange > 120) {
+      modulo = 30;
+    }
+  } else {
+    if (valueRange > 20) {
+      modulo = 10;
+    } else if (valueRange > 10) {
+      modulo = 5;
+    } else {
+      modulo = 2;
+    }
   }
 
-  const paces = [];
-  let currentSpeed = minSpeed;
-  while (currentSpeed <= maxSpeed) {
-    currentSpeed += 1;
-
-    if (currentSpeed % modulo === 0) {
-      paces.push(currentSpeed);
+  const yAxisLabels = [];
+  if (isCycling) {
+    const startValue = Math.ceil(minValue / modulo) * modulo;
+    for (let value = startValue; value <= maxValue; value += modulo) {
+      yAxisLabels.push(value);
+    }
+  } else {
+    let currentValue = minValue;
+    while (currentValue <= maxValue) {
+      currentValue += 1;
+      if (Math.round(currentValue) % modulo === 0) {
+        yAxisLabels.push(currentValue);
+      }
     }
   }
 
@@ -96,20 +158,6 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
       x: mousePos.x + 5,
       y: mousePos.y + 5,
     });
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleTouchMove = (e: any) => {
-    // Handle touch events for mobile
-    const touchPos = e.target.getStage().getPointerPosition();
-    if (touchPos) {
-      setTooltipProps({
-        text: `${e.target.name()}`,
-        visible: true,
-        x: touchPos.x + 5,
-        y: touchPos.y - 30, // Position above finger on touch
-      });
-    }
   };
 
   const handleMouseOut = () => {
@@ -127,18 +175,12 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
         height: "100%",
         position: "relative",
         margin: "auto",
-        overflow: "hidden", // Prevent horizontal scroll
-        touchAction: "pan-y", // Allow vertical scrolling but prevent horizontal pan conflicts
+        overflow: "hidden",
+        touchAction: "pan-y",
       }}
     >
       <Stage width={width} height={height + 30}>
-        <Layer
-          onMouseMove={handleMouseMove}
-          onMouseOut={handleMouseOut}
-          onTouchStart={handleTouchMove}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleMouseOut}
-        >
+        <Layer onMouseMove={handleMouseMove} onMouseOut={handleMouseOut} onTouchEnd={handleMouseOut}>
           {dataLaps.map((lap, index) => (
             <Rect
               key={index}
@@ -147,10 +189,9 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
               width={lap.width}
               height={lap.height}
               name={lap.name}
-              fill="lightgrey"
+              fill={lap.color}
               stroke="white"
               strokeWidth={1}
-              // Make bars more touch-friendly on mobile
               {...(isMobile && {
                 shadowBlur: 2,
                 shadowColor: "rgba(0,0,0,0.3)",
@@ -166,7 +207,6 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
             padding={isMobile ? 8 : 5}
             fill="black"
             fontStyle="bold"
-            // Add background for better readability on mobile
             {...(isMobile && {
               align: "center",
               backgroundColor: "rgba(255,255,255,0.9)",
@@ -175,16 +215,26 @@ const LineChart = ({ laps }: { laps: Lap[] }) => {
           />
         </Layer>
         <Layer>
-          {paces.map((pace, index) => (
-            <Text
-              key={index}
-              x={0}
-              y={height - (height * (maxSpeed - pace)) / speedRange}
-              text={`${Math.floor(pace / 60)}:${(pace % 60).toString().padStart(2, "0")}`}
-              fontSize={responsiveFontSize}
-              fill="#666"
-            />
-          ))}
+          {yAxisLabels.map((value, index) => {
+            const labelText = isCycling
+              ? `${value.toFixed(0)}`
+              : `${Math.floor(value / 60)}:${(Math.round(value) % 60).toString().padStart(2, "0")}`;
+
+            return (
+              <Text
+                key={index}
+                x={0}
+                y={
+                  isCycling
+                    ? height - (height * (value - minValue)) / valueRange
+                    : height - (height * (maxValue - value)) / valueRange
+                }
+                text={labelText}
+                fontSize={responsiveFontSize}
+                fill="#666"
+              />
+            );
+          })}
         </Layer>
       </Stage>
     </Box>
