@@ -8,6 +8,6 @@ RUN pip install uv
 
 COPY . /code
 
-RUN uv sync --locked
+RUN uv sync --locked --no-dev
 
 CMD ["uv", "run", "fastapi", "run", "python/api/app.py", "--port", "8080"]
