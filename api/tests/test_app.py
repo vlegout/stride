@@ -252,6 +252,12 @@ class TestApp(unittest.TestCase):
         response = self.client.get("/users/me/")
         self.assertEqual(response.status_code, 401)
 
+    def test_delete_activity_endpoint_requires_auth(self):
+        """Test delete activity endpoint requires authentication"""
+        activity_id = uuid.uuid4()
+        response = self.client.delete(f"/activities/{activity_id}/")
+        self.assertEqual(response.status_code, 401)
+
     def test_google_auth_endpoint_public_access(self):
         """Test Google auth endpoint is publicly accessible"""
         user_data = {
@@ -309,6 +315,77 @@ class TestAppEndpointValidation(unittest.TestCase):
         # Test invalid page (negative)
         response = self.client.get("/activities/?page=-1")
         self.assertEqual(response.status_code, 401)  # Should fail auth first
+
+
+class TestActivityStatusFunctionality(unittest.TestCase):
+    """Test activity status field functionality and soft delete behavior"""
+
+    def test_delete_activity_endpoint_exists(self):
+        """Test that delete activity endpoint is properly configured"""
+        from api.app import app
+
+        # Check that the DELETE route exists by examining the route table
+        routes = app.routes
+        delete_routes = [
+            route
+            for route in routes
+            if hasattr(route, "methods") and "DELETE" in route.methods
+        ]
+        activity_delete_routes = [
+            route
+            for route in delete_routes
+            if "/activities/{activity_id}/" in str(route.path)
+        ]
+
+        self.assertTrue(
+            len(activity_delete_routes) > 0,
+            "DELETE /activities/{activity_id}/ route should exist",
+        )
+
+    def test_status_field_in_query_filters(self):
+        """Test that activity queries include status filtering logic"""
+        # This test examines the source code to verify status filtering is implemented
+        import inspect
+        from api.app import read_activities, read_activity
+
+        # Check that read_activities function includes status filtering
+        read_activities_source = inspect.getsource(read_activities)
+        self.assertIn(
+            'status == "created"',
+            read_activities_source,
+            "read_activities should filter by status='created'",
+        )
+
+        # Check that read_activity function includes status filtering
+        read_activity_source = inspect.getsource(read_activity)
+        self.assertIn(
+            'status == "created"',
+            read_activity_source,
+            "read_activity should filter by status='created'",
+        )
+
+    def test_new_activity_defaults_to_created_status(self):
+        """Test that newly created activities have default status of 'created'"""
+        from api.model import ActivityBase
+
+        # Create an activity without specifying status
+        activity = ActivityBase(
+            fit="test.fit",
+            title="Test Activity",
+            sport="running",
+            device="Test Device",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=3600.0,
+            total_elapsed_time=3600.0,
+            total_distance=10000.0,
+            total_ascent=100.0,
+            avg_speed=10.0,
+        )
+
+        # Verify default status is "created"
+        self.assertEqual(activity.status, "created")
 
 
 if __name__ == "__main__":

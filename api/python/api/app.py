@@ -123,7 +123,9 @@ def read_activities(
         pattern="^(total_distance|start_time|avg_speed|avg_power|total_ascent|total_calories)$",
     ),
 ):
-    query = select(Activity).where(Activity.user_id == user_id)  # type: ignore
+    query = select(Activity).where(
+        Activity.user_id == user_id, Activity.status == "created"
+    )  # type: ignore
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
@@ -182,7 +184,11 @@ def read_activity(
     user_id: str = Depends(get_current_user_id),
 ):
     activity = session.exec(
-        select(Activity).where(Activity.id == activity_id, Activity.user_id == user_id)
+        select(Activity).where(
+            Activity.id == activity_id,
+            Activity.user_id == user_id,
+            Activity.status == "created",
+        )
     ).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
@@ -275,6 +281,27 @@ def create_activity(
             pass
 
 
+@app.delete("/activities/{activity_id}/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_activity(
+    activity_id: uuid.UUID,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    activity = session.exec(
+        select(Activity).where(
+            Activity.id == activity_id,
+            Activity.user_id == user_id,
+            Activity.status == "created",
+        )
+    ).first()
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    activity.status = "deleted"
+    session.add(activity)
+    session.commit()
+
+
 @app.get("/profile/", response_model=Profile)
 def read_profile(
     session: Session = Depends(get_session),
@@ -290,7 +317,7 @@ def read_profile(
                 COUNT(CASE WHEN sport = 'cycling' THEN 1 END) as cycling_activities,
                 COALESCE(SUM(CASE WHEN sport = 'cycling' THEN total_distance END), 0) as cycling_distance
             FROM activity
-            WHERE user_id = :user_id
+            WHERE user_id = :user_id AND status = 'created'
         """),
         {"user_id": user_id},
     ).one()
@@ -320,7 +347,7 @@ def read_profile(
                 COUNT(*) as n_activities,
                 COALESCE(SUM(total_distance), 0) as total_distance
             FROM activity
-            WHERE user_id = :user_id
+            WHERE user_id = :user_id AND status = 'created'
             AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) IN ({years_clause})
             AND EXTRACT(WEEK FROM TO_TIMESTAMP(start_time)) IN ({weeks_clause})
             GROUP BY year, week, sport
@@ -378,7 +405,7 @@ def read_profile(
                 COUNT(*) as n_activities,
                 COALESCE(SUM(total_distance), 0) as total_distance
             FROM activity
-            WHERE user_id = :user_id
+            WHERE user_id = :user_id AND status = 'created'
             AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
             GROUP BY year, sport
             ORDER BY year, sport
@@ -435,7 +462,7 @@ def read_profile(
             FROM performance p
             JOIN activity a ON p.activity_id = a.id
             WHERE p.distance IN ({distances_clause})
-            AND a.user_id = :user_id
+            AND a.user_id = :user_id AND a.status = 'created'
             GROUP BY p.distance
             ORDER BY p.distance
         """),
@@ -485,7 +512,7 @@ def read_weeks(
         # Get activities for this week
         activities = session.exec(
             select(Activity)
-            .where(Activity.user_id == user_id)
+            .where(Activity.user_id == user_id, Activity.status == "created")
             .where(Activity.start_time >= int(week_start.timestamp()))
             .where(Activity.start_time < int(week_end.timestamp()))
             .order_by(Activity.start_time.desc())  # type: ignore

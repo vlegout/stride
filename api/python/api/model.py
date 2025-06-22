@@ -43,6 +43,8 @@ class ActivityBase(SQLModel):
 
     fit: str = Field(unique=True)
 
+    status: str = Field(default="created")
+
     title: str
     description: str | None = None
 

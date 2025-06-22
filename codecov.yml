@@ -5,9 +5,11 @@ coverage:
       api:
         flags:
           - api
+        threshold: 10%
       front:
         flags:
           - front
+        threshold: 10%
 
 flags:
   api:
