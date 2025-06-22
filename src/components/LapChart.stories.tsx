@@ -7,18 +7,21 @@ import { Lap } from "../types";
 
 const theme = createTheme();
 
-const createSampleLaps = (numLaps: number, baseMinutes = 5, baseSeconds = 30): Lap[] => {
-  return Array.from({ length: numLaps }, (_, index) => ({
-    index: index + 1,
-    start_time: index * 300000, // 5 minutes apart in milliseconds
-    total_elapsed_time: (index + 1) * 300000,
-    total_distance: 1000, // 1km per lap
-    max_heart_rate: 160 + Math.floor(Math.random() * 20),
-    avg_heart_rate: 140 + Math.floor(Math.random() * 20),
-    max_speed: 4.5 + Math.random() * 0.5,
-    minutes: baseMinutes + Math.floor(Math.random() * 2) - 1, // Vary by ±1 minute
-    seconds: baseSeconds + Math.floor(Math.random() * 60) - 30, // Vary by ±30 seconds
-  }));
+const createSampleLaps = (numLaps: number, baseTimeSeconds = 330): Lap[] => {
+  return Array.from({ length: numLaps }, (_, index) => {
+    const lapTime = baseTimeSeconds + (Math.random() * 60 - 30);
+    const distance = 500 + Math.random() * 1000;
+    return {
+      index: index + 1,
+      start_time: index * lapTime,
+      total_elapsed_time: lapTime,
+      total_timer_time: lapTime,
+      total_distance: distance,
+      max_heart_rate: 160 + Math.floor(Math.random() * 20),
+      avg_heart_rate: 140 + Math.floor(Math.random() * 20),
+      max_speed: 0,
+    };
+  });
 };
 
 const meta = {
@@ -39,6 +42,11 @@ const meta = {
       description: "Array of lap data to display in the chart",
       control: { type: "object" },
     },
+    sport: {
+      description: "Sport type - determines whether to show pace (running) or speed (cycling)",
+      control: { type: "select" },
+      options: ["running", "cycling"],
+    },
   },
   decorators: [
     (Story) => (
@@ -58,6 +66,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     laps: createSampleLaps(5),
+    sport: "running",
   },
   parameters: {
     docs: {
@@ -70,7 +79,8 @@ export const Default: Story = {
 
 export const SingleLap: Story = {
   args: {
-    laps: createSampleLaps(1, 5, 15),
+    laps: createSampleLaps(1, 315),
+    sport: "running",
   },
   parameters: {
     docs: {
@@ -83,7 +93,8 @@ export const SingleLap: Story = {
 
 export const ManyLaps: Story = {
   args: {
-    laps: createSampleLaps(15, 4, 45),
+    laps: createSampleLaps(15, 285),
+    sport: "running",
   },
   parameters: {
     docs: {
@@ -96,7 +107,8 @@ export const ManyLaps: Story = {
 
 export const FastPace: Story = {
   args: {
-    laps: createSampleLaps(8, 3, 30), // ~3:30 pace
+    laps: createSampleLaps(8, 210),
+    sport: "running",
   },
   parameters: {
     docs: {
@@ -109,7 +121,8 @@ export const FastPace: Story = {
 
 export const SlowPace: Story = {
   args: {
-    laps: createSampleLaps(6, 7, 15), // ~7:15 pace
+    laps: createSampleLaps(6, 435),
+    sport: "running",
   },
   parameters: {
     docs: {
@@ -126,59 +139,55 @@ export const VariedPaces: Story = {
       {
         index: 1,
         start_time: 0,
-        total_elapsed_time: 270000,
+        total_elapsed_time: 270,
+        total_timer_time: 270,
         total_distance: 1000,
         max_heart_rate: 165,
         avg_heart_rate: 145,
-        max_speed: 4.2,
-        minutes: 4,
-        seconds: 30,
+        max_speed: 0,
       },
       {
         index: 2,
-        start_time: 270000,
-        total_elapsed_time: 600000,
+        start_time: 270,
+        total_elapsed_time: 330,
+        total_timer_time: 330,
         total_distance: 1000,
         max_heart_rate: 175,
         avg_heart_rate: 155,
-        max_speed: 4.8,
-        minutes: 5,
-        seconds: 30,
+        max_speed: 0,
       },
       {
         index: 3,
-        start_time: 600000,
-        total_elapsed_time: 870000,
+        start_time: 600,
+        total_elapsed_time: 255,
+        total_timer_time: 255,
         total_distance: 1000,
         max_heart_rate: 170,
         avg_heart_rate: 150,
-        max_speed: 4.5,
-        minutes: 4,
-        seconds: 15,
+        max_speed: 0,
       },
       {
         index: 4,
-        start_time: 870000,
-        total_elapsed_time: 1290000,
+        start_time: 855,
+        total_elapsed_time: 420,
+        total_timer_time: 420,
         total_distance: 1000,
         max_heart_rate: 180,
         avg_heart_rate: 165,
-        max_speed: 3.8,
-        minutes: 7,
-        seconds: 0,
+        max_speed: 0,
       },
       {
         index: 5,
-        start_time: 1290000,
-        total_elapsed_time: 1650000,
+        start_time: 1275,
+        total_elapsed_time: 360,
+        total_timer_time: 360,
         total_distance: 1000,
         max_heart_rate: 160,
         avg_heart_rate: 140,
-        max_speed: 4.6,
-        minutes: 6,
-        seconds: 0,
+        max_speed: 0,
       },
     ],
+    sport: "running",
   },
   parameters: {
     docs: {
@@ -193,11 +202,40 @@ export const VariedPaces: Story = {
 export const EmptyData: Story = {
   args: {
     laps: [],
+    sport: "running",
   },
   parameters: {
     docs: {
       description: {
         story: "Chart with no lap data - should render nothing.",
+      },
+    },
+  },
+};
+
+export const Cycling: Story = {
+  args: {
+    laps: createSampleLaps(5),
+    sport: "cycling",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Cycling lap chart showing speed calculated from distance and time.",
+      },
+    },
+  },
+};
+
+export const CyclingFast: Story = {
+  args: {
+    laps: createSampleLaps(8, 210),
+    sport: "cycling",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Fast cycling laps showing higher calculated speeds from shorter lap times.",
       },
     },
   },

@@ -131,8 +131,6 @@ class LapBase(SQLModel):
     max_speed: float | None = None
     max_heart_rate: int | None = None
     avg_heart_rate: int | None = None
-    minutes: int
-    seconds: int
 
 
 class Lap(LapBase, table=True):
