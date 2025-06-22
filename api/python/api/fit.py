@@ -81,9 +81,7 @@ def get_activity_from_fit(
     )
 
     laps_create = [
-        LapCreate(
-            id=uuid.uuid4(), activity_id=activity_create.id, minutes=0, seconds=0, **lap
-        )
+        LapCreate(id=uuid.uuid4(), activity_id=activity_create.id, **lap)
         for lap in fit.get("laps", [])
     ]
     tracepoints_create = [
