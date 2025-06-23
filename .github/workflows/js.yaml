@@ -27,6 +27,8 @@ jobs:
       - uses: chromaui/action@latest
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          skip: "dependabot/**"
+          autoAcceptChanges: "main"
 
   test:
     runs-on: ubuntu-latest
