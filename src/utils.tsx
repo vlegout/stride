@@ -1,4 +1,5 @@
 import { DateTime, Duration } from "luxon";
+import type { Sport } from "./types";
 
 export function formatSpeed(speed: number): string {
   if (speed == null) return "";
@@ -28,7 +29,7 @@ export function formatDate(date: Date): string {
   return DateTime.fromJSDate(date).toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
 }
 
-export function formatPace(speed: number, sport: string): string {
+export function formatPace(speed: number, sport: Sport): string {
   if (!speed || speed === 0) return "--";
 
   if (sport === "running") {

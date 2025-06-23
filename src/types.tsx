@@ -1,7 +1,10 @@
 import { type } from "arktype";
 
+export const Sport = type("'running'|'cycling'");
+export type Sport = typeof Sport.infer;
+
 export const ActivitiesQueryParams = type({
-  sport: "string",
+  sport: Sport.or("undefined"),
   distance: "number[]",
   fetchMap: "boolean",
   limit: "number",
@@ -50,7 +53,7 @@ export const Activity = type({
   title: "string",
   description: "string",
 
-  sport: "string",
+  sport: Sport,
   device: "string",
 
   race: "boolean",
@@ -104,7 +107,7 @@ export const ActivitiesResponse = type({
 export type ActivitiesResponse = typeof ActivitiesResponse.infer;
 
 export const Statistic = type({
-  sport: "string",
+  sport: Sport,
   n_activities: "number",
   total_distance: "number",
 });
@@ -172,7 +175,7 @@ export type GoogleAuthResponse = typeof GoogleAuthResponse.infer;
 export const WeeklyActivitySummary = type({
   id: "string.uuid.v5",
   title: "string",
-  sport: "string",
+  sport: Sport,
   start_time: "number",
   total_distance: "number",
   total_timer_time: "number",

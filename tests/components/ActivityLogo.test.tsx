@@ -24,16 +24,6 @@ describe("ActivityLogo", () => {
       render(<ActivityLogo sport="running" />);
       expect(screen.getByTestId("run-logo")).toBeInTheDocument();
     });
-
-    it("should not render anything for unknown sport", () => {
-      const { container } = render(<ActivityLogo sport="swimming" />);
-      expect(container.firstChild).toBeNull();
-    });
-
-    it("should not render anything for empty sport string", () => {
-      const { container } = render(<ActivityLogo sport="" />);
-      expect(container.firstChild).toBeNull();
-    });
   });
 
   describe("width prop handling", () => {

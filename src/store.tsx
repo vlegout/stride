@@ -2,9 +2,10 @@ import { create } from "zustand";
 import { type } from "arktype";
 import { persist } from "zustand/middleware";
 import type { User, Token } from "./types";
+import { Sport } from "./types";
 
 const ActivitiesFilterData = type({
-  sport: "string",
+  sport: Sport.or("undefined"),
   distance: ["number", "number"],
   race: "boolean",
   page: "number",
@@ -14,7 +15,7 @@ const ActivitiesFilterData = type({
 type ActivitiesFilterData = typeof ActivitiesFilterData.infer;
 
 interface ActivitiesFilterState extends ActivitiesFilterData {
-  setSport: (sport: string) => void;
+  setSport: (sport?: Sport) => void;
   setDistance: (distance: [number, number]) => void;
   setRace: (race: boolean) => void;
   setPage: (page: number) => void;
@@ -24,7 +25,7 @@ interface ActivitiesFilterState extends ActivitiesFilterData {
 }
 
 const initialState: ActivitiesFilterData = {
-  sport: "",
+  sport: undefined,
   distance: [0, 100] as [number, number],
   race: false,
   page: 1,

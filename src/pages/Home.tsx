@@ -11,7 +11,7 @@ import { PageHeader, SectionContainer } from "../components/ui";
 
 const Home = ({ race = false }: { race?: boolean }) => {
   const queryParams: ActivitiesQueryParams = {
-    sport: "",
+    sport: undefined,
     distance: [0, 100],
     fetchMap: true,
     limit: 5,

@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-import { Lap } from "../types";
+import { Lap, Sport } from "../types";
 
 interface LapData {
   index: number;
@@ -18,7 +18,7 @@ interface LapData {
   color: string;
 }
 
-const LineChart = ({ laps, sport }: { laps: Lap[]; sport: string }) => {
+const LineChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));

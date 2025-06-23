@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid";
 
 import ActivitiesTable from "../components/ActivitiesTable";
 import { useActivitiesStore } from "../store";
+import type { Sport } from "../types";
 import { PageHeader, FormField, SelectOption } from "../components/ui";
 
 const ActivitiesPage = () => {
@@ -34,8 +35,8 @@ const ActivitiesPage = () => {
           <FormField
             type="select"
             label="Sport"
-            value={sport}
-            onChange={(value) => setSport(value as string)}
+            value={sport ?? ""}
+            onChange={(value) => setSport(value === "" ? undefined : (value as Sport))}
             options={sportOptions}
           />
         </Grid>
