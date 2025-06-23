@@ -113,7 +113,7 @@ const PageHeader = ({ title, subtitle, breadcrumbs, actions, variant = "h4", spa
             component="h1"
             gutterBottom={!!subtitle}
             sx={{
-              fontWeight: 600,
+              fontWeight: 700,
               lineHeight: 1.2,
             }}
           >

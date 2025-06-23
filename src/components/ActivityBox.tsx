@@ -49,7 +49,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
         </Grid>
         {!isDetailed && (
           <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 700 }}>
               {locationText}
             </Typography>
           </Box>
