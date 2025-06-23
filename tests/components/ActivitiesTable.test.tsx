@@ -194,7 +194,7 @@ describe("ActivitiesTable", () => {
     vi.mocked(api.createActivitiesQueryKey).mockReturnValue([
       "activities",
       {
-        sport: "",
+        sport: undefined,
         distance: [0, 100],
         fetchMap: false,
         limit: 10,
@@ -230,7 +230,7 @@ describe("ActivitiesTable", () => {
     vi.mocked(api.createActivitiesQueryKey).mockReturnValue([
       "activities",
       {
-        sport: "",
+        sport: undefined,
         distance: [0, 100],
         fetchMap: false,
         limit: 10,
@@ -263,7 +263,7 @@ describe("ActivitiesTable", () => {
     vi.mocked(api.createActivitiesQueryKey).mockReturnValue([
       "activities",
       {
-        sport: "",
+        sport: undefined,
         distance: [0, 100],
         fetchMap: false,
         limit: 10,
@@ -302,7 +302,7 @@ describe("ActivitiesTable", () => {
     vi.mocked(api.createActivitiesQueryKey).mockReturnValue([
       "activities",
       {
-        sport: "",
+        sport: undefined,
         distance: [0, 100],
         fetchMap: false,
         limit: 10,

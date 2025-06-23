@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import MuiLink from "@mui/material/Link";
 
 import { fetchWeeks } from "../api";
+import type { Sport } from "../types";
 import { formatDate, formatDuration, formatDistance, formatPace } from "../utils";
 import ActivityLogo from "../components/ActivityLogo";
 import LoadingIndicator from "../components/LoadingIndicator";
@@ -12,7 +13,7 @@ import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../c
 interface ActivityRow {
   id: string;
   race?: boolean;
-  sport: string;
+  sport: Sport;
 }
 
 const WeeksPage = () => {
@@ -68,7 +69,7 @@ const WeeksPage = () => {
       label: "Sport",
       render: (value) => (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <ActivityLogo sport={value as string} width={20} />
+          <ActivityLogo sport={value as Sport} width={20} />
           <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
             {value as string}
           </Typography>
@@ -91,7 +92,7 @@ const WeeksPage = () => {
       id: "avg_speed",
       label: "Pace",
       align: "right" as const,
-      render: (value, row) => formatPace(value as number, row.sport),
+      render: (value, row) => formatPace(value as number, row.sport as Sport),
     },
   ];
 
@@ -147,7 +148,7 @@ const WeeksPage = () => {
                     {Object.entries(sportsBreakdown).map(([sport, stats]) => (
                       <Chip
                         key={sport}
-                        icon={<ActivityLogo sport={sport} width={16} />}
+                        icon={<ActivityLogo sport={sport as Sport} width={16} />}
                         label={`${sport}: ${stats.count} (${formatDistance(stats.distance)})`}
                         variant="outlined"
                       />

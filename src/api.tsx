@@ -56,7 +56,7 @@ export async function fetchActivities({
   const urlParams = [];
   if (fetchMap) urlParams.push("map=true");
   if (race) urlParams.push("race=true");
-  if (sport !== "") urlParams.push(`sport=${sport}`);
+  if (sport) urlParams.push(`sport=${sport}`);
   if (page) urlParams.push(`page=${page}`);
   if (limit) urlParams.push(`limit=${limit}`);
   if (distance && distance.length === 2) {
