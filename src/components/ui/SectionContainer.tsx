@@ -102,7 +102,7 @@ const SectionContainer = ({
         {(title || subtitle) && (
           <Box sx={{ textAlign: centered ? "center" : "left" }}>
             {title && (
-              <Typography variant={getTitleVariant()} component="h2" gutterBottom={!!subtitle} sx={{ fontWeight: 600 }}>
+              <Typography variant={getTitleVariant()} component="h2" gutterBottom={!!subtitle} sx={{ fontWeight: 700 }}>
                 {title}
               </Typography>
             )}

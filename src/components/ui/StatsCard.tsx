@@ -90,7 +90,7 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
         color="text.secondary"
         sx={{
           fontSize: isMobile ? "0.75rem" : "0.875rem",
-          fontWeight: 500,
+          fontWeight: 700,
         }}
       >
         {title}
