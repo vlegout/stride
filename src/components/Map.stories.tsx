@@ -23,6 +23,14 @@ const meta = {
       description: "Optional array of GPS coordinates to draw as a polyline route",
       control: false,
     },
+    height: {
+      description: "Height of the map container",
+      control: { type: "text" },
+    },
+    width: {
+      description: "Width of the map container",
+      control: { type: "text" },
+    },
   },
   decorators: [
     (Story) => (
@@ -64,6 +72,8 @@ export const CircularRoute: Story = {
       [40.7656, -73.9912],
       [40.7505, -73.9934],
     ],
+    height: "300px",
+    width: "500px",
   },
 };
 
@@ -83,6 +93,8 @@ export const LongRoute: Story = {
       [40.8012, -73.9588],
       [40.8176, -73.9482],
     ],
+    height: "250px",
+    width: "600px",
   },
 };
 
@@ -92,5 +104,7 @@ export const EmptyMap: Story = {
       [40.7128, -74.006],
       [40.7812, -73.9734],
     ],
+    height: "200px",
+    width: "200px",
   },
 };
