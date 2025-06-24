@@ -25,6 +25,7 @@ jobs:
       - run: npm run lint
       - run: CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} npm run build
       - uses: chromaui/action@latest
+        if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
           skip: "dependabot/**"
