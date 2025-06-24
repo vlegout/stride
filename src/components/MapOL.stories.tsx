@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import MapComponent from "./Map";
+import MapOLComponent from "./MapOL";
 
 const meta = {
-  title: "Components/Map",
-  component: MapComponent,
+  title: "Components/MapOL",
+  component: MapOLComponent,
   parameters: {
     layout: "centered",
     docs: {
       description: {
         component:
-          "Interactive map component using Leaflet that displays GPS tracks as polylines. Takes bounds and points to render a route on OpenStreetMap tiles.",
+          "Interactive map component using OpenLayers that displays GPS tracks as polylines. Takes bounds and points to render a route on OpenStreetMap tiles.",
       },
     },
   },
@@ -43,7 +43,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof MapComponent>;
+} satisfies Meta<typeof MapOLComponent>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
