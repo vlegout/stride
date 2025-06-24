@@ -31,6 +31,10 @@ const meta = {
       description: "Width of the map container",
       control: { type: "text" },
     },
+    showMarkers: {
+      description: "Show start and end markers on the route",
+      control: { type: "boolean" },
+    },
   },
   decorators: [
     (Story) => (
@@ -74,6 +78,7 @@ export const CircularRoute: Story = {
     ],
     height: "300px",
     width: "500px",
+    showMarkers: false,
   },
 };
 
@@ -106,5 +111,6 @@ export const EmptyMap: Story = {
     ],
     height: "200px",
     width: "200px",
+    showMarkers: false,
   },
 };
