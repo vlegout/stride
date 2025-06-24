@@ -9,7 +9,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 import { Activity } from "../types";
 
-import Map from "./Map";
+import MapComponent from "./Map";
 import ActivityLogo from "./ActivityLogo";
 import { StatsCard, PageHeader } from "./ui";
 
@@ -88,7 +88,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
         </Grid>
       </Grid>
       <Grid size={{ xs: 12, md: 6 }} sx={{ minHeight: isMobile ? "250px" : "auto" }}>
-        <Map
+        <MapComponent
           bounds={[
             [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
             [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
