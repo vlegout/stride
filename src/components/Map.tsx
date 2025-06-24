@@ -23,7 +23,7 @@ const endIcon = divIcon({
   iconAnchor: [12, 12],
 });
 
-const Map = ({ bounds, points, height = "400px", width = "400px", showMarkers = true }: MapProps) => {
+const MapComponent = ({ bounds, points, height = "400px", width = "400px", showMarkers = true }: MapProps) => {
   return (
     <MapContainer bounds={bounds} style={{ height, width }}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -38,4 +38,4 @@ const Map = ({ bounds, points, height = "400px", width = "400px", showMarkers = 
   );
 };
 
-export default Map;
+export default MapComponent;

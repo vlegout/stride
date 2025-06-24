@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import Map from "./Map";
+import MapComponent from "./Map";
 
 const meta = {
   title: "Components/Map",
-  component: Map,
+  component: MapComponent,
   parameters: {
     layout: "centered",
     docs: {
@@ -43,7 +43,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof Map>;
+} satisfies Meta<typeof MapComponent>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
