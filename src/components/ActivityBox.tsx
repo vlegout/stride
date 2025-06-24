@@ -3,13 +3,19 @@ import MuiLink from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useState } from "react";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 import { Activity } from "../types";
 
 import MapComponent from "./Map";
+import MapOLComponent from "./MapOL";
 import ActivityLogo from "./ActivityLogo";
 import { StatsCard, PageHeader } from "./ui";
 
@@ -22,8 +28,12 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+  const [mapProvider, setMapProvider] = useState<"leaflet" | "openlayers">("leaflet");
 
   const locationText = [activity.city, activity.country].filter(Boolean).join(", ") || "—";
+  const mapPoints = activity.tracepoints.map(
+    (point) => [point.lat, point.lng || (point as { lon?: number }).lon || 0] as [number, number],
+  );
 
   const title = isDetailed ? (
     <PageHeader title={activity.title} subtitle={locationText} />
@@ -88,13 +98,36 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
         </Grid>
       </Grid>
       <Grid size={{ xs: 12, md: 6 }} sx={{ minHeight: isMobile ? "250px" : "auto" }}>
-        <MapComponent
-          bounds={[
-            [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
-            [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
-          ]}
-          points={activity.tracepoints}
-        />
+        <Box sx={{ mb: 2 }}>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Map Provider</InputLabel>
+            <Select
+              value={mapProvider}
+              label="Map Provider"
+              onChange={(e) => setMapProvider(e.target.value as "leaflet" | "openlayers")}
+            >
+              <MenuItem value="leaflet">Leaflet</MenuItem>
+              <MenuItem value="openlayers">OpenLayers</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        {mapProvider === "leaflet" ? (
+          <MapComponent
+            bounds={[
+              [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
+              [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
+            ]}
+            points={mapPoints}
+          />
+        ) : (
+          <MapOLComponent
+            bounds={[
+              [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
+              [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
+            ]}
+            points={mapPoints}
+          />
+        )}
       </Grid>
     </Grid>
   );

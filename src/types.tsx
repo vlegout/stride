@@ -88,7 +88,7 @@ export const Activity = type({
   country: "string?",
 
   laps: [Lap],
-  tracepoints: [TracePoint],
+  tracepoints: TracePoint.array().atLeastLength(2),
   performances: [Performance],
 });
 export type Activity = typeof Activity.infer;
