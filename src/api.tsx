@@ -4,6 +4,7 @@ import type {
   Activity,
   ActivitiesResponse,
   ActivitiesQueryParams,
+  FitnessResponse,
   Profile,
   User,
   UserCreate,
@@ -85,6 +86,10 @@ export async function fetchProfile(): Promise<Profile> {
 
 export async function fetchWeeks(): Promise<WeeksResponse> {
   return await apiCall("/weeks/");
+}
+
+export async function fetchFitness(): Promise<FitnessResponse> {
+  return await apiCall("/fitness/");
 }
 
 export async function uploadActivity(fitFile: File, title: string, race: boolean): Promise<Activity> {

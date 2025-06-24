@@ -202,3 +202,16 @@ export const WeeksResponse = type({
   weeks: WeeklySummary.array(),
 });
 export type WeeksResponse = typeof WeeksResponse.infer;
+
+export const FitnessScore = type({
+  date: "string",
+  overall: "number",
+  running: "number",
+  cycling: "number",
+});
+export type FitnessScore = typeof FitnessScore.infer;
+
+export const FitnessResponse = type({
+  scores: FitnessScore.array(),
+});
+export type FitnessResponse = typeof FitnessResponse.infer;

@@ -624,3 +624,158 @@ def google_auth(
     except Exception as e:
         session.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+def calculate_activity_score(activity, sport_filter=None):
+    """Calculate the base score for an activity, optionally filtered by sport"""
+    if sport_filter and activity.sport != sport_filter:
+        return 0.0
+
+    activity_score = 0.0
+
+    # Distance contribution - running heavily favored
+    if activity.sport == "running":
+        # Running: 0.15 points per km, bigger bonuses
+        distance_km = activity.total_distance / 1000
+        activity_score += distance_km * 0.15
+        if distance_km > 21:  # Half marathon+
+            activity_score += distance_km * 0.03
+        if distance_km > 42:  # Marathon+
+            activity_score += distance_km * 0.03
+    elif activity.sport == "cycling":
+        # Cycling: 0.005 points per km (30x lower than running)
+        distance_km = activity.total_distance / 1000
+        activity_score += distance_km * 0.005
+        if distance_km > 100:  # Century ride
+            activity_score += distance_km * 0.001
+
+    # Time/endurance contribution - sport-specific
+    duration_hours = activity.total_timer_time / 3600
+    if activity.sport == "running":
+        if duration_hours > 1:
+            activity_score += (duration_hours - 1) * 0.15
+        if duration_hours > 3:
+            activity_score += (duration_hours - 3) * 0.08
+    elif activity.sport == "cycling":
+        # Cycling time contributions are much much lower
+        if duration_hours > 3:  # Cycling needs even longer duration to count
+            activity_score += (duration_hours - 3) * 0.02
+        if duration_hours > 5:
+            activity_score += (duration_hours - 5) * 0.005
+
+    # Elevation gain contribution - sport-specific
+    if activity.total_ascent:
+        ascent_km = activity.total_ascent / 1000
+        if activity.sport == "running":
+            activity_score += ascent_km * 0.3
+        elif activity.sport == "cycling":
+            # Cycling elevation is much less demanding
+            activity_score += ascent_km * 0.05
+
+    # Race bonus - tiny
+    if activity.race:
+        activity_score *= 1.05
+
+    # Power/intensity contribution - minimal
+    if activity.training_stress_score:
+        activity_score += activity.training_stress_score * 0.005
+    elif activity.avg_power and activity.sport == "cycling":
+        # Rough TSS estimation for cycling without TSS
+        if activity.avg_power > 200:
+            activity_score += (activity.avg_power - 200) * 0.0005 * duration_hours
+
+    return activity_score
+
+
+@app.get("/fitness/")
+def read_fitness_score(
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    # Get activities from the past 1.5 years (to have fitness history before the 365 days we show)
+    end_date = datetime.datetime.now()
+    total_days = int(365 * 1.5)  # 547 days
+    start_date = end_date - datetime.timedelta(days=total_days)
+    start_timestamp = int(start_date.timestamp())
+
+    activities = session.exec(
+        select(Activity).where(
+            Activity.user_id == user_id,
+            Activity.status == "created",
+            Activity.start_time >= start_timestamp,
+        )
+    ).all()
+
+    # Create daily scores for 1.5 years, but only return the last 365 days
+    daily_scores = []
+
+    for days_back in range(total_days):
+        day_date = end_date - datetime.timedelta(days=days_back)
+        day_start = day_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + datetime.timedelta(days=1)
+
+        day_end_ts = int(day_end.timestamp())
+
+        # Calculate fitness score for this day based on activities from past 90 days
+        # (rolling fitness window - fitness doesn't disappear overnight)
+        fitness_window_start = day_start - datetime.timedelta(days=90)
+        fitness_window_start_ts = int(fitness_window_start.timestamp())
+
+        # Get activities in the fitness window up to this day
+        relevant_activities = [
+            activity
+            for activity in activities
+            if fitness_window_start_ts <= activity.start_time < day_end_ts
+        ]
+
+        if not relevant_activities:
+            daily_scores.append(
+                {
+                    "date": day_date.strftime("%Y-%m-%d"),
+                    "overall": 0,
+                    "running": 0,
+                    "cycling": 0,
+                }
+            )
+            continue
+
+        # Calculate weighted scores for overall, running, and cycling
+        weighted_scores = {"overall": 0.0, "running": 0.0, "cycling": 0.0}
+
+        for activity in relevant_activities:
+            # Calculate how many days before this day the activity was
+            days_before = (day_end_ts - activity.start_time) / 86400
+
+            # Apply decay: activities lose 50% effectiveness over 90 days
+            decay_factor = max(0.1, 1.0 - (days_before / 90) * 0.5)
+
+            # Calculate scores for each category
+            overall_score = calculate_activity_score(activity) * decay_factor
+            running_score = calculate_activity_score(activity, "running") * decay_factor
+            cycling_score = calculate_activity_score(activity, "cycling") * decay_factor
+
+            weighted_scores["overall"] += overall_score
+            weighted_scores["running"] += running_score
+            weighted_scores["cycling"] += cycling_score
+
+        # Scale all scores to target range (0-200) - very conservative scaling
+        final_scores = {
+            sport: min(200, max(0, int(score * 0.5)))
+            for sport, score in weighted_scores.items()
+        }
+
+        daily_scores.append(
+            {
+                "date": day_date.strftime("%Y-%m-%d"),
+                "overall": final_scores["overall"],
+                "running": final_scores["running"],
+                "cycling": final_scores["cycling"],
+            }
+        )
+
+    # Reverse to get chronological order (oldest first)
+    daily_scores.reverse()
+
+    # Only return the last 365 days (skip the first 182 days)
+    days_to_skip = total_days - 365
+    return {"scores": daily_scores[days_to_skip:]}
