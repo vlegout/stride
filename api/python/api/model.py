@@ -101,7 +101,7 @@ class ActivityPublic(ActivityBase):
 
     @field_serializer("tracepoints")
     def serialize_tracepoints(self, tracepoints: List["Tracepoint"]):
-        return sorted(tracepoints, key=lambda a: a.timestamp, reverse=True)
+        return sorted(tracepoints, key=lambda a: a.timestamp)
 
 
 class ActivityPublicWithoutTracepoints(ActivityBase):
