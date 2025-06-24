@@ -22,6 +22,7 @@ const menus = [
   { to: "/activities", label: "Activities" },
   { to: "/weeks", label: "Weeks" },
   { to: "/races", label: "Races" },
+  { to: "/fitness", label: "Fitness" },
 ];
 
 const Header = () => {

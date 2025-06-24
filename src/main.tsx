@@ -12,6 +12,7 @@ import ActivityPage from "./pages/Activity";
 import WeeksPage from "./pages/Weeks";
 import Profile from "./pages/Profile";
 import Upload from "./pages/Upload";
+import Fitness from "./pages/Fitness";
 import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: "/races",
         element: <Home race={true} />,
+      },
+      {
+        path: "/fitness",
+        element: <Fitness />,
       },
     ],
   },
