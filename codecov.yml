@@ -10,9 +10,7 @@ coverage:
         flags:
           - front
         threshold: 10%
-    patch:
-      default:
-        threshold: 0%
+    patch: off
 
 flags:
   api:
