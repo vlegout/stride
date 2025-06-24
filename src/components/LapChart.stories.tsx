@@ -9,16 +9,16 @@ const theme = createTheme();
 
 const createSampleLaps = (numLaps: number, baseTimeSeconds = 330): Lap[] => {
   return Array.from({ length: numLaps }, (_, index) => {
-    const lapTime = baseTimeSeconds + (Math.random() * 60 - 30);
-    const distance = 500 + Math.random() * 1000;
+    const lapTime = baseTimeSeconds + ((index % 3) * 10 - 10);
+    const distance = 750 + (index % 4) * 100;
     return {
       index: index + 1,
       start_time: index * lapTime,
       total_elapsed_time: lapTime,
       total_timer_time: lapTime,
       total_distance: distance,
-      max_heart_rate: 160 + Math.floor(Math.random() * 20),
-      avg_heart_rate: 140 + Math.floor(Math.random() * 20),
+      max_heart_rate: 160 + (index % 3) * 5,
+      avg_heart_rate: 140 + (index % 4) * 5,
       max_speed: 0,
     };
   });
