@@ -716,9 +716,9 @@ def read_fitness_score(
 
         day_end_ts = int(day_end.timestamp())
 
-        # Calculate fitness score for this day based on activities from past 90 days
+        # Calculate fitness score for this day based on activities from past 42 days
         # (rolling fitness window - fitness doesn't disappear overnight)
-        fitness_window_start = day_start - datetime.timedelta(days=90)
+        fitness_window_start = day_start - datetime.timedelta(days=42)
         fitness_window_start_ts = int(fitness_window_start.timestamp())
 
         # Get activities in the fitness window up to this day
@@ -746,8 +746,8 @@ def read_fitness_score(
             # Calculate how many days before this day the activity was
             days_before = (day_end_ts - activity.start_time) / 86400
 
-            # Apply decay: activities lose 50% effectiveness over 90 days
-            decay_factor = max(0.1, 1.0 - (days_before / 90) * 0.5)
+            # Apply decay: activities lose 50% effectiveness over 42 days
+            decay_factor = max(0.1, 1.0 - (days_before / 42) * 0.5)
 
             # Calculate scores for each category
             overall_score = calculate_activity_score(activity) * decay_factor
