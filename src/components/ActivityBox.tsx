@@ -16,6 +16,7 @@ import { Activity } from "../types";
 
 import MapComponent from "./Map";
 import MapOLComponent from "./MapOL";
+import MapMapbox from "./MapMapbox";
 import ActivityLogo from "./ActivityLogo";
 import { StatsCard, PageHeader } from "./ui";
 
@@ -28,7 +29,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
-  const [mapProvider, setMapProvider] = useState<"leaflet" | "openlayers">("leaflet");
+  const [mapProvider, setMapProvider] = useState<"leaflet" | "openlayers" | "mapbox">("leaflet");
 
   const locationText = [activity.city, activity.country].filter(Boolean).join(", ") || "—";
   const mapPoints = activity.tracepoints.map(
@@ -104,10 +105,11 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             <Select
               value={mapProvider}
               label="Map Provider"
-              onChange={(e) => setMapProvider(e.target.value as "leaflet" | "openlayers")}
+              onChange={(e) => setMapProvider(e.target.value as "leaflet" | "openlayers" | "mapbox")}
             >
               <MenuItem value="leaflet">Leaflet</MenuItem>
               <MenuItem value="openlayers">OpenLayers</MenuItem>
+              <MenuItem value="mapbox">Mapbox</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -119,8 +121,16 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             ]}
             points={mapPoints}
           />
-        ) : (
+        ) : mapProvider === "openlayers" ? (
           <MapOLComponent
+            bounds={[
+              [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
+              [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
+            ]}
+            points={mapPoints}
+          />
+        ) : (
+          <MapMapbox
             bounds={[
               [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
               [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
