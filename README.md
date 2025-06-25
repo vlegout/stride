@@ -2,12 +2,13 @@
 
 Web app to visualize run & ride activities from FIT files with charts, maps, and performance metrics.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![codecov](https://codecov.io/gh/vlegout/stride/graph/badge.svg?token=KJ5PHYJVFQ)](https://codecov.io/gh/vlegout/stride)
+
 ## Tech Stack
 
 - React + TypeScript frontend
 - Rust + Python API backend
-
-[![codecov](https://codecov.io/gh/vlegout/stride/graph/badge.svg?token=KJ5PHYJVFQ)](https://codecov.io/gh/vlegout/stride)
 
 ## Environment Variables
 
