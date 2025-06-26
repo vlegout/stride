@@ -782,4 +782,37 @@ def read_fitness_score(
 
     # Only return the last 365 days (skip the first 182 days)
     days_to_skip = total_days - 365
-    return {"scores": daily_scores[days_to_skip:]}
+
+    # Calculate weekly TSS for the last 52 weeks
+    weekly_tss_data = []
+    current_date = datetime.datetime.now()
+
+    for weeks_back in range(52):
+        week_start = current_date - datetime.timedelta(weeks=weeks_back)
+        week_start = week_start - datetime.timedelta(days=week_start.weekday())
+        week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+        week_end = week_start + datetime.timedelta(days=7)
+
+        week_start_ts = int(week_start.timestamp())
+        week_end_ts = int(week_end.timestamp())
+
+        # Get activities for this week
+        week_activities = [
+            activity
+            for activity in activities
+            if week_start_ts <= activity.start_time < week_end_ts
+        ]
+
+        # Calculate total TSS for the week
+        total_tss = sum(
+            activity.training_stress_score or 0.0 for activity in week_activities
+        )
+
+        weekly_tss_data.append(
+            {"week_start": week_start.strftime("%Y-%m-%d"), "total_tss": total_tss}
+        )
+
+    # Reverse to get chronological order (oldest first)
+    weekly_tss_data.reverse()
+
+    return {"scores": daily_scores[days_to_skip:], "weekly_tss": weekly_tss_data}
