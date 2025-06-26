@@ -101,7 +101,11 @@ export const SliderField: Story = {
         type="slider"
         label="Volume"
         value={value}
-        onChange={(newValue) => setValue(newValue as number)}
+        onChange={(newValue) => {
+          if (typeof newValue === "number") {
+            setValue(newValue);
+          }
+        }}
         sliderProps={{
           min: 0,
           max: 100,
