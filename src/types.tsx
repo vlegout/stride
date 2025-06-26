@@ -218,8 +218,17 @@ export const WeeklyTSS = type({
 });
 export type WeeklyTSS = typeof WeeklyTSS.infer;
 
+export const WeeklyActivityData = type({
+  week_start: "string",
+  distance: "number",
+  time: "number",
+});
+export type WeeklyActivityData = typeof WeeklyActivityData.infer;
+
 export const FitnessResponse = type({
   scores: FitnessScore.array(),
   weekly_tss: WeeklyTSS.array(),
+  weekly_running: WeeklyActivityData.array(),
+  weekly_cycling: WeeklyActivityData.array(),
 });
 export type FitnessResponse = typeof FitnessResponse.infer;

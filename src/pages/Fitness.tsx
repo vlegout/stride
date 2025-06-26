@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Grid } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { Line } from "react-chartjs-2";
 import {
@@ -188,7 +188,7 @@ const Fitness = () => {
       },
       title: {
         display: true,
-        text: "Weekly Training Stress Score (Past 52 Weeks)",
+        text: "Weekly Training Stress Score",
       },
       tooltip: {
         callbacks: {
@@ -224,6 +224,102 @@ const Fitness = () => {
   const currentWeeklyTss = weeklyTssValues[weeklyTssValues.length - 1] || 0;
   const maxWeeklyTss = Math.max(...weeklyTssValues);
   const avgWeeklyTss = Math.round(weeklyTssValues.reduce((a, b) => a + b, 0) / weeklyTssValues.length);
+
+  const weeklyRunningDistances = fitnessData.weekly_running.map((week) => week.distance);
+  const weeklyRunningTimes = fitnessData.weekly_running.map((week) => week.time);
+  const weeklyRunningLabels = fitnessData.weekly_running.map((week) => week.week_start);
+
+  const weeklyCyclingDistances = fitnessData.weekly_cycling.map((week) => week.distance);
+  const weeklyCyclingTimes = fitnessData.weekly_cycling.map((week) => week.time);
+  const weeklyCyclingLabels = fitnessData.weekly_cycling.map((week) => week.week_start);
+
+  const runningDistanceChartData = {
+    labels: weeklyRunningLabels,
+    datasets: [
+      {
+        label: "Weekly Distance (km)",
+        data: weeklyRunningDistances,
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.1)",
+        tension: 0.1,
+        fill: true,
+      },
+    ],
+  };
+
+  const runningTimeChartData = {
+    labels: weeklyRunningLabels,
+    datasets: [
+      {
+        label: "Weekly Time (hours)",
+        data: weeklyRunningTimes,
+        borderColor: "rgb(255, 159, 64)",
+        backgroundColor: "rgba(255, 159, 64, 0.1)",
+        tension: 0.1,
+        fill: true,
+      },
+    ],
+  };
+
+  const cyclingDistanceChartData = {
+    labels: weeklyCyclingLabels,
+    datasets: [
+      {
+        label: "Weekly Distance (km)",
+        data: weeklyCyclingDistances,
+        borderColor: "rgb(54, 162, 235)",
+        backgroundColor: "rgba(54, 162, 235, 0.1)",
+        tension: 0.1,
+        fill: true,
+      },
+    ],
+  };
+
+  const cyclingTimeChartData = {
+    labels: weeklyCyclingLabels,
+    datasets: [
+      {
+        label: "Weekly Time (hours)",
+        data: weeklyCyclingTimes,
+        borderColor: "rgb(75, 192, 192)",
+        backgroundColor: "rgba(75, 192, 192, 0.1)",
+        tension: 0.1,
+        fill: true,
+      },
+    ],
+  };
+
+  const createChartOptions = (title: string, yAxisLabel: string) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: title,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: yAxisLabel,
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Week",
+        },
+        ticks: {
+          maxTicksLimit: 8,
+        },
+      },
+    },
+  });
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -277,7 +373,44 @@ const Fitness = () => {
       <SectionContainer>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Weekly Training Stress Score
+            Weekly Activity Metrics (Past 52 Weeks)
+          </Typography>
+        </Box>
+
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box sx={{ height: 300, width: "100%" }}>
+              <Line
+                data={runningDistanceChartData}
+                options={createChartOptions("Weekly Running Distance", "Distance (km)")}
+              />
+            </Box>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box sx={{ height: 300, width: "100%" }}>
+              <Line data={runningTimeChartData} options={createChartOptions("Weekly Running Time", "Time (hours)")} />
+            </Box>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box sx={{ height: 300, width: "100%" }}>
+              <Line
+                data={cyclingDistanceChartData}
+                options={createChartOptions("Weekly Cycling Distance", "Distance (km)")}
+              />
+            </Box>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box sx={{ height: 300, width: "100%" }}>
+              <Line data={cyclingTimeChartData} options={createChartOptions("Weekly Cycling Time", "Time (hours)")} />
+            </Box>
+          </Grid>
+        </Grid>
+      </SectionContainer>
+
+      <SectionContainer>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Weekly Training Stress Score (Past 52 Weeks)
           </Typography>
         </Box>
 

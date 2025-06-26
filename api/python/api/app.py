@@ -696,9 +696,8 @@ def read_fitness_score(
     session: Session = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    # Get activities from the past 1.5 years (to have fitness history before the 365 days we show)
     end_date = datetime.datetime.now()
-    total_days = int(365 * 1.5)  # 547 days
+    total_days = int(365 * 1.5)
     start_date = end_date - datetime.timedelta(days=total_days)
     start_timestamp = int(start_date.timestamp())
 
@@ -710,7 +709,6 @@ def read_fitness_score(
         )
     ).all()
 
-    # Create daily scores for 1.5 years, but only return the last 365 days
     daily_scores = []
 
     for days_back in range(total_days):
@@ -720,12 +718,9 @@ def read_fitness_score(
 
         day_end_ts = int(day_end.timestamp())
 
-        # Calculate fitness score for this day based on activities from past 42 days
-        # (rolling fitness window - fitness doesn't disappear overnight)
         fitness_window_start = day_start - datetime.timedelta(days=42)
         fitness_window_start_ts = int(fitness_window_start.timestamp())
 
-        # Get activities in the fitness window up to this day
         relevant_activities = [
             activity
             for activity in activities
@@ -743,17 +738,13 @@ def read_fitness_score(
             )
             continue
 
-        # Calculate weighted scores for overall, running, and cycling
         weighted_scores = {"overall": 0.0, "running": 0.0, "cycling": 0.0}
 
         for activity in relevant_activities:
-            # Calculate how many days before this day the activity was
             days_before = (day_end_ts - activity.start_time) / 86400
 
-            # Apply decay: activities lose 50% effectiveness over 42 days
             decay_factor = max(0.1, 1.0 - (days_before / 42) * 0.5)
 
-            # Calculate scores for each category
             overall_score = calculate_activity_score(activity) * decay_factor
             running_score = calculate_activity_score(activity, "running") * decay_factor
             cycling_score = calculate_activity_score(activity, "cycling") * decay_factor
@@ -762,7 +753,6 @@ def read_fitness_score(
             weighted_scores["running"] += running_score
             weighted_scores["cycling"] += cycling_score
 
-        # Scale all scores to target range (0-200) - very conservative scaling
         final_scores = {
             sport: min(200, max(0, int(score * 0.5)))
             for sport, score in weighted_scores.items()
@@ -777,14 +767,13 @@ def read_fitness_score(
             }
         )
 
-    # Reverse to get chronological order (oldest first)
     daily_scores.reverse()
 
-    # Only return the last 365 days (skip the first 182 days)
     days_to_skip = total_days - 365
 
-    # Calculate weekly TSS for the last 52 weeks
     weekly_tss_data = []
+    weekly_running_data = []
+    weekly_cycling_data = []
     current_date = datetime.datetime.now()
 
     for weeks_back in range(52):
@@ -796,23 +785,58 @@ def read_fitness_score(
         week_start_ts = int(week_start.timestamp())
         week_end_ts = int(week_end.timestamp())
 
-        # Get activities for this week
         week_activities = [
             activity
             for activity in activities
             if week_start_ts <= activity.start_time < week_end_ts
         ]
 
-        # Calculate total TSS for the week
         total_tss = sum(
             activity.training_stress_score or 0.0 for activity in week_activities
         )
 
-        weekly_tss_data.append(
-            {"week_start": week_start.strftime("%Y-%m-%d"), "total_tss": total_tss}
+        running_activities = [a for a in week_activities if a.sport == "running"]
+        running_distance = sum(
+            (a.total_distance or 0) / 1000.0 for a in running_activities
+        )
+        running_time = sum(
+            (a.total_timer_time or 0) / 3600.0 for a in running_activities
+        )
+        cycling_activities = [a for a in week_activities if a.sport == "cycling"]
+        cycling_distance = sum(
+            (a.total_distance or 0) / 1000.0 for a in cycling_activities
+        )
+        cycling_time = sum(
+            (a.total_timer_time or 0) / 3600.0 for a in cycling_activities
         )
 
-    # Reverse to get chronological order (oldest first)
-    weekly_tss_data.reverse()
+        week_str = week_start.strftime("%Y-%m-%d")
 
-    return {"scores": daily_scores[days_to_skip:], "weekly_tss": weekly_tss_data}
+        weekly_tss_data.append({"week_start": week_str, "total_tss": total_tss})
+
+        weekly_running_data.append(
+            {
+                "week_start": week_str,
+                "distance": round(running_distance, 2),
+                "time": round(running_time, 2),
+            }
+        )
+
+        weekly_cycling_data.append(
+            {
+                "week_start": week_str,
+                "distance": round(cycling_distance, 2),
+                "time": round(cycling_time, 2),
+            }
+        )
+
+    weekly_tss_data.reverse()
+    weekly_running_data.reverse()
+    weekly_cycling_data.reverse()
+
+    return {
+        "scores": daily_scores[days_to_skip:],
+        "weekly_tss": weekly_tss_data,
+        "weekly_running": weekly_running_data,
+        "weekly_cycling": weekly_cycling_data,
+    }
