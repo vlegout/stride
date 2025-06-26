@@ -34,6 +34,10 @@ const ActivityPage = () => {
   const altitudeData = tracePoints.map((point: TracePoint) => point.altitude);
   const powerData = tracePoints.map((point: TracePoint) => point.power);
 
+  const hasValidData = (data: number[]) => {
+    return data.length > 0 && data.some((value) => value && value > 0);
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <SectionContainer spacing="compact">
@@ -48,21 +52,47 @@ const ActivityPage = () => {
         <Performances performances={data.performances} />
       </SectionContainer>
 
-      <SectionContainer spacing="compact">
-        <LineChart labels={labels} data={speedData} />
-      </SectionContainer>
+      {hasValidData(speedData) && (
+        <SectionContainer spacing="compact">
+          <LineChart
+            labels={labels}
+            data={speedData}
+            title="Speed"
+            xAxisLabel="Distance (km)"
+            yAxisLabel="Speed (km/h)"
+          />
+        </SectionContainer>
+      )}
 
-      <SectionContainer spacing="compact">
-        <LineChart labels={labels} data={hrData} />
-      </SectionContainer>
+      {hasValidData(hrData) && (
+        <SectionContainer spacing="compact">
+          <LineChart
+            labels={labels}
+            data={hrData}
+            title="Heart Rate"
+            xAxisLabel="Distance (km)"
+            yAxisLabel="Heart Rate (bpm)"
+          />
+        </SectionContainer>
+      )}
 
-      <SectionContainer spacing="compact">
-        <LineChart labels={labels} data={altitudeData} />
-      </SectionContainer>
+      {hasValidData(altitudeData) && (
+        <SectionContainer spacing="compact">
+          <LineChart
+            labels={labels}
+            data={altitudeData}
+            title="Altitude"
+            xAxisLabel="Distance (km)"
+            yAxisLabel="Altitude (m)"
+          />
+        </SectionContainer>
+      )}
 
-      <SectionContainer spacing="compact">
-        <LineChart labels={labels} data={powerData} />
-      </SectionContainer>
+      {hasValidData(powerData) && (
+        <SectionContainer spacing="compact">
+          <LineChart labels={labels} data={powerData} title="Power" xAxisLabel="Distance (km)" yAxisLabel="Power (W)" />
+        </SectionContainer>
+      )}
     </Box>
   );
 };

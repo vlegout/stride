@@ -48,6 +48,18 @@ const meta = {
       description: "Array of numeric data points for the y-axis",
       control: { type: "object" },
     },
+    title: {
+      description: "Optional chart title",
+      control: { type: "text" },
+    },
+    xAxisLabel: {
+      description: "Optional label for the x-axis",
+      control: { type: "text" },
+    },
+    yAxisLabel: {
+      description: "Optional label for the y-axis",
+      control: { type: "text" },
+    },
   },
 } satisfies Meta<typeof LineChart>;
 
@@ -61,10 +73,23 @@ export const Default: Story = {
   },
 };
 
+export const WithLabels: Story = {
+  args: {
+    labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    data: [12, 19, 3, 5, 2, 3, 15, 8, 12, 7],
+    title: "Sample Chart",
+    xAxisLabel: "Time (minutes)",
+    yAxisLabel: "Value",
+  },
+};
+
 export const PerformanceData: Story = {
   args: {
     labels: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
     data: [180, 175, 185, 190, 188, 192, 195, 200, 198, 205, 202],
+    title: "Heart Rate Performance",
+    xAxisLabel: "Distance (km)",
+    yAxisLabel: "Heart Rate (bpm)",
   },
 };
 

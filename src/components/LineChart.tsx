@@ -4,7 +4,15 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 
-const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
+interface LineChartProps {
+  labels: number[];
+  data: number[];
+  title?: string;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+}
+
+const LineChart = ({ labels, data, title, xAxisLabel, yAxisLabel }: LineChartProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
@@ -22,21 +30,35 @@ const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
         type: "linear",
         max: Math.max(...labels),
         grid: {
-          display: !isSmall, // Hide grid on very small screens
+          display: !isSmall,
         },
         ticks: {
           font: {
             size: isSmall ? 10 : 12,
           },
         },
+        title: {
+          display: !!xAxisLabel,
+          text: xAxisLabel || "",
+          font: {
+            size: isSmall ? 11 : 13,
+          },
+        },
       },
       y: {
         grid: {
-          display: !isSmall, // Hide grid on very small screens
+          display: !isSmall,
         },
         ticks: {
           font: {
             size: isSmall ? 10 : 12,
+          },
+        },
+        title: {
+          display: !!yAxisLabel,
+          text: yAxisLabel || "",
+          font: {
+            size: isSmall ? 11 : 13,
           },
         },
       },
@@ -51,6 +73,17 @@ const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
       },
     },
     plugins: {
+      title: {
+        display: !!title,
+        text: title || "",
+        font: {
+          size: isSmall ? 14 : 16,
+        },
+        padding: {
+          top: 10,
+          bottom: 20,
+        },
+      },
       legend: {
         display: false,
       },
@@ -79,7 +112,7 @@ const LineChart = ({ labels, data }: { labels: number[]; data: number[] }) => {
     ],
   };
 
-  const chartHeight = isSmall ? 80 : isMobile ? 100 : 120;
+  const chartHeight = isSmall ? 140 : isMobile ? 160 : 180;
 
   return (
     <Box
