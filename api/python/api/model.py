@@ -227,6 +227,7 @@ class WeeklySummary(BaseModel):
     total_activities: int
     total_distance: float
     total_time: float
+    total_tss: float
     sports_breakdown: dict[
         str, dict[str, float]
     ]  # {sport: {distance: float, time: float, count: int}}

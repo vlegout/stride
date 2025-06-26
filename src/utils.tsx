@@ -12,6 +12,8 @@ export function formatDistance(distance: number): string {
 }
 
 export function formatDuration(seconds: number): string {
+  if (!seconds || seconds === 0) return "—";
+
   return Duration.fromObject({ seconds: Math.floor(seconds) })
     .rescale()
     .toHuman({ unitDisplay: "narrow" });

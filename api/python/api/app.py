@@ -532,6 +532,9 @@ def read_weeks(
         total_activities = len(activities)
         total_distance = sum(activity.total_distance for activity in activities)
         total_time = sum(activity.total_timer_time for activity in activities)
+        total_tss = sum(
+            activity.training_stress_score or 0.0 for activity in activities
+        )
 
         # Calculate sports breakdown
         sports_breakdown = {}
@@ -552,6 +555,7 @@ def read_weeks(
             total_activities=total_activities,
             total_distance=total_distance,
             total_time=total_time,
+            total_tss=total_tss,
             sports_breakdown=sports_breakdown,
         )
 

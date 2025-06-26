@@ -194,6 +194,7 @@ export const WeeklySummary = type({
   total_activities: "number",
   total_distance: "number",
   total_time: "number",
+  total_tss: "number",
   sports_breakdown: "unknown",
 });
 export type WeeklySummary = typeof WeeklySummary.infer;
