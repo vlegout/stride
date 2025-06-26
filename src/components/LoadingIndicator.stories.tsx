@@ -8,7 +8,8 @@ const meta = {
     layout: "centered",
     docs: {
       description: {
-        component: "A loading indicator component that displays a circular progress spinner with customizable message text.",
+        component:
+          "A loading indicator component that displays a circular progress spinner with customizable message text.",
       },
     },
   },
