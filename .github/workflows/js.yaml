@@ -30,6 +30,7 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
           skip: "dependabot/**"
           autoAcceptChanges: "main"
+          exitOnceUploaded: true
         env:
           VITE_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN_DEV }}
 
