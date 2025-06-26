@@ -46,7 +46,7 @@
     "@chromatic-com/storybook": "^4.0.1",
     "@codecov/vite-plugin": "^1.9.1",
     "@eslint/js": "^9.29.0",
-    "@playwright/test": "^1.47.2",
+    "@playwright/test": "^1.53.1",
     "@storybook/addon-docs": "^9.0.13",
     "@storybook/addon-onboarding": "^9.0.12",
     "@storybook/addon-vitest": "^9.0.13",
