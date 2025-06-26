@@ -7,11 +7,23 @@ import * as api from "../../src/api";
 import * as store from "../../src/store";
 
 // Mock the API module
-vi.spyOn(api, "fetchActivities");
-vi.spyOn(api, "createActivitiesQueryKey");
+vi.mock("../../src/api", async () => {
+  const actual = await vi.importActual("../../src/api");
+  return {
+    ...actual,
+    fetchActivities: vi.fn(),
+    createActivitiesQueryKey: vi.fn(),
+  };
+});
 
 // Mock the store
-vi.spyOn(store, "useActivitiesStore");
+vi.mock("../../src/store", async () => {
+  const actual = await vi.importActual("../../src/store");
+  return {
+    ...actual,
+    useActivitiesStore: vi.fn(),
+  };
+});
 
 // Mock the ActivityLogo component
 vi.mock("../../src/components/ActivityLogo", () => ({
