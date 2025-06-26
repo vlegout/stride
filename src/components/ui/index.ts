@@ -5,5 +5,4 @@ export { default as FormField } from "./FormField";
 export { default as SectionContainer } from "./SectionContainer";
 
 export type { Column, DataTableProps } from "./DataTable";
-export type { BreadcrumbItem } from "./PageHeader";
 export type { SelectOption } from "./FormField";

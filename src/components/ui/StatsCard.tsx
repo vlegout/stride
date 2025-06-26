@@ -7,12 +7,11 @@ import { colors } from "../../colors";
 interface StatsCardProps {
   title: string;
   value: string | number;
-  subtitle?: string;
-  variant?: "primary" | "secondary" | "default";
-  size?: "small" | "medium" | "large";
+  variant?: "primary" | "default";
+  size?: "small" | "large";
 }
 
-const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium" }: StatsCardProps) => {
+const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -27,8 +26,6 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
     switch (variant) {
       case "primary":
         return colors.primarySoft;
-      case "secondary":
-        return "rgba(0, 0, 0, 0.04)";
       default:
         return "rgba(0, 0, 0, 0.02)";
     }
@@ -36,23 +33,19 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
 
   const getValueVariant = () => {
     switch (size) {
-      case "small":
-        return isMobile ? "body1" : "h6";
       case "large":
         return isMobile ? "h4" : "h3";
       default:
-        return isMobile ? "h5" : "h4";
+        return isMobile ? "body1" : "h6";
     }
   };
 
   const getPadding = () => {
     switch (size) {
-      case "small":
-        return { xs: 1.5, sm: 2 };
       case "large":
         return { xs: 2.5, sm: 3 };
       default:
-        return { xs: 2, sm: 2.5 };
+        return { xs: 1.5, sm: 2 };
     }
   };
 
@@ -95,19 +88,6 @@ const StatsCard = ({ title, value, subtitle, variant = "default", size = "medium
       >
         {title}
       </Typography>
-      {subtitle && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{
-            display: "block",
-            mt: 0.5,
-            fontSize: isMobile ? "0.7rem" : "0.75rem",
-          }}
-        >
-          {subtitle}
-        </Typography>
-      )}
     </Box>
   );
 };

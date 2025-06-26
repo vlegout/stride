@@ -1,45 +1,35 @@
 import { ReactNode } from "react";
-import { Box, Paper, Typography, Divider } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface SectionContainerProps {
   children: ReactNode;
   title?: string;
-  subtitle?: string;
-  actions?: ReactNode;
-  variant?: "plain" | "paper" | "bordered";
-  spacing?: "compact" | "normal" | "spacious";
+  variant?: "paper";
+  spacing?: "compact";
   maxWidth?: string | number | Record<string, string | number>;
   centered?: boolean;
-  divider?: boolean;
   elevation?: number;
 }
 
 const SectionContainer = ({
   children,
   title,
-  subtitle,
-  actions,
-  variant = "plain",
-  spacing = "normal",
+  variant,
+  spacing,
   maxWidth,
   centered = false,
-  divider = false,
   elevation = 1,
 }: SectionContainerProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const getSpacing = () => {
-    switch (spacing) {
-      case "compact":
-        return { xs: 1, sm: 2 };
-      case "spacious":
-        return { xs: 3, sm: 4 };
-      default:
-        return { xs: 2, sm: 3 };
+    if (spacing === "compact") {
+      return { xs: 1, sm: 2 };
     }
+    return { xs: 2, sm: 3 };
   };
 
   const getContainerProps = () => {
@@ -63,18 +53,6 @@ const SectionContainer = ({
       };
     }
 
-    if (variant === "bordered") {
-      return {
-        sx: {
-          ...baseProps.sx,
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 1,
-          p: getSpacing(),
-        },
-      };
-    }
-
     return baseProps;
   };
 
@@ -86,44 +64,17 @@ const SectionContainer = ({
   };
 
   const renderHeader = () => {
-    if (!title && !actions) return null;
+    if (!title) return null;
 
     return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexDirection: { xs: "column", sm: "row" },
-          gap: { xs: 1, sm: 2 },
-          mb: title || subtitle ? 2 : 0,
-        }}
-      >
-        {(title || subtitle) && (
-          <Box sx={{ textAlign: centered ? "center" : "left" }}>
-            {title && (
-              <Typography variant={getTitleVariant()} component="h2" gutterBottom={!!subtitle} sx={{ fontWeight: 700 }}>
-                {title}
-              </Typography>
-            )}
-            {subtitle && (
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: isMobile ? "0.75rem" : "0.875rem" }}>
-                {subtitle}
-              </Typography>
-            )}
-          </Box>
-        )}
-
-        {actions && (
-          <Box
-            sx={{
-              flexShrink: 0,
-              alignSelf: { xs: centered ? "center" : "flex-start", sm: "flex-start" },
-            }}
-          >
-            {actions}
-          </Box>
-        )}
+      <Box sx={{ mb: 2 }}>
+        <Typography
+          variant={getTitleVariant()}
+          component="h2"
+          sx={{ fontWeight: 700, textAlign: centered ? "center" : "left" }}
+        >
+          {title}
+        </Typography>
       </Box>
     );
   };
@@ -131,9 +82,6 @@ const SectionContainer = ({
   return (
     <Box {...getContainerProps()}>
       {renderHeader()}
-
-      {divider && (title || actions) && <Divider sx={{ mb: 2 }} />}
-
       {children}
     </Box>
   );
