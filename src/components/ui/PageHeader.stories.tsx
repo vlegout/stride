@@ -1,14 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { MemoryRouter } from "react-router-dom";
 import { Button, IconButton } from "@mui/material";
 import { Add, Settings } from "@mui/icons-material";
-import PageHeader, { BreadcrumbItem } from "./PageHeader";
-
-const breadcrumbs: BreadcrumbItem[] = [
-  { label: "Home", to: "/" },
-  { label: "Activities", to: "/activities" },
-  { label: "Current Activity" },
-];
+import PageHeader from "./PageHeader";
 
 const meta = {
   title: "Components/PageHeader",
@@ -24,11 +17,9 @@ const meta = {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <div style={{ padding: "20px" }}>
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div style={{ padding: "20px" }}>
+        <Story />
+      </div>
     ),
   ],
   argTypes: {
@@ -61,13 +52,6 @@ export const WithSubtitle: Story = {
   },
 };
 
-export const WithBreadcrumbs: Story = {
-  args: {
-    title: "Current Activity",
-    breadcrumbs,
-  },
-};
-
 export const WithActions: Story = {
   args: {
     title: "Activities",
@@ -89,7 +73,6 @@ export const Complete: Story = {
   args: {
     title: "Activity Analysis",
     subtitle: "Detailed view of your training session",
-    breadcrumbs,
     actions: (
       <Button variant="outlined" startIcon={<Settings />}>
         Settings

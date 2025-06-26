@@ -1,24 +1,17 @@
 import { ReactNode } from "react";
-import { Box, Typography, Breadcrumbs, Link } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Link as RouterLink } from "react-router-dom";
-
-export interface BreadcrumbItem {
-  label: string;
-  to?: string;
-}
 
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
-  breadcrumbs?: BreadcrumbItem[];
   actions?: ReactNode;
   variant?: "h4" | "h5" | "h6";
   spacing?: "compact" | "normal" | "spacious";
 }
 
-const PageHeader = ({ title, subtitle, breadcrumbs, actions, variant = "h4", spacing = "normal" }: PageHeaderProps) => {
+const PageHeader = ({ title, subtitle, actions, variant = "h4", spacing = "normal" }: PageHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -54,50 +47,6 @@ const PageHeader = ({ title, subtitle, breadcrumbs, actions, variant = "h4", spa
         textAlign: "center",
       }}
     >
-      {breadcrumbs && breadcrumbs.length > 0 && (
-        <Breadcrumbs
-          aria-label="breadcrumb"
-          sx={{
-            mb: 1,
-            justifyContent: "center",
-            "& .MuiBreadcrumbs-ol": {
-              justifyContent: "center",
-            },
-          }}
-        >
-          {breadcrumbs.map((crumb, index) => {
-            const isLast = index === breadcrumbs.length - 1;
-
-            if (isLast || !crumb.to) {
-              return (
-                <Typography
-                  key={index}
-                  color="text.primary"
-                  variant="body2"
-                  sx={{ fontSize: isMobile ? "0.75rem" : "0.875rem" }}
-                >
-                  {crumb.label}
-                </Typography>
-              );
-            }
-
-            return (
-              <Link
-                key={index}
-                component={RouterLink}
-                to={crumb.to}
-                underline="hover"
-                color="inherit"
-                variant="body2"
-                sx={{ fontSize: isMobile ? "0.75rem" : "0.875rem" }}
-              >
-                {crumb.label}
-              </Link>
-            );
-          })}
-        </Breadcrumbs>
-      )}
-
       <Box
         sx={{
           display: "flex",
