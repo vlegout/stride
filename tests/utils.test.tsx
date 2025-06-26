@@ -7,6 +7,7 @@ import {
   formatInterval,
   formatPace,
   formatDate,
+  isTokenValid,
 } from "../src/utils";
 
 describe("utils", () => {
@@ -119,6 +120,38 @@ describe("utils", () => {
       expect(result).toContain("Dec");
       expect(result).toContain("25");
       expect(result).toContain("2022");
+    });
+  });
+
+  describe("isTokenValid", () => {
+    it("should return true for a valid token", () => {
+      const token = "some_token";
+      const tokenExpiry = Date.now() + 3600 * 1000; // 1 hour from now
+      expect(isTokenValid(token, tokenExpiry)).toBe(true);
+    });
+
+    it("should return false for an expired token", () => {
+      const token = "some_token";
+      const tokenExpiry = Date.now() - 3600 * 1000; // 1 hour ago
+      expect(isTokenValid(token, tokenExpiry)).toBe(false);
+    });
+
+    it("should return false for a null token", () => {
+      const token = null;
+      const tokenExpiry = Date.now() + 3600 * 1000;
+      expect(isTokenValid(token, tokenExpiry)).toBe(false);
+    });
+
+    it("should return false for a null tokenExpiry", () => {
+      const token = "some_token";
+      const tokenExpiry = null;
+      expect(isTokenValid(token, tokenExpiry)).toBe(false);
+    });
+
+    it("should return false for both null", () => {
+      const token = null;
+      const tokenExpiry = null;
+      expect(isTokenValid(token, tokenExpiry)).toBe(false);
     });
   });
 });

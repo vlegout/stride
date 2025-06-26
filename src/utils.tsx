@@ -41,3 +41,7 @@ export function formatPace(speed: number, sport: Sport): string {
     return `${speed.toFixed(1)} km/h`;
   }
 }
+
+export function isTokenValid(token: string | null, tokenExpiry: number | null): boolean {
+  return !!(token && tokenExpiry && Date.now() < tokenExpiry);
+}

@@ -45,7 +45,6 @@ export const useActivitiesStore = create<ActivitiesFilterState>((set) => ({
 }));
 
 interface AuthState {
-  isAuthenticated: boolean;
   user: User | null;
   token: string | null;
   tokenExpiry: number | null;
@@ -53,25 +52,22 @@ interface AuthState {
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   setAuth: (user: User, token: Token) => void;
-  isTokenValid: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
-      isAuthenticated: false,
+    (set) => ({
       user: null,
       token: null,
       tokenExpiry: null,
       logout: () => {
         set({
-          isAuthenticated: false,
           user: null,
           token: null,
           tokenExpiry: null,
         });
       },
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) => set({ user }),
       setToken: (token) => set({ token }),
       setAuth: (user: User, token: Token) => {
         const expiry = Date.now() + token.expires_in * 1000;
@@ -79,18 +75,12 @@ export const useAuthStore = create<AuthState>()(
           user,
           token: token.access_token,
           tokenExpiry: expiry,
-          isAuthenticated: true,
         });
-      },
-      isTokenValid: () => {
-        const state = get();
-        return !!(state.token && state.tokenExpiry && Date.now() < state.tokenExpiry);
       },
     }),
     {
       name: "auth-storage",
       partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
         user: state.user,
         token: state.token,
         tokenExpiry: state.tokenExpiry,
