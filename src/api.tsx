@@ -20,7 +20,7 @@ function getAuthToken(): string | null {
   const authStore = useAuthStore.getState();
 
   // Check if we have a valid JWT token
-  if (isTokenValid(authStore.token, authStore.tokenExpiry) && authStore.token) {
+  if (isTokenValid(authStore.token, authStore.tokenExpiry)) {
     return authStore.token;
   }
 
@@ -120,7 +120,6 @@ export async function fetchCurrentUser(): Promise<User> {
 }
 
 export async function authenticateWithGoogle(userData: UserCreate): Promise<GoogleAuthResponse> {
-  // No token needed for auth endpoint
   const response = await axios.post(`${API_URL}/auth/google/`, userData, {
     headers: {
       "Content-Type": "application/json",
