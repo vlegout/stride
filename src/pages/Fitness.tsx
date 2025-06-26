@@ -50,7 +50,7 @@ const Fitness = () => {
     );
   }
 
-  if (!fitnessData?.scores) {
+  if (!fitnessData?.scores || !fitnessData?.weekly_tss) {
     return (
       <Box sx={{ width: "100%" }}>
         <PageHeader title="Fitness" />
@@ -102,10 +102,6 @@ const Fitness = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: true,
-        position: "top" as const,
-      },
       title: {
         display: true,
         text: "Fitness Score Over Time (Past 365 Days)",
@@ -166,6 +162,69 @@ const Fitness = () => {
   const avgRunning = Math.round(runningScores.reduce((a, b) => a + b, 0) / runningScores.length);
   const avgCycling = Math.round(cyclingScores.reduce((a, b) => a + b, 0) / cyclingScores.length);
 
+  const weeklyTssLabels = fitnessData.weekly_tss.map((week) => week.week_start);
+  const weeklyTssValues = fitnessData.weekly_tss.map((week) => week.total_tss);
+
+  const weeklyTssChartData = {
+    labels: weeklyTssLabels,
+    datasets: [
+      {
+        label: "Weekly TSS",
+        data: weeklyTssValues,
+        borderColor: "rgb(153, 102, 255)",
+        backgroundColor: "rgba(153, 102, 255, 0.1)",
+        tension: 0.1,
+        fill: true,
+      },
+    ],
+  };
+
+  const weeklyTssChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Weekly Training Stress Score (Past 52 Weeks)",
+      },
+      tooltip: {
+        callbacks: {
+          title: function (context: TooltipItem<"line">[]) {
+            return context[0].label || "";
+          },
+          label: function (context: TooltipItem<"line">) {
+            return `TSS: ${context.parsed.y}`;
+          },
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "TSS",
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Week",
+        },
+        ticks: {
+          maxTicksLimit: 10,
+        },
+      },
+    },
+  };
+
+  const currentWeeklyTss = weeklyTssValues[weeklyTssValues.length - 1] || 0;
+  const maxWeeklyTss = Math.max(...weeklyTssValues);
+  const avgWeeklyTss = Math.round(weeklyTssValues.reduce((a, b) => a + b, 0) / weeklyTssValues.length);
+
   return (
     <Box sx={{ width: "100%" }}>
       <PageHeader title="Fitness" />
@@ -199,11 +258,31 @@ const Fitness = () => {
               <Typography variant="body2">Peak: {maxCycling}</Typography>
               <Typography variant="body2">Average: {avgCycling}</Typography>
             </Box>
+            <Box>
+              <Typography variant="subtitle2" color="text.secondary">
+                Weekly TSS
+              </Typography>
+              <Typography variant="body2">Current: {currentWeeklyTss}</Typography>
+              <Typography variant="body2">Peak: {maxWeeklyTss}</Typography>
+              <Typography variant="body2">Average: {avgWeeklyTss}</Typography>
+            </Box>
           </Box>
         </Box>
 
-        <Box sx={{ height: 400, width: "100%" }}>
+        <Box sx={{ height: 400, width: "100%", mb: 4 }}>
           <Line data={chartData} options={chartOptions} />
+        </Box>
+      </SectionContainer>
+
+      <SectionContainer>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Weekly Training Stress Score
+          </Typography>
+        </Box>
+
+        <Box sx={{ height: 400, width: "100%" }}>
+          <Line data={weeklyTssChartData} options={weeklyTssChartOptions} />
         </Box>
       </SectionContainer>
     </Box>

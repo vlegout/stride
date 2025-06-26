@@ -49,7 +49,12 @@ describe("utils", () => {
     });
 
     it("should handle zero duration", () => {
-      expect(formatDuration(0)).toBe("");
+      expect(formatDuration(0)).toBe("—");
+    });
+
+    it("should handle null/undefined duration", () => {
+      expect(formatDuration(null as unknown as number)).toBe("—");
+      expect(formatDuration(undefined as unknown as number)).toBe("—");
     });
 
     it("should floor fractional seconds", () => {

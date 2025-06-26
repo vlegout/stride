@@ -117,24 +117,22 @@ const WeeksPage = () => {
               </Box>
 
               <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                  <StatsCard title="Activities" value={week.total_activities} variant="primary" size="large" />
+                <Grid size={{ xs: 6, sm: 3 }}>
+                  <StatsCard title="Activities" value={week.total_activities} variant="primary" size="small" />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 6, sm: 3 }}>
                   <StatsCard
-                    title="Total Distance"
+                    title="Distance"
                     value={formatDistance(week.total_distance)}
                     variant="primary"
-                    size="large"
+                    size="small"
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                  <StatsCard
-                    title="Total Time"
-                    value={formatDuration(week.total_time)}
-                    variant="primary"
-                    size="large"
-                  />
+                <Grid size={{ xs: 6, sm: 3 }}>
+                  <StatsCard title="Time" value={formatDuration(week.total_time)} variant="primary" size="small" />
+                </Grid>
+                <Grid size={{ xs: 6, sm: 3 }}>
+                  <StatsCard title="TSS" value={week.total_tss?.toFixed(0) || "0"} variant="primary" size="small" />
                 </Grid>
               </Grid>
 
