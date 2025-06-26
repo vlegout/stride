@@ -40,7 +40,7 @@
     "react-konva": "^19.0.6",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.6.2",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",
