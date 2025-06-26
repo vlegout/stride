@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -6,12 +5,11 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
-  actions?: ReactNode;
   variant?: "h4" | "h5" | "h6";
   spacing?: "compact" | "normal" | "spacious";
 }
 
-const PageHeader = ({ title, subtitle, actions, variant = "h4", spacing = "normal" }: PageHeaderProps) => {
+const PageHeader = ({ title, subtitle, variant = "h4", spacing = "normal" }: PageHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -51,8 +49,8 @@ const PageHeader = ({ title, subtitle, actions, variant = "h4", spacing = "norma
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          flexDirection: { xs: "column", sm: actions ? "row" : "column" },
+          justifyContent: "center",
+          flexDirection: "column",
           gap: { xs: 1, sm: 2 },
         }}
       >
@@ -82,17 +80,6 @@ const PageHeader = ({ title, subtitle, actions, variant = "h4", spacing = "norma
             </Typography>
           )}
         </Box>
-
-        {actions && (
-          <Box
-            sx={{
-              flexShrink: 0,
-              alignSelf: { xs: "center", sm: "flex-start" },
-            }}
-          >
-            {actions}
-          </Box>
-        )}
       </Box>
     </Box>
   );

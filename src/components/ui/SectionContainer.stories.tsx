@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button, Typography, Box, Chip } from "@mui/material";
-import { Add, MoreVert } from "@mui/icons-material";
+import { Typography, Box, Chip } from "@mui/material";
 import SectionContainer from "./SectionContainer";
 
 const SampleContent = () => (
@@ -33,12 +32,12 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["plain", "paper", "bordered"],
+      options: ["paper"],
       description: "Visual variant of the container",
     },
     spacing: {
       control: { type: "select" },
-      options: ["compact", "normal", "spacious"],
+      options: ["compact"],
       description: "Spacing inside the container",
     },
     elevation: {
@@ -64,46 +63,11 @@ export const WithTitle: Story = {
   },
 };
 
-export const WithTitleAndSubtitle: Story = {
-  args: {
-    title: "Activity Statistics",
-    subtitle: "Overview of your recent performance",
-    children: <SampleContent />,
-  },
-};
-
-export const WithActions: Story = {
-  args: {
-    title: "Recent Activities",
-    actions: (
-      <>
-        <Button size="small" startIcon={<Add />}>
-          Add New
-        </Button>
-        <Button size="small" variant="outlined">
-          <MoreVert />
-        </Button>
-      </>
-    ),
-    children: <SampleContent />,
-  },
-};
-
 export const PaperVariant: Story = {
   args: {
     title: "Paper Container",
-    subtitle: "Elevated section with shadow",
     variant: "paper",
     elevation: 3,
-    children: <SampleContent />,
-  },
-};
-
-export const BorderedVariant: Story = {
-  args: {
-    title: "Bordered Container",
-    subtitle: "Section with border styling",
-    variant: "bordered",
     children: <SampleContent />,
   },
 };
@@ -111,19 +75,8 @@ export const BorderedVariant: Story = {
 export const CompactSpacing: Story = {
   args: {
     title: "Compact Section",
-    subtitle: "Reduced spacing for dense layouts",
     spacing: "compact",
     variant: "paper",
-    children: <SampleContent />,
-  },
-};
-
-export const SpaciousLayout: Story = {
-  args: {
-    title: "Spacious Section",
-    subtitle: "Extra spacing for breathing room",
-    spacing: "spacious",
-    variant: "bordered",
     children: <SampleContent />,
   },
 };
@@ -131,21 +84,9 @@ export const SpaciousLayout: Story = {
 export const CenteredContent: Story = {
   args: {
     title: "Centered Section",
-    subtitle: "Content aligned to center",
     centered: true,
     maxWidth: 600,
     variant: "paper",
-    children: <SampleContent />,
-  },
-};
-
-export const WithDivider: Story = {
-  args: {
-    title: "Section with Divider",
-    subtitle: "Header separated from content",
-    divider: true,
-    variant: "paper",
-    actions: <Button size="small">Action</Button>,
     children: <SampleContent />,
   },
 };

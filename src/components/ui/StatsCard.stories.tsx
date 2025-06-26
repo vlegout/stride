@@ -22,18 +22,14 @@ const meta = {
       control: "text",
       description: "The statistical value to display",
     },
-    subtitle: {
-      control: "text",
-      description: "Optional subtitle for additional context",
-    },
     variant: {
       control: { type: "select" },
-      options: ["default", "primary", "secondary"],
+      options: ["default", "primary"],
       description: "Visual variant of the card",
     },
     size: {
       control: { type: "select" },
-      options: ["small", "medium", "large"],
+      options: ["small", "large"],
       description: "Size of the card",
     },
   },
@@ -57,27 +53,10 @@ export const Primary: Story = {
   },
 };
 
-export const Secondary: Story = {
-  args: {
-    title: "Avg Speed",
-    value: "12.3 km/h",
-    variant: "secondary",
-  },
-};
-
-export const WithSubtitle: Story = {
-  args: {
-    title: "Elevation Gain",
-    value: "342 m",
-    subtitle: "Total ascent",
-  },
-};
-
 export const Small: Story = {
   args: {
     title: "Calories",
     value: "486",
-    size: "small",
   },
 };
 

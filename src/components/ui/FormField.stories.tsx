@@ -38,16 +38,6 @@ const meta = {
       options: ["text", "select", "checkbox", "slider", "file"],
       description: "Type of form field",
     },
-    size: {
-      control: { type: "select" },
-      options: ["small", "medium"],
-      description: "Size of the field",
-    },
-    variant: {
-      control: { type: "select" },
-      options: ["outlined", "filled", "standard"],
-      description: "Visual variant of the field",
-    },
   },
 } satisfies Meta<typeof FormField>;
 
@@ -68,17 +58,6 @@ export const TextFieldError: Story = {
     label: "Email",
     value: "invalid-email",
     error: true,
-    helperText: "Please enter a valid email address",
-  },
-};
-
-export const MultilineText: Story = {
-  args: {
-    type: "text",
-    label: "Description",
-    multiline: true,
-    rows: 4,
-    placeholder: "Enter description...",
   },
 };
 
@@ -126,8 +105,6 @@ export const SliderField: Story = {
         sliderProps={{
           min: 0,
           max: 100,
-          step: 10,
-          marks: true,
           valueLabelDisplay: "auto",
         }}
       />
@@ -160,14 +137,6 @@ export const FileField: Story = {
   },
 };
 
-export const SmallSize: Story = {
-  args: {
-    type: "text",
-    label: "Small Field",
-    size: "small",
-  },
-};
-
 export const DisabledField: Story = {
   args: {
     type: "text",
@@ -182,6 +151,5 @@ export const RequiredField: Story = {
     type: "text",
     label: "Required Field",
     required: true,
-    helperText: "This field is required",
   },
 };

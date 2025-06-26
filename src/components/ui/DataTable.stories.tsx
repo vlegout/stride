@@ -43,11 +43,6 @@ const meta = {
   },
   tags: ["autodocs"],
   argTypes: {
-    size: {
-      control: { type: "select" },
-      options: ["small", "medium"],
-      description: "Size of the table",
-    },
     responsive: {
       control: "boolean",
       description: "Whether the table should be responsive",
@@ -76,14 +71,6 @@ export const WithSorting: Story = {
     sortColumn: "name",
     sortDirection: "asc",
     onSort: (column: string) => console.log("Sort by:", column),
-  },
-};
-
-export const SmallSize: Story = {
-  args: {
-    columns,
-    rows: mockData,
-    size: "small",
   },
 };
 

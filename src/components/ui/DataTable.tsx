@@ -31,7 +31,6 @@ export interface DataTableProps<T = Record<string, unknown>> {
   sortDirection?: "asc" | "desc";
   onSort?: (column: string) => void;
   minWidth?: string | number;
-  size?: "small" | "medium";
   stickyHeader?: boolean;
   maxHeight?: string | number;
   emptyMessage?: string;
@@ -45,7 +44,6 @@ const DataTable = <T extends Record<string, unknown>>({
   sortDirection = "asc",
   onSort,
   minWidth = 650,
-  size = "medium",
   stickyHeader = false,
   maxHeight,
   emptyMessage = "No data available",
@@ -53,7 +51,7 @@ const DataTable = <T extends Record<string, unknown>>({
 }: DataTableProps<T>) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const tableSize = responsive && isMobile ? "small" : size;
+  const tableSize = responsive && isMobile ? "small" : "medium";
 
   const handleSort = (columnId: string) => {
     if (onSort) {

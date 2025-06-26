@@ -1,6 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button, IconButton } from "@mui/material";
-import { Add, Settings } from "@mui/icons-material";
 import PageHeader from "./PageHeader";
 
 const meta = {
@@ -52,32 +50,10 @@ export const WithSubtitle: Story = {
   },
 };
 
-export const WithActions: Story = {
-  args: {
-    title: "Activities",
-    subtitle: "Manage your training activities",
-    actions: (
-      <>
-        <IconButton>
-          <Settings />
-        </IconButton>
-        <Button variant="contained" startIcon={<Add />}>
-          Add Activity
-        </Button>
-      </>
-    ),
-  },
-};
-
 export const Complete: Story = {
   args: {
     title: "Activity Analysis",
     subtitle: "Detailed view of your training session",
-    actions: (
-      <Button variant="outlined" startIcon={<Settings />}>
-        Settings
-      </Button>
-    ),
   },
 };
 

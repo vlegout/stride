@@ -123,7 +123,7 @@ export default function Login() {
         <PageHeader title="Welcome to Stride" variant="h4" spacing="compact" />
       </Box>
 
-      <SectionContainer maxWidth="400px" centered variant="paper" elevation={3} spacing="normal">
+      <SectionContainer maxWidth="400px" centered variant="paper" elevation={3}>
         {error && (
           <Alert severity="error" sx={{ mb: 3 }}>
             {error}
