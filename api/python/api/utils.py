@@ -12,7 +12,7 @@ from sqlmodel import Session, select
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
 
-from api.model import Activity, Location, Performance, Tracepoint
+from api.model import Activity, Location, Performance, PerformancePower, Tracepoint
 
 
 def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
@@ -99,6 +99,68 @@ def get_best_performances(
         perf.time = t
 
     return performances
+
+
+def get_best_performance_power(
+    activity: Activity, tracepoints: List[Tracepoint]
+) -> List[PerformancePower]:
+    if not tracepoints:
+        return []
+
+    if activity.sport != "cycling":
+        return []
+
+    time_periods = [
+        datetime.timedelta(minutes=1),
+        datetime.timedelta(minutes=5),
+        datetime.timedelta(minutes=10),
+        datetime.timedelta(minutes=20),
+        datetime.timedelta(hours=1),
+        datetime.timedelta(hours=2),
+    ]
+    max_time = tracepoints[-1].timestamp - tracepoints[0].timestamp
+    performance_powers = [
+        PerformancePower(id=uuid.uuid4(), activity_id=activity.id, time=t)
+        for t in time_periods
+        if max_time >= t
+    ]
+    if not performance_powers:
+        return []
+
+    best_powers = [0.0] * len(performance_powers)
+    n = len(tracepoints)
+
+    for i, perf in enumerate(performance_powers):
+        start = 0
+        end = 0
+        while start < n:
+            while (
+                end < n
+                and tracepoints[end].timestamp - tracepoints[start].timestamp
+                < perf.time
+            ):
+                end += 1
+            if end >= n:
+                break
+
+            power_sum = 0.0
+            power_count = 0
+            for j in range(start, end + 1):
+                power = tracepoints[j].power
+                if power is not None:
+                    power_sum += power
+                    power_count += 1
+
+            if power_count > 0:
+                avg_power = power_sum / power_count
+                if avg_power > best_powers[i]:
+                    best_powers[i] = avg_power
+            start += 1
+
+    for perf, best_power in zip(performance_powers, best_powers):
+        perf.power = best_power
+
+    return performance_powers
 
 
 def get_s3_client():

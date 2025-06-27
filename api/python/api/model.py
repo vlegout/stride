@@ -90,6 +90,9 @@ class ActivityBase(SQLModel):
 class Activity(ActivityBase, table=True):
     laps: list["Lap"] = Relationship()
     performances: list["Performance"] = Relationship()
+    performance_power: list["PerformancePower"] = Relationship(
+        back_populates="activity"
+    )
     tracepoints: list["Tracepoint"] = Relationship(back_populates="activity")
     user: User = Relationship(back_populates="activities")
 
@@ -97,6 +100,7 @@ class Activity(ActivityBase, table=True):
 class ActivityPublic(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
+    performance_power: list["PerformancePower"] = []
     tracepoints: list["Tracepoint"] = []
 
     @field_serializer("tracepoints")
@@ -107,6 +111,7 @@ class ActivityPublic(ActivityBase):
 class ActivityPublicWithoutTracepoints(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
+    performance_power: list["PerformancePower"] = []
 
 
 class Pagination(BaseModel):
@@ -149,6 +154,21 @@ class Performance(PerformanceBase, table=True):
 
 
 class PerformanceProfile(PerformanceBase):
+    pass
+
+
+class PerformancePowerBase(SQLModel):
+    time: datetime.timedelta
+    power: float
+
+
+class PerformancePower(PerformancePowerBase, table=True):
+    id: uuid.UUID = Field(primary_key=True)
+    activity_id: uuid.UUID = Field(foreign_key="activity.id")
+    activity: Activity = Relationship(back_populates="performance_power")
+
+
+class PerformancePowerProfil(PerformancePowerBase):
     pass
 
 
@@ -203,6 +223,7 @@ class Profile(BaseModel):
     cycling_total_distance: float = 0.0
     years: List[YearsStatistics] = []
     running_performances: List[PerformanceProfile] = []
+    cycling_performances: List[PerformancePowerProfil] = []
 
 
 class WeeklyActivitySummary(BaseModel):

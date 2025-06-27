@@ -31,6 +31,7 @@ from api.model import (
     ActivityPublicWithoutTracepoints,
     Pagination,
     PerformanceProfile,
+    PerformancePowerProfil,
     Profile,
     Statistic,
     User,
@@ -43,6 +44,7 @@ from api.model import (
 )
 from api.utils import (
     get_best_performances,
+    get_best_performance_power,
     generate_random_string,
     upload_file_to_s3,
     upload_content_to_s3,
@@ -221,6 +223,7 @@ def create_activity(
         )
 
         performances = get_best_performances(activity, tracepoints)
+        performance_powers = get_best_performance_power(activity, tracepoints)
 
         MAX_DATA_POINTS = 500
         while len(tracepoints) > MAX_DATA_POINTS:
@@ -255,6 +258,9 @@ def create_activity(
 
         for performance in performances:
             session.add(performance)
+
+        for performance_power in performance_powers:
+            session.add(performance_power)
 
         session.commit()
         session.refresh(activity)
@@ -395,6 +401,26 @@ def read_profile(
         if performance_dict.get(distance) is not None
     ]
 
+    power_performance_stats = session.execute(
+        text("""
+            SELECT pp.time, MAX(pp.power) as best_power
+            FROM performancepower pp
+            JOIN activity a ON pp.activity_id = a.id
+            WHERE a.user_id = :user_id AND a.status = 'created'
+            GROUP BY pp.time
+            ORDER BY pp.time
+        """),
+        {"user_id": user_id},
+    ).all()
+
+    cycling_performances = [
+        PerformancePowerProfil(
+            time=row[0],
+            power=row[1],
+        )
+        for row in power_performance_stats
+    ]
+
     return Profile(
         n_activities=overall_stats[0],
         run_n_activities=overall_stats[1],
@@ -403,6 +429,7 @@ def read_profile(
         cycling_total_distance=overall_stats[4] or 0.0,
         years=years_data,
         running_performances=running_performances,
+        cycling_performances=cycling_performances,
     )
 
 
