@@ -85,7 +85,7 @@ export const SingleLap: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Chart with a single lap - minimal viable data.",
+        story: "Chart with a single lap - returns null (no chart rendered).",
       },
     },
   },
