@@ -9,6 +9,7 @@ from api.utils import (
     get_delta_lat_lon,
     get_uuid,
     get_best_performances,
+    get_best_performance_power,
     get_activity_location,
 )
 
@@ -291,6 +292,117 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(city, "Nantes")
         self.assertEqual(subdivision, "Loire-Atlantique")
         self.assertEqual(country, "France")
+
+    def test_get_best_performance_power_empty_tracepoints(self):
+        """Test get_best_performance_power with empty tracepoints returns empty list"""
+        activity = Activity(
+            id=uuid.uuid4(),
+            fit="test.fit",
+            title="Test Bike",
+            description="Test",
+            sport="cycling",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=3600.0,
+            total_elapsed_time=3600.0,
+            total_distance=30000.0,
+            total_ascent=100.0,
+            avg_speed=8.33,
+            user_id="test-user-id",
+        )
+
+        performances = get_best_performance_power(activity, [])
+        self.assertEqual(performances, [])
+
+    def test_get_best_performance_power_non_cycling_activity(self):
+        """Test get_best_performance_power with non-cycling sport returns empty list"""
+        activity = Activity(
+            id=uuid.uuid4(),
+            fit="test.fit",
+            title="Test Run",
+            description="Test",
+            sport="running",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=1800.0,
+            total_elapsed_time=1800.0,
+            total_distance=5000.0,
+            total_ascent=50.0,
+            avg_speed=2.78,
+            user_id="test-user-id",
+        )
+
+        tracepoints = [
+            Tracepoint(
+                id=uuid.uuid4(),
+                activity_id=activity.id,
+                lat=47.2183,
+                lon=-1.5536,
+                timestamp=datetime.datetime.now(),
+                distance=5000.0,
+                heart_rate=150,
+                speed=5.0,
+                power=250,
+            )
+        ]
+
+        performances = get_best_performance_power(activity, tracepoints)
+        self.assertEqual(performances, [])
+
+    def test_get_best_performance_power_cycling_activity(self):
+        """Test get_best_performance_power with cycling activity creates power performances"""
+        activity = Activity(
+            id=uuid.uuid4(),
+            fit="test.fit",
+            title="Test Bike",
+            description="Test",
+            sport="cycling",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=3600.0,
+            total_elapsed_time=3600.0,
+            total_distance=30000.0,
+            total_ascent=100.0,
+            avg_speed=8.33,
+            user_id="test-user-id",
+        )
+
+        # Create tracepoints for a 1 hour cycling activity
+        base_time = datetime.datetime.now()
+        tracepoints = []
+        for i in range(60):  # 60 minutes of data
+            tracepoints.append(
+                Tracepoint(
+                    id=uuid.uuid4(),
+                    activity_id=activity.id,
+                    lat=47.2183 + i * 0.0001,
+                    lon=-1.5536 + i * 0.0001,
+                    timestamp=base_time
+                    + datetime.timedelta(seconds=i * 60),  # 1 minute intervals
+                    distance=i * 500,  # 500m per minute
+                    heart_rate=150,
+                    speed=8.33,
+                    power=250 + i,  # Increasing power
+                )
+            )
+
+        performances = get_best_performance_power(activity, tracepoints)
+
+        # Should have power performances for various time periods
+        self.assertGreater(len(performances), 0)
+
+        # Check that all performances have the correct activity_id
+        for perf in performances:
+            self.assertEqual(perf.activity_id, activity.id)
+            self.assertIsNotNone(perf.time)
+            self.assertIsInstance(perf.time, datetime.timedelta)
+            self.assertGreater(perf.power, 0)
 
 
 if __name__ == "__main__":

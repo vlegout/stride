@@ -21,6 +21,12 @@ export const Performance = type({
 });
 export type Performance = typeof Performance.infer;
 
+export const PowerPerformance = type({
+  time: "string",
+  power: "number",
+});
+export type PowerPerformance = typeof PowerPerformance.infer;
+
 export const Lap = type({
   index: "number",
   start_time: "number",
@@ -90,6 +96,7 @@ export const Activity = type({
   laps: [Lap],
   tracepoints: TracePoint.array().atLeastLength(2),
   performances: [Performance],
+  performance_power: [PowerPerformance],
 });
 export type Activity = typeof Activity.infer;
 
@@ -134,6 +141,7 @@ export const Profile = type({
   cycling_total_distance: "number",
   years: [YearsStatistics],
   running_performances: [Performance],
+  cycling_performances: [PowerPerformance],
 });
 export type Profile = typeof Profile.infer;
 

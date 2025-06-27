@@ -14,8 +14,12 @@ from sqlmodel import Session, SQLModel, select
 
 from api.db import engine
 from api.fit import get_activity_from_fit
-from api.model import Activity, Lap, Location, Tracepoint
-from api.utils import get_best_performances, get_activity_location
+from api.model import Activity, Lap, Location, PerformancePower, Tracepoint
+from api.utils import (
+    get_best_performances,
+    get_best_performance_power,
+    get_activity_location,
+)
 
 MAX_DATA_POINTS = 500
 NB_CPUS = 2
@@ -42,7 +46,7 @@ def get_activity_from_yaml(
 
 def get_data(
     session: Session, input_file: str
-) -> tuple[Activity, List[Lap], List[Tracepoint], list]:
+) -> tuple[Activity, List[Lap], List[Tracepoint], list, list]:
     if input_file.endswith(".yaml"):
         activity, laps, tracepoints = get_activity_from_yaml(
             session,
@@ -55,16 +59,19 @@ def get_data(
         )
 
     performances = get_best_performances(activity, tracepoints)
+    performance_powers = get_best_performance_power(activity, tracepoints)
 
     while len(tracepoints) > MAX_DATA_POINTS:
         tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
 
-    return activity, laps, tracepoints, performances
+    return activity, laps, tracepoints, performances, performance_powers
 
 
 def process_file(input_file: str) -> None:
     session = Session(engine)
-    activity, laps, tracepoints, performances = get_data(session, input_file)
+    activity, laps, tracepoints, performances, performance_powers = get_data(
+        session, input_file
+    )
     session.add(activity)
 
     for lap in laps:
@@ -75,6 +82,9 @@ def process_file(input_file: str) -> None:
 
     for performance in performances:
         session.add(performance)
+
+    for performance_power in performance_powers:
+        session.add(performance_power)
 
     session.commit()
 
@@ -129,7 +139,7 @@ def read_fit(
 ):
     """Read a .fit file and parse activity, laps, and tracepoints."""
     session = Session(engine)
-    activity, laps, tracepoints, performances = get_data(
+    activity, laps, tracepoints, performances, performance_powers = get_data(
         session,
         fit_file,
     )
@@ -155,6 +165,12 @@ def read_fit(
         print(tp)
     if len(tracepoints) > 10:
         print(f"... ({len(tracepoints) - 10} more tracepoints)")
+    print("\nRunning Performances:")
+    for performance in performances:
+        print(f"  {performance.distance}m: {performance.time}")
+    print("\nCycling Power Performances:")
+    for performance_power in performance_powers:
+        print(f"  {performance_power.time}: {performance_power.power}W")
 
 
 @app.command()
@@ -235,6 +251,56 @@ def update_locations():
 
     session.commit()
     print(f"Updated {updated_count} activities with location data")
+
+
+@app.command()
+def update_performance_power():
+    """Update power performances for all cycling activities."""
+    session = Session(engine)
+
+    cycling_activities = session.exec(
+        select(Activity).where(
+            Activity.sport == "cycling", Activity.status == "created"
+        )
+    ).all()
+
+    print(f"Found {len(cycling_activities)} cycling activities to process...")
+
+    processed_count = 0
+
+    for activity in cycling_activities:
+        existing_power_performances = session.exec(
+            select(PerformancePower).where(PerformancePower.activity_id == activity.id)
+        ).all()
+
+        if existing_power_performances:
+            print(f"Skipping activity {activity.id} - already has power performances")
+            continue
+
+        tracepoints = session.exec(
+            select(Tracepoint)
+            .where(Tracepoint.activity_id == activity.id)
+            .order_by(Tracepoint.timestamp)
+        ).all()
+
+        if not tracepoints:
+            print(f"Skipping activity {activity.id} - no tracepoints found")
+            continue
+
+        performance_powers = get_best_performance_power(activity, tracepoints)
+
+        if performance_powers:
+            for performance_power in performance_powers:
+                session.add(performance_power)
+            processed_count += 1
+            print(f"Added power performances for activity {activity.id}")
+        else:
+            print(f"No power performances calculated for activity {activity.id}")
+
+    session.commit()
+    print(
+        f"Processed {processed_count} cycling activities and added power performances"
+    )
 
 
 if __name__ == "__main__":

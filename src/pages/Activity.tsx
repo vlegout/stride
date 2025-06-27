@@ -9,6 +9,7 @@ import { TracePoint } from "../types";
 import LineChart from "../components/LineChart";
 import LapChart from "../components/LapChart";
 import Performances from "../components/Performances";
+import PowerPerformances from "../components/PowerPerformances";
 import ActivityBox from "../components/ActivityBox";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { SectionContainer } from "../components/ui";
@@ -51,6 +52,12 @@ const ActivityPage = () => {
       <SectionContainer maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
         <Performances performances={data.performances} />
       </SectionContainer>
+
+      {data.sport === "cycling" && (
+        <SectionContainer maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
+          <PowerPerformances performances={data.performance_power} />
+        </SectionContainer>
+      )}
 
       {hasValidData(speedData) && (
         <SectionContainer spacing="compact">

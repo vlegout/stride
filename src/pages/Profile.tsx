@@ -8,6 +8,7 @@ import { fetchProfile } from "../api";
 import { formatDistance } from "../utils";
 
 import Performances from "../components/Performances";
+import PowerPerformances from "../components/PowerPerformances";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
 
@@ -72,6 +73,10 @@ const Profile = () => {
 
       <SectionContainer title="Running Performances" maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
         <Performances performances={data.running_performances} />
+      </SectionContainer>
+
+      <SectionContainer title="Cycling Power Performances" maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
+        <PowerPerformances performances={data.cycling_performances} />
       </SectionContainer>
 
       <SectionContainer
