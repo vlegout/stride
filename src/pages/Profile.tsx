@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Chart as ChartJS, BarElement, ChartOptions, LinearScale, CategoryScale, Tooltip } from "chart.js";
-import { Bar } from "react-chartjs-2";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
@@ -25,48 +23,6 @@ const Profile = () => {
   if (isPending || isFetching || error) {
     return <LoadingIndicator message="Loading profile..." />;
   }
-
-  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
-
-  const weekOptions: ChartOptions<"bar"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false,
-    plugins: {
-      tooltip: {
-        enabled: true,
-        callbacks: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          label: (context: any) => formatDistance(context.raw),
-        },
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          font: {
-            size: isMobile ? 10 : 12,
-          },
-        },
-      },
-      y: {
-        ticks: {
-          font: {
-            size: isMobile ? 10 : 12,
-          },
-        },
-      },
-    },
-  };
-
-  const weekData = {
-    labels: data.weeks.map((week) => week.week),
-    datasets: [
-      {
-        data: data.weeks.map((week) => week.statistics[0].total_distance),
-      },
-    ],
-  };
 
   const profileStatsColumns: Column[] = [
     {
@@ -112,12 +68,6 @@ const Profile = () => {
 
       <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "800px" }} centered variant="paper">
         <DataTable columns={profileStatsColumns} rows={profileStatsRows} minWidth={isMobile ? 300 : 650} responsive />
-      </SectionContainer>
-
-      <SectionContainer title="Weekly Distance" maxWidth={{ xs: "100%", sm: "90%", md: "800px" }} centered>
-        <Box sx={{ height: { xs: "200px", sm: "250px", md: "300px" } }}>
-          <Bar options={weekOptions} data={weekData} />
-        </Box>
       </SectionContainer>
 
       <SectionContainer title="Running Performances" maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
