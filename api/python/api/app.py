@@ -407,6 +407,12 @@ def read_profile(
             FROM performancepower pp
             JOIN activity a ON pp.activity_id = a.id
             WHERE a.user_id = :user_id AND a.status = 'created'
+            AND pp.time IN (
+                INTERVAL '1 minute',
+                INTERVAL '5 minutes',
+                INTERVAL '20 minutes',
+                INTERVAL '1 hour'
+            )
             GROUP BY pp.time
             ORDER BY pp.time
         """),

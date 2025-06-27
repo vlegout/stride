@@ -110,14 +110,20 @@ def get_best_performance_power(
     if activity.sport != "cycling":
         return []
 
-    time_periods = [
-        datetime.timedelta(minutes=1),
-        datetime.timedelta(minutes=5),
-        datetime.timedelta(minutes=10),
-        datetime.timedelta(minutes=20),
-        datetime.timedelta(hours=1),
-        datetime.timedelta(hours=2),
-    ]
+    time_periods = []
+
+    # Every second up to 2 minutes (120 seconds)
+    for s in range(1, 121):
+        time_periods.append(datetime.timedelta(seconds=s))
+
+    # Every 10 seconds from 130s to 3600s (60 minutes)
+    for s in range(130, 3601, 10):
+        time_periods.append(datetime.timedelta(seconds=s))
+
+    # Every minute after 60 minutes
+    for m in range(61, 241):  # up to 4 hours
+        time_periods.append(datetime.timedelta(minutes=m))
+
     max_time = tracepoints[-1].timestamp - tracepoints[0].timestamp
     performance_powers = [
         PerformancePower(id=uuid.uuid4(), activity_id=activity.id, time=t)
@@ -127,35 +133,63 @@ def get_best_performance_power(
     if not performance_powers:
         return []
 
+    # Convert time periods to seconds for faster comparison
+    period_seconds = [int(p.time.total_seconds()) for p in performance_powers]
     best_powers = [0.0] * len(performance_powers)
     n = len(tracepoints)
 
-    for i, perf in enumerate(performance_powers):
-        start = 0
-        end = 0
-        while start < n:
-            while (
-                end < n
-                and tracepoints[end].timestamp - tracepoints[start].timestamp
-                < perf.time
-            ):
-                end += 1
-            if end >= n:
-                break
+    # Pre-filter tracepoints with valid power data
+    valid_tracepoints = [
+        (i, tp) for i, tp in enumerate(tracepoints) if tp.power is not None
+    ]
 
-            power_sum = 0.0
-            power_count = 0
-            for j in range(start, end + 1):
-                power = tracepoints[j].power
-                if power is not None:
-                    power_sum += power
-                    power_count += 1
+    if not valid_tracepoints:
+        return performance_powers
 
+    # For each time period, use efficient sliding window
+    for period_idx, target_seconds in enumerate(period_seconds):
+        if target_seconds == 0:
+            continue
+
+        max_power = 0.0
+
+        # Use two pointers for sliding window
+        left = 0
+        power_sum = 0.0
+        power_count = 0
+
+        for right in range(n):
+            # Add current point to window if it has power
+            right_power = tracepoints[right].power
+            if right_power is not None:
+                power_sum += right_power
+                power_count += 1
+
+            # Shrink window from left while it's too large
+            while left <= right:
+                time_diff = (
+                    tracepoints[right].timestamp - tracepoints[left].timestamp
+                ).total_seconds()
+                if time_diff < target_seconds:
+                    break
+
+                # Remove left point from window if it has power
+                left_power = tracepoints[left].power
+                if left_power is not None:
+                    power_sum -= left_power
+                    power_count -= 1
+                left += 1
+
+            # Update max power if window is valid
             if power_count > 0:
-                avg_power = power_sum / power_count
-                if avg_power > best_powers[i]:
-                    best_powers[i] = avg_power
-            start += 1
+                time_diff = (
+                    tracepoints[right].timestamp - tracepoints[left].timestamp
+                ).total_seconds()
+                if time_diff >= target_seconds - 1:  # Allow 1 second tolerance
+                    avg_power = power_sum / power_count
+                    max_power = max(max_power, avg_power)
+
+        best_powers[period_idx] = max_power
 
     for perf, best_power in zip(performance_powers, best_powers):
         perf.power = best_power

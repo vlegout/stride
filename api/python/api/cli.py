@@ -267,6 +267,7 @@ def update_performance_power():
     print(f"Found {len(cycling_activities)} cycling activities to process...")
 
     processed_count = 0
+    skipped_count = 0
 
     for activity in cycling_activities:
         existing_power_performances = session.exec(
@@ -277,30 +278,48 @@ def update_performance_power():
             print(f"Skipping activity {activity.id} - already has power performances")
             continue
 
-        tracepoints = session.exec(
-            select(Tracepoint)
-            .where(Tracepoint.activity_id == activity.id)
-            .order_by(Tracepoint.timestamp)
-        ).all()
+        # Check if FIT file exists in data/fit or data/files
+        fit_file_paths = [f"./data/fit/{activity.fit}", f"./data/files/{activity.fit}"]
+        fit_file_path = None
+        for path in fit_file_paths:
+            if os.path.exists(path):
+                fit_file_path = path
+                break
 
-        if not tracepoints:
-            print(f"Skipping activity {activity.id} - no tracepoints found")
+        if fit_file_path is None:
+            print(
+                f"Skipping activity {activity.id} - FIT file {activity.fit} not found in data/fit or data/files"
+            )
+            skipped_count += 1
             continue
 
-        performance_powers = get_best_performance_power(activity, tracepoints)
+        try:
+            # Read tracepoints directly from FIT file
+            _, _, tracepoints = get_activity_from_fit(session, fit_file_path)
 
-        if performance_powers:
-            for performance_power in performance_powers:
-                session.add(performance_power)
-            processed_count += 1
-            print(f"Added power performances for activity {activity.id}")
-        else:
-            print(f"No power performances calculated for activity {activity.id}")
+            if not tracepoints:
+                print(f"Skipping activity {activity.id} - no tracepoints in FIT file")
+                continue
+
+            performance_powers = get_best_performance_power(activity, tracepoints)
+
+            if performance_powers:
+                for performance_power in performance_powers:
+                    session.add(performance_power)
+                processed_count += 1
+                print(f"Added power performances for activity {activity.id}")
+            else:
+                print(f"No power performances calculated for activity {activity.id}")
+
+        except Exception as e:
+            print(f"Error processing FIT file for activity {activity.id}: {e}")
+            skipped_count += 1
 
     session.commit()
     print(
         f"Processed {processed_count} cycling activities and added power performances"
     )
+    print(f"Skipped {skipped_count} activities due to missing FIT files or errors")
 
 
 if __name__ == "__main__":
