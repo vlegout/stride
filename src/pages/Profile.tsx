@@ -75,8 +75,8 @@ const Profile = () => {
         <Performances performances={data.running_performances} />
       </SectionContainer>
 
-      <SectionContainer title="Cycling Power Performances" maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
-        <PowerPerformances performances={data.cycling_performances} />
+      <SectionContainer title="Cycling Performances" maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
+        <PowerPerformances performances={data.cycling_performances} showChart={false} />
       </SectionContainer>
 
       <SectionContainer

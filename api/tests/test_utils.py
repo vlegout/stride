@@ -373,22 +373,22 @@ class TestUtils(unittest.TestCase):
             user_id="test-user-id",
         )
 
-        # Create tracepoints for a 1 hour cycling activity
+        # Create tracepoints for a 1 hour cycling activity with 1-second intervals
         base_time = datetime.datetime.now()
         tracepoints = []
-        for i in range(60):  # 60 minutes of data
+        for i in range(3600):  # 3600 seconds (1 hour) of data
             tracepoints.append(
                 Tracepoint(
                     id=uuid.uuid4(),
                     activity_id=activity.id,
-                    lat=47.2183 + i * 0.0001,
-                    lon=-1.5536 + i * 0.0001,
+                    lat=47.2183 + i * 0.00001,
+                    lon=-1.5536 + i * 0.00001,
                     timestamp=base_time
-                    + datetime.timedelta(seconds=i * 60),  # 1 minute intervals
-                    distance=i * 500,  # 500m per minute
+                    + datetime.timedelta(seconds=i),  # 1 second intervals
+                    distance=i * 8.33,  # Distance based on constant speed
                     heart_rate=150,
                     speed=8.33,
-                    power=250 + i,  # Increasing power
+                    power=250 + (i // 60),  # Power increases every minute
                 )
             )
 

@@ -1,5 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import PowerPerformances from "./PowerPerformances";
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const meta: Meta<typeof PowerPerformances> = {
   title: "Components/PowerPerformances",

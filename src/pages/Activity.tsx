@@ -54,7 +54,7 @@ const ActivityPage = () => {
       </SectionContainer>
 
       {data.sport === "cycling" && (
-        <SectionContainer maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
+        <SectionContainer maxWidth="100%" spacing="compact">
           <PowerPerformances performances={data.performance_power} />
         </SectionContainer>
       )}
