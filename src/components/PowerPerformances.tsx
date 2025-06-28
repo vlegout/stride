@@ -17,8 +17,23 @@ const PowerPerformances = ({
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
+  // Convert ISO 8601 duration to seconds for sorting
+  const durationToSeconds = (duration: string): number => {
+    // Parse PT format (e.g., PT1M, PT5M, PT20M, PT1H, PT30S, etc.)
+    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return 0;
+
+    const hours = parseInt(match[1] || "0");
+    const minutes = parseInt(match[2] || "0");
+    const seconds = parseInt(match[3] || "0");
+
+    return hours * 3600 + minutes * 60 + seconds;
+  };
+
   const allowedTimePeriods = ["PT1M", "PT5M", "PT20M", "PT1H"];
-  const filteredPerformances = performances.filter((performance) => allowedTimePeriods.includes(performance.time));
+  const filteredPerformances = performances
+    .filter((performance) => allowedTimePeriods.includes(performance.time))
+    .sort((a, b) => durationToSeconds(a.time) - durationToSeconds(b.time));
 
   if (performances.length === 0) {
     return null;
@@ -36,19 +51,6 @@ const PowerPerformances = ({
       format: (value) => `${Math.round(value as number)}W`,
     },
   ];
-
-  // Convert ISO 8601 duration to seconds for sorting
-  const durationToSeconds = (duration: string): number => {
-    // Parse PT format (e.g., PT1M, PT5M, PT20M, PT1H, PT30S, etc.)
-    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-    if (!match) return 0;
-
-    const hours = parseInt(match[1] || "0");
-    const minutes = parseInt(match[2] || "0");
-    const seconds = parseInt(match[3] || "0");
-
-    return hours * 3600 + minutes * 60 + seconds;
-  };
 
   // Prepare data for power curve chart (using ALL performances)
   const allSortedPerformances = [...performances]
