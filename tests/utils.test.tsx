@@ -8,7 +8,10 @@ import {
   formatPace,
   formatDate,
   isTokenValid,
+  processTracePointData,
+  hasValidData,
 } from "../src/utils";
+import type { TracePoint } from "../src/types";
 
 describe("utils", () => {
   describe("formatSpeed", () => {
@@ -157,6 +160,162 @@ describe("utils", () => {
       const token = null;
       const tokenExpiry = null;
       expect(isTokenValid(token, tokenExpiry)).toBe(false);
+    });
+  });
+
+  describe("processTracePointData", () => {
+    const mockTracePoint: TracePoint = {
+      lat: 45.123,
+      lng: 2.456,
+      timestamp: "2024-01-01T10:00:00Z",
+      distance: 5000,
+      heart_rate: 150,
+      speed: 12.5,
+      power: 250,
+      altitude: 100,
+    };
+
+    it("should process valid trace point data correctly", () => {
+      const tracePoints = [mockTracePoint];
+      const result = processTracePointData(tracePoints);
+
+      expect(result).toEqual({
+        labels: [5.0], // 5000m converted to 5km
+        speedData: [12.5],
+        hrData: [150],
+        altitudeData: [100],
+        powerData: [250],
+      });
+    });
+
+    it("should handle empty array", () => {
+      const result = processTracePointData([]);
+      expect(result).toEqual({
+        labels: [],
+        speedData: [],
+        hrData: [],
+        altitudeData: [],
+        powerData: [],
+      });
+    });
+
+    it("should handle null/undefined input", () => {
+      const result = processTracePointData(null as unknown as TracePoint[]);
+      expect(result).toEqual({
+        labels: [],
+        speedData: [],
+        hrData: [],
+        altitudeData: [],
+        powerData: [],
+      });
+    });
+
+    it("should handle multiple trace points", () => {
+      const tracePoints = [
+        mockTracePoint,
+        {
+          ...mockTracePoint,
+          distance: 10000,
+          speed: 15.0,
+          heart_rate: 160,
+          altitude: 120,
+          power: 280,
+        },
+      ];
+      const result = processTracePointData(tracePoints);
+
+      expect(result).toEqual({
+        labels: [5.0, 10.0],
+        speedData: [12.5, 15.0],
+        hrData: [150, 160],
+        altitudeData: [100, 120],
+        powerData: [250, 280],
+      });
+    });
+
+    it("should handle trace points with null/undefined values", () => {
+      const tracePointsWithNulls = [
+        {
+          ...mockTracePoint,
+          distance: null as unknown as number,
+          speed: undefined as unknown as number,
+          heart_rate: null as unknown as number,
+          altitude: undefined as unknown as number,
+          power: null as unknown as number,
+        },
+      ];
+      const result = processTracePointData(tracePointsWithNulls);
+
+      expect(result).toEqual({
+        labels: [0], // null distance becomes 0
+        speedData: [0], // undefined speed becomes 0
+        hrData: [0], // null heart_rate becomes 0
+        altitudeData: [0], // undefined altitude becomes 0
+        powerData: [0], // null power becomes 0
+      });
+    });
+
+    it("should handle mixed valid and invalid data", () => {
+      const mixedData = [
+        mockTracePoint,
+        {
+          ...mockTracePoint,
+          distance: null as unknown as number,
+          speed: 20.0,
+          heart_rate: undefined as unknown as number,
+          altitude: 150,
+          power: null as unknown as number,
+        },
+      ];
+      const result = processTracePointData(mixedData);
+
+      expect(result).toEqual({
+        labels: [5.0, 0],
+        speedData: [12.5, 20.0],
+        hrData: [150, 0],
+        altitudeData: [100, 150],
+        powerData: [250, 0],
+      });
+    });
+  });
+
+  describe("hasValidData", () => {
+    it("should return true for arrays with positive values", () => {
+      expect(hasValidData([1, 2, 3])).toBe(true);
+      expect(hasValidData([0, 0, 5])).toBe(true);
+      expect(hasValidData([10.5, 20.3])).toBe(true);
+    });
+
+    it("should return false for empty arrays", () => {
+      expect(hasValidData([])).toBe(false);
+    });
+
+    it("should return false for arrays with only zero values", () => {
+      expect(hasValidData([0, 0, 0])).toBe(false);
+    });
+
+    it("should return false for arrays with only null values", () => {
+      expect(hasValidData([null, null] as unknown as number[])).toBe(false);
+    });
+
+    it("should return false for arrays with only negative values", () => {
+      expect(hasValidData([-1, -2, -3])).toBe(false);
+    });
+
+    it("should return true for arrays with at least one positive value", () => {
+      expect(hasValidData([0, 0, 1])).toBe(true);
+      expect(hasValidData([null, 0, 5] as unknown as number[])).toBe(true);
+      expect(hasValidData([-1, 0, 3])).toBe(true);
+    });
+
+    it("should handle null/undefined input", () => {
+      expect(hasValidData(null as unknown as number[])).toBe(false);
+      expect(hasValidData(undefined as unknown as number[])).toBe(false);
+    });
+
+    it("should handle arrays with mixed null/undefined/number values", () => {
+      expect(hasValidData([null, undefined, 0, 5] as unknown as number[])).toBe(true);
+      expect(hasValidData([null, undefined, 0] as unknown as number[])).toBe(false);
     });
   });
 });
