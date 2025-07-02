@@ -53,7 +53,7 @@ from api.utils import (
     create_default_zones,
     update_user_zones_from_activities,
 )
-from api.fitness import calculate_fitness_scores
+from api.fitness import calculate_fitness_scores, update_ftp_for_date
 
 
 app = FastAPI()
@@ -272,6 +272,11 @@ def create_activity(
 
         # Update user's training zones based on this new activity
         update_user_zones_from_activities(session, user_id)
+
+        # Update FTP if this is a cycling activity
+        if activity.sport == "cycling":
+            activity_date = datetime.date.fromtimestamp(activity.start_time)
+            update_ftp_for_date(session, user_id, activity_date)
 
         return ActivityPublic.model_validate(activity)
 

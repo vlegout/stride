@@ -321,6 +321,71 @@ const Fitness = () => {
     },
   });
 
+  // FTP Chart Data
+  const ftpLabels = fitnessData.ftp?.map((ftp) => ftp.date) || [];
+  const ftpValues = fitnessData.ftp?.map((ftp) => ftp.ftp) || [];
+
+  const ftpChartData = {
+    labels: ftpLabels,
+    datasets: [
+      {
+        label: "FTP (W)",
+        data: ftpValues,
+        borderColor: "rgb(255, 206, 84)",
+        backgroundColor: "rgba(255, 206, 84, 0.1)",
+        tension: 0.1,
+        fill: true,
+      },
+    ],
+  };
+
+  const ftpChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Functional Threshold Power (FTP) Over Time",
+      },
+      tooltip: {
+        callbacks: {
+          title: function (context: TooltipItem<"line">[]) {
+            return context[0].label || "";
+          },
+          label: function (context: TooltipItem<"line">) {
+            return `FTP: ${context.parsed.y}W`;
+          },
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: false,
+        title: {
+          display: true,
+          text: "Power (W)",
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Date",
+        },
+        ticks: {
+          maxTicksLimit: 10,
+        },
+      },
+    },
+  };
+
+  // FTP Statistics
+  const currentFtp = ftpValues.length > 0 ? ftpValues[ftpValues.length - 1] : 0;
+  const maxFtp = ftpValues.length > 0 ? Math.max(...ftpValues) : 0;
+  const avgFtp = ftpValues.length > 0 ? Math.round(ftpValues.reduce((a, b) => a + b, 0) / ftpValues.length) : 0;
+
   return (
     <Box sx={{ width: "100%" }}>
       <PageHeader title="Fitness" />
@@ -362,6 +427,16 @@ const Fitness = () => {
               <Typography variant="body2">Peak: {maxWeeklyTss}</Typography>
               <Typography variant="body2">Average: {avgWeeklyTss}</Typography>
             </Box>
+            {ftpValues.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  FTP (Cycling)
+                </Typography>
+                <Typography variant="body2">Current: {currentFtp}W</Typography>
+                <Typography variant="body2">Peak: {maxFtp}W</Typography>
+                <Typography variant="body2">Average: {avgFtp}W</Typography>
+              </Box>
+            )}
           </Box>
         </Box>
 
@@ -418,6 +493,20 @@ const Fitness = () => {
           <Line data={weeklyTssChartData} options={weeklyTssChartOptions} />
         </Box>
       </SectionContainer>
+
+      {ftpValues.length > 0 && (
+        <SectionContainer>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Functional Threshold Power (Past 52 Weeks)
+            </Typography>
+          </Box>
+
+          <Box sx={{ height: 400, width: "100%" }}>
+            <Line data={ftpChartData} options={ftpChartOptions} />
+          </Box>
+        </SectionContainer>
+      )}
     </Box>
   );
 };

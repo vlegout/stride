@@ -218,9 +218,16 @@ class TestFitness(unittest.TestCase):
         ]
 
         mock_session = Mock()
-        mock_result = Mock()
-        mock_result.all.return_value = mock_activities
-        mock_session.exec.return_value = mock_result
+
+        # Create separate mock results for activities and FTP queries
+        mock_activities_result = Mock()
+        mock_activities_result.all.return_value = mock_activities
+
+        mock_ftp_result = Mock()
+        mock_ftp_result.all.return_value = []  # No FTP records
+
+        # Mock session.exec to return different results based on call order
+        mock_session.exec.side_effect = [mock_activities_result, mock_ftp_result]
 
         result = calculate_fitness_scores(mock_session, "test-user-id")
 
@@ -229,6 +236,7 @@ class TestFitness(unittest.TestCase):
         self.assertIn("weekly_tss", result)
         self.assertIn("weekly_running", result)
         self.assertIn("weekly_cycling", result)
+        self.assertIn("ftp", result)
 
         # Should have 365 daily scores
         self.assertEqual(len(result["scores"]), 365)

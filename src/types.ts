@@ -242,10 +242,17 @@ export const WeeklyActivityData = type({
 });
 export type WeeklyActivityData = typeof WeeklyActivityData.infer;
 
+export const FtpData = type({
+  date: "string",
+  ftp: "number",
+});
+export type FtpData = typeof FtpData.infer;
+
 export const FitnessResponse = type({
   scores: FitnessScore.array(),
   weekly_tss: WeeklyTSS.array(),
   weekly_running: WeeklyActivityData.array(),
   weekly_cycling: WeeklyActivityData.array(),
+  ftp: FtpData.array(),
 });
 export type FitnessResponse = typeof FitnessResponse.infer;
