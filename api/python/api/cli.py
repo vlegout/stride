@@ -1,4 +1,5 @@
 import concurrent.futures
+import datetime
 import json
 import os
 import time
@@ -14,7 +15,16 @@ from sqlmodel import Session, SQLModel, select
 
 from api.db import engine
 from api.fit import get_activity_from_fit
-from api.model import Activity, Lap, Location, PerformancePower, Tracepoint, User, Zone
+from api.model import (
+    Activity,
+    Lap,
+    Location,
+    PerformancePower,
+    Tracepoint,
+    User,
+    Zone,
+    Ftp,
+)
 from api.utils import (
     get_best_performances,
     get_best_performance_power,
@@ -22,6 +32,7 @@ from api.utils import (
     update_user_zones_from_activities,
     create_default_zones,
 )
+from api.fitness import update_ftp_for_date
 
 MAX_DATA_POINTS = 500
 NB_CPUS = 2
@@ -368,6 +379,86 @@ def update_zones():
 
     print(f"Updated zones for {updated_count} users")
     print(f"Skipped {skipped_count} users with no activities")
+
+
+@app.command()
+def update_ftp():
+    """Update FTP values for all cycling activities."""
+    session = Session(engine)
+
+    # Get all cycling activities
+    cycling_activities = session.exec(
+        select(Activity)
+        .where(Activity.sport == "cycling", Activity.status == "created")
+        .order_by(Activity.start_time)
+    ).all()
+
+    print(f"Found {len(cycling_activities)} cycling activities to process...")
+
+    processed_count = 0
+    skipped_count = 0
+    activities_by_user = {}
+
+    # Group activities by user for better processing
+    for activity in cycling_activities:
+        if activity.user_id not in activities_by_user:
+            activities_by_user[activity.user_id] = []
+        activities_by_user[activity.user_id].append(activity)
+
+    print(f"Processing activities for {len(activities_by_user)} users...")
+
+    for user_id, user_activities in activities_by_user.items():
+        print(f"Processing {len(user_activities)} activities for user {user_id}...")
+
+        processed_activities = set()
+
+        for activity in user_activities:
+            activity_date = datetime.date.fromtimestamp(activity.start_time)
+
+            # Skip if we already processed this date for this user
+            date_key = (user_id, activity_date)
+            if date_key in processed_activities:
+                continue
+
+            # Check if FTP already exists for this date
+            existing_ftp = session.exec(
+                select(Ftp).where(Ftp.user_id == user_id, Ftp.date == activity_date)
+            ).first()
+
+            if existing_ftp:
+                print(
+                    f"  Skipping {activity_date} - FTP already exists ({existing_ftp.ftp:.1f}W)"
+                )
+                skipped_count += 1
+                processed_activities.add(date_key)
+                continue
+
+            # Update FTP for this date
+            try:
+                update_ftp_for_date(session, user_id, activity_date)
+
+                # Check if FTP was actually created (i.e., calculated FTP > 0)
+                new_ftp = session.exec(
+                    select(Ftp).where(Ftp.user_id == user_id, Ftp.date == activity_date)
+                ).first()
+
+                if new_ftp:
+                    print(f"  Created FTP for {activity_date}: {new_ftp.ftp:.1f}W")
+                    processed_count += 1
+                else:
+                    print(
+                        f"  No FTP calculated for {activity_date} (insufficient data)"
+                    )
+                    skipped_count += 1
+
+                processed_activities.add(date_key)
+
+            except Exception as e:
+                print(f"  Error processing {activity_date}: {e}")
+                skipped_count += 1
+
+    print(f"Processed {processed_count} FTP records")
+    print(f"Skipped {skipped_count} dates (existing records or insufficient data)")
 
 
 if __name__ == "__main__":

@@ -25,6 +25,7 @@ class UserBase(SQLModel):
 class User(UserBase, table=True):
     activities: list["Activity"] = Relationship(back_populates="user")
     zones: list["Zone"] = Relationship(back_populates="user")
+    ftps: list["Ftp"] = Relationship()
 
 
 class UserPublic(UserBase):
@@ -212,6 +213,21 @@ class Zone(ZoneBase, table=True):
 
 
 class ZonePublic(ZoneBase):
+    pass
+
+
+class FtpBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: str = Field(foreign_key="user.id")
+    date: datetime.date
+    ftp: float
+
+
+class Ftp(FtpBase, table=True):
+    user: User = Relationship(back_populates="ftps")
+
+
+class FtpPublic(FtpBase):
     pass
 
 

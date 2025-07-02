@@ -1,6 +1,6 @@
 import datetime
 from sqlmodel import Session, select
-from api.model import Activity
+from api.model import Activity, Ftp
 
 
 def calculate_activity_score(activity, sport_filter=None):
@@ -204,9 +204,150 @@ def calculate_fitness_scores(session: Session, user_id: str):
     weekly_running_data.reverse()
     weekly_cycling_data.reverse()
 
+    # Get FTP data for the same time period (past 1 year)
+    ftp_start_date = current_date - datetime.timedelta(days=365)
+    ftp_records = session.exec(
+        select(Ftp)
+        .where(Ftp.user_id == user_id, Ftp.date >= ftp_start_date.date())
+        .order_by(Ftp.date.asc())  # type: ignore[attr-defined]
+    ).all()
+
+    # Convert FTP records to the format expected by the frontend
+    ftp_data = []
+    for ftp_record in ftp_records:
+        ftp_data.append(
+            {"date": ftp_record.date.strftime("%Y-%m-%d"), "ftp": ftp_record.ftp}
+        )
+
     return {
         "scores": daily_scores[days_to_skip:],
         "weekly_tss": weekly_tss_data,
         "weekly_running": weekly_running_data,
         "weekly_cycling": weekly_cycling_data,
+        "ftp": ftp_data,
     }
+
+
+def calculate_ftp_from_activities(
+    session: Session, user_id: str, reference_date: datetime.date
+) -> float:
+    """Calculate FTP based on cycling activities from the past 6 months from a given date"""
+
+    start_date = reference_date - datetime.timedelta(days=180)  # 6 months
+    start_timestamp = int(
+        datetime.datetime.combine(start_date, datetime.time.min).timestamp()
+    )
+    end_timestamp = int(
+        datetime.datetime.combine(reference_date, datetime.time.max).timestamp()
+    )
+
+    cycling_activities = session.exec(
+        select(Activity).where(
+            Activity.user_id == user_id,
+            Activity.status == "created",
+            Activity.sport == "cycling",
+            Activity.start_time >= start_timestamp,
+            Activity.start_time <= end_timestamp,
+            Activity.avg_power.is_not(None),  # type: ignore[union-attr]
+        )
+    ).all()
+
+    if not cycling_activities:
+        return 0.0
+
+    # Calculate FTP using different methods and take the highest reasonable value
+    ftp_estimates = []
+
+    # Method 1: 95% of best 20-minute power (if we have NP power)
+    twenty_min_powers = []
+    for activity in cycling_activities:
+        if (
+            activity.np_power and activity.total_timer_time >= 1200
+        ):  # At least 20 minutes
+            twenty_min_powers.append(activity.np_power)
+
+    if twenty_min_powers:
+        best_20min = max(twenty_min_powers)
+        ftp_estimates.append(best_20min * 0.95)
+
+    # Method 2: 75% of best 5-minute power (approximated from max power)
+    max_powers = [
+        activity.max_power for activity in cycling_activities if activity.max_power
+    ]
+    if max_powers:
+        best_5min_approx = max(max_powers) * 0.85  # Approximate 5-min from max power
+        ftp_estimates.append(best_5min_approx * 0.75)
+
+    # Method 3: Use average power from longer rides (>60 minutes) as baseline
+    long_ride_avg_powers = []
+    for activity in cycling_activities:
+        if activity.total_timer_time >= 3600 and activity.avg_power:  # At least 1 hour
+            # Weight by duration - longer rides get more weight
+            duration_hours = activity.total_timer_time / 3600
+            weight = min(duration_hours / 2, 2.0)  # Cap at 2x weight
+            long_ride_avg_powers.extend([activity.avg_power] * int(weight))
+
+    if long_ride_avg_powers:
+        avg_long_ride_power = sum(long_ride_avg_powers) / len(long_ride_avg_powers)
+        ftp_estimates.append(
+            avg_long_ride_power * 1.1
+        )  # Long ride power is typically 90% of FTP
+
+    # Method 4: Use recent high-intensity activities
+    recent_high_intensity = []
+    for activity in cycling_activities:
+        if (
+            activity.avg_power
+            and activity.total_timer_time >= 1800  # At least 30 minutes
+            and activity.avg_power > 200
+        ):  # Some reasonable power threshold
+            recent_high_intensity.append(activity.avg_power)
+
+    if recent_high_intensity:
+        # Take top 25% of high-intensity rides
+        recent_high_intensity.sort(reverse=True)
+        top_quarter = recent_high_intensity[: max(1, len(recent_high_intensity) // 4)]
+        avg_high_intensity = sum(top_quarter) / len(top_quarter)
+        ftp_estimates.append(avg_high_intensity)
+
+    if not ftp_estimates:
+        # Fallback: use overall average power from all cycling activities
+        all_avg_powers = [
+            activity.avg_power for activity in cycling_activities if activity.avg_power
+        ]
+        if all_avg_powers:
+            return sum(all_avg_powers) / len(all_avg_powers)
+        return 0.0
+
+    # Remove outliers (values more than 50% different from median)
+    ftp_estimates.sort()
+    if len(ftp_estimates) >= 3:
+        median = ftp_estimates[len(ftp_estimates) // 2]
+        filtered_estimates = [
+            ftp for ftp in ftp_estimates if abs(ftp - median) / median <= 0.5
+        ]
+        if filtered_estimates:
+            ftp_estimates = filtered_estimates
+
+    # Return the average of remaining estimates
+    return sum(ftp_estimates) / len(ftp_estimates)
+
+
+def update_ftp_for_date(session: Session, user_id: str, date: datetime.date) -> None:
+    """Update or create FTP record for a specific date based on past 6 months of activities"""
+
+    calculated_ftp = calculate_ftp_from_activities(session, user_id, date)
+
+    if calculated_ftp > 0:
+        # Check if FTP record already exists for this date
+        existing_ftp = session.exec(
+            select(Ftp).where(Ftp.user_id == user_id, Ftp.date == date)
+        ).first()
+
+        if existing_ftp:
+            existing_ftp.ftp = calculated_ftp
+        else:
+            new_ftp = Ftp(user_id=user_id, date=date, ftp=calculated_ftp)
+            session.add(new_ftp)
+
+        session.commit()
