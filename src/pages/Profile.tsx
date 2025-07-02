@@ -10,6 +10,7 @@ import { formatDistance } from "../utils";
 import Performances from "../components/Performances";
 import PowerPerformances from "../components/PowerPerformances";
 import LoadingIndicator from "../components/LoadingIndicator";
+import ZoneTables from "../components/ZoneTables";
 import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
 
 const Profile = () => {
@@ -78,6 +79,8 @@ const Profile = () => {
       <SectionContainer title="Cycling Performances" maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
         <PowerPerformances performances={data.cycling_performances} showChart={false} />
       </SectionContainer>
+
+      <ZoneTables zones={data.zones} />
 
       <SectionContainer
         title="Yearly Statistics"
