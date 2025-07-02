@@ -24,6 +24,7 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     activities: list["Activity"] = Relationship(back_populates="user")
+    zones: list["Zone"] = Relationship(back_populates="user")
 
 
 class UserPublic(UserBase):
@@ -198,6 +199,22 @@ class Location(SQLModel, table=True):
     country: str | None = None
 
 
+class ZoneBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: str = Field(foreign_key="user.id")
+    index: int
+    type: str = Field(regex="^(heart_rate|pace|power)$")
+    max_value: float
+
+
+class Zone(ZoneBase, table=True):
+    user: User = Relationship(back_populates="zones")
+
+
+class ZonePublic(ZoneBase):
+    pass
+
+
 class Statistic(BaseModel):
     sport: str
     n_activities: int = 0
@@ -224,6 +241,7 @@ class Profile(BaseModel):
     years: List[YearsStatistics] = []
     running_performances: List[PerformanceProfile] = []
     cycling_performances: List[PerformancePowerProfil] = []
+    zones: List[ZonePublic] = []
 
 
 class WeeklyActivitySummary(BaseModel):

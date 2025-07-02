@@ -133,6 +133,15 @@ export const WeeksStatistics = type({
 });
 export type WeeksStatistics = typeof WeeksStatistics.infer;
 
+export const Zone = type({
+  id: "string.uuid.v4",
+  user_id: "string",
+  index: "number",
+  type: "'heart_rate'|'pace'|'power'",
+  max_value: "number",
+});
+export type Zone = typeof Zone.infer;
+
 export const Profile = type({
   n_activities: "number",
   run_n_activities: "number",
@@ -142,6 +151,7 @@ export const Profile = type({
   years: [YearsStatistics],
   running_performances: [Performance],
   cycling_performances: [PowerPerformance],
+  zones: Zone.array(),
 });
 export type Profile = typeof Profile.infer;
 

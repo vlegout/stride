@@ -41,6 +41,8 @@ from api.model import (
     WeeklySummary,
     WeeksResponse,
     YearsStatistics,
+    Zone,
+    ZonePublic,
 )
 from api.utils import (
     get_best_performances,
@@ -48,6 +50,8 @@ from api.utils import (
     generate_random_string,
     upload_file_to_s3,
     upload_content_to_s3,
+    create_default_zones,
+    update_user_zones_from_activities,
 )
 from api.fitness import calculate_fitness_scores
 
@@ -266,6 +270,9 @@ def create_activity(
         session.commit()
         session.refresh(activity)
 
+        # Update user's training zones based on this new activity
+        update_user_zones_from_activities(session, user_id)
+
         return ActivityPublic.model_validate(activity)
 
     except Exception as e:
@@ -428,6 +435,13 @@ def read_profile(
         for row in power_performance_stats
     ]
 
+    # Get user zones
+    zones = session.exec(
+        select(Zone).where(Zone.user_id == user_id).order_by(Zone.type, Zone.index)  # type: ignore
+    ).all()
+
+    zones_public = [ZonePublic.model_validate(zone) for zone in zones]
+
     return Profile(
         n_activities=overall_stats[0],
         run_n_activities=overall_stats[1],
@@ -437,6 +451,7 @@ def read_profile(
         years=years_data,
         running_performances=running_performances,
         cycling_performances=cycling_performances,
+        zones=zones_public,
     )
 
 
@@ -575,6 +590,10 @@ def google_auth(
             session.add(user)
             session.commit()
             session.refresh(user)
+
+            # Create default zones for the new user
+            create_default_zones(session, user.id)
+            session.commit()
 
             user_public = UserPublic.model_validate(user)
             token = create_token_response(user.id, user.email)

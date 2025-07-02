@@ -14,11 +14,13 @@ from sqlmodel import Session, SQLModel, select
 
 from api.db import engine
 from api.fit import get_activity_from_fit
-from api.model import Activity, Lap, Location, PerformancePower, Tracepoint
+from api.model import Activity, Lap, Location, PerformancePower, Tracepoint, User, Zone
 from api.utils import (
     get_best_performances,
     get_best_performance_power,
     get_activity_location,
+    update_user_zones_from_activities,
+    create_default_zones,
 )
 
 MAX_DATA_POINTS = 500
@@ -320,6 +322,52 @@ def update_performance_power():
         f"Processed {processed_count} cycling activities and added power performances"
     )
     print(f"Skipped {skipped_count} activities due to missing FIT files or errors")
+
+
+@app.command()
+def update_zones():
+    """Update training zones for all users based on their existing activities."""
+    session = Session(engine)
+
+    # Get all users
+    users = session.exec(select(User)).all()
+
+    print(f"Found {len(users)} users to process...")
+
+    updated_count = 0
+    skipped_count = 0
+
+    for user in users:
+        # Check if user has any activities
+        activities = session.exec(
+            select(Activity).where(
+                Activity.user_id == user.id, Activity.status == "created"
+            )
+        ).all()
+
+        if not activities:
+            print(f"Skipping user {user.id} ({user.email}) - no activities found")
+            skipped_count += 1
+            continue
+
+        # Check if user has zones
+        existing_zones = session.exec(select(Zone).where(Zone.user_id == user.id)).all()
+
+        if not existing_zones:
+            print(f"Creating default zones for user {user.id} ({user.email}) first...")
+            create_default_zones(session, user.id)
+            session.commit()
+
+        # Update zones based on activities
+        print(
+            f"Updating zones for user {user.id} ({user.email}) based on {len(activities)} activities..."
+        )
+        update_user_zones_from_activities(session, user.id)
+        updated_count += 1
+        print(f"Updated zones for user {user.id} ({user.email})")
+
+    print(f"Updated zones for {updated_count} users")
+    print(f"Skipped {skipped_count} users with no activities")
 
 
 if __name__ == "__main__":
