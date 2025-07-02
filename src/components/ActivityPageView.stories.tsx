@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router-dom";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
 import ActivityPageView from "./ActivityPageView";
-import { ProcessedChartData } from "../utils/activityDataProcessors";
+import { ProcessedChartData } from "../utils";
 import { Activity } from "../types";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);

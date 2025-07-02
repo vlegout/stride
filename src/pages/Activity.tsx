@@ -4,7 +4,7 @@ import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, Line
 import LoadingIndicator from "../components/LoadingIndicator";
 import ActivityPageView from "../components/ActivityPageView";
 import { useActivityData } from "../hooks";
-import { processTracePointData } from "../utils/activityDataProcessors";
+import { processTracePointData } from "../utils";
 import { TracePoint } from "../types";
 
 const ActivityPage = () => {

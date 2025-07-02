@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
 import ActivityCharts from "./ActivityCharts";
-import { ProcessedChartData } from "../utils/activityDataProcessors";
+import { ProcessedChartData } from "../utils";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 

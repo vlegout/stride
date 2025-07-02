@@ -5,7 +5,7 @@ import Performances from "./Performances";
 import PowerPerformances from "./PowerPerformances";
 import ActivityCharts from "./ActivityCharts";
 import { SectionContainer } from "./ui";
-import { ProcessedChartData } from "../utils/activityDataProcessors";
+import { ProcessedChartData } from "../utils";
 import { Activity } from "../types";
 
 interface ActivityPageViewProps {
