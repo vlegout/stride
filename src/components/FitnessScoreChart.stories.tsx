@@ -22,9 +22,9 @@ const generateMockScores = (days: number) => {
     const date = new Date(baseDate);
     date.setDate(date.getDate() + i);
 
-    const overall = Math.max(0, 75 + Math.sin(i / 30) * 15 + (Math.random() - 0.5) * 10);
-    const running = Math.max(0, overall * (0.8 + Math.random() * 0.4));
-    const cycling = Math.max(0, overall * (0.6 + Math.random() * 0.4));
+    const overall = Math.max(0, 75 + Math.sin(i / 30) * 15 + Math.cos(i / 20) * 5);
+    const running = Math.max(0, overall * (0.8 + Math.sin(i / 40) * 0.2));
+    const cycling = Math.max(0, overall * (0.6 + Math.cos(i / 35) * 0.2));
 
     scores.push({
       date: date.toISOString().split("T")[0],
@@ -51,11 +51,11 @@ export const ShortPeriod: Story = {
 
 export const HighVariability: Story = {
   args: {
-    scores: generateMockScores(365).map((score) => ({
+    scores: generateMockScores(365).map((score, i) => ({
       ...score,
-      overall: Math.max(0, score.overall + (Math.random() - 0.5) * 30),
-      running: Math.max(0, score.running + (Math.random() - 0.5) * 25),
-      cycling: Math.max(0, score.cycling + (Math.random() - 0.5) * 25),
+      overall: Math.max(0, score.overall + Math.sin(i / 25) * 15),
+      running: Math.max(0, score.running + Math.cos(i / 20) * 12.5),
+      cycling: Math.max(0, score.cycling + Math.sin(i / 18) * 12.5),
     })),
   },
 };

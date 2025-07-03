@@ -23,7 +23,7 @@ const generateWeeklyData = (weeks: number, baseDistance: number, baseTime: numbe
     date.setDate(date.getDate() + i * 7);
 
     const seasonalFactor = 0.8 + 0.4 * Math.sin((i / weeks) * 2 * Math.PI);
-    const randomFactor = 0.7 + Math.random() * 0.6;
+    const randomFactor = 0.7 + Math.abs(Math.cos(i / 12)) * 0.6;
 
     data.push({
       week_start: date.toISOString().split("T")[0],

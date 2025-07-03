@@ -23,7 +23,7 @@ const generateTSSData = (weeks: number) => {
     date.setDate(date.getDate() + i * 7);
 
     const seasonalFactor = 0.7 + 0.6 * Math.sin((i / weeks) * 2 * Math.PI);
-    const randomFactor = 0.6 + Math.random() * 0.8;
+    const randomFactor = 0.6 + Math.abs(Math.sin(i / 8)) * 0.8;
     const baseTSS = 350;
 
     data.push({
@@ -67,9 +67,9 @@ export const ShortPeriod: Story = {
 
 export const HighVariability: Story = {
   args: {
-    weeklyTss: generateTSSData(52).map((week) => ({
+    weeklyTss: generateTSSData(52).map((week, i) => ({
       ...week,
-      total_tss: Math.max(0, week.total_tss + (Math.random() - 0.5) * 400),
+      total_tss: Math.max(0, week.total_tss + Math.sin(i / 6) * 200),
     })),
   },
 };
