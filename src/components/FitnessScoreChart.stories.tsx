@@ -55,7 +55,7 @@ export const HighVariability: Story = {
       ...score,
       overall: Math.max(0, score.overall + Math.sin(i / 25) * 15),
       running: Math.max(0, score.running + Math.cos(i / 20) * 12.5),
-      cycling: Math.max(0, score.cycling + Math.sin(i / 18) * 12.5),
+      cycling: Math.round(Math.max(0, score.cycling + Math.sin(i / 18) * 12.5)),
     })),
   },
 };
