@@ -69,7 +69,7 @@ export const HighVariability: Story = {
   args: {
     weeklyTss: generateTSSData(52).map((week, i) => ({
       ...week,
-      total_tss: Math.max(0, week.total_tss + Math.sin(i / 6) * 200),
+      total_tss: Math.round(Math.max(0, week.total_tss + Math.sin(i / 6) * 200)),
     })),
   },
 };
