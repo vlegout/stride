@@ -25,7 +25,7 @@ const generateFTPData = (dataPoints: number, baseFTP: number) => {
     date.setDate(date.getDate() + i * 30);
 
     const trend = Math.sin((i / dataPoints) * Math.PI) * 0.1;
-    const noise = (Math.random() - 0.5) * 0.05;
+    const noise = Math.sin(i / 7) * 0.025;
     currentFTP = Math.round(currentFTP * (1 + trend + noise));
 
     data.push({
