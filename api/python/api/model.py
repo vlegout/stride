@@ -220,7 +220,7 @@ class FtpBase(SQLModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: str = Field(foreign_key="user.id")
     date: datetime.date
-    ftp: float
+    ftp: int
 
 
 class Ftp(FtpBase, table=True):

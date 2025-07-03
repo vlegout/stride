@@ -345,9 +345,9 @@ def update_ftp_for_date(session: Session, user_id: str, date: datetime.date) -> 
         ).first()
 
         if existing_ftp:
-            existing_ftp.ftp = calculated_ftp
+            existing_ftp.ftp = round(calculated_ftp)
         else:
-            new_ftp = Ftp(user_id=user_id, date=date, ftp=calculated_ftp)
+            new_ftp = Ftp(user_id=user_id, date=date, ftp=round(calculated_ftp))
             session.add(new_ftp)
 
         session.commit()
