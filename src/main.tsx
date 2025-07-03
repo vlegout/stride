@@ -11,6 +11,7 @@ import ActivitiesPage from "./pages/Activities";
 import ActivityPage from "./pages/Activity";
 import WeeksPage from "./pages/Weeks";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Upload from "./pages/Upload";
 import Fitness from "./pages/Fitness";
 import Login from "./pages/Login";
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/settings",
+        element: <Settings />,
       },
       {
         path: "/upload",
