@@ -35,6 +35,7 @@ export interface DataTableProps<T = Record<string, unknown>> {
   maxHeight?: string | number;
   emptyMessage?: string;
   responsive?: boolean;
+  showHeader?: boolean;
 }
 
 const DataTable = <T extends Record<string, unknown>>({
@@ -48,6 +49,7 @@ const DataTable = <T extends Record<string, unknown>>({
   maxHeight,
   emptyMessage = "No data available",
   responsive = true,
+  showHeader = true,
 }: DataTableProps<T>) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -112,33 +114,35 @@ const DataTable = <T extends Record<string, unknown>>({
         stickyHeader={stickyHeader}
         aria-label="data table"
       >
-        <TableHead>
-          <TableRow>
-            {columns.map((column) => (
-              <TableCell
-                key={column.id}
-                align={column.align || "left"}
-                sortDirection={sortColumn === column.id ? sortDirection : false}
-                sx={{
-                  fontWeight: "bold",
-                  ...getResponsiveStyles(column),
-                }}
-              >
-                {column.sortable && onSort ? (
-                  <TableSortLabel
-                    active={sortColumn === column.id}
-                    direction={sortColumn === column.id ? sortDirection : "asc"}
-                    onClick={() => handleSort(column.id)}
-                  >
-                    {column.label}
-                  </TableSortLabel>
-                ) : (
-                  column.label
-                )}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
+        {showHeader && (
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align={column.align || "left"}
+                  sortDirection={sortColumn === column.id ? sortDirection : false}
+                  sx={{
+                    fontWeight: "bold",
+                    ...getResponsiveStyles(column),
+                  }}
+                >
+                  {column.sortable && onSort ? (
+                    <TableSortLabel
+                      active={sortColumn === column.id}
+                      direction={sortColumn === column.id ? sortDirection : "asc"}
+                      onClick={() => handleSort(column.id)}
+                    >
+                      {column.label}
+                    </TableSortLabel>
+                  ) : (
+                    column.label
+                  )}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+        )}
         <TableBody>
           {rows.map((row, index) => (
             <TableRow

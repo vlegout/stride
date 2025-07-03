@@ -11,6 +11,7 @@ import Avatar from "@mui/material/Avatar";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
+import SettingsIcon from "@mui/icons-material/Settings";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
@@ -100,6 +101,18 @@ const Header = () => {
                     </Link>
                   </MenuItem>
                 ))}
+                <MenuItem onClick={handleMenuClose}>
+                  <Link
+                    to="/settings"
+                    style={{
+                      textDecoration: "none",
+                      color: colors.text.primary,
+                      width: "100%",
+                    }}
+                  >
+                    Settings
+                  </Link>
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>
                   <LogoutIcon />
                 </MenuItem>
@@ -171,6 +184,20 @@ const Header = () => {
                       >
                         {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email}
                       </Typography>
+                    </Link>
+                    <Link to="/settings" style={{ textDecoration: "none" }}>
+                      <IconButton
+                        color="inherit"
+                        aria-label="settings"
+                        sx={{
+                          color: colors.text.onLight,
+                          "&:hover": {
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          },
+                        }}
+                      >
+                        <SettingsIcon />
+                      </IconButton>
                     </Link>
                   </>
                 )}
