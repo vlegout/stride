@@ -9,7 +9,8 @@ import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import { Activity, ActivitiesQueryParams, Sport } from "../types";
 import ActivityLogo from "./ActivityLogo";
 import { useActivitiesStore } from "../store";
-import LoadingIndicator from "./LoadingIndicator";
+import LoadingState from "./LoadingState";
+import ErrorState from "./ErrorState";
 import { DataTable, Column } from "./ui";
 
 const ActivitiesTable = () => {
@@ -26,7 +27,7 @@ const ActivitiesTable = () => {
     orderBy,
   };
 
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: createActivitiesQueryKey(queryParams),
     queryFn: fetchActivities,
     placeholderData: keepPreviousData,
@@ -99,8 +100,9 @@ const ActivitiesTable = () => {
     { id: "device", label: "Device" },
   ];
 
-  if (isPending || error) return <LoadingIndicator message="Loading activities..." />;
-  if (!data) return <LoadingIndicator message="Loading activities..." />;
+  if (isPending) return <LoadingState message="Loading activities..." />;
+  if (error) return <ErrorState error={error} onRetry={refetch} />;
+  if (!data) return <LoadingState message="Loading activities..." />;
 
   return (
     <>

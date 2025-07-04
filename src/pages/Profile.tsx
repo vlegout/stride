@@ -9,12 +9,13 @@ import { formatDistance } from "../utils";
 
 import Performances from "../components/Performances";
 import PowerPerformances from "../components/PowerPerformances";
-import LoadingIndicator from "../components/LoadingIndicator";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 import ZoneTables from "../components/ZoneTables";
 import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
 
 const Profile = () => {
-  const { data, error, isPending, isFetching } = useQuery({
+  const { data, error, isPending, isFetching, refetch } = useQuery({
     queryKey: ["id"],
     queryFn: fetchProfile,
   });
@@ -22,8 +23,12 @@ const Profile = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  if (isPending || isFetching || error) {
-    return <LoadingIndicator message="Loading profile..." />;
+  if (isPending || isFetching) {
+    return <LoadingState message="Loading profile..." />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} onRetry={refetch} />;
   }
 
   const profileStatsColumns: Column[] = [

@@ -17,6 +17,7 @@ import Fitness from "./pages/Fitness";
 import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 import "leaflet/dist/leaflet.css";
 
@@ -85,7 +86,9 @@ createRoot(document.getElementById("root")!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <ErrorBoundary>
+          <RouterProvider router={router} />
+        </ErrorBoundary>
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,

@@ -7,7 +7,8 @@ import { fetchWeeks } from "../api";
 import type { Sport } from "../types";
 import { formatDate, formatDuration, formatDistance, formatPace } from "../utils";
 import ActivityLogo from "../components/ActivityLogo";
-import LoadingIndicator from "../components/LoadingIndicator";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../components/ui";
 
 interface ActivityRow {
@@ -21,21 +22,18 @@ const WeeksPage = () => {
     data: weeksData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["weeks"],
     queryFn: fetchWeeks,
   });
 
   if (isLoading) {
-    return <LoadingIndicator message="Loading weekly summary..." />;
+    return <LoadingState message="Loading weekly summary..." />;
   }
 
   if (error) {
-    return (
-      <Box sx={{ mt: 2 }}>
-        <Alert severity="error">Failed to load weeks data</Alert>
-      </Box>
-    );
+    return <ErrorState error={error} onRetry={refetch} />;
   }
 
   if (!weeksData || !weeksData.weeks) {

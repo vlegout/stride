@@ -14,7 +14,8 @@ import {
 
 import PageHeader from "../components/ui/PageHeader";
 import SectionContainer from "../components/ui/SectionContainer";
-import LoadingIndicator from "../components/LoadingIndicator";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 import FitnessOverview from "../components/FitnessOverview";
 import FitnessScoreChart from "../components/FitnessScoreChart";
 import WeeklyMetricsCharts from "../components/WeeklyMetricsCharts";
@@ -29,6 +30,7 @@ const Fitness = () => {
     data: fitnessData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["fitness"],
     queryFn: fetchFitness,
@@ -38,7 +40,7 @@ const Fitness = () => {
     return (
       <Box sx={{ width: "100%" }}>
         <PageHeader title="Fitness" />
-        <LoadingIndicator />
+        <LoadingState message="Loading fitness data..." />
       </Box>
     );
   }
@@ -47,9 +49,7 @@ const Fitness = () => {
     return (
       <Box sx={{ width: "100%" }}>
         <PageHeader title="Fitness" />
-        <SectionContainer>
-          <Typography color="error">Failed to load fitness data</Typography>
-        </SectionContainer>
+        <ErrorState error={error} onRetry={refetch} />
       </Box>
     );
   }

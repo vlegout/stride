@@ -3,8 +3,10 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
 import Header from "../components/Header";
+import { useApiNavigation } from "../hooks/useApiNavigation";
 
 const Layout = () => {
+  useApiNavigation();
   return (
     <Box>
       <Header />

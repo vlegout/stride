@@ -4,7 +4,8 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { fetchCurrentUser } from "../api";
-import LoadingIndicator from "../components/LoadingIndicator";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
 
 const Settings = () => {
@@ -13,6 +14,7 @@ const Settings = () => {
     error,
     isPending,
     isFetching,
+    refetch,
   } = useQuery({
     queryKey: ["currentUser"],
     queryFn: fetchCurrentUser,
@@ -21,8 +23,12 @@ const Settings = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  if (isPending || isFetching || error) {
-    return <LoadingIndicator message="Loading settings..." />;
+  if (isPending || isFetching) {
+    return <LoadingState message="Loading settings..." />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} onRetry={refetch} />;
   }
 
   const userInfoColumns: Column[] = [
