@@ -10,9 +10,11 @@ import Box from "@mui/material/Box";
 const PowerPerformances = ({
   performances,
   showChart = true,
+  showTitle = true,
 }: {
   performances: PowerPerformance[];
   showChart?: boolean;
+  showTitle?: boolean;
 }) => {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
@@ -126,7 +128,7 @@ const PowerPerformances = ({
   };
 
   return (
-    <SectionContainer title="Power Performances" maxWidth="100%">
+    <SectionContainer {...(showTitle ? { title: "Power Performances" } : {})} maxWidth="100%">
       {showChart && (
         <Box sx={{ mb: 1, height: 500, width: "100%" }}>
           <Line options={chartOptions} data={lineData} />

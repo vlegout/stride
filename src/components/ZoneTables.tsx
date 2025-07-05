@@ -1,5 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -67,39 +68,32 @@ const ZoneTables: React.FC<ZoneTablesProps> = ({ zones }) => {
   }
 
   return (
-    <Box sx={{ width: "100%" }}>
-      {heartRateZones.length > 0 && (
-        <SectionContainer
-          title="Heart Rate Zones"
-          maxWidth={{ xs: "100%", sm: "400px", md: "350px" }}
-          centered
-          variant="paper"
-        >
-          <DataTable columns={zoneColumns} rows={heartRateRows} minWidth={isMobile ? 250 : 300} responsive />
-        </SectionContainer>
-      )}
+    <Box sx={{ width: "100%", px: 2 }}>
+      <Grid container spacing={2} sx={{ justifyContent: "center", maxWidth: "1200px", margin: "0 auto" }}>
+        {heartRateZones.length > 0 && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <SectionContainer title="Heart Rate Zones" maxWidth="100%" centered variant="paper">
+              <DataTable columns={zoneColumns} rows={heartRateRows} minWidth={isMobile ? 250 : 300} responsive />
+            </SectionContainer>
+          </Grid>
+        )}
 
-      {paceZones.length > 0 && (
-        <SectionContainer
-          title="Pace Zones"
-          maxWidth={{ xs: "100%", sm: "400px", md: "350px" }}
-          centered
-          variant="paper"
-        >
-          <DataTable columns={zoneColumns} rows={paceRows} minWidth={isMobile ? 250 : 300} responsive />
-        </SectionContainer>
-      )}
+        {paceZones.length > 0 && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <SectionContainer title="Pace Zones" maxWidth="100%" centered variant="paper">
+              <DataTable columns={zoneColumns} rows={paceRows} minWidth={isMobile ? 250 : 300} responsive />
+            </SectionContainer>
+          </Grid>
+        )}
 
-      {powerZones.length > 0 && (
-        <SectionContainer
-          title="Power Zones"
-          maxWidth={{ xs: "100%", sm: "400px", md: "350px" }}
-          centered
-          variant="paper"
-        >
-          <DataTable columns={zoneColumns} rows={powerRows} minWidth={isMobile ? 250 : 300} responsive />
-        </SectionContainer>
-      )}
+        {powerZones.length > 0 && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <SectionContainer title="Power Zones" maxWidth="100%" centered variant="paper">
+              <DataTable columns={zoneColumns} rows={powerRows} minWidth={isMobile ? 250 : 300} responsive />
+            </SectionContainer>
+          </Grid>
+        )}
+      </Grid>
     </Box>
   );
 };
