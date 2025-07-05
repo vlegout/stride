@@ -67,8 +67,8 @@ const mockActivities: Activity[] = [
         altitude: 25,
       },
     ],
-    performances: [{ distance: 5000, time: "PT30M30S" }],
-    performance_power: [{ time: "PT30M30S", power: 0 }],
+    performances: [{ distance: 5000, time: "PT30M30S", activity_id: "1" }],
+    performance_power: [{ time: "PT30M30S", power: 0, activity_id: "1" }],
   },
   {
     id: "2",
@@ -133,8 +133,8 @@ const mockActivities: Activity[] = [
         altitude: 200,
       },
     ],
-    performances: [{ distance: 45000, time: "PT1H31M40S" }],
-    performance_power: [{ time: "PT1H31M40S", power: 180 }],
+    performances: [{ distance: 45000, time: "PT1H31M40S", activity_id: "2" }],
+    performance_power: [{ time: "PT1H31M40S", power: 180, activity_id: "2" }],
   },
   {
     id: "3",
@@ -199,8 +199,8 @@ const mockActivities: Activity[] = [
         altitude: 18,
       },
     ],
-    performances: [{ distance: 8000, time: "PT1H0M0S" }],
-    performance_power: [{ time: "PT1H0M0S", power: 0 }],
+    performances: [{ distance: 8000, time: "PT1H0M0S", activity_id: "3" }],
+    performance_power: [{ time: "PT1H0M0S", power: 0, activity_id: "3" }],
   },
 ];
 

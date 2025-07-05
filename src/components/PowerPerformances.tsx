@@ -6,6 +6,7 @@ import { ChartOptions } from "chart.js";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
+import { Link } from "react-router-dom";
 
 const PowerPerformances = ({
   performances,
@@ -45,12 +46,20 @@ const PowerPerformances = ({
     {
       id: "time",
       label: "Duration",
-      format: (value) => formatInterval(value as string),
+      render: (value, row) => (
+        <Link to={`/activities/${row.activity_id}`} style={{ textDecoration: "none", color: "inherit" }}>
+          {formatInterval(value as string)}
+        </Link>
+      ),
     },
     {
       id: "power",
       label: "Power (W)",
-      format: (value) => `${Math.round(value as number)}W`,
+      render: (value, row) => (
+        <Link to={`/activities/${row.activity_id}`} style={{ textDecoration: "none", color: "inherit" }}>
+          {`${Math.round(value as number)}W`}
+        </Link>
+      ),
     },
   ];
 
