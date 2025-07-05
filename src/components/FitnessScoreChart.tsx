@@ -23,9 +23,10 @@ interface FitnessScore {
 
 interface FitnessScoreChartProps {
   scores: FitnessScore[];
+  title?: string;
 }
 
-const FitnessScoreChart = ({ scores }: FitnessScoreChartProps) => {
+const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: FitnessScoreChartProps) => {
   const labels = scores.map((score) => score.date);
   const overallScores = scores.map((score) => score.overall);
   const runningScores = scores.map((score) => score.running);
@@ -69,7 +70,7 @@ const FitnessScoreChart = ({ scores }: FitnessScoreChartProps) => {
     plugins: {
       title: {
         display: true,
-        text: "Fitness Score Over Time (Past 365 Days)",
+        text: title,
       },
       tooltip: {
         callbacks: {

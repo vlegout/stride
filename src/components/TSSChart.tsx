@@ -88,7 +88,7 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Weekly Training Stress Score (Past 52 Weeks)
+          Weekly Training Stress Score
         </Typography>
       </Box>
 

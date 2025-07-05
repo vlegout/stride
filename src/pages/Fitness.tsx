@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -20,11 +21,15 @@ import FitnessScoreChart from "../components/FitnessScoreChart";
 import WeeklyMetricsCharts from "../components/WeeklyMetricsCharts";
 import TSSChart from "../components/TSSChart";
 import FTPChart from "../components/FTPChart";
+import DateSelector, { DateRangeOption } from "../components/DateSelector";
 import { fetchFitness } from "../api";
+import { filterDataByDateRange, filterWeeklyDataByDateRange, getDateRangeLabel } from "../utils/date";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const Fitness = () => {
+  const [selectedRange, setSelectedRange] = useState<DateRangeOption>("1y");
+
   const {
     data: fitnessData,
     isLoading,
@@ -65,28 +70,38 @@ const Fitness = () => {
     );
   }
 
-  const overallScores = fitnessData.scores.map((score) => score.overall);
-  const runningScores = fitnessData.scores.map((score) => score.running);
-  const cyclingScores = fitnessData.scores.map((score) => score.cycling);
+  const filteredScores = filterDataByDateRange(fitnessData.scores, selectedRange);
+  const filteredWeeklyTss = filterWeeklyDataByDateRange(fitnessData.weekly_tss, selectedRange);
+  const filteredWeeklyRunning = filterWeeklyDataByDateRange(fitnessData.weekly_running, selectedRange);
+  const filteredWeeklyCycling = filterWeeklyDataByDateRange(fitnessData.weekly_cycling, selectedRange);
+  const filteredFtp = fitnessData.ftp ? filterDataByDateRange(fitnessData.ftp, selectedRange) : [];
+
+  const overallScores = filteredScores.map((score) => score.overall);
+  const runningScores = filteredScores.map((score) => score.running);
+  const cyclingScores = filteredScores.map((score) => score.cycling);
 
   const currentOverall = overallScores[overallScores.length - 1] || 0;
   const currentRunning = runningScores[runningScores.length - 1] || 0;
   const currentCycling = cyclingScores[cyclingScores.length - 1] || 0;
 
-  const maxOverall = Math.max(...overallScores);
-  const maxRunning = Math.max(...runningScores);
-  const maxCycling = Math.max(...cyclingScores);
+  const maxOverall = overallScores.length > 0 ? Math.max(...overallScores) : 0;
+  const maxRunning = runningScores.length > 0 ? Math.max(...runningScores) : 0;
+  const maxCycling = cyclingScores.length > 0 ? Math.max(...cyclingScores) : 0;
 
-  const avgOverall = Math.round(overallScores.reduce((a, b) => a + b, 0) / overallScores.length);
-  const avgRunning = Math.round(runningScores.reduce((a, b) => a + b, 0) / runningScores.length);
-  const avgCycling = Math.round(cyclingScores.reduce((a, b) => a + b, 0) / cyclingScores.length);
+  const avgOverall =
+    overallScores.length > 0 ? Math.round(overallScores.reduce((a, b) => a + b, 0) / overallScores.length) : 0;
+  const avgRunning =
+    runningScores.length > 0 ? Math.round(runningScores.reduce((a, b) => a + b, 0) / runningScores.length) : 0;
+  const avgCycling =
+    cyclingScores.length > 0 ? Math.round(cyclingScores.reduce((a, b) => a + b, 0) / cyclingScores.length) : 0;
 
-  const weeklyTssValues = fitnessData.weekly_tss.map((week) => week.total_tss);
+  const weeklyTssValues = filteredWeeklyTss.map((week) => week.total_tss);
   const currentWeeklyTss = weeklyTssValues[weeklyTssValues.length - 1] || 0;
-  const maxWeeklyTss = Math.max(...weeklyTssValues);
-  const avgWeeklyTss = Math.round(weeklyTssValues.reduce((a, b) => a + b, 0) / weeklyTssValues.length);
+  const maxWeeklyTss = weeklyTssValues.length > 0 ? Math.max(...weeklyTssValues) : 0;
+  const avgWeeklyTss =
+    weeklyTssValues.length > 0 ? Math.round(weeklyTssValues.reduce((a, b) => a + b, 0) / weeklyTssValues.length) : 0;
 
-  const ftpValues = fitnessData.ftp?.map((ftp) => ftp.ftp) || [];
+  const ftpValues = filteredFtp.map((ftp) => ftp.ftp);
   const currentFtp = ftpValues.length > 0 ? ftpValues[ftpValues.length - 1] : undefined;
   const maxFtp = ftpValues.length > 0 ? Math.max(...ftpValues) : undefined;
   const avgFtp = ftpValues.length > 0 ? Math.round(ftpValues.reduce((a, b) => a + b, 0) / ftpValues.length) : undefined;
@@ -95,6 +110,7 @@ const Fitness = () => {
     <Box sx={{ width: "100%" }}>
       <PageHeader title="Fitness" />
       <SectionContainer>
+        <DateSelector selectedRange={selectedRange} onChange={setSelectedRange} />
         <FitnessOverview
           currentOverall={currentOverall}
           maxOverall={maxOverall}
@@ -113,20 +129,23 @@ const Fitness = () => {
           {...(avgFtp !== undefined && { avgFtp })}
         />
 
-        <FitnessScoreChart scores={fitnessData.scores} />
+        <FitnessScoreChart
+          scores={filteredScores}
+          title={`Fitness Score Over Time (Past ${getDateRangeLabel(selectedRange)})`}
+        />
       </SectionContainer>
 
       <SectionContainer>
-        <WeeklyMetricsCharts weeklyRunning={fitnessData.weekly_running} weeklyCycling={fitnessData.weekly_cycling} />
+        <WeeklyMetricsCharts weeklyRunning={filteredWeeklyRunning} weeklyCycling={filteredWeeklyCycling} />
       </SectionContainer>
 
       <SectionContainer>
-        <TSSChart weeklyTss={fitnessData.weekly_tss} />
+        <TSSChart weeklyTss={filteredWeeklyTss} />
       </SectionContainer>
 
-      {fitnessData.ftp && fitnessData.ftp.length > 0 && (
+      {filteredFtp.length > 0 && (
         <SectionContainer>
-          <FTPChart ftp={fitnessData.ftp} />
+          <FTPChart ftp={filteredFtp} />
         </SectionContainer>
       )}
     </Box>
