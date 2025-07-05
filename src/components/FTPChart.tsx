@@ -88,7 +88,7 @@ const FTPChart = ({ ftp }: FTPChartProps) => {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Functional Threshold Power (Past 52 Weeks)
+          Functional Threshold Power
         </Typography>
       </Box>
 

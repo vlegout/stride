@@ -126,7 +126,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Weekly Activity Metrics (Past 52 Weeks)
+          Weekly Activity Metrics
         </Typography>
       </Box>
 
