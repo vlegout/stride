@@ -4,6 +4,7 @@ import type {
   Activity,
   ActivitiesResponse,
   ActivitiesQueryParams,
+  ActivityUpdate,
   FitnessResponse,
   Profile,
   User,
@@ -109,6 +110,23 @@ export async function uploadActivity(fitFile: File, title: string, race: boolean
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+}
+
+export async function updateActivity(id: string, updates: ActivityUpdate): Promise<Activity> {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error("No valid authentication token available");
+  }
+
+  const response = await axios.patch(`${API_URL}/activities/${id}/`, updates, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   });
 

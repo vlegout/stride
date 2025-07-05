@@ -29,6 +29,7 @@ from api.model import (
     ActivityList,
     ActivityPublic,
     ActivityPublicWithoutTracepoints,
+    ActivityUpdate,
     Pagination,
     PerformanceProfile,
     PerformancePowerProfil,
@@ -311,6 +312,34 @@ def delete_activity(
     activity.status = "deleted"
     session.add(activity)
     session.commit()
+
+
+@app.patch("/activities/{activity_id}/", response_model=ActivityPublic)
+def update_activity(
+    activity_id: uuid.UUID,
+    activity_update: ActivityUpdate,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    activity = session.exec(
+        select(Activity).where(
+            Activity.id == activity_id,
+            Activity.user_id == user_id,
+            Activity.status == "created",
+        )
+    ).first()
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    update_data = activity_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(activity, field, value)
+
+    session.add(activity)
+    session.commit()
+    session.refresh(activity)
+
+    return ActivityPublic.model_validate(activity)
 
 
 @app.get("/profile/", response_model=Profile)

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
 
 import ActivityPageView from "./ActivityPageView";
@@ -151,6 +152,15 @@ const mockCyclingActivity: Activity = {
   performance_power: [{ time: "PT2H0M0S", power: 220, activity_id: "550e8400-e29b-41d4-a716-446655440001" }],
 };
 
+// Create a QueryClient for Storybook
+const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
 const meta = {
   title: "Components/ActivityPageView",
   component: ActivityPageView,
@@ -172,11 +182,13 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <div style={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-          <Story />
-        </div>
-      </MemoryRouter>
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter>
+          <div style={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+            <Story />
+          </div>
+        </MemoryRouter>
+      </QueryClientProvider>
     ),
   ],
 } satisfies Meta<typeof ActivityPageView>;

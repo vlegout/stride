@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ActivityBox from "./ActivityBox";
 import type { Activity } from "../types";
 
@@ -453,6 +454,15 @@ const mockCyclingActivity: Activity = {
   performance_power: [{ time: "PT2H0M0S", power: 220, activity_id: "550e8400-e29b-41d4-a716-446655440001" }],
 };
 
+// Create a QueryClient for Storybook
+const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
 const meta = {
   title: "Components/ActivityBox",
   component: ActivityBox,
@@ -478,11 +488,13 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <div style={{ padding: "20px", backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-          <Story />
-        </div>
-      </MemoryRouter>
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter>
+          <div style={{ padding: "20px", backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+            <Story />
+          </div>
+        </MemoryRouter>
+      </QueryClientProvider>
     ),
   ],
 } satisfies Meta<typeof ActivityBox>;

@@ -102,6 +102,12 @@ export const Activity = type({
 });
 export type Activity = typeof Activity.infer;
 
+export const ActivityUpdate = type({
+  title: "string?",
+  race: "boolean?",
+});
+export type ActivityUpdate = typeof ActivityUpdate.infer;
+
 export const Pagination = type({
   page: "number",
   per_page: "number",
