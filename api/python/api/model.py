@@ -40,6 +40,11 @@ class UserCreate(BaseModel):
     google_picture: str | None = None
 
 
+class ActivityUpdate(BaseModel):
+    title: str | None = None
+    race: bool | None = None
+
+
 class ActivityBase(SQLModel):
     id: uuid.UUID = Field(default=None, primary_key=True)
 

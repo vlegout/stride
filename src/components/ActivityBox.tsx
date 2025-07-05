@@ -7,6 +7,8 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import EditIcon from "@mui/icons-material/Edit";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
@@ -18,6 +20,7 @@ import MapComponent from "./Map";
 import MapOLComponent from "./MapOL";
 import MapMapbox from "./MapMapbox";
 import ActivityLogo from "./ActivityLogo";
+import EditActivityModal from "./EditActivityModal";
 import { StatsCard, PageHeader } from "./ui";
 
 interface ActivityBoxProps {
@@ -30,6 +33,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
   const [mapProvider, setMapProvider] = useState<"leaflet" | "openlayers" | "mapbox">("leaflet");
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const locationText = [activity.city, activity.country].filter(Boolean).join(", ") || "—";
   const mapPoints = activity.tracepoints.map(
@@ -37,7 +41,19 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   );
 
   const title = isDetailed ? (
-    <PageHeader title={activity.title} subtitle={locationText} />
+    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+      <Box sx={{ flexGrow: 1 }}>
+        <PageHeader title={activity.title} subtitle={locationText} />
+      </Box>
+      <Button
+        variant="outlined"
+        size="small"
+        onClick={() => setEditModalOpen(true)}
+        sx={{ flexShrink: 0, minWidth: "auto", p: 1 }}
+      >
+        <EditIcon />
+      </Button>
+    </Box>
   ) : (
     <Typography variant={isSmall ? "h6" : "h5"}>
       <MuiLink component={Link} to={`/activities/${activity.id}`}>
@@ -139,6 +155,9 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
           />
         )}
       </Grid>
+      {isDetailed && (
+        <EditActivityModal open={editModalOpen} onClose={() => setEditModalOpen(false)} activity={activity} />
+      )}
     </Grid>
   );
 };
