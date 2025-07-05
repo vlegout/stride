@@ -1,19 +1,26 @@
 import Box from "@mui/material/Box";
+
 import ActivityBox from "./ActivityBox";
 import LapChart from "./LapChart";
 import Performances from "./Performances";
 import PowerPerformances from "./PowerPerformances";
 import ActivityCharts from "./ActivityCharts";
+
 import { SectionContainer } from "./ui";
-import { ProcessedChartData } from "../utils";
+import { processTracePointData } from "../utils";
 import { Activity } from "../types";
 
 interface ActivityPageViewProps {
   data: Activity;
-  chartData: ProcessedChartData;
 }
 
-const ActivityPageView = ({ data, chartData }: ActivityPageViewProps) => {
+const ActivityPageView = ({ data }: ActivityPageViewProps) => {
+  if (!data || !data.tracepoints || data.tracepoints.length === 0) {
+    return null;
+  }
+
+  const chartData = processTracePointData(data.tracepoints);
+
   return (
     <Box sx={{ width: "100%" }}>
       <SectionContainer spacing="compact">

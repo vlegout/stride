@@ -3,9 +3,8 @@ import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, Line
 
 import LoadingIndicator from "../components/LoadingIndicator";
 import ActivityPageView from "../components/ActivityPageView";
+
 import { useActivityData } from "../hooks";
-import { processTracePointData } from "../utils";
-import { TracePoint } from "../types";
 
 const ActivityPage = () => {
   const params = useParams();
@@ -17,10 +16,7 @@ const ActivityPage = () => {
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
-  const tracePoints: TracePoint[] = data?.tracepoints ?? [];
-  const chartData = processTracePointData(tracePoints);
-
-  return <ActivityPageView data={data} chartData={chartData} />;
+  return <ActivityPageView data={data} />;
 };
 
 export default ActivityPage;

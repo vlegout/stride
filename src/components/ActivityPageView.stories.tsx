@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router-dom";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
+
 import ActivityPageView from "./ActivityPageView";
-import { ProcessedChartData } from "../utils";
 import { Activity } from "../types";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
@@ -124,37 +124,31 @@ const mockCyclingActivity: Activity = {
       heart_rate: 120,
       speed: 0,
       power: 0,
-      altitude: 50,
+      altitude: 40,
+    },
+    {
+      lat: 45.4815,
+      lng: -123.0815,
+      timestamp: "2022-01-01T20:30:00Z",
+      distance: 50000,
+      heart_rate: 130,
+      speed: 12.0,
+      power: 120,
+      altitude: 45,
     },
     {
       lat: 45.5115,
       lng: -123.0915,
-      timestamp: "2022-01-01T22:20:00Z",
+      timestamp: "2022-01-01T22:40:00Z",
       distance: 65000,
       heart_rate: 145,
-      speed: 9.0,
+      speed: 34.0,
       power: 220,
       altitude: 50,
     },
   ],
   performances: [{ distance: 65000, time: "PT2H0M0S" }],
   performance_power: [{ time: "PT2H0M0S", power: 220 }],
-};
-
-const runningChartData: ProcessedChartData = {
-  labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  speedData: [0, 3.5, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2, 4.0, 3.9, 3.2],
-  hrData: [140, 145, 150, 155, 160, 162, 165, 168, 170, 168, 150],
-  altitudeData: [20, 22, 25, 28, 30, 32, 35, 38, 40, 35, 20],
-  powerData: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-};
-
-const cyclingChartData: ProcessedChartData = {
-  labels: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65],
-  speedData: [0, 8.5, 9.2, 9.8, 10.5, 11.2, 12.0, 13.5, 15.0, 14.0, 12.5, 11.0, 9.8, 7.5],
-  hrData: [120, 135, 142, 148, 155, 162, 168, 175, 180, 165, 155, 148, 142, 125],
-  altitudeData: [50, 80, 120, 180, 250, 350, 450, 550, 650, 550, 450, 350, 250, 50],
-  powerData: [0, 180, 200, 220, 250, 280, 320, 380, 450, 350, 280, 240, 200, 120],
 };
 
 const meta = {
@@ -175,10 +169,6 @@ const meta = {
       description: "Complete activity data object",
       control: false,
     },
-    chartData: {
-      description: "Processed chart data for line charts",
-      control: false,
-    },
   },
   decorators: [
     (Story) => (
@@ -197,14 +187,12 @@ type Story = StoryObj<typeof meta>;
 export const RunningActivity: Story = {
   args: {
     data: mockRunningActivity,
-    chartData: runningChartData,
   },
 };
 
 export const CyclingActivity: Story = {
   args: {
     data: mockCyclingActivity,
-    chartData: cyclingChartData,
   },
 };
 
@@ -216,6 +204,5 @@ export const RaceActivity: Story = {
       title: "10K Race",
       description: "Personal best attempt at local 10K race",
     },
-    chartData: runningChartData,
   },
 };
