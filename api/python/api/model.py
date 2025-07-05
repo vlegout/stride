@@ -156,7 +156,7 @@ class Performance(PerformanceBase, table=True):
 
 
 class PerformanceProfile(PerformanceBase):
-    pass
+    activity_id: uuid.UUID
 
 
 class PerformancePowerBase(SQLModel):
@@ -171,7 +171,7 @@ class PerformancePower(PerformancePowerBase, table=True):
 
 
 class PerformancePowerProfil(PerformancePowerBase):
-    pass
+    activity_id: uuid.UUID
 
 
 class TracepointBase(SQLModel):

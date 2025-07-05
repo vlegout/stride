@@ -70,8 +70,8 @@ const mockRunningActivity: Activity = {
       altitude: 25,
     },
   ],
-  performances: [{ distance: 10000, time: "PT45M0S" }],
-  performance_power: [{ time: "PT45M0S", power: 0 }],
+  performances: [{ distance: 10000, time: "PT45M0S", activity_id: "550e8400-e29b-41d4-a716-446655440000" }],
+  performance_power: [{ time: "PT45M0S", power: 0, activity_id: "550e8400-e29b-41d4-a716-446655440000" }],
 };
 
 const mockCyclingActivity: Activity = {
@@ -147,8 +147,8 @@ const mockCyclingActivity: Activity = {
       altitude: 50,
     },
   ],
-  performances: [{ distance: 65000, time: "PT2H0M0S" }],
-  performance_power: [{ time: "PT2H0M0S", power: 220 }],
+  performances: [{ distance: 65000, time: "PT2H0M0S", activity_id: "550e8400-e29b-41d4-a716-446655440001" }],
+  performance_power: [{ time: "PT2H0M0S", power: 220, activity_id: "550e8400-e29b-41d4-a716-446655440001" }],
 };
 
 const meta = {

@@ -1,6 +1,7 @@
 import { Performance } from "../types";
 import { formatDistance, formatInterval } from "../utils";
 import { DataTable, Column, SectionContainer } from "./ui";
+import { Link } from "react-router-dom";
 
 const Performances = ({ performances, showTitle = true }: { performances: Performance[]; showTitle?: boolean }) => {
   if (performances.length === 0) {
@@ -11,12 +12,20 @@ const Performances = ({ performances, showTitle = true }: { performances: Perfor
     {
       id: "distance",
       label: "Distance",
-      format: (value) => formatDistance(value as number),
+      render: (value, row) => (
+        <Link to={`/activities/${row.activity_id}`} style={{ textDecoration: "none", color: "inherit" }}>
+          {formatDistance(value as number)}
+        </Link>
+      ),
     },
     {
       id: "time",
       label: "Time",
-      format: (value) => formatInterval(value as string),
+      render: (value, row) => (
+        <Link to={`/activities/${row.activity_id}`} style={{ textDecoration: "none", color: "inherit" }}>
+          {formatInterval(value as string)}
+        </Link>
+      ),
     },
   ];
 

@@ -18,12 +18,14 @@ export type ActivitiesQueryParams = typeof ActivitiesQueryParams.infer;
 export const Performance = type({
   distance: "number",
   time: "string",
+  activity_id: "string.uuid.v5",
 });
 export type Performance = typeof Performance.infer;
 
 export const PowerPerformance = type({
   time: "string",
   power: "number",
+  activity_id: "string.uuid.v5",
 });
 export type PowerPerformance = typeof PowerPerformance.infer;
 

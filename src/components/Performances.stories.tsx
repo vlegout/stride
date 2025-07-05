@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import Performances from "./Performances";
+import { MemoryRouter } from "react-router-dom";
 
 const meta = {
   title: "Components/Performances",
@@ -19,6 +20,13 @@ const meta = {
       control: false,
     },
   },
+  decorators: [
+    (Story) => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
 } satisfies Meta<typeof Performances>;
 
 export default meta;
@@ -27,9 +35,9 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     performances: [
-      { distance: 1000, time: "PT3M30S" },
-      { distance: 5000, time: "PT18M0S" },
-      { distance: 10000, time: "PT37M0S" },
+      { distance: 1000, time: "PT3M30S", activity_id: "550e8400-e29b-41d4-a716-446655440001" },
+      { distance: 5000, time: "PT18M0S", activity_id: "550e8400-e29b-41d4-a716-446655440002" },
+      { distance: 10000, time: "PT37M0S", activity_id: "550e8400-e29b-41d4-a716-446655440003" },
     ],
   },
 };
