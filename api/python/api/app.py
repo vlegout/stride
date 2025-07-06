@@ -490,6 +490,8 @@ def read_best_performances(
     performances = []
 
     if sport == Sport.cycling:
+        assert distance is not None  # Validated above
+
         # Convert distance enum to timedelta (minutes)
         distance_mapping = {
             CyclingDistance.one_minute: datetime.timedelta(minutes=1),
@@ -525,6 +527,8 @@ def read_best_performances(
         parameter = distance.value
 
     elif sport == Sport.running:
+        assert time is not None  # Validated above
+
         # Convert time enum to distance in meters
         time_mapping = {
             RunningDistance.one_km: 1000,
