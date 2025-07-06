@@ -100,10 +100,12 @@ export async function fetchBestPerformances(
   sport: string,
   distance?: string,
   time?: string,
+  year?: number,
 ): Promise<BestPerformanceResponse> {
   const params = new URLSearchParams({ sport });
   if (distance) params.append("distance", distance);
   if (time) params.append("time", time);
+  if (year) params.append("year", year.toString());
 
   return await apiCall(`/best/?${params.toString()}`);
 }

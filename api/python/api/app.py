@@ -464,6 +464,7 @@ def read_best_performances(
     sport: Sport,
     distance: CyclingDistance | None = None,
     time: RunningDistance | None = None,
+    year: int | None = None,
     session: Session = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
@@ -504,18 +505,22 @@ def read_best_performances(
         target_time = distance_mapping[distance]
 
         # Query for cycling power performances
-        power_performances = session.execute(
-            text("""
-                SELECT pp.power, a.* 
-                FROM performancepower pp
-                JOIN activity a ON pp.activity_id = a.id
-                WHERE a.user_id = :user_id AND a.status = 'created'
-                AND pp.time = :target_time
-                ORDER BY pp.power DESC
-                LIMIT 10
-            """),
-            {"user_id": user_id, "target_time": target_time},
-        ).all()
+        query = """
+            SELECT pp.power, a.*
+            FROM performancepower pp
+            JOIN activity a ON pp.activity_id = a.id
+            WHERE a.user_id = :user_id AND a.status = 'created'
+            AND pp.time = :target_time
+        """
+        params = {"user_id": user_id, "target_time": target_time}
+
+        if year is not None:
+            query += " AND EXTRACT(YEAR FROM to_timestamp(a.start_time)) = :year"
+            params["year"] = year
+
+        query += " ORDER BY pp.power DESC LIMIT 10"
+
+        power_performances = session.execute(text(query), params).all()
 
         for row in power_performances:
             power = row[0]
@@ -541,19 +546,23 @@ def read_best_performances(
         target_distance = time_mapping[time]
 
         # Query for running performances (best times)
-        running_performances = session.execute(
-            text("""
-                SELECT EXTRACT(EPOCH FROM p.time) as time_seconds, a.*
-                FROM performance p
-                JOIN activity a ON p.activity_id = a.id
-                WHERE a.user_id = :user_id AND a.status = 'created'
-                AND p.distance = :target_distance
-                AND p.time IS NOT NULL
-                ORDER BY p.time ASC
-                LIMIT 10
-            """),
-            {"user_id": user_id, "target_distance": target_distance},
-        ).all()
+        query = """
+            SELECT EXTRACT(EPOCH FROM p.time) as time_seconds, a.*
+            FROM performance p
+            JOIN activity a ON p.activity_id = a.id
+            WHERE a.user_id = :user_id AND a.status = 'created'
+            AND p.distance = :target_distance
+            AND p.time IS NOT NULL
+        """
+        params = {"user_id": user_id, "target_distance": target_distance}
+
+        if year is not None:
+            query += " AND EXTRACT(YEAR FROM to_timestamp(a.start_time)) = :year"
+            params["year"] = year
+
+        query += " ORDER BY p.time ASC LIMIT 10"
+
+        running_performances = session.execute(text(query), params).all()
 
         for row in running_performances:
             time_seconds = row[0]
