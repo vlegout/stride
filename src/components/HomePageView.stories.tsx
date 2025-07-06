@@ -204,12 +204,6 @@ const mockActivities: Activity[] = [
   },
 ];
 
-const mockRaceActivities: Activity[] = mockActivities.map((activity) => ({
-  ...activity,
-  race: true,
-  title: activity.sport === "running" ? "10K Race" : "Criterium Race",
-}));
-
 const meta = {
   title: "Components/HomePageView",
   component: HomePageView,
@@ -227,10 +221,6 @@ const meta = {
     activities: {
       description: "Array of activities to display",
       control: false,
-    },
-    race: {
-      control: { type: "boolean" },
-      description: "Whether this is showing races or regular activities (affects header title)",
     },
   },
   decorators: [
@@ -250,27 +240,17 @@ type Story = StoryObj<typeof meta>;
 export const RecentActivities: Story = {
   args: {
     activities: mockActivities,
-    race: false,
-  },
-};
-
-export const RecentRaces: Story = {
-  args: {
-    activities: mockRaceActivities,
-    race: true,
   },
 };
 
 export const SingleActivity: Story = {
   args: {
     activities: [mockActivities[0]],
-    race: false,
   },
 };
 
 export const EmptyState: Story = {
   args: {
     activities: [],
-    race: false,
   },
 };

@@ -22,7 +22,6 @@ const menus = [
   { to: "/", label: "Home" },
   { to: "/activities", label: "Activities" },
   { to: "/weeks", label: "Weeks" },
-  { to: "/races", label: "Races" },
   { to: "/fitness", label: "Fitness" },
   { to: "/best", label: "Best" },
 ];
