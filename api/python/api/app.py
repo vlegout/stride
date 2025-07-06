@@ -38,6 +38,7 @@ from api.model import (
     User,
     UserCreate,
     UserPublic,
+    UserUpdate,
     WeeklyActivitySummary,
     WeeklySummary,
     WeeksResponse,
@@ -593,6 +594,28 @@ def read_current_user(
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    return UserPublic.model_validate(user)
+
+
+@app.patch("/users/me/", response_model=UserPublic)
+def update_current_user(
+    user_update: UserUpdate,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    update_data = user_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(user, field, value)
+
+    user.updated_at = datetime.datetime.now(datetime.timezone.utc)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
 
     return UserPublic.model_validate(user)
 

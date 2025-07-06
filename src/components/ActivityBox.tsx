@@ -3,10 +3,6 @@ import MuiLink from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTheme } from "@mui/material/styles";
@@ -15,6 +11,7 @@ import { useState } from "react";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 import { Activity } from "../types";
+import { useAuthStore } from "../store";
 
 import MapComponent from "./Map";
 import MapOLComponent from "./MapOL";
@@ -32,8 +29,10 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
-  const [mapProvider, setMapProvider] = useState<"leaflet" | "openlayers" | "mapbox">("leaflet");
+  const { user } = useAuthStore();
   const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const mapProvider = user?.map || "leaflet";
 
   const locationText = [activity.city, activity.country].filter(Boolean).join(", ") || "—";
   const mapPoints = activity.tracepoints.map(
@@ -115,20 +114,6 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
         </Grid>
       </Grid>
       <Grid size={{ xs: 12, md: 6 }} sx={{ minHeight: isMobile ? "250px" : "auto" }}>
-        <Box sx={{ mb: 2 }}>
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Map Provider</InputLabel>
-            <Select
-              value={mapProvider}
-              label="Map Provider"
-              onChange={(e) => setMapProvider(e.target.value as "leaflet" | "openlayers" | "mapbox")}
-            >
-              <MenuItem value="leaflet">Leaflet</MenuItem>
-              <MenuItem value="openlayers">OpenLayers</MenuItem>
-              <MenuItem value="mapbox">Mapbox</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
         {mapProvider === "leaflet" ? (
           <MapComponent
             bounds={[
