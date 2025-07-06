@@ -1,15 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { fetchProfile } from "../api";
 import { formatDistance } from "../utils";
 
-import Performances from "../components/Performances";
-import PowerPerformances from "../components/PowerPerformances";
 import LoadingIndicator from "../components/LoadingIndicator";
 import ZoneTables from "../components/ZoneTables";
 import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
@@ -72,21 +69,6 @@ const Profile = () => {
       <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "800px" }} centered variant="paper">
         <DataTable columns={profileStatsColumns} rows={profileStatsRows} minWidth={isMobile ? 300 : 650} responsive />
       </SectionContainer>
-
-      <Box sx={{ width: "100%", px: 2 }}>
-        <Grid container spacing={2} sx={{ justifyContent: "center", maxWidth: "800px", margin: "0 auto" }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <SectionContainer title="Running Performances" maxWidth="100%" centered>
-              <Performances performances={data.running_performances} showTitle={false} />
-            </SectionContainer>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <SectionContainer title="Cycling Performances" maxWidth="100%" centered>
-              <PowerPerformances performances={data.cycling_performances} showChart={false} showTitle={false} />
-            </SectionContainer>
-          </Grid>
-        </Grid>
-      </Box>
 
       <ZoneTables zones={data.zones} />
 

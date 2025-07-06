@@ -5,6 +5,7 @@ import type {
   ActivitiesResponse,
   ActivitiesQueryParams,
   ActivityUpdate,
+  BestPerformanceResponse,
   FitnessResponse,
   Profile,
   User,
@@ -93,6 +94,18 @@ export async function fetchWeeks(): Promise<WeeksResponse> {
 
 export async function fetchFitness(): Promise<FitnessResponse> {
   return await apiCall("/fitness/");
+}
+
+export async function fetchBestPerformances(
+  sport: string,
+  distance?: string,
+  time?: string,
+): Promise<BestPerformanceResponse> {
+  const params = new URLSearchParams({ sport });
+  if (distance) params.append("distance", distance);
+  if (time) params.append("time", time);
+
+  return await apiCall(`/best/?${params.toString()}`);
 }
 
 export async function uploadActivity(fitFile: File, title: string, race: boolean): Promise<Activity> {

@@ -157,11 +157,22 @@ export const Profile = type({
   cycling_n_activities: "number",
   cycling_total_distance: "number",
   years: [YearsStatistics],
-  running_performances: [Performance],
-  cycling_performances: [PowerPerformance],
   zones: Zone.array(),
 });
 export type Profile = typeof Profile.infer;
+
+export const BestPerformanceItem = type({
+  value: "number",
+  activity: Activity,
+});
+export type BestPerformanceItem = typeof BestPerformanceItem.infer;
+
+export const BestPerformanceResponse = type({
+  sport: "string",
+  parameter: "string",
+  performances: [BestPerformanceItem],
+});
+export type BestPerformanceResponse = typeof BestPerformanceResponse.infer;
 
 export const User = type({
   id: "string",

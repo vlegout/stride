@@ -2,6 +2,7 @@ import datetime
 import os
 import tempfile
 import uuid
+from enum import Enum
 
 import yaml
 from fastapi import (
@@ -30,9 +31,9 @@ from api.model import (
     ActivityPublic,
     ActivityPublicWithoutTracepoints,
     ActivityUpdate,
+    BestPerformanceItem,
+    BestPerformanceResponse,
     Pagination,
-    PerformanceProfile,
-    PerformancePowerProfil,
     Profile,
     Statistic,
     User,
@@ -419,73 +420,6 @@ def read_profile(
             )
         )
 
-    performance_distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
-    distances_clause = ",".join(str(d) for d in performance_distances)
-    performance_stats = session.execute(
-        text(f"""
-            SELECT p.distance, MIN(p.time) as best_time, p.activity_id
-            FROM performance p
-            JOIN activity a ON p.activity_id = a.id
-            WHERE p.distance IN ({distances_clause})
-            AND a.user_id = :user_id AND a.status = 'created'
-            AND p.time = (
-                SELECT MIN(p2.time)
-                FROM performance p2
-                JOIN activity a2 ON p2.activity_id = a2.id
-                WHERE p2.distance = p.distance
-                AND a2.user_id = :user_id AND a2.status = 'created'
-            )
-            GROUP BY p.distance, p.activity_id
-            ORDER BY p.distance
-        """),
-        {"user_id": user_id},
-    ).all()
-
-    performance_dict = {row[0]: (row[1], row[2]) for row in performance_stats}
-    running_performances = [
-        PerformanceProfile(
-            distance=distance,
-            time=performance_dict.get(distance, (None, None))[0],
-            activity_id=performance_dict.get(distance, (None, None))[1],
-        )
-        for distance in performance_distances
-        if performance_dict.get(distance) is not None
-    ]
-
-    power_performance_stats = session.execute(
-        text("""
-            SELECT pp.time, MAX(pp.power) as best_power, pp.activity_id
-            FROM performancepower pp
-            JOIN activity a ON pp.activity_id = a.id
-            WHERE a.user_id = :user_id AND a.status = 'created'
-            AND pp.time IN (
-                INTERVAL '1 minute',
-                INTERVAL '5 minutes',
-                INTERVAL '20 minutes',
-                INTERVAL '1 hour'
-            )
-            AND pp.power = (
-                SELECT MAX(pp2.power)
-                FROM performancepower pp2
-                JOIN activity a2 ON pp2.activity_id = a2.id
-                WHERE pp2.time = pp.time
-                AND a2.user_id = :user_id AND a2.status = 'created'
-            )
-            GROUP BY pp.time, pp.activity_id
-            ORDER BY pp.time
-        """),
-        {"user_id": user_id},
-    ).all()
-
-    cycling_performances = [
-        PerformancePowerProfil(
-            time=row[0],
-            power=row[1],
-            activity_id=row[2],
-        )
-        for row in power_performance_stats
-    ]
-
     # Get user zones
     zones = session.exec(
         select(Zone).where(Zone.user_id == user_id).order_by(Zone.type, Zone.index)  # type: ignore
@@ -500,9 +434,142 @@ def read_profile(
         cycling_n_activities=overall_stats[3],
         cycling_total_distance=overall_stats[4] or 0.0,
         years=years_data,
-        running_performances=running_performances,
-        cycling_performances=cycling_performances,
         zones=zones_public,
+    )
+
+
+class Sport(str, Enum):
+    running = "running"
+    cycling = "cycling"
+
+
+class CyclingDistance(str, Enum):
+    one_minute = "1"
+    five_minutes = "5"
+    ten_minutes = "10"
+    twenty_minutes = "20"
+    one_hour = "60"
+
+
+class RunningDistance(str, Enum):
+    one_km = "1"
+    five_km = "5"
+    ten_km = "10"
+    half_marathon = "21.098"
+    full_marathon = "42.195"
+
+
+@app.get("/best/", response_model=BestPerformanceResponse)
+def read_best_performances(
+    sport: Sport,
+    distance: CyclingDistance | None = None,
+    time: RunningDistance | None = None,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    # Validate parameters based on sport
+    if sport == Sport.cycling:
+        if distance is None:
+            raise HTTPException(
+                status_code=400, detail="Distance parameter required for cycling"
+            )
+        if time is not None:
+            raise HTTPException(
+                status_code=400, detail="Time parameter not valid for cycling"
+            )
+    elif sport == Sport.running:
+        if time is None:
+            raise HTTPException(
+                status_code=400, detail="Time parameter required for running"
+            )
+        if distance is not None:
+            raise HTTPException(
+                status_code=400, detail="Distance parameter not valid for running"
+            )
+
+    performances = []
+
+    if sport == Sport.cycling:
+        assert distance is not None  # Validated above
+
+        # Convert distance enum to timedelta (minutes)
+        distance_mapping = {
+            CyclingDistance.one_minute: datetime.timedelta(minutes=1),
+            CyclingDistance.five_minutes: datetime.timedelta(minutes=5),
+            CyclingDistance.ten_minutes: datetime.timedelta(minutes=10),
+            CyclingDistance.twenty_minutes: datetime.timedelta(minutes=20),
+            CyclingDistance.one_hour: datetime.timedelta(minutes=60),
+        }
+
+        target_time = distance_mapping[distance]
+
+        # Query for cycling power performances
+        power_performances = session.execute(
+            text("""
+                SELECT pp.power, a.* 
+                FROM performancepower pp
+                JOIN activity a ON pp.activity_id = a.id
+                WHERE a.user_id = :user_id AND a.status = 'created'
+                AND pp.time = :target_time
+                ORDER BY pp.power DESC
+                LIMIT 10
+            """),
+            {"user_id": user_id, "target_time": target_time},
+        ).all()
+
+        for row in power_performances:
+            power = row[0]
+            activity_data = dict(row._mapping)
+            del activity_data["power"]  # Remove power from activity data
+            activity = ActivityPublicWithoutTracepoints(**activity_data)
+            performances.append(BestPerformanceItem(value=power, activity=activity))
+
+        parameter = distance.value
+
+    elif sport == Sport.running:
+        assert time is not None  # Validated above
+
+        # Convert time enum to distance in meters
+        time_mapping = {
+            RunningDistance.one_km: 1000,
+            RunningDistance.five_km: 5000,
+            RunningDistance.ten_km: 10000,
+            RunningDistance.half_marathon: 21097.5,
+            RunningDistance.full_marathon: 42195,
+        }
+
+        target_distance = time_mapping[time]
+
+        # Query for running performances (best times)
+        running_performances = session.execute(
+            text("""
+                SELECT EXTRACT(EPOCH FROM p.time) as time_seconds, a.*
+                FROM performance p
+                JOIN activity a ON p.activity_id = a.id
+                WHERE a.user_id = :user_id AND a.status = 'created'
+                AND p.distance = :target_distance
+                AND p.time IS NOT NULL
+                ORDER BY p.time ASC
+                LIMIT 10
+            """),
+            {"user_id": user_id, "target_distance": target_distance},
+        ).all()
+
+        for row in running_performances:
+            time_seconds = row[0]
+            activity_data = dict(row._mapping)
+            del activity_data["time_seconds"]  # Remove time_seconds from activity data
+            activity = ActivityPublicWithoutTracepoints(**activity_data)
+            performances.append(
+                BestPerformanceItem(value=time_seconds, activity=activity)
+            )
+
+        parameter = time.value
+
+    return BestPerformanceResponse(
+        sport=sport.value,
+        parameter=parameter,
+        performances=performances,
     )
 
 
