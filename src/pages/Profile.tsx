@@ -70,7 +70,6 @@ const Profile = () => {
         <DataTable columns={profileStatsColumns} rows={profileStatsRows} minWidth={isMobile ? 300 : 650} responsive />
       </SectionContainer>
 
-
       <ZoneTables zones={data.zones} />
 
       <SectionContainer

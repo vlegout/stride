@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Upload from "./pages/Upload";
 import Fitness from "./pages/Fitness";
+import Best from "./pages/Best";
 import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
       {
         path: "/fitness",
         element: <Fitness />,
+      },
+      {
+        path: "/best",
+        element: <Best />,
       },
     ],
   },

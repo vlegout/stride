@@ -161,6 +161,19 @@ export const Profile = type({
 });
 export type Profile = typeof Profile.infer;
 
+export const BestPerformanceItem = type({
+  value: "number",
+  activity: Activity,
+});
+export type BestPerformanceItem = typeof BestPerformanceItem.infer;
+
+export const BestPerformanceResponse = type({
+  sport: "string",
+  parameter: "string",
+  performances: [BestPerformanceItem],
+});
+export type BestPerformanceResponse = typeof BestPerformanceResponse.infer;
+
 export const User = type({
   id: "string",
   first_name: "string",

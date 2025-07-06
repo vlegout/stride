@@ -274,6 +274,17 @@ class Profile(BaseModel):
     zones: List[ZonePublic] = []
 
 
+class BestPerformanceItem(BaseModel):
+    value: float
+    activity: ActivityPublicWithoutTracepoints
+
+
+class BestPerformanceResponse(BaseModel):
+    sport: str
+    parameter: str
+    performances: List[BestPerformanceItem]
+
+
 class WeeklyActivitySummary(BaseModel):
     id: uuid.UUID
     title: str
