@@ -6,13 +6,12 @@ import { PageHeader, SectionContainer } from "./ui";
 
 interface HomePageViewProps {
   activities: Activity[];
-  race: boolean;
 }
 
-const HomePageView = ({ activities, race }: HomePageViewProps) => {
+const HomePageView = ({ activities }: HomePageViewProps) => {
   return (
     <Box sx={{ width: "100%" }}>
-      <PageHeader title={race ? "Recent Races" : "Recent Activities"} />
+      <PageHeader title="Recent Activities" />
 
       <SectionContainer maxWidth="1000px" centered>
         {activities.map((activity: Activity) => (

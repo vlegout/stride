@@ -66,10 +66,6 @@ const router = createBrowserRouter([
         element: <Upload />,
       },
       {
-        path: "/races",
-        element: <Home race={true} />,
-      },
-      {
         path: "/fitness",
         element: <Fitness />,
       },
