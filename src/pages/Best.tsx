@@ -21,17 +21,19 @@ const Best = () => {
   const [sport, setSport] = useState("running");
   const [selectedDistance, setSelectedDistance] = useState("");
   const [selectedTime, setSelectedTime] = useState("42.195");
+  const [selectedYear, setSelectedYear] = useState<number | string>("all");
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { data, error, isPending, isFetching } = useQuery({
-    queryKey: ["best", sport, selectedDistance, selectedTime],
+    queryKey: ["best", sport, selectedDistance, selectedTime, selectedYear],
     queryFn: () =>
       fetchBestPerformances(
         sport,
         sport === "cycling" ? selectedDistance : undefined,
         sport === "running" ? selectedTime : undefined,
+        selectedYear === "all" ? undefined : Number(selectedYear),
       ),
   });
 
@@ -49,6 +51,15 @@ const Best = () => {
     { value: "10", label: "10 km" },
     { value: "21.098", label: "Half Marathon" },
     { value: "42.195", label: "Marathon" },
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const yearOptions = [
+    { value: "all", label: "All" },
+    ...Array.from({ length: currentYear - 2012 }, (_, i) => ({
+      value: currentYear - i,
+      label: (currentYear - i).toString(),
+    })),
   ];
 
   const handleSportChange = (newSport: string) => {
@@ -125,7 +136,7 @@ const Best = () => {
       <SectionContainer maxWidth={{ xs: "100%", sm: "800px", md: "1000px" }} centered variant="paper">
         <Box sx={{ mb: 3 }}>
           <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <FormControl fullWidth>
                 <InputLabel>Sport</InputLabel>
                 <Select value={sport} label="Sport" onChange={(e) => handleSportChange(e.target.value)}>
@@ -135,7 +146,7 @@ const Best = () => {
               </FormControl>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <FormControl fullWidth>
                 <InputLabel>{sport === "cycling" ? "Duration" : "Distance"}</InputLabel>
                 <Select
@@ -151,6 +162,19 @@ const Best = () => {
                 >
                   {(sport === "cycling" ? cyclingDistances : runningDistances).map((option) => (
                     <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <FormControl fullWidth>
+                <InputLabel>Year</InputLabel>
+                <Select value={selectedYear} label="Year" onChange={(e) => setSelectedYear(e.target.value)}>
+                  {yearOptions.map((option) => (
+                    <MenuItem key={option.value || "all"} value={option.value}>
                       {option.label}
                     </MenuItem>
                   ))}
