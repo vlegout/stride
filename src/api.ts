@@ -9,6 +9,7 @@ import type {
   Profile,
   User,
   UserCreate,
+  UserUpdate,
   GoogleAuthResponse,
   WeeksResponse,
 } from "./types";
@@ -135,6 +136,23 @@ export async function updateActivity(id: string, updates: ActivityUpdate): Promi
 
 export async function fetchCurrentUser(): Promise<User> {
   return await apiCall("/users/me/");
+}
+
+export async function updateUser(updates: UserUpdate): Promise<User> {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error("No valid authentication token available");
+  }
+
+  const response = await axios.patch(`${API_URL}/users/me/`, updates, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return response.data;
 }
 
 export async function authenticateWithGoogle(userData: UserCreate): Promise<GoogleAuthResponse> {

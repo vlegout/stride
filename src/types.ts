@@ -170,6 +170,7 @@ export const User = type({
   email: "string",
   google_id: "string",
   google_picture: "string?",
+  map: "'leaflet'|'openlayers'|'mapbox'",
   created_at: "string",
   updated_at: "string",
 });
@@ -183,6 +184,11 @@ export const UserCreate = type({
   google_picture: "string?",
 });
 export type UserCreate = typeof UserCreate.infer;
+
+export const UserUpdate = type({
+  map: "'leaflet'|'openlayers'|'mapbox'?",
+});
+export type UserUpdate = typeof UserUpdate.infer;
 
 export const Token = type({
   access_token: "string",

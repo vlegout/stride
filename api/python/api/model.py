@@ -3,7 +3,7 @@ import uuid
 
 from typing import List
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, field_validator
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -14,12 +14,20 @@ class UserBase(SQLModel):
     email: str = Field(unique=True)
     google_id: str = Field(unique=True)
     google_picture: str | None = None
+    map: str = Field(default="leaflet")
     created_at: datetime.datetime = Field(
         default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
     )
     updated_at: datetime.datetime = Field(
         default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
     )
+
+    @field_validator("map")
+    @classmethod
+    def validate_map(cls, v):
+        if v not in ["leaflet", "openlayers", "mapbox"]:
+            raise ValueError("Map must be one of: leaflet, openlayers, mapbox")
+        return v
 
 
 class User(UserBase, table=True):
@@ -38,6 +46,17 @@ class UserCreate(BaseModel):
     email: str
     google_id: str
     google_picture: str | None = None
+
+
+class UserUpdate(BaseModel):
+    map: str | None = None
+
+    @field_validator("map")
+    @classmethod
+    def validate_map(cls, v):
+        if v is not None and v not in ["leaflet", "openlayers", "mapbox"]:
+            raise ValueError("Map must be one of: leaflet, openlayers, mapbox")
+        return v
 
 
 class ActivityUpdate(BaseModel):
