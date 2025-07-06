@@ -31,8 +31,6 @@ from api.model import (
     ActivityPublicWithoutTracepoints,
     ActivityUpdate,
     Pagination,
-    PerformanceProfile,
-    PerformancePowerProfil,
     Profile,
     Statistic,
     User,
@@ -419,73 +417,6 @@ def read_profile(
             )
         )
 
-    performance_distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
-    distances_clause = ",".join(str(d) for d in performance_distances)
-    performance_stats = session.execute(
-        text(f"""
-            SELECT p.distance, MIN(p.time) as best_time, p.activity_id
-            FROM performance p
-            JOIN activity a ON p.activity_id = a.id
-            WHERE p.distance IN ({distances_clause})
-            AND a.user_id = :user_id AND a.status = 'created'
-            AND p.time = (
-                SELECT MIN(p2.time)
-                FROM performance p2
-                JOIN activity a2 ON p2.activity_id = a2.id
-                WHERE p2.distance = p.distance
-                AND a2.user_id = :user_id AND a2.status = 'created'
-            )
-            GROUP BY p.distance, p.activity_id
-            ORDER BY p.distance
-        """),
-        {"user_id": user_id},
-    ).all()
-
-    performance_dict = {row[0]: (row[1], row[2]) for row in performance_stats}
-    running_performances = [
-        PerformanceProfile(
-            distance=distance,
-            time=performance_dict.get(distance, (None, None))[0],
-            activity_id=performance_dict.get(distance, (None, None))[1],
-        )
-        for distance in performance_distances
-        if performance_dict.get(distance) is not None
-    ]
-
-    power_performance_stats = session.execute(
-        text("""
-            SELECT pp.time, MAX(pp.power) as best_power, pp.activity_id
-            FROM performancepower pp
-            JOIN activity a ON pp.activity_id = a.id
-            WHERE a.user_id = :user_id AND a.status = 'created'
-            AND pp.time IN (
-                INTERVAL '1 minute',
-                INTERVAL '5 minutes',
-                INTERVAL '20 minutes',
-                INTERVAL '1 hour'
-            )
-            AND pp.power = (
-                SELECT MAX(pp2.power)
-                FROM performancepower pp2
-                JOIN activity a2 ON pp2.activity_id = a2.id
-                WHERE pp2.time = pp.time
-                AND a2.user_id = :user_id AND a2.status = 'created'
-            )
-            GROUP BY pp.time, pp.activity_id
-            ORDER BY pp.time
-        """),
-        {"user_id": user_id},
-    ).all()
-
-    cycling_performances = [
-        PerformancePowerProfil(
-            time=row[0],
-            power=row[1],
-            activity_id=row[2],
-        )
-        for row in power_performance_stats
-    ]
-
     # Get user zones
     zones = session.exec(
         select(Zone).where(Zone.user_id == user_id).order_by(Zone.type, Zone.index)  # type: ignore
@@ -500,8 +431,6 @@ def read_profile(
         cycling_n_activities=overall_stats[3],
         cycling_total_distance=overall_stats[4] or 0.0,
         years=years_data,
-        running_performances=running_performances,
-        cycling_performances=cycling_performances,
         zones=zones_public,
     )
 

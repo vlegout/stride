@@ -157,8 +157,6 @@ export const Profile = type({
   cycling_n_activities: "number",
   cycling_total_distance: "number",
   years: [YearsStatistics],
-  running_performances: [Performance],
-  cycling_performances: [PowerPerformance],
   zones: Zone.array(),
 });
 export type Profile = typeof Profile.infer;

@@ -179,10 +179,6 @@ class Performance(PerformanceBase, table=True):
     activity: Activity = Relationship(back_populates="performances")
 
 
-class PerformanceProfile(PerformanceBase):
-    activity_id: uuid.UUID
-
-
 class PerformancePowerBase(SQLModel):
     time: datetime.timedelta
     power: float
@@ -192,10 +188,6 @@ class PerformancePower(PerformancePowerBase, table=True):
     id: uuid.UUID = Field(primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
     activity: Activity = Relationship(back_populates="performance_power")
-
-
-class PerformancePowerProfil(PerformancePowerBase):
-    activity_id: uuid.UUID
 
 
 class TracepointBase(SQLModel):
@@ -279,8 +271,6 @@ class Profile(BaseModel):
     cycling_n_activities: int = 0
     cycling_total_distance: float = 0.0
     years: List[YearsStatistics] = []
-    running_performances: List[PerformanceProfile] = []
-    cycling_performances: List[PerformancePowerProfil] = []
     zones: List[ZonePublic] = []
 
 
