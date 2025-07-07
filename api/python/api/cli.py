@@ -19,6 +19,7 @@ from api.model import (
     Activity,
     Lap,
     Location,
+    Performance,
     PerformancePower,
     Tracepoint,
     User,
@@ -26,6 +27,7 @@ from api.model import (
     Ftp,
 )
 from api.utils import (
+    calculate_activity_zone_data,
     get_best_performances,
     get_best_performance_power,
     get_activity_location,
@@ -59,7 +61,14 @@ def get_activity_from_yaml(
 
 def get_data(
     session: Session, input_file: str
-) -> tuple[Activity, List[Lap], List[Tracepoint], list, list]:
+) -> tuple[
+    Activity,
+    List[Lap],
+    List[Tracepoint],
+    List[Tracepoint],
+    List[Performance],
+    List[PerformancePower],
+]:
     if input_file.endswith(".yaml"):
         activity, laps, tracepoints = get_activity_from_yaml(
             session,
@@ -74,17 +83,32 @@ def get_data(
     performances = get_best_performances(activity, tracepoints)
     performance_powers = get_best_performance_power(activity, tracepoints)
 
+    # Store original tracepoints for zone calculation before filtering
+    original_tracepoints = tracepoints.copy()
+
     while len(tracepoints) > MAX_DATA_POINTS:
         tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
 
-    return activity, laps, tracepoints, performances, performance_powers
+    return (
+        activity,
+        laps,
+        tracepoints,
+        original_tracepoints,
+        performances,
+        performance_powers,
+    )
 
 
 def process_file(input_file: str) -> None:
     session = Session(engine)
-    activity, laps, tracepoints, performances, performance_powers = get_data(
-        session, input_file
-    )
+    (
+        activity,
+        laps,
+        tracepoints,
+        original_tracepoints,
+        performances,
+        performance_powers,
+    ) = get_data(session, input_file)
     session.add(activity)
 
     for lap in laps:
@@ -99,6 +123,10 @@ def process_file(input_file: str) -> None:
     for performance_power in performance_powers:
         session.add(performance_power)
 
+    session.commit()
+
+    # Calculate and save zone data for this activity using original unfiltered tracepoints
+    calculate_activity_zone_data(session, activity, original_tracepoints)
     session.commit()
 
 
@@ -148,14 +176,30 @@ def create_db():
 @app.command()
 def read_fit(
     fit_file: str = typer.Argument(),
+    email: str = typer.Option(..., help="User email to fetch zones"),
     out_file: str = typer.Option(None),
 ):
     """Read a .fit file and parse activity, laps, and tracepoints."""
     session = Session(engine)
-    activity, laps, tracepoints, performances, performance_powers = get_data(
+    (
+        activity,
+        laps,
+        tracepoints,
+        original_tracepoints,
+        performances,
+        performance_powers,
+    ) = get_data(
         session,
         fit_file,
     )
+
+    # Find user by email and set activity user_id for zone calculations
+    user = session.exec(select(User).where(User.email == email)).first()
+    if not user:
+        print(f"User with email {email} not found")
+        return
+
+    activity.user_id = user.id
 
     if out_file:
         with open(out_file, "w") as f:
@@ -184,6 +228,134 @@ def read_fit(
     print("\nCycling Power Performances:")
     for performance_power in performance_powers:
         print(f"  {performance_power.time}: {performance_power.power}W")
+
+    # Calculate and print zone data
+    print("\nZone Analysis:")
+    user_zones = session.exec(select(Zone).where(Zone.user_id == user.id)).all()
+
+    if not user_zones:
+        print("  No zones found for user")
+    else:
+        # Group zones by type
+        heart_rate_zones = [z for z in user_zones if z.type == "heart_rate"]
+        pace_zones = [z for z in user_zones if z.type == "pace"]
+        power_zones = [z for z in user_zones if z.type == "power"]
+
+        hr_zone_data_display = {}
+        pace_zone_data_display = {}
+        power_zone_data_display = {}
+
+        # Calculate heart rate zones
+        if heart_rate_zones and any(tp.heart_rate for tp in original_tracepoints):
+            from api.utils import _calculate_heart_rate_zones
+
+            hr_zone_data = _calculate_heart_rate_zones(
+                heart_rate_zones, original_tracepoints
+            )
+            for zone in heart_rate_zones:
+                if zone.id in hr_zone_data:
+                    hr_zone_data_display[
+                        f"HR Zone {zone.index} (≤{zone.max_value:.0f} bpm)"
+                    ] = hr_zone_data[zone.id]
+
+        # Calculate pace zones for running
+        if pace_zones and activity.sport == "running":
+            from api.utils import _calculate_pace_zones
+
+            pace_zone_data = _calculate_pace_zones(pace_zones, original_tracepoints)
+            for zone in pace_zones:
+                if zone.id in pace_zone_data:
+                    pace_min = int(zone.max_value // 60)
+                    pace_sec = int(zone.max_value % 60)
+
+                    # Display format depends on zone
+                    if zone.index == 5:  # Fastest zone
+                        zone_label = (
+                            f"Pace Zone {zone.index} (≤{pace_min}:{pace_sec:02d} /km)"
+                        )
+                    elif zone.index == 1:  # Slowest zone
+                        zone_label = (
+                            f"Pace Zone {zone.index} (>{pace_min}:{pace_sec:02d} /km)"
+                        )
+                    else:  # Middle zones - show range
+                        # Find the next faster zone to show range
+                        faster_zone = next(
+                            (z for z in pace_zones if z.index == zone.index + 1), None
+                        )
+                        if faster_zone:
+                            faster_min = int(faster_zone.max_value // 60)
+                            faster_sec = int(faster_zone.max_value % 60)
+                            zone_label = f"Pace Zone {zone.index} ({faster_min}:{faster_sec:02d}-{pace_min}:{pace_sec:02d} /km)"
+                        else:
+                            zone_label = f"Pace Zone {zone.index} (≤{pace_min}:{pace_sec:02d} /km)"
+
+                    pace_zone_data_display[zone_label] = pace_zone_data[zone.id]
+
+        # Calculate power zones for cycling
+        if (
+            power_zones
+            and activity.sport == "cycling"
+            and any(tp.power for tp in original_tracepoints)
+        ):
+            from api.utils import _calculate_power_zones
+
+            power_zone_data = _calculate_power_zones(power_zones, original_tracepoints)
+            for zone in power_zones:
+                if zone.id in power_zone_data:
+                    power_zone_data_display[
+                        f"Power Zone {zone.index} (≤{zone.max_value:.0f} W)"
+                    ] = power_zone_data[zone.id]
+
+        # Display zones with percentages per type
+        if hr_zone_data_display or pace_zone_data_display or power_zone_data_display:
+            print("  Time in zones:")
+
+            # Display heart rate zones
+            if hr_zone_data_display:
+                hr_total_time = sum(hr_zone_data_display.values())
+                for zone_name, time_seconds in sorted(hr_zone_data_display.items()):
+                    time_min = int(time_seconds // 60)
+                    time_sec = int(time_seconds % 60)
+                    percentage = (
+                        (time_seconds / hr_total_time * 100) if hr_total_time > 0 else 0
+                    )
+                    print(
+                        f"    {zone_name}: {time_min}:{time_sec:02d} ({percentage:.1f}%)"
+                    )
+
+            # Display pace zones
+            if pace_zone_data_display:
+                pace_total_time = sum(pace_zone_data_display.values())
+                for zone_name, time_seconds in sorted(pace_zone_data_display.items()):
+                    time_min = int(time_seconds // 60)
+                    time_sec = int(time_seconds % 60)
+                    percentage = (
+                        (time_seconds / pace_total_time * 100)
+                        if pace_total_time > 0
+                        else 0
+                    )
+                    print(
+                        f"    {zone_name}: {time_min}:{time_sec:02d} ({percentage:.1f}%)"
+                    )
+
+            # Display power zones
+            if power_zone_data_display:
+                power_total_time = sum(power_zone_data_display.values())
+                for zone_name, time_seconds in sorted(power_zone_data_display.items()):
+                    time_min = int(time_seconds // 60)
+                    time_sec = int(time_seconds % 60)
+                    percentage = (
+                        (time_seconds / power_total_time * 100)
+                        if power_total_time > 0
+                        else 0
+                    )
+                    print(
+                        f"    {zone_name}: {time_min}:{time_sec:02d} ({percentage:.1f}%)"
+                    )
+        else:
+            print(
+                "  No zone data calculated (missing sensor data or incompatible sport)"
+            )
 
 
 @app.command()
