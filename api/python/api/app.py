@@ -48,6 +48,7 @@ from api.model import (
     ZonePublic,
 )
 from api.utils import (
+    calculate_activity_zone_data,
     get_best_performances,
     get_best_performance_power,
     generate_random_string,
@@ -233,6 +234,9 @@ def create_activity(
         performances = get_best_performances(activity, tracepoints)
         performance_powers = get_best_performance_power(activity, tracepoints)
 
+        # Store original tracepoints for zone calculation before filtering
+        original_tracepoints = tracepoints.copy()
+
         MAX_DATA_POINTS = 500
         while len(tracepoints) > MAX_DATA_POINTS:
             tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
@@ -272,6 +276,10 @@ def create_activity(
 
         session.commit()
         session.refresh(activity)
+
+        # Calculate and save zone data for this activity using original unfiltered tracepoints
+        calculate_activity_zone_data(session, activity, original_tracepoints)
+        session.commit()
 
         # Update user's training zones based on this new activity
         update_user_zones_from_activities(session, user_id)

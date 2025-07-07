@@ -5,7 +5,7 @@ import random
 import string
 import uuid
 
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 
 import boto3
 from sqlmodel import Session, select
@@ -14,6 +14,9 @@ from fastapi import HTTPException
 
 from api.model import (
     Activity,
+    ActivityZoneHeartRate,
+    ActivityZonePace,
+    ActivityZonePower,
     Location,
     Performance,
     PerformancePower,
@@ -481,3 +484,171 @@ def create_default_zones(session: Session, user_id: str):
             max_value=zone_data["max_value"],
         )
         session.add(zone)
+
+
+def calculate_activity_zone_data(
+    session: Session, activity: Activity, tracepoints: List[Tracepoint]
+) -> None:
+    """Calculate and save time spent in each zone for an activity"""
+    if not tracepoints or not activity.user_id:
+        return
+
+    # Get user's zones
+    user_zones = session.exec(
+        select(Zone).where(Zone.user_id == activity.user_id)
+    ).all()
+
+    if not user_zones:
+        return
+
+    # Group zones by type
+    heart_rate_zones = [z for z in user_zones if z.type == "heart_rate"]
+    pace_zones = [z for z in user_zones if z.type == "pace"]
+    power_zones = [z for z in user_zones if z.type == "power"]
+
+    # Calculate heart rate zone data
+    if heart_rate_zones and any(tp.heart_rate for tp in tracepoints):
+        zone_data = _calculate_heart_rate_zones(heart_rate_zones, tracepoints)
+        for zone_id, time_in_zone in zone_data.items():
+            if time_in_zone > 0:
+                activity_zone_hr = ActivityZoneHeartRate(
+                    activity_id=activity.id,
+                    zone_id=zone_id,
+                    time_in_zone=time_in_zone,
+                )
+                session.add(activity_zone_hr)
+
+    # Calculate pace zone data for running
+    if pace_zones and activity.sport == "running":
+        zone_data = _calculate_pace_zones(pace_zones, tracepoints)
+        for zone_id, time_in_zone in zone_data.items():
+            if time_in_zone > 0:
+                activity_zone_pace = ActivityZonePace(
+                    activity_id=activity.id,
+                    zone_id=zone_id,
+                    time_in_zone=time_in_zone,
+                )
+                session.add(activity_zone_pace)
+
+    # Calculate power zone data for cycling
+    if (
+        power_zones
+        and activity.sport == "cycling"
+        and any(tp.power for tp in tracepoints)
+    ):
+        zone_data = _calculate_power_zones(power_zones, tracepoints)
+        for zone_id, time_in_zone in zone_data.items():
+            if time_in_zone > 0:
+                activity_zone_power = ActivityZonePower(
+                    activity_id=activity.id,
+                    zone_id=zone_id,
+                    time_in_zone=time_in_zone,
+                )
+                session.add(activity_zone_power)
+
+
+def _calculate_heart_rate_zones(
+    zones: List[Zone], tracepoints: List[Tracepoint]
+) -> Dict[uuid.UUID, float]:
+    """Calculate time spent in each heart rate zone"""
+    zone_data: Dict[uuid.UUID, float] = {}
+
+    # Sort zones by max_value for proper zone assignment
+    sorted_zones = sorted(zones, key=lambda z: z.max_value)
+
+    for i in range(len(tracepoints) - 1):
+        current_tp = tracepoints[i]
+        next_tp = tracepoints[i + 1]
+
+        if current_tp.heart_rate is None:
+            continue
+
+        # Calculate time spent at this heart rate
+        time_diff = (next_tp.timestamp - current_tp.timestamp).total_seconds()
+
+        # Find which zone this heart rate belongs to
+        zone_id = None
+        for zone in sorted_zones:
+            if current_tp.heart_rate <= zone.max_value:
+                zone_id = zone.id
+                break
+
+        if zone_id:
+            zone_data[zone_id] = zone_data.get(zone_id, 0) + time_diff
+
+    return zone_data
+
+
+def _calculate_pace_zones(
+    zones: List[Zone], tracepoints: List[Tracepoint]
+) -> Dict[uuid.UUID, float]:
+    """Calculate time spent in each pace zone"""
+    zone_data: Dict[uuid.UUID, float] = {}
+
+    zones_by_index = sorted(zones, key=lambda z: z.index)
+
+    for i in range(len(tracepoints) - 1):
+        current_tp = tracepoints[i]
+        next_tp = tracepoints[i + 1]
+
+        if current_tp.speed <= 0:
+            continue
+
+        # Calculate pace in seconds per km
+        speed_kmh = current_tp.speed  # Treat as km/h directly
+        if speed_kmh > 0:
+            pace = 3600 / speed_kmh  # sec/km
+        else:
+            continue  # Skip points with zero speed
+
+        # Calculate time spent at this pace
+        time_diff = (next_tp.timestamp - current_tp.timestamp).total_seconds()
+
+        # Find which zone this pace belongs to
+        zone_id = None
+
+        # Check from fastest to slowest zone to find the most appropriate zone
+        for zone in reversed(zones_by_index):
+            if pace <= zone.max_value:
+                zone_id = zone.id
+                break
+
+        # If no zone found (pace is slower than all zones), assign to slowest zone
+        if zone_id is None:
+            zone_id = zones_by_index[0].id  # Zone 1 (slowest)
+
+        zone_data[zone_id] = zone_data.get(zone_id, 0) + time_diff
+
+    return zone_data
+
+
+def _calculate_power_zones(
+    zones: List[Zone], tracepoints: List[Tracepoint]
+) -> Dict[uuid.UUID, float]:
+    """Calculate time spent in each power zone"""
+    zone_data: Dict[uuid.UUID, float] = {}
+
+    # Sort zones by max_value for proper zone assignment
+    sorted_zones = sorted(zones, key=lambda z: z.max_value)
+
+    for i in range(len(tracepoints) - 1):
+        current_tp = tracepoints[i]
+        next_tp = tracepoints[i + 1]
+
+        if current_tp.power is None:
+            continue
+
+        # Calculate time spent at this power
+        time_diff = (next_tp.timestamp - current_tp.timestamp).total_seconds()
+
+        # Find which zone this power belongs to
+        zone_id = None
+        for zone in sorted_zones:
+            if current_tp.power <= zone.max_value:
+                zone_id = zone.id
+                break
+
+        if zone_id:
+            zone_data[zone_id] = zone_data.get(zone_id, 0) + time_diff
+
+    return zone_data

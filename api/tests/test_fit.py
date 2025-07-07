@@ -32,7 +32,7 @@ class TestFit(unittest.TestCase):
             fit_path = os.path.join(test_dir, "data", f"{sport}.fit")
             json_path = os.path.join(test_dir, "data", f"{sport}.json")
 
-            activity, _, _, _, _ = get_data(
+            activity, _, _, _, _, _ = get_data(
                 mock_session,
                 fit_path,
             )

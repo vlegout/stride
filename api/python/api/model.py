@@ -120,6 +120,11 @@ class Activity(ActivityBase, table=True):
         back_populates="activity"
     )
     tracepoints: list["Tracepoint"] = Relationship(back_populates="activity")
+    zone_paces: list["ActivityZonePace"] = Relationship(back_populates="activity")
+    zone_powers: list["ActivityZonePower"] = Relationship(back_populates="activity")
+    zone_heart_rates: list["ActivityZoneHeartRate"] = Relationship(
+        back_populates="activity"
+    )
     user: User = Relationship(back_populates="activities")
 
 
@@ -214,6 +219,54 @@ class Location(SQLModel, table=True):
     city: str | None = None
     subdivision: str | None = None
     country: str | None = None
+
+
+class ActivityZonePaceBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    activity_id: uuid.UUID = Field(foreign_key="activity.id")
+    zone_id: uuid.UUID = Field(foreign_key="zone.id")
+    time_in_zone: float
+
+
+class ActivityZonePace(ActivityZonePaceBase, table=True):
+    activity: Activity = Relationship(back_populates="zone_paces")
+    zone: "Zone" = Relationship()
+
+
+class ActivityZonePacePublic(ActivityZonePaceBase):
+    pass
+
+
+class ActivityZonePowerBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    activity_id: uuid.UUID = Field(foreign_key="activity.id")
+    zone_id: uuid.UUID = Field(foreign_key="zone.id")
+    time_in_zone: float
+
+
+class ActivityZonePower(ActivityZonePowerBase, table=True):
+    activity: Activity = Relationship(back_populates="zone_powers")
+    zone: "Zone" = Relationship()
+
+
+class ActivityZonePowerPublic(ActivityZonePowerBase):
+    pass
+
+
+class ActivityZoneHeartRateBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    activity_id: uuid.UUID = Field(foreign_key="activity.id")
+    zone_id: uuid.UUID = Field(foreign_key="zone.id")
+    time_in_zone: float
+
+
+class ActivityZoneHeartRate(ActivityZoneHeartRateBase, table=True):
+    activity: Activity = Relationship(back_populates="zone_heart_rates")
+    zone: "Zone" = Relationship()
+
+
+class ActivityZoneHeartRatePublic(ActivityZoneHeartRateBase):
+    pass
 
 
 class ZoneBase(SQLModel):
