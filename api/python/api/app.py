@@ -21,6 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, text
 from sqlmodel import Session, select
+from sqlalchemy.orm import selectinload
 
 from api.auth import verify_token, create_token_response, Token
 from api.fit import get_activity_from_fit
@@ -31,6 +32,12 @@ from api.model import (
     ActivityPublic,
     ActivityPublicWithoutTracepoints,
     ActivityUpdate,
+    ActivityZonePace,
+    ActivityZonePacePublic,
+    ActivityZonePower,
+    ActivityZonePowerPublic,
+    ActivityZoneHeartRate,
+    ActivityZoneHeartRatePublic,
     BestPerformanceItem,
     BestPerformanceResponse,
     Pagination,
@@ -202,6 +209,62 @@ def read_activity(
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
     return activity
+
+
+class ActivityZonesResponse(BaseModel):
+    pace: list[ActivityZonePacePublic]
+    power: list[ActivityZonePowerPublic]
+    heart_rate: list[ActivityZoneHeartRatePublic]
+
+
+@app.get("/activities/{activity_id}/zones", response_model=ActivityZonesResponse)
+def read_activity_zones(
+    activity_id: uuid.UUID,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    activity = session.exec(
+        select(Activity).where(
+            Activity.id == activity_id,
+            Activity.user_id == user_id,
+            Activity.status == "created",
+        )
+    ).first()
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    pace_zones = session.exec(
+        select(ActivityZonePace)
+        .where(ActivityZonePace.activity_id == activity_id)
+        .options(selectinload(ActivityZonePace.zone))  # type: ignore
+        .join(Zone)
+        .order_by(Zone.index)  # type: ignore
+    ).all()
+
+    power_zones = session.exec(
+        select(ActivityZonePower)
+        .where(ActivityZonePower.activity_id == activity_id)
+        .options(selectinload(ActivityZonePower.zone))  # type: ignore
+        .join(Zone)
+        .order_by(Zone.index)  # type: ignore
+    ).all()
+
+    heart_rate_zones = session.exec(
+        select(ActivityZoneHeartRate)
+        .where(ActivityZoneHeartRate.activity_id == activity_id)
+        .options(selectinload(ActivityZoneHeartRate.zone))  # type: ignore
+        .join(Zone)
+        .order_by(Zone.index)  # type: ignore
+    ).all()
+
+    return ActivityZonesResponse(
+        pace=[ActivityZonePacePublic.model_validate(zone) for zone in pace_zones],
+        power=[ActivityZonePowerPublic.model_validate(zone) for zone in power_zones],
+        heart_rate=[
+            ActivityZoneHeartRatePublic.model_validate(zone)
+            for zone in heart_rate_zones
+        ],
+    )
 
 
 @app.post(

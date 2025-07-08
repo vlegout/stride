@@ -84,6 +84,73 @@ export async function fetchActivity(id: string): Promise<Activity> {
   return await apiCall("/activities/" + id + "/");
 }
 
+interface ActivityZoneRaw {
+  id: string;
+  activity_id: string;
+  zone_id: string;
+  time_in_zone: number;
+  zone: {
+    id: string;
+    user_id: string;
+    index: number;
+    type: string;
+    max_value: number;
+  };
+}
+
+interface ActivityZonesRawResponse {
+  pace?: ActivityZoneRaw[];
+  power?: ActivityZoneRaw[];
+  heart_rate?: ActivityZoneRaw[];
+}
+
+export async function fetchActivityZones(id: string): Promise<{
+  heartRate?: { zone: number; time: number; percentage: number }[];
+  power?: { zone: number; time: number; percentage: number }[];
+  pace?: { zone: number; time: number; percentage: number }[];
+}> {
+  const response: ActivityZonesRawResponse = await apiCall("/activities/" + id + "/zones/");
+
+  // Transform API response to match frontend expectations
+  const transformed: {
+    heartRate?: { zone: number; time: number; percentage: number }[];
+    power?: { zone: number; time: number; percentage: number }[];
+    pace?: { zone: number; time: number; percentage: number }[];
+  } = {};
+
+  // Calculate total time for percentage calculation
+  const calculateTotalTime = (zones: ActivityZoneRaw[]) => zones.reduce((sum, z) => sum + z.time_in_zone, 0);
+
+  if (response.heart_rate && response.heart_rate.length > 0) {
+    const totalTime = calculateTotalTime(response.heart_rate);
+    transformed.heartRate = response.heart_rate.map((z: ActivityZoneRaw) => ({
+      zone: z.zone.index,
+      time: z.time_in_zone,
+      percentage: totalTime > 0 ? (z.time_in_zone / totalTime) * 100 : 0,
+    }));
+  }
+
+  if (response.power && response.power.length > 0) {
+    const totalTime = calculateTotalTime(response.power);
+    transformed.power = response.power.map((z: ActivityZoneRaw) => ({
+      zone: z.zone.index,
+      time: z.time_in_zone,
+      percentage: totalTime > 0 ? (z.time_in_zone / totalTime) * 100 : 0,
+    }));
+  }
+
+  if (response.pace && response.pace.length > 0) {
+    const totalTime = calculateTotalTime(response.pace);
+    transformed.pace = response.pace.map((z: ActivityZoneRaw) => ({
+      zone: z.zone.index,
+      time: z.time_in_zone,
+      percentage: totalTime > 0 ? (z.time_in_zone / totalTime) * 100 : 0,
+    }));
+  }
+
+  return transformed;
+}
+
 export async function fetchProfile(): Promise<Profile> {
   return await apiCall("/profile/");
 }
