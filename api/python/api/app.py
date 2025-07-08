@@ -217,7 +217,7 @@ class ActivityZonesResponse(BaseModel):
     heart_rate: list[ActivityZoneHeartRatePublic]
 
 
-@app.get("/activities/{activity_id}/zones", response_model=ActivityZonesResponse)
+@app.get("/activities/{activity_id}/zones/", response_model=ActivityZonesResponse)
 def read_activity_zones(
     activity_id: uuid.UUID,
     session: Session = Depends(get_session),
