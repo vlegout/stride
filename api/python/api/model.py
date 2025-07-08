@@ -234,7 +234,7 @@ class ActivityZonePace(ActivityZonePaceBase, table=True):
 
 
 class ActivityZonePacePublic(ActivityZonePaceBase):
-    pass
+    zone: "ZonePublic"
 
 
 class ActivityZonePowerBase(SQLModel):
@@ -250,7 +250,7 @@ class ActivityZonePower(ActivityZonePowerBase, table=True):
 
 
 class ActivityZonePowerPublic(ActivityZonePowerBase):
-    pass
+    zone: "ZonePublic"
 
 
 class ActivityZoneHeartRateBase(SQLModel):
@@ -266,7 +266,7 @@ class ActivityZoneHeartRate(ActivityZoneHeartRateBase, table=True):
 
 
 class ActivityZoneHeartRatePublic(ActivityZoneHeartRateBase):
-    pass
+    zone: "ZonePublic"
 
 
 class ZoneBase(SQLModel):

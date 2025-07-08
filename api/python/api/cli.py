@@ -17,6 +17,9 @@ from api.db import engine
 from api.fit import get_activity_from_fit
 from api.model import (
     Activity,
+    ActivityZoneHeartRate,
+    ActivityZonePace,
+    ActivityZonePower,
     Lap,
     Location,
     Performance,
@@ -631,6 +634,159 @@ def update_ftp():
 
     print(f"Processed {processed_count} FTP records")
     print(f"Skipped {skipped_count} dates (existing records or insufficient data)")
+
+
+@app.command()
+def update_activity_zones():
+    """Update zone data for all activities by recalculating time spent in zones using FIT files."""
+    session = Session(engine)
+
+    # Get all activities with status 'created'
+    activities = session.exec(
+        select(Activity)
+        .where(Activity.status == "created")
+        .order_by(Activity.start_time)
+    ).all()
+
+    print(f"Found {len(activities)} activities to process...")
+
+    processed_count = 0
+    skipped_count = 0
+    error_count = 0
+
+    for activity in activities:
+        try:
+            print(f"Processing activity {activity.id} ({activity.sport})...")
+
+            if not activity.user_id:
+                print(f"  Skipping activity {activity.id} - no user_id")
+                skipped_count += 1
+                continue
+
+            # Check if FIT file exists in data/fit or data/files
+            fit_file_paths = [
+                f"./data/fit/{activity.fit}",
+                f"./data/files/{activity.fit}",
+            ]
+            fit_file_path = None
+            for path in fit_file_paths:
+                if os.path.exists(path):
+                    fit_file_path = path
+                    break
+
+            if fit_file_path is None:
+                print(
+                    f"  Skipping activity {activity.id} - FIT file {activity.fit} not found"
+                )
+                skipped_count += 1
+                continue
+
+            # Delete existing zone data for this activity
+            existing_pace_zones = session.exec(
+                select(ActivityZonePace).where(
+                    ActivityZonePace.activity_id == activity.id
+                )
+            ).all()
+            for zone in existing_pace_zones:
+                session.delete(zone)
+
+            existing_power_zones = session.exec(
+                select(ActivityZonePower).where(
+                    ActivityZonePower.activity_id == activity.id
+                )
+            ).all()
+            for zone in existing_power_zones:
+                session.delete(zone)
+
+            existing_hr_zones = session.exec(
+                select(ActivityZoneHeartRate).where(
+                    ActivityZoneHeartRate.activity_id == activity.id
+                )
+            ).all()
+            for zone in existing_hr_zones:
+                session.delete(zone)
+
+            # Read tracepoints from FIT file
+            try:
+                _, _, tracepoints = get_activity_from_fit(session, fit_file_path)
+            except Exception as e:
+                print(f"  Error reading FIT file for activity {activity.id}: {e}")
+                error_count += 1
+                continue
+
+            if not tracepoints:
+                print(f"  Skipping activity {activity.id} - no tracepoints in FIT file")
+                skipped_count += 1
+                continue
+
+            # Check if user has zones before calculating
+            user_zones = session.exec(
+                select(Zone).where(Zone.user_id == activity.user_id)
+            ).all()
+
+            if not user_zones:
+                print(f"  Creating default zones for user {activity.user_id}")
+                create_default_zones(session, activity.user_id)
+                session.commit()
+
+            print(
+                f"  Found {len(tracepoints)} tracepoints, user has {len(user_zones)} zones"
+            )
+
+            # Check what sensor data is available
+            has_hr = any(tp.heart_rate for tp in tracepoints)
+            has_power = any(tp.power for tp in tracepoints)
+            print(
+                f"  Sensor data - HR: {has_hr}, Power: {has_power}, Sport: {activity.sport}"
+            )
+
+            # Recalculate zone data using tracepoints from FIT file
+            calculate_activity_zone_data(session, activity, tracepoints)
+
+            # Count new zone entries to verify calculation worked
+            new_pace_zones = session.exec(
+                select(ActivityZonePace).where(
+                    ActivityZonePace.activity_id == activity.id
+                )
+            ).all()
+            new_power_zones = session.exec(
+                select(ActivityZonePower).where(
+                    ActivityZonePower.activity_id == activity.id
+                )
+            ).all()
+            new_hr_zones = session.exec(
+                select(ActivityZoneHeartRate).where(
+                    ActivityZoneHeartRate.activity_id == activity.id
+                )
+            ).all()
+
+            zone_counts = len(new_pace_zones) + len(new_power_zones) + len(new_hr_zones)
+            print(
+                f"  Updated activity {activity.id}: {zone_counts} zone entries created (HR: {len(new_hr_zones)}, Pace: {len(new_pace_zones)}, Power: {len(new_power_zones)})"
+            )
+
+            processed_count += 1
+
+            # Commit every 10 activities to avoid memory issues
+            if processed_count % 10 == 0:
+                session.commit()
+                print(
+                    f"  Committed batch (processed {processed_count} activities so far)"
+                )
+
+        except Exception as e:
+            print(f"  Error processing activity {activity.id}: {e}")
+            error_count += 1
+            # Rollback the session to continue with next activity
+            session.rollback()
+
+    # Final commit
+    session.commit()
+
+    print("Zone update completed:")
+    print(f"  Processed: {processed_count} activities")
+    print(f"  Skipped: {skipped_count} activities")
+    print(f"  Errors: {error_count} activities")
 
 
 if __name__ == "__main__":
