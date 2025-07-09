@@ -218,7 +218,7 @@ const meta = {
     (Story) => {
       const queryClient = createQueryClient();
       setupMockData(queryClient);
-      
+
       return (
         <QueryClientProvider client={queryClient}>
           <MemoryRouter>
