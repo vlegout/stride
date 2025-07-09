@@ -8,6 +8,31 @@ import { Activity } from "../types";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
 
+// Mock zone data for testing
+const mockZoneData = {
+  heartRate: [
+    { zone: 1, time: 900, percentage: 22.5 },
+    { zone: 2, time: 1200, percentage: 30.0 },
+    { zone: 3, time: 1080, percentage: 27.0 },
+    { zone: 4, time: 600, percentage: 15.0 },
+    { zone: 5, time: 220, percentage: 5.5 },
+  ],
+  power: [
+    { zone: 1, time: 1200, percentage: 25.0 },
+    { zone: 2, time: 1800, percentage: 37.5 },
+    { zone: 3, time: 900, percentage: 18.8 },
+    { zone: 4, time: 600, percentage: 12.5 },
+    { zone: 5, time: 300, percentage: 6.2 },
+  ],
+  pace: [
+    { zone: 1, time: 1800, percentage: 40.0 },
+    { zone: 2, time: 1200, percentage: 26.7 },
+    { zone: 3, time: 900, percentage: 20.0 },
+    { zone: 4, time: 420, percentage: 9.3 },
+    { zone: 5, time: 180, percentage: 4.0 },
+  ],
+};
+
 const mockRunningActivity: Activity = {
   id: "550e8400-e29b-41d4-a716-446655440000",
   fit: "running_activity.fit",
@@ -161,6 +186,12 @@ const createQueryClient = () =>
     },
   });
 
+// Add mock zone data to the query client
+const setupMockData = (client: QueryClient) => {
+  client.setQueryData(["activityZones", "550e8400-e29b-41d4-a716-446655440000"], mockZoneData);
+  client.setQueryData(["activityZones", "550e8400-e29b-41d4-a716-446655440001"], mockZoneData);
+};
+
 const meta = {
   title: "Components/ActivityPageView",
   component: ActivityPageView,
@@ -172,6 +203,9 @@ const meta = {
           "Complete activity detail view showing activity summary, lap chart, performances, and multiple data charts. For cycling activities, also shows power performances.",
       },
     },
+    msw: {
+      handlers: [],
+    },
   },
   tags: ["autodocs"],
   argTypes: {
@@ -181,15 +215,20 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
-      <QueryClientProvider client={createQueryClient()}>
-        <MemoryRouter>
-          <div style={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-            <Story />
-          </div>
-        </MemoryRouter>
-      </QueryClientProvider>
-    ),
+    (Story) => {
+      const queryClient = createQueryClient();
+      setupMockData(queryClient);
+      
+      return (
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <div style={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+              <Story />
+            </div>
+          </MemoryRouter>
+        </QueryClientProvider>
+      );
+    },
   ],
 } satisfies Meta<typeof ActivityPageView>;
 
