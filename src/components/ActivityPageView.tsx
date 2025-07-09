@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 
 import ActivityBox from "./ActivityBox";
 import LapChart from "./LapChart";
@@ -46,25 +47,33 @@ const ActivityPageView = ({ data }: ActivityPageViewProps) => {
       )}
 
       {zonesData && (
-        <>
-          {zonesData.heartRate && zonesData.heartRate.length > 0 && (
-            <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
-              <ActivityZones zones={zonesData.heartRate} title="Heart Rate Zones" />
-            </SectionContainer>
-          )}
+        <Box sx={{ width: "100%", px: 2 }}>
+          <Grid container spacing={2} sx={{ justifyContent: "center", maxWidth: "1200px", margin: "0 auto" }}>
+            {zonesData.heartRate && zonesData.heartRate.length > 0 && (
+              <Grid size={{ xs: 12, md: 4 }}>
+                <SectionContainer maxWidth="100%" centered>
+                  <ActivityZones zones={zonesData.heartRate} title="Heart Rate Zones" />
+                </SectionContainer>
+              </Grid>
+            )}
 
-          {zonesData.power && zonesData.power.length > 0 && data.sport === "cycling" && (
-            <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
-              <ActivityZones zones={zonesData.power} title="Power Zones" />
-            </SectionContainer>
-          )}
+            {zonesData.power && zonesData.power.length > 0 && data.sport === "cycling" && (
+              <Grid size={{ xs: 12, md: 4 }}>
+                <SectionContainer maxWidth="100%" centered>
+                  <ActivityZones zones={zonesData.power} title="Power Zones" />
+                </SectionContainer>
+              </Grid>
+            )}
 
-          {zonesData.pace && zonesData.pace.length > 0 && data.sport === "running" && (
-            <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
-              <ActivityZones zones={zonesData.pace} title="Pace Zones" />
-            </SectionContainer>
-          )}
-        </>
+            {zonesData.pace && zonesData.pace.length > 0 && data.sport === "running" && (
+              <Grid size={{ xs: 12, md: 4 }}>
+                <SectionContainer maxWidth="100%" centered>
+                  <ActivityZones zones={zonesData.pace} title="Pace Zones" />
+                </SectionContainer>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
       )}
 
       <ActivityCharts chartData={chartData} />
