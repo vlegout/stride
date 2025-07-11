@@ -337,11 +337,8 @@ def create_activity(
         for performance_power in performance_powers:
             session.add(performance_power)
 
-        session.commit()
-        session.refresh(activity)
-
-        # Calculate and save zone data for this activity using original unfiltered tracepoints
         calculate_activity_zone_data(session, activity, original_tracepoints)
+
         session.commit()
 
         # Update user's training zones based on this new activity
