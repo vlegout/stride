@@ -123,7 +123,7 @@ const ActivityZones = ({ zones, title }: ActivityZonesProps) => {
       <Box
         sx={{
           width: "100%",
-          height: isSmall ? 300 : isMobile ? 350 : 400,
+          height: isSmall ? 200 : isMobile ? 250 : 300,
           position: "relative",
         }}
       >
