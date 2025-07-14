@@ -19,6 +19,7 @@ import LoadingIndicator from "../components/LoadingIndicator";
 import FitnessOverview from "../components/FitnessOverview";
 import FitnessScoreChart from "../components/FitnessScoreChart";
 import WeeklyMetricsCharts from "../components/WeeklyMetricsCharts";
+import WeeklyZonesCharts from "../components/WeeklyZonesCharts";
 import TSSChart from "../components/TSSChart";
 import FTPChart from "../components/FTPChart";
 import DateSelector, { DateRangeOption } from "../components/DateSelector";
@@ -74,6 +75,9 @@ const Fitness = () => {
   const filteredWeeklyTss = filterWeeklyDataByDateRange(fitnessData.weekly_tss, selectedRange);
   const filteredWeeklyRunning = filterWeeklyDataByDateRange(fitnessData.weekly_running, selectedRange);
   const filteredWeeklyCycling = filterWeeklyDataByDateRange(fitnessData.weekly_cycling, selectedRange);
+  const filteredWeeklyZones = fitnessData.weekly_zones
+    ? filterWeeklyDataByDateRange(fitnessData.weekly_zones, selectedRange)
+    : [];
   const filteredFtp = fitnessData.ftp ? filterDataByDateRange(fitnessData.ftp, selectedRange) : [];
 
   const overallScores = filteredScores.map((score) => score.overall);
@@ -142,6 +146,12 @@ const Fitness = () => {
       <SectionContainer>
         <TSSChart weeklyTss={filteredWeeklyTss} />
       </SectionContainer>
+
+      {filteredWeeklyZones.length > 0 && (
+        <SectionContainer>
+          <WeeklyZonesCharts weeklyZones={filteredWeeklyZones} />
+        </SectionContainer>
+      )}
 
       {filteredFtp.length > 0 && (
         <SectionContainer>

@@ -1,19 +1,17 @@
 import { Box, Typography } from "@mui/material";
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
-  Filler,
   TooltipItem,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface WeeklyTSSData {
   week_start: string;
@@ -34,10 +32,7 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
       {
         label: "Weekly TSS",
         data: weeklyTssValues,
-        borderColor: "rgb(153, 102, 255)",
-        backgroundColor: "rgba(153, 102, 255, 0.1)",
-        tension: 0.1,
-        fill: true,
+        backgroundColor: "rgba(153, 102, 255, 0.7)",
       },
     ],
   };
@@ -55,10 +50,10 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
       },
       tooltip: {
         callbacks: {
-          title: function (context: TooltipItem<"line">[]) {
+          title: function (context: TooltipItem<"bar">[]) {
             return context[0].label || "";
           },
-          label: function (context: TooltipItem<"line">) {
+          label: function (context: TooltipItem<"bar">) {
             return `TSS: ${context.parsed.y}`;
           },
         },
@@ -93,7 +88,7 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
       </Box>
 
       <Box sx={{ height: 400, width: "100%" }}>
-        <Line data={weeklyTssChartData} options={weeklyTssChartOptions} />
+        <Bar data={weeklyTssChartData} options={weeklyTssChartOptions} />
       </Box>
     </Box>
   );
