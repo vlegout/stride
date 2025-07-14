@@ -184,6 +184,8 @@ class TestFitness(unittest.TestCase):
         self.assertIn("weekly_tss", result)
         self.assertIn("weekly_running", result)
         self.assertIn("weekly_cycling", result)
+        self.assertIn("weekly_zones", result)
+        self.assertIn("ftp", result)
 
         # All daily scores should be 0
         for daily_score in result["scores"]:
@@ -219,15 +221,25 @@ class TestFitness(unittest.TestCase):
 
         mock_session = Mock()
 
-        # Create separate mock results for activities and FTP queries
+        # Create mock results for all the queries made by calculate_fitness_scores
         mock_activities_result = Mock()
         mock_activities_result.all.return_value = mock_activities
 
         mock_ftp_result = Mock()
         mock_ftp_result.all.return_value = []  # No FTP records
 
+        mock_zones_result = Mock()
+        mock_zones_result.all.return_value = []  # No zones
+
+        # Mock empty results for weekly activity queries (52 weeks)
+        mock_weekly_activities_result = Mock()
+        mock_weekly_activities_result.all.return_value = []
+
         # Mock session.exec to return different results based on call order
-        mock_session.exec.side_effect = [mock_activities_result, mock_ftp_result]
+        # First call: main activities, second: FTP, third: zones, then 52 weekly queries
+        side_effects = [mock_activities_result, mock_ftp_result, mock_zones_result]
+        side_effects.extend([mock_weekly_activities_result] * 52)
+        mock_session.exec.side_effect = side_effects
 
         result = calculate_fitness_scores(mock_session, "test-user-id")
 
@@ -236,6 +248,7 @@ class TestFitness(unittest.TestCase):
         self.assertIn("weekly_tss", result)
         self.assertIn("weekly_running", result)
         self.assertIn("weekly_cycling", result)
+        self.assertIn("weekly_zones", result)
         self.assertIn("ftp", result)
 
         # Should have 365 daily scores

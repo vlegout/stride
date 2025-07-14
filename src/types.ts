@@ -273,11 +273,29 @@ export const FtpData = type({
 });
 export type FtpData = typeof FtpData.infer;
 
+export const ZoneTimeData = type({
+  zone_index: "number",
+  total_time: "number",
+  running_time: "number | undefined",
+  cycling_time: "number | undefined",
+  max_value: "number",
+});
+export type ZoneTimeData = typeof ZoneTimeData.infer;
+
+export const WeeklyZoneData = type({
+  week_start: "string",
+  heart_rate_zones: ZoneTimeData.array(),
+  pace_zones: ZoneTimeData.array(),
+  power_zones: ZoneTimeData.array(),
+});
+export type WeeklyZoneData = typeof WeeklyZoneData.infer;
+
 export const FitnessResponse = type({
   scores: FitnessScore.array(),
   weekly_tss: WeeklyTSS.array(),
   weekly_running: WeeklyActivityData.array(),
   weekly_cycling: WeeklyActivityData.array(),
+  weekly_zones: WeeklyZoneData.array(),
   ftp: FtpData.array(),
 });
 export type FitnessResponse = typeof FitnessResponse.infer;
