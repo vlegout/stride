@@ -1,18 +1,8 @@
 import { Box, Typography, Grid } from "@mui/material";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
+import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface WeeklyData {
   week_start: string;
@@ -72,10 +62,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
       {
         label: "Weekly Distance (km)",
         data: weeklyRunningDistances,
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.1)",
-        tension: 0.1,
-        fill: true,
+        backgroundColor: "rgba(255, 99, 132, 0.7)",
       },
     ],
   };
@@ -86,10 +73,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
       {
         label: "Weekly Time (hours)",
         data: weeklyRunningTimes,
-        borderColor: "rgb(255, 159, 64)",
-        backgroundColor: "rgba(255, 159, 64, 0.1)",
-        tension: 0.1,
-        fill: true,
+        backgroundColor: "rgba(255, 159, 64, 0.7)",
       },
     ],
   };
@@ -100,10 +84,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
       {
         label: "Weekly Distance (km)",
         data: weeklyCyclingDistances,
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgba(54, 162, 235, 0.1)",
-        tension: 0.1,
-        fill: true,
+        backgroundColor: "rgba(54, 162, 235, 0.7)",
       },
     ],
   };
@@ -114,10 +95,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
       {
         label: "Weekly Time (hours)",
         data: weeklyCyclingTimes,
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.1)",
-        tension: 0.1,
-        fill: true,
+        backgroundColor: "rgba(75, 192, 192, 0.7)",
       },
     ],
   };
@@ -133,7 +111,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 300, width: "100%" }}>
-            <Line
+            <Bar
               data={runningDistanceChartData}
               options={createChartOptions("Weekly Running Distance", "Distance (km)")}
             />
@@ -141,12 +119,12 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 300, width: "100%" }}>
-            <Line data={runningTimeChartData} options={createChartOptions("Weekly Running Time", "Time (hours)")} />
+            <Bar data={runningTimeChartData} options={createChartOptions("Weekly Running Time", "Time (hours)")} />
           </Box>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 300, width: "100%" }}>
-            <Line
+            <Bar
               data={cyclingDistanceChartData}
               options={createChartOptions("Weekly Cycling Distance", "Distance (km)")}
             />
@@ -154,7 +132,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 300, width: "100%" }}>
-            <Line data={cyclingTimeChartData} options={createChartOptions("Weekly Cycling Time", "Time (hours)")} />
+            <Bar data={cyclingTimeChartData} options={createChartOptions("Weekly Cycling Time", "Time (hours)")} />
           </Box>
         </Grid>
       </Grid>
