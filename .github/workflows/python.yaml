@@ -28,6 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: astral-sh/setup-uv@v5
+      - run: uv run --project api ty check
       - run: uv run --project api mypy ./api
 
   pre-commit:

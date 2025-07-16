@@ -327,9 +327,7 @@ class TestActivityStatusFunctionality(unittest.TestCase):
         # Check that the DELETE route exists by examining the route table
         routes = app.routes
         delete_routes = [
-            route
-            for route in routes
-            if hasattr(route, "methods") and "DELETE" in route.methods
+            route for route in routes if "DELETE" in getattr(route, "methods", ())
         ]
         activity_delete_routes = [
             route
