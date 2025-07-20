@@ -10,22 +10,21 @@ from fastapi import (
     Depends,
     HTTPException,
     Query,
-    Request,
     status,
     UploadFile,
     File,
     Form,
 )
-from pydantic import BaseModel
+from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from sqlalchemy import func, text
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
 
-from api.auth import verify_token, create_token_response, Token
+from api.auth import create_token_response, Token
+from api.dependencies import get_session, get_current_user_id, verify_jwt_token
 from api.fit import get_activity_from_fit
-from api.db import engine
 from api.model import (
     Activity,
     ActivityList,
@@ -77,49 +76,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if "JWT_SECRET_KEY" not in os.environ:
-    raise ValueError("Missing environment variables: JWT_SECRET_KEY")
 
-
-@app.middleware("http")
-async def verify_jwt_token(request: Request, call_next):
-    if request.method == "OPTIONS":
-        return await call_next(request)
-
-    if request.url.path == "/" or request.url.path.startswith("/auth/"):
-        return await call_next(request)
-
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Missing or invalid authorization header"},
-        )
-
-    token = auth_header.replace("Bearer ", "")
-    try:
-        token_data = verify_token(token)
-        # Add user info to request state for use in endpoints
-        request.state.user_id = token_data.user_id
-        request.state.user_email = token_data.email
-    except HTTPException:
-        return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Invalid or expired token"},
-        )
-
-    return await call_next(request)
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-
-def get_current_user_id(request: Request) -> str:
-    if not hasattr(request.state, "user_id") or not request.state.user_id:
-        raise HTTPException(status_code=401, detail="User not authenticated")
-    return request.state.user_id
+app.add_middleware(BaseHTTPMiddleware, dispatch=verify_jwt_token)
 
 
 @app.get("/activities/", response_model=ActivityList)

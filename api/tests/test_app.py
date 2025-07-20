@@ -11,7 +11,8 @@ from sqlmodel import Session
 
 os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-for-testing")
 
-from api.app import app, get_session, get_current_user_id, verify_jwt_token
+from api.app import app
+from api.dependencies import get_session, get_current_user_id, verify_jwt_token
 from api.auth import create_token_response
 
 
@@ -103,7 +104,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(context.exception.status_code, 401)
         self.assertEqual(context.exception.detail, "User not authenticated")
 
-    @patch("api.app.verify_token")
+    @patch("api.dependencies.verify_token")
     def test_verify_jwt_token_middleware_options(self, mock_verify):
         """Test JWT middleware allows OPTIONS requests"""
 
@@ -118,7 +119,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(result, "options_response")
         mock_verify.assert_not_called()
 
-    @patch("api.app.verify_token")
+    @patch("api.dependencies.verify_token")
     def test_verify_jwt_token_middleware_public_paths(self, mock_verify):
         """Test JWT middleware allows public paths"""
 
@@ -134,7 +135,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(result, "public_response")
         mock_verify.assert_not_called()
 
-    @patch("api.app.verify_token")
+    @patch("api.dependencies.verify_token")
     def test_verify_jwt_token_middleware_missing_header(self, mock_verify):
         """Test JWT middleware with missing authorization header"""
 
@@ -153,7 +154,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(content["detail"], "Missing or invalid authorization header")
         mock_verify.assert_not_called()
 
-    @patch("api.app.verify_token")
+    @patch("api.dependencies.verify_token")
     def test_verify_jwt_token_middleware_invalid_header(self, mock_verify):
         """Test JWT middleware with invalid authorization header"""
 
@@ -172,7 +173,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(content["detail"], "Missing or invalid authorization header")
         mock_verify.assert_not_called()
 
-    @patch("api.app.verify_token")
+    @patch("api.dependencies.verify_token")
     def test_verify_jwt_token_middleware_valid_token(self, mock_verify):
         """Test JWT middleware with valid token"""
 
@@ -198,7 +199,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(mock_request.state.user_id, self.test_user_id)
         self.assertEqual(mock_request.state.user_email, self.test_email)
 
-    @patch("api.app.verify_token")
+    @patch("api.dependencies.verify_token")
     def test_verify_jwt_token_middleware_invalid_token(self, mock_verify):
         """Test JWT middleware with invalid token"""
 
