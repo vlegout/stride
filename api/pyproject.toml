@@ -26,6 +26,7 @@ dev-dependencies = [
     "types-boto3>=1.38.32",
     "types-python-jose>=3.5.0.20250531",
     "ty>=0.0.1a14",
+    "hypothesis>=6.136.2",
 ]
 
 [build-system]

@@ -17,3 +17,5 @@ api/python/api/api.abi3.so
 /dist
 
 .env
+
+.hypothesis/
