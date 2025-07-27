@@ -9,6 +9,7 @@ from typing import List, Tuple, Optional, Dict
 
 import boto3
 from sqlmodel import Session, select
+from sqlalchemy import func, desc, asc
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
 
@@ -20,6 +21,7 @@ from api.model import (
     Location,
     Performance,
     PerformancePower,
+    PerformanceRecord,
     Tracepoint,
     Zone,
 )
@@ -577,6 +579,118 @@ def _calculate_heart_rate_zones(
             zone_data[zone_id] = zone_data.get(zone_id, 0) + time_diff
 
     return zone_data
+
+
+def create_performance_records(
+    session: Session,
+    activity: Activity,
+    performances: List[Performance],
+    performance_powers: List[PerformancePower],
+) -> List[PerformanceRecord]:
+    records = []
+    current_year = datetime.datetime.fromtimestamp(activity.start_time).year
+
+    for performance in performances:
+        metric_type = f"{int(performance.distance)}m_time"
+        if performance.time is None:
+            continue
+
+        value = performance.time.total_seconds()
+
+        for scope in ["year", "all_time"]:
+            query = (
+                select(Performance)
+                .join(Activity)
+                .where(
+                    Activity.user_id == activity.user_id,
+                    Activity.sport == activity.sport,
+                    Performance.distance == performance.distance,
+                    Performance.time is not None,
+                )
+            )
+
+            if scope == "year":
+                query = query.where(
+                    func.extract("year", func.to_timestamp(Activity.start_time))
+                    == current_year
+                )
+
+            existing_perfs = session.exec(
+                query.order_by(asc(Performance.time)).limit(5)  # type: ignore[arg-type]
+            ).all()
+
+            rank = None
+            for i, existing_perf in enumerate(existing_perfs):
+                if existing_perf.time and value < existing_perf.time.total_seconds():
+                    rank = i + 1
+                    break
+
+            if rank is None and len(existing_perfs) < 5:
+                rank = len(existing_perfs) + 1
+
+            if rank and rank <= 5:
+                record = PerformanceRecord(
+                    id=uuid.uuid4(),
+                    activity_id=activity.id,
+                    performance_id=performance.id,
+                    metric_type=metric_type,
+                    value=value,
+                    rank=rank,
+                    scope=scope,
+                    sport=activity.sport,
+                    year=current_year,
+                )
+                records.append(record)
+
+    for performance_power in performance_powers:
+        metric_type = f"{int(performance_power.time.total_seconds())}s_power"
+        value = performance_power.power
+
+        for scope in ["year", "all_time"]:
+            power_query = (
+                select(PerformancePower)
+                .join(Activity)
+                .where(
+                    Activity.user_id == activity.user_id,
+                    Activity.sport == activity.sport,
+                    PerformancePower.time == performance_power.time,
+                )
+            )
+
+            if scope == "year":
+                power_query = power_query.where(
+                    func.extract("year", func.to_timestamp(Activity.start_time))
+                    == current_year
+                )
+
+            existing_power_perfs = session.exec(
+                power_query.order_by(desc(PerformancePower.power)).limit(5)  # type: ignore[arg-type]
+            ).all()
+
+            rank = None
+            for i, existing_perf in enumerate(existing_power_perfs):  # type: ignore[assignment]
+                if value > existing_perf.power:  # type: ignore[attr-defined]
+                    rank = i + 1
+                    break
+
+            if rank is None and len(existing_power_perfs) < 5:
+                rank = len(existing_power_perfs) + 1
+
+            if rank and rank <= 5:
+                record = PerformanceRecord(
+                    id=uuid.uuid4(),
+                    activity_id=activity.id,
+                    performance_power_id=performance_power.id,
+                    metric_type=metric_type,
+                    value=value,
+                    rank=rank,
+                    scope=scope,
+                    sport=activity.sport,
+                    year=current_year,
+                )
+                records.append(record)
+
+    return records
 
 
 def _calculate_pace_zones(

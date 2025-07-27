@@ -5,13 +5,14 @@ import ActivityBox from "./ActivityBox";
 import LapChart from "./LapChart";
 import Performances from "./Performances";
 import PowerPerformances from "./PowerPerformances";
+import PerformanceRecords from "./PerformanceRecords";
 import ActivityCharts from "./ActivityCharts";
 import ActivityZones from "./ActivityZones";
 
 import { SectionContainer } from "./ui";
 import { processTracePointData } from "../utils";
 import { Activity } from "../types";
-import { useActivityZones } from "../hooks";
+import { useActivityZones, useActivityPerformanceRecords } from "../hooks";
 
 interface ActivityPageViewProps {
   data: Activity;
@@ -19,6 +20,7 @@ interface ActivityPageViewProps {
 
 const ActivityPageView = ({ data }: ActivityPageViewProps) => {
   const { data: zonesData } = useActivityZones(data.id.toString());
+  const { data: recordsData } = useActivityPerformanceRecords(data.id.toString());
 
   if (!data || !data.tracepoints || data.tracepoints.length === 0) {
     return null;
@@ -43,6 +45,12 @@ const ActivityPageView = ({ data }: ActivityPageViewProps) => {
       {data.sport === "cycling" && (
         <SectionContainer maxWidth="100%" spacing="compact">
           <PowerPerformances performances={data.performance_power} />
+        </SectionContainer>
+      )}
+
+      {recordsData && recordsData.records.length > 0 && (
+        <SectionContainer maxWidth="100%">
+          <PerformanceRecords records={recordsData.records} />
         </SectionContainer>
       )}
 

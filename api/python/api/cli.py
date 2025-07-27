@@ -31,6 +31,7 @@ from api.model import (
 )
 from api.utils import (
     calculate_activity_zone_data,
+    create_performance_records,
     get_best_performances,
     get_best_performance_power,
     get_activity_location,
@@ -128,8 +129,14 @@ def process_file(input_file: str) -> None:
 
     session.commit()
 
-    # Calculate and save zone data for this activity using original unfiltered tracepoints
     calculate_activity_zone_data(session, activity, original_tracepoints)
+
+    performance_records = create_performance_records(
+        session, activity, performances, performance_powers
+    )
+    for record in performance_records:
+        session.add(record)
+
     session.commit()
 
 

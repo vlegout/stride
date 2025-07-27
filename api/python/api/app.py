@@ -18,7 +18,7 @@ from fastapi import (
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sqlalchemy import func, text
+from sqlalchemy import func, text, asc
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
 
@@ -40,6 +40,9 @@ from api.model import (
     BestPerformanceItem,
     BestPerformanceResponse,
     Pagination,
+    PerformanceRecord,
+    PerformanceRecordPublic,
+    PerformanceRecordResponse,
     Profile,
     Statistic,
     User,
@@ -55,6 +58,7 @@ from api.model import (
 )
 from api.utils import (
     calculate_activity_zone_data,
+    create_performance_records,
     get_best_performances,
     get_best_performance_power,
     generate_random_string,
@@ -296,6 +300,12 @@ def create_activity(
             session.add(performance_power)
 
         calculate_activity_zone_data(session, activity, original_tracepoints)
+
+        performance_records = create_performance_records(
+            session, activity, performances, performance_powers
+        )
+        for record in performance_records:
+            session.add(record)
 
         session.commit()
 
@@ -786,3 +796,43 @@ def read_fitness_score(
     user_id: str = Depends(get_current_user_id),
 ):
     return calculate_fitness_scores(session, user_id)
+
+
+@app.get("/activities/{activity_id}/records/", response_model=PerformanceRecordResponse)
+def read_activity_performance_records(
+    activity_id: uuid.UUID,
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    activity = session.exec(
+        select(Activity).where(Activity.id == activity_id, Activity.user_id == user_id)
+    ).first()
+
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    records = session.exec(
+        select(PerformanceRecord)
+        .options(selectinload(PerformanceRecord.activity))  # type: ignore[arg-type]
+        .where(PerformanceRecord.activity_id == activity_id)
+        .order_by(asc(PerformanceRecord.rank))  # type: ignore[arg-type]
+    ).all()
+
+    public_records = [
+        PerformanceRecordPublic(
+            id=record.id,
+            activity_id=record.activity_id,
+            performance_id=record.performance_id,
+            performance_power_id=record.performance_power_id,
+            metric_type=record.metric_type,
+            value=record.value,
+            rank=record.rank,
+            scope=record.scope,
+            record_date=record.record_date,
+            sport=record.sport,
+            year=record.year,
+            activity=ActivityPublicWithoutTracepoints.model_validate(record.activity),
+        )
+        for record in records
+    ]
+    return PerformanceRecordResponse(sport=activity.sport, records=public_records)
