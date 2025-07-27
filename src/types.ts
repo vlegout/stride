@@ -299,3 +299,32 @@ export const FitnessResponse = type({
   ftp: FtpData.array(),
 });
 export type FitnessResponse = typeof FitnessResponse.infer;
+
+export const PerformanceRecordPublic = type({
+  id: "string.uuid.v4",
+  activity_id: "string.uuid.v4",
+  performance_id: "string.uuid.v4 | undefined",
+  performance_power_id: "string.uuid.v4 | undefined",
+  metric_type: "string",
+  value: "number",
+  rank: "number",
+  scope: "'year' | 'all_time'",
+  record_date: "string",
+  sport: Sport,
+  year: "number",
+  activity: {
+    id: "string.uuid.v4",
+    title: "string",
+    sport: Sport,
+    start_time: "number",
+    total_distance: "number",
+    total_timer_time: "number",
+  },
+});
+export type PerformanceRecordPublic = typeof PerformanceRecordPublic.infer;
+
+export const PerformanceRecordResponse = type({
+  sport: Sport,
+  records: PerformanceRecordPublic.array(),
+});
+export type PerformanceRecordResponse = typeof PerformanceRecordResponse.infer;
