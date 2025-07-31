@@ -31,6 +31,12 @@ export function formatDateTime(datetime: number): string {
   return DateTime.fromSeconds(datetime).toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
 }
 
+export function formatTime(seconds: number): string {
+  if (!seconds || seconds === 0) return "—";
+
+  return Duration.fromObject({ seconds: Math.floor(seconds) }).toFormat("h:mm:ss");
+}
+
 export function formatInterval(timedelta: string): string {
   return Duration.fromISO(timedelta).toFormat("hh:mm:ss");
 }
