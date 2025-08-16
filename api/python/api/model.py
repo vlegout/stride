@@ -195,6 +195,30 @@ class PerformancePower(PerformancePowerBase, table=True):
     activity: Activity = Relationship(back_populates="performance_power")
 
 
+class PerformanceRecordBase(SQLModel):
+    activity_id: uuid.UUID = Field(foreign_key="activity.id")
+    performance_id: uuid.UUID | None = Field(foreign_key="performance.id", default=None)
+    performance_power_id: uuid.UUID | None = Field(
+        foreign_key="performancepower.id", default=None
+    )
+    metric_type: str
+    value: float
+    rank: int
+    scope: str
+    record_date: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+    sport: str
+    year: int
+
+
+class PerformanceRecord(PerformanceRecordBase, table=True):
+    id: uuid.UUID = Field(primary_key=True)
+    activity: Activity = Relationship()
+    performance: Performance | None = Relationship()
+    performance_power: PerformancePower | None = Relationship()
+
+
 class TracepointBase(SQLModel):
     id: uuid.UUID = Field(primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
@@ -336,6 +360,19 @@ class BestPerformanceResponse(BaseModel):
     sport: str
     parameter: str
     performances: List[BestPerformanceItem]
+
+
+class PerformanceRecordPublic(PerformanceRecordBase):
+    id: uuid.UUID
+    activity: ActivityPublicWithoutTracepoints
+
+
+class PerformanceRecordResponse(BaseModel):
+    sport: str | None = None
+    metric_type: str | None = None
+    scope: str | None = None
+    year: int | None = None
+    records: List[PerformanceRecordPublic]
 
 
 class WeeklyActivitySummary(BaseModel):
