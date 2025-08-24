@@ -7,6 +7,7 @@ import type {
   ActivityUpdate,
   BestPerformanceResponse,
   FitnessResponse,
+  PerformanceRecordResponse,
   Profile,
   User,
   UserCreate,
@@ -102,6 +103,10 @@ interface ActivityZonesRawResponse {
   pace?: ActivityZoneRaw[];
   power?: ActivityZoneRaw[];
   heart_rate?: ActivityZoneRaw[];
+}
+
+export async function fetchActivityPerformanceRecords(id: string): Promise<PerformanceRecordResponse> {
+  return await apiCall("/activities/" + id + "/records/");
 }
 
 export async function fetchActivityZones(id: string): Promise<{
