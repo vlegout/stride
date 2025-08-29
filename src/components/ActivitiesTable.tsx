@@ -92,6 +92,12 @@ const ActivitiesTable = () => {
     },
     { id: "total_training_effect", label: "Training Effect" },
     {
+      id: "training_stress_score",
+      label: "TSS",
+      sortable: true,
+      format: (value) => (value ? Math.round(value as number).toString() : "—"),
+    },
+    {
       id: "race",
       label: "Race",
       render: (value) => (value ? "Yes" : "No"),

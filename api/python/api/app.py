@@ -94,7 +94,7 @@ def read_activities(
     order: str = Query(default="desc", pattern="^(asc|desc)$"),
     order_by: str = Query(
         default="start_time",
-        pattern="^(total_distance|start_time|avg_speed|avg_power|total_ascent|total_calories)$",
+        pattern="^(total_distance|start_time|avg_speed|avg_power|total_ascent|total_calories|training_stress_score)$",
     ),
 ):
     query = select(Activity).where(
@@ -119,6 +119,8 @@ def read_activities(
         order_column = Activity.total_ascent
     elif order_by == "total_calories":
         order_column = Activity.total_calories  # type: ignore
+    elif order_by == "training_stress_score":
+        order_column = Activity.training_stress_score  # type: ignore
     else:
         order_column = Activity.start_time
 
