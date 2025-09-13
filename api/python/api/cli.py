@@ -45,6 +45,33 @@ NB_CPUS = 2
 app = typer.Typer()
 
 
+def fetch_location(lat: float, lon: float, activity_id: int) -> Location | None:
+    url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}&localityLanguage=en"
+
+    try:
+        response = httpx.get(url, timeout=10.0, follow_redirects=True)
+        response.raise_for_status()
+        data = response.json()
+    except httpx.TimeoutException as e:
+        print(f"Timeout fetching location for activity {activity_id}: {e}")
+        return None
+    except httpx.RequestError as e:
+        print(f"Request error fetching location for activity {activity_id}: {e}")
+        return None
+    except httpx.HTTPStatusError as e:
+        print(f"HTTP status error fetching location for activity {activity_id}: {e}")
+        return None
+
+    return Location(
+        id=uuid.uuid4(),
+        lat=lat,
+        lon=lon,
+        city=data.get("city") or data.get("locality"),
+        subdivision=data.get("principalSubdivision"),
+        country=data.get("countryName"),
+    )
+
+
 def get_activity_from_yaml(
     session: Session, yaml_file: str
 ) -> tuple[Activity, List[Lap], List[Tracepoint]]:
@@ -392,42 +419,28 @@ def update_locations():
             )
 
             if city is None and subdivision is None and country is None:
-                try:
-                    current_time = time.time()
-                    if current_time - last_api_call < 1.0:
-                        time.sleep(1.0 - (current_time - last_api_call))
+                current_time = time.time()
+                if current_time - last_api_call < 1.0:
+                    time.sleep(1.0 - (current_time - last_api_call))
 
-                    url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={first_tracepoint.lat}&longitude={first_tracepoint.lon}&localityLanguage=en"
-                    response = httpx.get(url, timeout=10.0, follow_redirects=True)
-                    response.raise_for_status()
-                    data = response.json()
-                    last_api_call = time.time()
+                location = fetch_location(
+                    first_tracepoint.lat, first_tracepoint.lon, activity.id
+                )
+                if location is None:
+                    continue
 
-                    city = data.get("city") or data.get("locality")
-                    subdivision = data.get("principalSubdivision")
-                    country = data.get("countryName")
+                last_api_call = time.time()
 
-                    if city or subdivision or country:
-                        location = Location(
-                            id=uuid.uuid4(),
-                            lat=first_tracepoint.lat,
-                            lon=first_tracepoint.lon,
-                            city=city,
-                            subdivision=subdivision,
-                            country=country,
-                        )
-                        session.add(location)
+                session.add(location)
 
-                        activity.city = city
-                        activity.subdivision = subdivision
-                        activity.country = country
-                        updated_count += 1
-                        print(
-                            f"Added location and updated activity {activity.id}: {city}, {subdivision}, {country}"
-                        )
+                activity.city = location.city
+                activity.subdivision = location.subdivision
+                activity.country = location.country
+                updated_count += 1
+                print(
+                    f"Added location and updated activity {activity.id}: {location.city}, {location.subdivision}, {location.country}"
+                )
 
-                except Exception as e:
-                    print(f"Error fetching location for activity {activity.id}: {e}")
             elif city is not None or subdivision is not None or country is not None:
                 activity.city = city
                 activity.subdivision = subdivision
