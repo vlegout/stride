@@ -392,42 +392,44 @@ def update_locations():
             )
 
             if city is None and subdivision is None and country is None:
-                try:
-                    current_time = time.time()
-                    if current_time - last_api_call < 1.0:
-                        time.sleep(1.0 - (current_time - last_api_call))
+                current_time = time.time()
+                if current_time - last_api_call < 1.0:
+                    time.sleep(1.0 - (current_time - last_api_call))
 
-                    url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={first_tracepoint.lat}&longitude={first_tracepoint.lon}&localityLanguage=en"
+                url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={first_tracepoint.lat}&longitude={first_tracepoint.lon}&localityLanguage=en"
+
+                try:
                     response = httpx.get(url, timeout=10.0, follow_redirects=True)
                     response.raise_for_status()
                     data = response.json()
-                    last_api_call = time.time()
-
-                    city = data.get("city") or data.get("locality")
-                    subdivision = data.get("principalSubdivision")
-                    country = data.get("countryName")
-
-                    if city or subdivision or country:
-                        location = Location(
-                            id=uuid.uuid4(),
-                            lat=first_tracepoint.lat,
-                            lon=first_tracepoint.lon,
-                            city=city,
-                            subdivision=subdivision,
-                            country=country,
-                        )
-                        session.add(location)
-
-                        activity.city = city
-                        activity.subdivision = subdivision
-                        activity.country = country
-                        updated_count += 1
-                        print(
-                            f"Added location and updated activity {activity.id}: {city}, {subdivision}, {country}"
-                        )
-
                 except Exception as e:
                     print(f"Error fetching location for activity {activity.id}: {e}")
+                    continue
+
+                last_api_call = time.time()
+
+                city = data.get("city") or data.get("locality")
+                subdivision = data.get("principalSubdivision")
+                country = data.get("countryName")
+
+                location = Location(
+                    id=uuid.uuid4(),
+                    lat=first_tracepoint.lat,
+                    lon=first_tracepoint.lon,
+                    city=city,
+                    subdivision=subdivision,
+                    country=country,
+                )
+                session.add(location)
+
+                activity.city = city
+                activity.subdivision = subdivision
+                activity.country = country
+                updated_count += 1
+                print(
+                    f"Added location and updated activity {activity.id}: {city}, {subdivision}, {country}"
+                )
+
             elif city is not None or subdivision is not None or country is not None:
                 activity.city = city
                 activity.subdivision = subdivision
