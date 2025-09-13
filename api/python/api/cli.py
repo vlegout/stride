@@ -2,12 +2,9 @@ import concurrent.futures
 import datetime
 import json
 import os
-import time
-import uuid
 
 from typing import List
 
-import httpx
 import typer
 import yaml
 
@@ -21,7 +18,6 @@ from api.model import (
     ActivityZonePace,
     ActivityZonePower,
     Lap,
-    Location,
     Performance,
     PerformancePower,
     Tracepoint,
@@ -31,6 +27,7 @@ from api.model import (
 )
 from api.utils import (
     calculate_activity_zone_data,
+    extract_location_from_api,
     get_best_performances,
     get_best_performance_power,
     get_activity_location,
@@ -392,42 +389,18 @@ def update_locations():
             )
 
             if city is None and subdivision is None and country is None:
-                try:
-                    current_time = time.time()
-                    if current_time - last_api_call < 1.0:
-                        time.sleep(1.0 - (current_time - last_api_call))
+                city, subdivision, country, last_api_call = extract_location_from_api(
+                    session, first_tracepoint.lat, first_tracepoint.lon, last_api_call
+                )
 
-                    url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={first_tracepoint.lat}&longitude={first_tracepoint.lon}&localityLanguage=en"
-                    response = httpx.get(url, timeout=10.0, follow_redirects=True)
-                    response.raise_for_status()
-                    data = response.json()
-                    last_api_call = time.time()
-
-                    city = data.get("city") or data.get("locality")
-                    subdivision = data.get("principalSubdivision")
-                    country = data.get("countryName")
-
-                    if city or subdivision or country:
-                        location = Location(
-                            id=uuid.uuid4(),
-                            lat=first_tracepoint.lat,
-                            lon=first_tracepoint.lon,
-                            city=city,
-                            subdivision=subdivision,
-                            country=country,
-                        )
-                        session.add(location)
-
-                        activity.city = city
-                        activity.subdivision = subdivision
-                        activity.country = country
-                        updated_count += 1
-                        print(
-                            f"Added location and updated activity {activity.id}: {city}, {subdivision}, {country}"
-                        )
-
-                except Exception as e:
-                    print(f"Error fetching location for activity {activity.id}: {e}")
+                if city or subdivision or country:
+                    activity.city = city
+                    activity.subdivision = subdivision
+                    activity.country = country
+                    updated_count += 1
+                    print(
+                        f"Added location and updated activity {activity.id}: {city}, {subdivision}, {country}"
+                    )
             elif city is not None or subdivision is not None or country is not None:
                 activity.city = city
                 activity.subdivision = subdivision

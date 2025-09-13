@@ -3,11 +3,13 @@ import math
 import os
 import random
 import string
+import time
 import uuid
 
 from typing import List, Tuple, Optional, Dict
 
 import boto3
+import httpx
 from sqlmodel import Session, select
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
@@ -652,3 +654,51 @@ def _calculate_power_zones(
             zone_data[zone_id] = zone_data.get(zone_id, 0) + time_diff
 
     return zone_data
+
+
+def extract_location_from_api(
+    session: Session, lat: float, lon: float, last_api_call: float
+) -> Tuple[Optional[str], Optional[str], Optional[str], float]:
+    """Extract city, subdivision, and country from coordinates using external API.
+
+    Args:
+        session: Database session
+        lat: Latitude coordinate
+        lon: Longitude coordinate
+        last_api_call: Timestamp of last API call to enforce rate limiting
+
+    Returns:
+        Tuple of (city, subdivision, country, updated_last_api_call_time)
+    """
+    current_time = time.time()
+    if current_time - last_api_call < 1.0:
+        time.sleep(1.0 - (current_time - last_api_call))
+
+    url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}&localityLanguage=en"
+
+    try:
+        response = httpx.get(url, timeout=10.0, follow_redirects=True)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as e:
+        print(f"Error fetching location for coordinates {lat}, {lon}: {e}")
+        return None, None, None, last_api_call
+
+    updated_last_api_call = time.time()
+
+    city = data.get("city") or data.get("locality")
+    subdivision = data.get("principalSubdivision")
+    country = data.get("countryName")
+
+    if city or subdivision or country:
+        location = Location(
+            id=uuid.uuid4(),
+            lat=lat,
+            lon=lon,
+            city=city,
+            subdivision=subdivision,
+            country=country,
+        )
+        session.add(location)
+
+    return city, subdivision, country, updated_last_api_call
