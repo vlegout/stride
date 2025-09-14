@@ -528,7 +528,6 @@ def update_zones():
     """Update training zones for all users based on their existing activities."""
     session = Session(engine)
 
-    # Get all users
     users = session.exec(select(User)).all()
 
     print(f"Found {len(users)} users to process...")
@@ -537,7 +536,6 @@ def update_zones():
     skipped_count = 0
 
     for user in users:
-        # Check if user has any activities
         activities = session.exec(
             select(Activity).where(
                 Activity.user_id == user.id, Activity.status == "created"
@@ -549,7 +547,6 @@ def update_zones():
             skipped_count += 1
             continue
 
-        # Check if user has zones
         existing_zones = session.exec(select(Zone).where(Zone.user_id == user.id)).all()
 
         if not existing_zones:
@@ -557,7 +554,6 @@ def update_zones():
             create_default_zones(session, user.id)
             session.commit()
 
-        # Update zones based on activities
         print(
             f"Updating zones for user {user.id} ({user.email}) based on {len(activities)} activities..."
         )
