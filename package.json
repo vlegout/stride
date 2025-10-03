@@ -62,7 +62,7 @@
     "@vitest/ui": "^3.2.4",
     "chromatic": "^13.3.0",
     "eslint": "^9.36.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-hooks": "^6.1.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "eslint-plugin-storybook": "^9.1.10",
     "globals": "^16.4.0",
