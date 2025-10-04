@@ -36,15 +36,18 @@ const ZoneTables: React.FC<ZoneTablesProps> = ({ zones }) => {
     },
   ];
 
-  const formatHeartRateValue = (value: number) => `${Math.round(value)} bpm`;
-  const formatPaceValue = (value: number) => {
+  const formatHeartRateValue = (value: number): string => `${Math.round(value)} bpm`;
+  const formatPaceValue = (value: number): string => {
     const minutes = Math.floor(value / 60);
     const seconds = Math.round(value % 60);
     return `${minutes}:${seconds.toString().padStart(2, "0")} /km`;
   };
-  const formatPowerValue = (value: number) => `${Math.round(value)} W`;
+  const formatPowerValue = (value: number): string => `${Math.round(value)} W`;
 
-  const createZoneRows = (zones: Zone[], formatter: (value: number) => string) =>
+  const createZoneRows = (
+    zones: Zone[],
+    formatter: (value: number) => string,
+  ): { id: string; zone: string; max_value: string }[] =>
     zones
       .sort((a, b) => a.index - b.index)
       .map((zone) => ({

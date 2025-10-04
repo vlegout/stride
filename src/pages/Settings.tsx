@@ -42,7 +42,7 @@ const Settings = () => {
     return <LoadingIndicator message="Loading settings..." />;
   }
 
-  const handleMapChange = (mapProvider: "leaflet" | "openlayers" | "mapbox") => {
+  const handleMapChange = (mapProvider: "leaflet" | "openlayers" | "mapbox"): void => {
     updateUserMutation.mutate({ map: mapProvider });
   };
 

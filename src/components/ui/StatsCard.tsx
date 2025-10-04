@@ -15,14 +15,14 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const getDisplayValue = () => {
+  const getDisplayValue = (): string | number => {
     if (value === null || value === undefined || value === 0) {
       return "—";
     }
     return value;
   };
 
-  const getBackgroundColor = () => {
+  const getBackgroundColor = (): string => {
     switch (variant) {
       case "primary":
         return colors.primarySoft;
@@ -31,7 +31,7 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
     }
   };
 
-  const getValueVariant = () => {
+  const getValueVariant = (): "h3" | "h4" | "h6" | "body1" => {
     switch (size) {
       case "large":
         return isMobile ? "h4" : "h3";
@@ -40,7 +40,7 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
     }
   };
 
-  const getPadding = () => {
+  const getPadding = (): { xs: number; sm: number } => {
     switch (size) {
       case "large":
         return { xs: 2.5, sm: 3 };

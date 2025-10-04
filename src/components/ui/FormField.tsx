@@ -82,26 +82,26 @@ const FormField = ({
   sliderProps,
   fileProps,
 }: FormFieldProps) => {
-  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     if (onChange) {
       onChange(event.target.value, event);
     }
   };
 
-  const handleSelectChange = (event: SelectChangeEvent) => {
+  const handleSelectChange = (event: SelectChangeEvent): void => {
     if (onChange) {
       onChange(event.target.value, event);
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
     if (onChange) {
       onChange(file, event);
     }
   };
 
-  const renderField = () => {
+  const renderField = (): React.ReactNode => {
     switch (type) {
       case "text":
         return (

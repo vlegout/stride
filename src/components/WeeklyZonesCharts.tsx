@@ -10,7 +10,7 @@ interface WeeklyZonesChartsProps {
 }
 
 const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
-  const createChartOptions = (title: string, yAxisLabel: string) => ({
+  const createChartOptions = (title: string, yAxisLabel: string): object => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -46,7 +46,7 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   });
 
   // Generate colors for each zone
-  const generateZoneColors = (numZones: number) => {
+  const generateZoneColors = (numZones: number): string[] => {
     const colors = [
       "rgba(75, 192, 192, 0.7)", // Zone 1 - Teal
       "rgba(54, 162, 235, 0.7)", // Zone 2 - Blue
@@ -60,7 +60,10 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   };
 
   // Create heart rate zones chart data for running
-  const createRunningHeartRateZoneData = () => {
+  const createRunningHeartRateZoneData = (): {
+    labels: string[];
+    datasets: { label: string; data: number[]; backgroundColor: string }[];
+  } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.heart_rate_zones.length));
     const colors = generateZoneColors(maxZones);
@@ -81,7 +84,10 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   };
 
   // Create heart rate zones chart data for cycling
-  const createCyclingHeartRateZoneData = () => {
+  const createCyclingHeartRateZoneData = (): {
+    labels: string[];
+    datasets: { label: string; data: number[]; backgroundColor: string }[];
+  } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.heart_rate_zones.length));
     const colors = generateZoneColors(maxZones);
@@ -102,7 +108,10 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   };
 
   // Create pace zones chart data
-  const createPaceZoneData = () => {
+  const createPaceZoneData = (): {
+    labels: string[];
+    datasets: { label: string; data: number[]; backgroundColor: string }[];
+  } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.pace_zones.length));
     const colors = generateZoneColors(maxZones);
@@ -123,7 +132,10 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   };
 
   // Create power zones chart data
-  const createPowerZoneData = () => {
+  const createPowerZoneData = (): {
+    labels: string[];
+    datasets: { label: string; data: number[]; backgroundColor: string }[];
+  } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.power_zones.length));
     const colors = generateZoneColors(maxZones);

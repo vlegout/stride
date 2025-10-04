@@ -11,7 +11,7 @@ interface WeeklyMetricsChartsProps {
 }
 
 const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChartsProps) => {
-  const createChartOptions = (title: string, yAxisLabel: string) => ({
+  const createChartOptions = (title: string, yAxisLabel: string): object => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
