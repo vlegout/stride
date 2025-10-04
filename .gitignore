@@ -19,3 +19,5 @@ api/python/api/api.abi3.so
 .env
 
 .hypothesis/
+
+/*.sql
