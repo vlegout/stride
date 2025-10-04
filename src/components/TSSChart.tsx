@@ -10,16 +10,12 @@ import {
   Legend,
   TooltipItem,
 } from "chart.js";
+import { WeeklyTSS } from "../types";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-interface WeeklyTSSData {
-  week_start: string;
-  total_tss: number;
-}
-
 interface TSSChartProps {
-  weeklyTss: WeeklyTSSData[];
+  weeklyTss: WeeklyTSS[];
 }
 
 const TSSChart = ({ weeklyTss }: TSSChartProps) => {

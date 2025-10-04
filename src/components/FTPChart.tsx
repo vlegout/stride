@@ -12,16 +12,12 @@ import {
   Filler,
   TooltipItem,
 } from "chart.js";
+import { FtpData } from "../types";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-interface FTPData {
-  date: string;
-  ftp: number;
-}
-
 interface FTPChartProps {
-  ftp: FTPData[];
+  ftp: FtpData[];
 }
 
 const FTPChart = ({ ftp }: FTPChartProps) => {
