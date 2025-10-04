@@ -11,15 +11,9 @@ import {
   Legend,
   TooltipItem,
 } from "chart.js";
+import { FitnessScore } from "../types";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
-interface FitnessScore {
-  date: string;
-  overall: number;
-  running: number;
-  cycling: number;
-}
 
 interface FitnessScoreChartProps {
   scores: FitnessScore[];
