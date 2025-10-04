@@ -150,7 +150,7 @@ const LineChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e: any): void => {
     const mousePos = e.target.getStage().getPointerPosition();
     setTooltipProps({
       text: `${e.target.name()}`,
@@ -160,7 +160,7 @@ const LineChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     });
   };
 
-  const handleMouseOut = () => {
+  const handleMouseOut = (): void => {
     setTooltipProps((prev) => ({ ...prev, visible: false }));
   };
 

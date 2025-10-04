@@ -55,13 +55,13 @@ const DataTable = <T extends Record<string, unknown>>({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const tableSize = responsive && isMobile ? "small" : "medium";
 
-  const handleSort = (columnId: string) => {
+  const handleSort = (columnId: string): void => {
     if (onSort) {
       onSort(columnId);
     }
   };
 
-  const getCellValue = (row: T, column: Column<T>) => {
+  const getCellValue = (row: T, column: Column<T>): React.ReactNode => {
     const value = row[column.id];
 
     if (column.render) {

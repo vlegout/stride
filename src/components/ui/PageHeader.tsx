@@ -13,7 +13,7 @@ const PageHeader = ({ title, subtitle, variant = "h4", spacing = "normal" }: Pag
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const getTitleVariant = () => {
+  const getTitleVariant = (): "h4" | "h5" | "h6" => {
     if (isMobile) {
       switch (variant) {
         case "h4":
@@ -27,7 +27,7 @@ const PageHeader = ({ title, subtitle, variant = "h4", spacing = "normal" }: Pag
     return variant;
   };
 
-  const getSpacing = () => {
+  const getSpacing = (): { xs: number; sm: number } => {
     switch (spacing) {
       case "compact":
         return { xs: 1, sm: 2 };

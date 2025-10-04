@@ -32,7 +32,7 @@ const ActivitiesTable = () => {
     placeholderData: keepPreviousData,
   });
 
-  const sortHandler = (columnId: string) => {
+  const sortHandler = (columnId: string): void => {
     const newOrder = order === "asc" ? "desc" : "asc";
     setOrderBy(columnId as keyof Activity);
     setOrder(newOrder);

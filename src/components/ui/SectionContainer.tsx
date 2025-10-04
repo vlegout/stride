@@ -25,14 +25,14 @@ const SectionContainer = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const getSpacing = () => {
+  const getSpacing = (): { xs: number; sm: number } => {
     if (spacing === "compact") {
       return { xs: 1, sm: 2 };
     }
     return { xs: 2, sm: 3 };
   };
 
-  const getContainerProps = () => {
+  const getContainerProps = (): Record<string, unknown> => {
     const baseProps = {
       sx: {
         mb: getSpacing(),
@@ -56,14 +56,14 @@ const SectionContainer = ({
     return baseProps;
   };
 
-  const getTitleVariant = () => {
+  const getTitleVariant = (): "h6" | "subtitle1" => {
     if (isMobile) {
       return "subtitle1";
     }
     return "h6";
   };
 
-  const renderHeader = () => {
+  const renderHeader = (): React.ReactNode => {
     if (!title) return null;
 
     return (

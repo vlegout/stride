@@ -32,15 +32,15 @@ const Header = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { logout, user } = useAuthStore();
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
+  const handleMenuClose = (): void => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     logout();
     handleMenuClose();
   };

@@ -32,7 +32,7 @@ const Best = () => {
       ),
   });
 
-  const handleSportChange = (newSport: string) => {
+  const handleSportChange = (newSport: string): void => {
     setSport(newSport);
     if (newSport === "cycling") {
       setSelectedDistance("1");

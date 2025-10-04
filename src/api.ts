@@ -31,7 +31,7 @@ function getAuthToken(): string | null {
   return null;
 }
 
-export async function apiCall(url: string) {
+export async function apiCall<T = unknown>(url: string): Promise<T> {
   url = `${API_URL}${url}`;
   const token = getAuthToken();
 

@@ -27,7 +27,7 @@ const ActivitiesPageView = ({
     { value: "running", label: "Running" },
   ];
 
-  const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number | number[]) => {
+  const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number | number[]): void => {
     if (Array.isArray(value) && value.length === 2 && typeof value[0] === "number" && typeof value[1] === "number") {
       onDistanceChange([value[0], value[1]]);
     } else {
@@ -35,7 +35,7 @@ const ActivitiesPageView = ({
     }
   };
 
-  const handleSportChange = (value: unknown) => {
+  const handleSportChange = (value: unknown): void => {
     if (typeof value === "string") {
       if (value === "") {
         onSportChange(undefined);
