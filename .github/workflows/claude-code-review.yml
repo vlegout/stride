@@ -5,7 +5,7 @@ on:
 
 jobs:
   claude-review:
-    if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
+    if: ${{ github.event.pull_request.user.type != 'Bot' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
