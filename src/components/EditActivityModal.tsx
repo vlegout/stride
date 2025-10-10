@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Alert, CircularProgress } from "@mui/material";
 import { AxiosError } from "axios";
@@ -19,13 +19,6 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
-
-  // Sync form state with activity prop changes
-  useEffect(() => {
-    setTitle(activity.title);
-    setRace(activity.race);
-    setError(null);
-  }, [activity]);
 
   const updateMutation = useMutation({
     mutationFn: (updates: ActivityUpdate) => updateActivity(activity.id, updates),
@@ -75,7 +68,7 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog key={activity.id} open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Edit Activity</DialogTitle>
       <DialogContent>
         {error && (
