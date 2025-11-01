@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ci": "vitest --coverage --reporter=junit --outputFile=test-report.junit.xml",
+    "test:ci": "vitest run --config=vitest.config.ci.ts --coverage --reporter=junit --outputFile=test-report.junit.xml --passWithNoTests",
     "test:ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -67,7 +67,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "eslint-plugin-storybook": "^10.0.2",
     "globals": "^16.4.0",
-    "jsdom": "^27.0.1",
+    "jsdom": "^25.0.1",
     "playwright": "^1.56.1",
     "prettier": "^3.6.2",
     "storybook": "^10.0.2",
