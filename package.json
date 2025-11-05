@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ci": "vitest --coverage --reporter=junit --outputFile=test-report.junit.xml",
+    "test:ci": "vitest run --project=unit --coverage --reporter=junit --outputFile=test-report.junit.xml --reporter=default && vitest run --project=storybook --coverage --reporter=junit --outputFile=test-report-storybook.junit.xml --reporter=default",
     "test:ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -41,7 +41,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^4.1.1",
+    "@chromatic-com/storybook": "^4.1.2",
     "@codecov/vite-plugin": "^1.9.1",
     "@eslint/js": "^9.38.0",
     "@playwright/test": "^1.56.1",
@@ -59,6 +59,8 @@
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.0.4",
     "@vitest/browser": "^4.0.7",
+    "@vitest/browser-playwright": "^4.0.7",
+    "@vitest/coverage-istanbul": "^4.0.7",
     "@vitest/coverage-v8": "^4.0.7",
     "@vitest/ui": "^4.0.7",
     "chromatic": "^13.3.2",
@@ -67,7 +69,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "eslint-plugin-storybook": "^10.0.2",
     "globals": "^16.4.0",
-    "jsdom": "^27.0.1",
+    "jsdom": "^26.1.0",
     "playwright": "^1.56.1",
     "prettier": "^3.6.2",
     "storybook": "^10.0.2",
