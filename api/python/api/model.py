@@ -323,6 +323,8 @@ class Profile(BaseModel):
     run_total_distance: float = 0.0
     cycling_n_activities: int = 0
     cycling_total_distance: float = 0.0
+    swimming_n_activities: int = 0
+    swimming_total_distance: float = 0.0
     years: List[YearsStatistics] = []
     zones: List[ZonePublic] = []
 

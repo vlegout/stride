@@ -1,6 +1,6 @@
 import { type } from "arktype";
 
-export const Sport = type("'running'|'cycling'");
+export const Sport = type("'running'|'cycling'|'swimming'");
 export type Sport = typeof Sport.infer;
 
 export const ActivitiesQueryParams = type({
@@ -96,7 +96,7 @@ export const Activity = type({
   country: "string?",
 
   laps: [Lap],
-  tracepoints: TracePoint.array().atLeastLength(2),
+  tracepoints: TracePoint.array(),
   performances: [Performance],
   performance_power: [PowerPerformance],
 });
@@ -130,14 +130,14 @@ export type Statistic = typeof Statistic.infer;
 
 export const YearsStatistics = type({
   year: "number",
-  statistics: Statistic.array().atLeastLength(2),
+  statistics: Statistic.array().atLeastLength(3),
 });
 export type YearsStatistics = typeof YearsStatistics.infer;
 
 export const WeeksStatistics = type({
   start: "string",
   week: "number",
-  statistics: Statistic.array().atLeastLength(2),
+  statistics: Statistic.array().atLeastLength(3),
 });
 export type WeeksStatistics = typeof WeeksStatistics.infer;
 
@@ -156,6 +156,8 @@ export const Profile = type({
   run_total_distance: "number",
   cycling_n_activities: "number",
   cycling_total_distance: "number",
+  swimming_n_activities: "number",
+  swimming_total_distance: "number",
   years: [YearsStatistics],
   zones: Zone.array(),
 });

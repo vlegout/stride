@@ -30,6 +30,9 @@ const LineChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     y: 0,
   });
 
+  if (sport == "swimming") {
+    return null;
+  }
   if (laps.some((lap) => lap.total_timer_time == null || lap.total_distance == null) || laps.length <= 1) {
     return null;
   }

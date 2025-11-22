@@ -20,11 +20,11 @@ interface ActivityPageViewProps {
 const ActivityPageView = ({ data }: ActivityPageViewProps) => {
   const { data: zonesData } = useActivityZones(data.id.toString());
 
-  if (!data || !data.tracepoints || data.tracepoints.length === 0) {
+  if (!data) {
     return null;
   }
 
-  const chartData = processTracePointData(data.tracepoints);
+  const chartData = data.tracepoints ? processTracePointData(data.tracepoints) : null;
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -46,7 +46,7 @@ const ActivityPageView = ({ data }: ActivityPageViewProps) => {
         </SectionContainer>
       )}
 
-      {zonesData && (
+      {zonesData && data.sport !== "swimming" && (
         <Box sx={{ width: "100%", px: 2 }}>
           <Grid container spacing={2} sx={{ justifyContent: "center", maxWidth: "1200px", margin: "0 auto" }}>
             {zonesData.heartRate && zonesData.heartRate.length > 0 && (
@@ -76,7 +76,7 @@ const ActivityPageView = ({ data }: ActivityPageViewProps) => {
         </Box>
       )}
 
-      <ActivityCharts chartData={chartData} />
+      {chartData && <ActivityCharts chartData={chartData} />}
     </Box>
   );
 };

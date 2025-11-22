@@ -43,6 +43,8 @@ const Profile = () => {
     { id: 3, metric: "Run Total Distance", value: formatDistance(data.run_total_distance) },
     { id: 4, metric: "Cycling Total Activities", value: data.cycling_n_activities },
     { id: 5, metric: "Cycling Total Distance", value: formatDistance(data.cycling_total_distance) },
+    { id: 6, metric: "Swimming Total Activities", value: data.swimming_n_activities },
+    { id: 7, metric: "Swimming Total Distance", value: formatDistance(data.swimming_total_distance) },
   ];
 
   const yearlyStatsColumns: Column[] = [
@@ -51,6 +53,8 @@ const Profile = () => {
     { id: "run_distance", label: "Distance", align: "center" as const },
     { id: "cycling_activities", label: "Activities", align: "center" as const },
     { id: "cycling_distance", label: "Distance", align: "center" as const },
+    { id: "swimming_activities", label: "Activities", align: "center" as const },
+    { id: "swimming_distance", label: "Distance", align: "center" as const },
   ];
 
   const yearlyStatsRows = data.years.map((year) => ({
@@ -60,6 +64,8 @@ const Profile = () => {
     run_distance: formatDistance(year.statistics[0].total_distance),
     cycling_activities: year.statistics[1].n_activities,
     cycling_distance: formatDistance(year.statistics[1].total_distance),
+    swimming_activities: year.statistics[2].n_activities,
+    swimming_distance: formatDistance(year.statistics[2].total_distance),
   }));
 
   return (
@@ -82,6 +88,7 @@ const Profile = () => {
           <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "bold" }}>
               Running &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cycling
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Swimming
             </Typography>
           </Box>
         </Box>

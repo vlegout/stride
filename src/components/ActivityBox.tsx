@@ -114,7 +114,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
         </Grid>
       </Grid>
       <Grid size={{ xs: 12, md: 6 }} sx={{ minHeight: isMobile ? "250px" : "auto" }}>
-        {mapProvider === "leaflet" ? (
+        {mapProvider === "leaflet" && activity.sport !== "swimming" ? (
           <MapComponent
             bounds={[
               [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
@@ -122,7 +122,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             ]}
             points={mapPoints}
           />
-        ) : mapProvider === "openlayers" ? (
+        ) : mapProvider === "openlayers" && activity.sport !== "swimming" ? (
           <MapOLComponent
             bounds={[
               [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
@@ -130,7 +130,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             ]}
             points={mapPoints}
           />
-        ) : (
+        ) : activity.sport !== "swimming" ? (
           <MapMapbox
             bounds={[
               [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
@@ -138,6 +138,8 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
             ]}
             points={mapPoints}
           />
+        ) : (
+          <Box></Box>
         )}
       </Grid>
       {isDetailed && (
