@@ -386,8 +386,10 @@ def read_profile(
                 COUNT(CASE WHEN sport = 'running' THEN 1 END) as run_activities,
                 COALESCE(SUM(CASE WHEN sport = 'running' THEN total_distance END), 0) as run_distance,
                 COUNT(CASE WHEN sport = 'cycling' THEN 1 END) as cycling_activities,
-                COALESCE(SUM(CASE WHEN sport = 'cycling' THEN total_distance END), 0) as cycling_distance
-            FROM activity
+                COALESCE(SUM(CASE WHEN sport = 'cycling' THEN total_distance END), 0) as cycling_distance,
+                COUNT(CASE WHEN sport = 'swimming' THEN 1 END) as swimming_activities,
+                COALESCE(SUM(CASE WHEN sport = 'swimming' THEN total_distance END), 0) as swimming_distance
+             FROM activity
             WHERE user_id = :user_id AND status = 'created'
         """),
         {"user_id": user_id},
@@ -444,6 +446,15 @@ def read_profile(
                             "total_distance", 0.0
                         ),
                     ),
+                    Statistic(
+                        sport="swimming",
+                        n_activities=int(
+                            year_data.get("swimming", {}).get("n_activities", 0)
+                        ),
+                        total_distance=year_data.get("swimming", {}).get(
+                            "total_distance", 0.0
+                        ),
+                    ),
                 ],
             )
         )
@@ -461,6 +472,8 @@ def read_profile(
         run_total_distance=overall_stats[2] or 0.0,
         cycling_n_activities=overall_stats[3],
         cycling_total_distance=overall_stats[4] or 0.0,
+        swimming_n_activities=overall_stats[5],
+        swimming_total_distance=overall_stats[6] or 0.0,
         years=years_data,
         zones=zones_public,
     )
@@ -469,6 +482,7 @@ def read_profile(
 class Sport(str, Enum):
     running = "running"
     cycling = "cycling"
+    swimming = "swimming"
 
 
 class CyclingDistance(str, Enum):

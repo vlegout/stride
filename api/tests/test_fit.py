@@ -25,7 +25,7 @@ class TestFit(unittest.TestCase):
 
         test_dir = os.path.dirname(os.path.abspath(__file__))
 
-        for sport in ["run", "ride"]:
+        for sport in ["run", "ride", "swim"]:
             fit_path = os.path.join(test_dir, "data", f"{sport}.fit")
             json_path = os.path.join(test_dir, "data", f"{sport}.json")
 
