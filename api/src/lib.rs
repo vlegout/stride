@@ -157,6 +157,9 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 fit_rust::protocol::value::Value::Enum("cycling") => {
                                     fit.activity.sport = "cycling".to_string()
                                 }
+                                fit_rust::protocol::value::Value::Enum("swimming") => {
+                                    fit.activity.sport = "swimming".to_string()
+                                }
                                 _ => {}
                             },
                             7 => {
