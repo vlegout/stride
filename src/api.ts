@@ -1,4 +1,5 @@
 import axios from "axios";
+import { type } from "arktype";
 
 import type {
   Activity,
@@ -13,6 +14,17 @@ import type {
   UserUpdate,
   GoogleAuthResponse,
   WeeksResponse,
+} from "./types";
+import {
+  Activity as ActivityValidator,
+  ActivitiesResponse as ActivitiesResponseValidator,
+  ActivityZonesRawResponse as ActivityZonesRawResponseValidator,
+  BestPerformanceResponse as BestPerformanceResponseValidator,
+  FitnessResponse as FitnessResponseValidator,
+  Profile as ProfileValidator,
+  User as UserValidator,
+  GoogleAuthResponse as GoogleAuthResponseValidator,
+  WeeksResponse as WeeksResponseValidator,
 } from "./types";
 import { useAuthStore } from "./store";
 import { isTokenValid } from "./utils";
@@ -29,6 +41,15 @@ function getAuthToken(): string | null {
 
   // No valid token available
   return null;
+}
+
+function validateResponse<T>(data: unknown, validator: (data: unknown) => T | type.errors, context: string): T {
+  const result = validator(data);
+  if (result instanceof type.errors) {
+    console.error(`API response validation failed for ${context}:`, result.summary);
+    throw new Error(`Invalid API response: ${result.summary}`);
+  }
+  return result;
 }
 
 export async function apiCall<T = unknown>(url: string): Promise<T> {
@@ -73,35 +94,19 @@ export async function fetchActivities({
   if (orderBy) urlParams.push(`order_by=${orderBy}`);
   const queryString = urlParams.length ? "?" + urlParams.join("&") : "";
 
-  return await apiCall("/activities/" + queryString);
+  const data = await apiCall("/activities/" + queryString);
+  return validateResponse(data, ActivitiesResponseValidator, "fetchActivities");
 }
 
 export async function fetchLastActivities(): Promise<Activity[]> {
-  return await apiCall("/activities/");
+  const data = await apiCall("/activities/");
+  const ActivityArray = ActivityValidator.array();
+  return validateResponse(data, ActivityArray, "fetchLastActivities");
 }
 
 export async function fetchActivity(id: string): Promise<Activity> {
-  return await apiCall("/activities/" + id + "/");
-}
-
-interface ActivityZoneRaw {
-  id: string;
-  activity_id: string;
-  zone_id: string;
-  time_in_zone: number;
-  zone: {
-    id: string;
-    user_id: string;
-    index: number;
-    type: string;
-    max_value: number;
-  };
-}
-
-interface ActivityZonesRawResponse {
-  pace?: ActivityZoneRaw[];
-  power?: ActivityZoneRaw[];
-  heart_rate?: ActivityZoneRaw[];
+  const data = await apiCall("/activities/" + id + "/");
+  return validateResponse(data, ActivityValidator, "fetchActivity");
 }
 
 export async function fetchActivityZones(id: string): Promise<{
@@ -109,7 +114,8 @@ export async function fetchActivityZones(id: string): Promise<{
   power?: { zone: number; time: number; percentage: number }[];
   pace?: { zone: number; time: number; percentage: number }[];
 }> {
-  const response: ActivityZonesRawResponse = await apiCall("/activities/" + id + "/zones/");
+  const data = await apiCall("/activities/" + id + "/zones/");
+  const response = validateResponse(data, ActivityZonesRawResponseValidator, "fetchActivityZones");
 
   // Transform API response to match frontend expectations
   const transformed: {
@@ -119,11 +125,11 @@ export async function fetchActivityZones(id: string): Promise<{
   } = {};
 
   // Calculate total time for percentage calculation
-  const calculateTotalTime = (zones: ActivityZoneRaw[]) => zones.reduce((sum, z) => sum + z.time_in_zone, 0);
+  const calculateTotalTime = (zones: { time_in_zone: number }[]) => zones.reduce((sum, z) => sum + z.time_in_zone, 0);
 
   if (response.heart_rate && response.heart_rate.length > 0) {
     const totalTime = calculateTotalTime(response.heart_rate);
-    transformed.heartRate = response.heart_rate.map((z: ActivityZoneRaw) => ({
+    transformed.heartRate = response.heart_rate.map((z) => ({
       zone: z.zone.index,
       time: z.time_in_zone,
       percentage: totalTime > 0 ? (z.time_in_zone / totalTime) * 100 : 0,
@@ -132,7 +138,7 @@ export async function fetchActivityZones(id: string): Promise<{
 
   if (response.power && response.power.length > 0) {
     const totalTime = calculateTotalTime(response.power);
-    transformed.power = response.power.map((z: ActivityZoneRaw) => ({
+    transformed.power = response.power.map((z) => ({
       zone: z.zone.index,
       time: z.time_in_zone,
       percentage: totalTime > 0 ? (z.time_in_zone / totalTime) * 100 : 0,
@@ -141,7 +147,7 @@ export async function fetchActivityZones(id: string): Promise<{
 
   if (response.pace && response.pace.length > 0) {
     const totalTime = calculateTotalTime(response.pace);
-    transformed.pace = response.pace.map((z: ActivityZoneRaw) => ({
+    transformed.pace = response.pace.map((z) => ({
       zone: z.zone.index,
       time: z.time_in_zone,
       percentage: totalTime > 0 ? (z.time_in_zone / totalTime) * 100 : 0,
@@ -152,15 +158,18 @@ export async function fetchActivityZones(id: string): Promise<{
 }
 
 export async function fetchProfile(): Promise<Profile> {
-  return await apiCall("/profile/");
+  const data = await apiCall("/profile/");
+  return validateResponse(data, ProfileValidator, "fetchProfile");
 }
 
 export async function fetchWeeks(): Promise<WeeksResponse> {
-  return await apiCall("/weeks/");
+  const data = await apiCall("/weeks/");
+  return validateResponse(data, WeeksResponseValidator, "fetchWeeks");
 }
 
 export async function fetchFitness(): Promise<FitnessResponse> {
-  return await apiCall("/fitness/");
+  const data = await apiCall("/fitness/");
+  return validateResponse(data, FitnessResponseValidator, "fetchFitness");
 }
 
 export async function fetchBestPerformances(
@@ -174,7 +183,8 @@ export async function fetchBestPerformances(
   if (time) params.append("time", time);
   if (year) params.append("year", year.toString());
 
-  return await apiCall(`/best/?${params.toString()}`);
+  const data = await apiCall(`/best/?${params.toString()}`);
+  return validateResponse(data, BestPerformanceResponseValidator, "fetchBestPerformances");
 }
 
 export async function uploadActivity(fitFile: File, title: string, race: boolean): Promise<Activity> {
@@ -196,7 +206,7 @@ export async function uploadActivity(fitFile: File, title: string, race: boolean
     },
   });
 
-  return response.data;
+  return validateResponse(response.data, ActivityValidator, "uploadActivity");
 }
 
 export async function updateActivity(id: string, updates: ActivityUpdate): Promise<Activity> {
@@ -213,11 +223,12 @@ export async function updateActivity(id: string, updates: ActivityUpdate): Promi
     },
   });
 
-  return response.data;
+  return validateResponse(response.data, ActivityValidator, "updateActivity");
 }
 
 export async function fetchCurrentUser(): Promise<User> {
-  return await apiCall("/users/me/");
+  const data = await apiCall("/users/me/");
+  return validateResponse(data, UserValidator, "fetchCurrentUser");
 }
 
 export async function updateUser(updates: UserUpdate): Promise<User> {
@@ -234,7 +245,7 @@ export async function updateUser(updates: UserUpdate): Promise<User> {
     },
   });
 
-  return response.data;
+  return validateResponse(response.data, UserValidator, "updateUser");
 }
 
 export async function authenticateWithGoogle(userData: UserCreate): Promise<GoogleAuthResponse> {
@@ -244,5 +255,5 @@ export async function authenticateWithGoogle(userData: UserCreate): Promise<Goog
     },
   });
 
-  return response.data;
+  return validateResponse(response.data, GoogleAuthResponseValidator, "authenticateWithGoogle");
 }

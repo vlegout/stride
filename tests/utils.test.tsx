@@ -175,7 +175,7 @@ describe("utils", () => {
   describe("processTracePointData", () => {
     const mockTracePoint: TracePoint = {
       lat: 45.123,
-      lng: 2.456,
+      lon: 2.456,
       timestamp: "2024-01-01T10:00:00Z",
       distance: 5000,
       heart_rate: 150,

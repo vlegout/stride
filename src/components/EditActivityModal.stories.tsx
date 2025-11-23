@@ -49,7 +49,7 @@ const mockActivity: Activity = {
   tracepoints: [
     {
       lat: 40.7829,
-      lng: -73.9654,
+      lon: -73.9654,
       timestamp: "2022-01-01T08:00:00Z",
       distance: 0,
       heart_rate: 140,
@@ -59,7 +59,7 @@ const mockActivity: Activity = {
     },
     {
       lat: 40.7849,
-      lng: -73.9634,
+      lon: -73.9634,
       timestamp: "2022-01-01T08:02:00Z",
       distance: 300,
       heart_rate: 145,

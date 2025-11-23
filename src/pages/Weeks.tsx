@@ -101,8 +101,7 @@ const WeeksPage = () => {
       <PageHeader title="Weekly Summary" />
 
       {weeksData.weeks.map((week) => {
-        const sportsBreakdown =
-          (week.sports_breakdown as Record<string, { distance: number; time: number; count: number }>) || {};
+        const sportsBreakdown = week.sports_breakdown;
 
         return (
           <Card key={`${week.year}-${week.week_number}`} sx={{ mb: 3 }}>

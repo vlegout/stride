@@ -45,8 +45,6 @@ const generateSampleWeeklyZones = (weeks: number): WeeklyZoneData[] => {
       paceZones.push({
         zone_index: zone,
         total_time: zone * 400 + i * 100, // Deterministic: 400-2400 seconds
-        running_time: undefined,
-        cycling_time: undefined,
         max_value: 300 + zone * 30, // Pace in seconds per km
       });
     }
@@ -57,8 +55,6 @@ const generateSampleWeeklyZones = (weeks: number): WeeklyZoneData[] => {
       powerZones.push({
         zone_index: zone,
         total_time: zone * 200 + i * 50, // Deterministic: 200-1800 seconds
-        running_time: undefined,
-        cycling_time: undefined,
         max_value: 150 + zone * 50, // Power in watts
       });
     }
@@ -193,12 +189,8 @@ export const MinimalData: Story = {
           { zone_index: 1, total_time: 1800, running_time: 1200, cycling_time: 600, max_value: 140 },
           { zone_index: 2, total_time: 900, running_time: 600, cycling_time: 300, max_value: 160 },
         ],
-        pace_zones: [
-          { zone_index: 1, total_time: 1200, running_time: undefined, cycling_time: undefined, max_value: 330 },
-        ],
-        power_zones: [
-          { zone_index: 1, total_time: 900, running_time: undefined, cycling_time: undefined, max_value: 200 },
-        ],
+        pace_zones: [{ zone_index: 1, total_time: 1200, max_value: 330 }],
+        power_zones: [{ zone_index: 1, total_time: 900, max_value: 200 }],
       },
     ],
   },

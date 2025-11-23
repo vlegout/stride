@@ -3,6 +3,20 @@ import { type } from "arktype";
 export const Sport = type("'running'|'cycling'|'swimming'");
 export type Sport = typeof Sport.infer;
 
+export const DistanceRange = type(["number", "number"]);
+export type DistanceRange = typeof DistanceRange.infer;
+
+export const NonEmptyString = type("string")
+  .pipe((s) => s.trim())
+  .narrow((s, ctx) => (s.length > 0 ? true : ctx.mustBe("a non-empty string")));
+export type NonEmptyString = typeof NonEmptyString.infer;
+
+export const FileExtension = type("string").narrow((name, ctx) => {
+  const lower = name.toLowerCase();
+  return lower.endsWith(".fit") || lower.endsWith(".zip") ? true : ctx.mustBe("a .fit or .zip file");
+});
+export type FileExtension = typeof FileExtension.infer;
+
 export const ActivitiesQueryParams = type({
   sport: Sport.or("undefined"),
   distance: "number[]",
@@ -37,19 +51,19 @@ export const Lap = type({
   total_distance: "number",
   max_heart_rate: "number",
   avg_heart_rate: "number",
-  max_speed: "number",
+  max_speed: "number | null",
 });
 export type Lap = typeof Lap.infer;
 
 export const TracePoint = type({
-  lat: "number",
-  lng: "number",
+  lat: "number?",
+  lon: "number?",
   timestamp: "string",
   distance: "number",
   heart_rate: "number",
   speed: "number",
   power: "number",
-  altitude: "number",
+  altitude: "number?",
 });
 export type TracePoint = typeof TracePoint.infer;
 
@@ -92,18 +106,18 @@ export const Activity = type({
   lon: "number",
   delta_lat: "number",
   delta_lon: "number",
-  city: "string?",
-  country: "string?",
+  city: "string | null",
+  country: "string | null",
 
-  laps: [Lap],
-  tracepoints: TracePoint.array(),
-  performances: [Performance],
-  performance_power: [PowerPerformance],
+  laps: Lap.array().optional(),
+  tracepoints: TracePoint.array().optional(),
+  performances: Performance.array().optional(),
+  performance_power: PowerPerformance.array().optional(),
 });
 export type Activity = typeof Activity.infer;
 
 export const ActivityUpdate = type({
-  title: "string?",
+  "title?": NonEmptyString,
   race: "boolean?",
 });
 export type ActivityUpdate = typeof ActivityUpdate.infer;
@@ -158,7 +172,7 @@ export const Profile = type({
   cycling_total_distance: "number",
   swimming_n_activities: "number",
   swimming_total_distance: "number",
-  years: [YearsStatistics],
+  years: YearsStatistics.array(),
   zones: Zone.array(),
 });
 export type Profile = typeof Profile.infer;
@@ -172,7 +186,7 @@ export type BestPerformanceItem = typeof BestPerformanceItem.infer;
 export const BestPerformanceResponse = type({
   sport: "string",
   parameter: "string",
-  performances: [BestPerformanceItem],
+  performances: BestPerformanceItem.array(),
 });
 export type BestPerformanceResponse = typeof BestPerformanceResponse.infer;
 
@@ -230,6 +244,12 @@ export const WeeklyActivitySummary = type({
 });
 export type WeeklyActivitySummary = typeof WeeklyActivitySummary.infer;
 
+const SportsBreakdownItem = type({
+  distance: "number",
+  time: "number",
+  count: "number",
+});
+
 export const WeeklySummary = type({
   week_start: "string",
   week_number: "number",
@@ -239,7 +259,7 @@ export const WeeklySummary = type({
   total_distance: "number",
   total_time: "number",
   total_tss: "number",
-  sports_breakdown: "unknown",
+  sports_breakdown: { "[string]": SportsBreakdownItem },
 });
 export type WeeklySummary = typeof WeeklySummary.infer;
 
@@ -278,8 +298,8 @@ export type FtpData = typeof FtpData.infer;
 export const ZoneTimeData = type({
   zone_index: "number",
   total_time: "number",
-  running_time: "number | undefined",
-  cycling_time: "number | undefined",
+  running_time: "number?",
+  cycling_time: "number?",
   max_value: "number",
 });
 export type ZoneTimeData = typeof ZoneTimeData.infer;
@@ -301,3 +321,25 @@ export const FitnessResponse = type({
   ftp: FtpData.array(),
 });
 export type FitnessResponse = typeof FitnessResponse.infer;
+
+export const ActivityZoneRaw = type({
+  id: "string",
+  activity_id: "string",
+  zone_id: "string",
+  time_in_zone: "number",
+  zone: {
+    id: "string",
+    user_id: "string",
+    index: "number",
+    type: "string",
+    max_value: "number",
+  },
+});
+export type ActivityZoneRaw = typeof ActivityZoneRaw.infer;
+
+export const ActivityZonesRawResponse = type({
+  pace: ActivityZoneRaw.array().optional(),
+  power: ActivityZoneRaw.array().optional(),
+  heart_rate: ActivityZoneRaw.array().optional(),
+});
+export type ActivityZonesRawResponse = typeof ActivityZonesRawResponse.infer;

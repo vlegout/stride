@@ -77,7 +77,7 @@ const mockRunningActivity: Activity = {
   tracepoints: [
     {
       lat: 40.7829,
-      lng: -73.9654,
+      lon: -73.9654,
       timestamp: "2022-01-01T08:00:00Z",
       distance: 0,
       heart_rate: 140,
@@ -87,7 +87,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7849,
-      lng: -73.9634,
+      lon: -73.9634,
       timestamp: "2022-01-01T08:45:00Z",
       distance: 10000,
       heart_rate: 150,
@@ -144,7 +144,7 @@ const mockCyclingActivity: Activity = {
   tracepoints: [
     {
       lat: 45.4215,
-      lng: -123.1815,
+      lon: -123.1815,
       timestamp: "2022-01-01T20:20:00Z",
       distance: 0,
       heart_rate: 120,
@@ -154,7 +154,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4815,
-      lng: -123.0815,
+      lon: -123.0815,
       timestamp: "2022-01-01T20:30:00Z",
       distance: 50000,
       heart_rate: 130,
@@ -164,7 +164,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.5115,
-      lng: -123.0915,
+      lon: -123.0915,
       timestamp: "2022-01-01T22:40:00Z",
       distance: 65000,
       heart_rate: 145,

@@ -2,7 +2,9 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import ActivitiesTable from "./ActivitiesTable";
 import type { Sport } from "../types";
+import { DistanceRange, Sport as SportValidator } from "../types";
 import { PageHeader, FormField, SelectOption } from "./ui";
+import { type } from "arktype";
 
 interface ActivitiesPageViewProps {
   sport: Sport | undefined;
@@ -29,25 +31,21 @@ const ActivitiesPageView = ({
   ];
 
   const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number | number[]): void => {
-    if (Array.isArray(value) && value.length === 2 && typeof value[0] === "number" && typeof value[1] === "number") {
-      onDistanceChange([value[0], value[1]]);
-    } else {
-      console.warn("Invalid distance range value received:", value);
+    const validated = DistanceRange(value);
+    if (validated instanceof type.errors) {
+      console.warn("Invalid distance range value received:", value, validated.summary);
+      return;
     }
+    onDistanceChange(validated);
   };
 
   const handleSportChange = (value: unknown): void => {
-    if (typeof value === "string") {
-      if (value === "") {
-        onSportChange(undefined);
-      } else if (value === "cycling" || value === "running" || value === "swimming") {
-        onSportChange(value as Sport);
-      } else {
-        console.warn("Invalid sport value received:", value);
-      }
-    } else {
-      console.warn("Sport value must be a string, received:", typeof value);
+    const validated = SportValidator.or("''")(value);
+    if (validated instanceof type.errors) {
+      console.warn("Invalid sport value received:", value, validated.summary);
+      return;
     }
+    onSportChange(validated === "" ? undefined : validated);
   };
 
   return (
