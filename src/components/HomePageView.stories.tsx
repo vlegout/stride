@@ -48,7 +48,7 @@ const mockActivities: Activity[] = [
     tracepoints: [
       {
         lat: 40.7829,
-        lng: -73.9654,
+        lon: -73.9654,
         timestamp: "2022-01-01T08:00:00Z",
         distance: 0,
         heart_rate: 140,
@@ -58,7 +58,7 @@ const mockActivities: Activity[] = [
       },
       {
         lat: 40.7849,
-        lng: -73.9634,
+        lon: -73.9634,
         timestamp: "2022-01-01T08:30:30Z",
         distance: 5000,
         heart_rate: 150,
@@ -114,7 +114,7 @@ const mockActivities: Activity[] = [
     tracepoints: [
       {
         lat: 45.4215,
-        lng: -123.1815,
+        lon: -123.1815,
         timestamp: "2022-01-02T08:00:00Z",
         distance: 0,
         heart_rate: 120,
@@ -124,7 +124,7 @@ const mockActivities: Activity[] = [
       },
       {
         lat: 45.5115,
-        lng: -123.0915,
+        lon: -123.0915,
         timestamp: "2022-01-02T09:31:40Z",
         distance: 45000,
         heart_rate: 140,
@@ -180,7 +180,7 @@ const mockActivities: Activity[] = [
     tracepoints: [
       {
         lat: 40.7484,
-        lng: -73.9857,
+        lon: -73.9857,
         timestamp: "2022-01-03T08:00:00Z",
         distance: 0,
         heart_rate: 150,
@@ -190,7 +190,7 @@ const mockActivities: Activity[] = [
       },
       {
         lat: 40.7494,
-        lng: -73.9847,
+        lon: -73.9847,
         timestamp: "2022-01-03T09:00:00Z",
         distance: 8000,
         heart_rate: 165,

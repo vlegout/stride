@@ -37,7 +37,7 @@ const MapMapbox = ({ bounds, points, height = "400px", width = "400px", showMark
           properties: {},
           geometry: {
             type: "LineString",
-            coordinates: points.map(([lat, lng]) => [lng, lat]),
+            coordinates: points.map(([lat, lon]) => [lon, lat]),
           },
         },
       });

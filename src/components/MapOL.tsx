@@ -13,8 +13,8 @@ import { MapComponentProps } from "./MapTypes";
 import { LatLngExpression } from "leaflet";
 
 const latLngToCoord = (point: LatLngExpression): number[] => {
-  const [lat, lng] = Array.isArray(point) ? point : [point.lat, point.lng];
-  return fromLonLat([lng, lat]);
+  const [lat, lon] = Array.isArray(point) ? point : [point.lat, point.lng];
+  return fromLonLat([lon, lat]);
 };
 
 const MapOLComponent = ({

@@ -35,9 +35,10 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   const mapProvider = user?.map || "leaflet";
 
   const locationText = [activity.city, activity.country].filter(Boolean).join(", ") || "—";
-  const mapPoints = activity.tracepoints.map(
-    (point) => [point.lat, point.lng || (point as { lon?: number }).lon || 0] as [number, number],
-  );
+  const mapPoints =
+    activity.tracepoints
+      ?.filter((point) => point.lat != null && point.lon != null)
+      .map((point) => [point.lat, point.lon] as [number, number]) ?? [];
 
   const title = isDetailed ? (
     <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>

@@ -33,16 +33,16 @@ const ActivityPageView = ({ data }: ActivityPageViewProps) => {
       </SectionContainer>
 
       <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
-        <LapChart laps={data.laps} sport={data.sport} />
+        <LapChart laps={data.laps || []} sport={data.sport} />
       </SectionContainer>
 
       <SectionContainer maxWidth={{ xs: "100%", sm: "500px", md: "400px" }} centered>
-        <Performances performances={data.performances} />
+        <Performances performances={data.performances || []} />
       </SectionContainer>
 
       {data.sport === "cycling" && (
         <SectionContainer maxWidth="100%" spacing="compact">
-          <PowerPerformances performances={data.performance_power} />
+          <PowerPerformances performances={data.performance_power || []} />
         </SectionContainer>
       )}
 

@@ -50,7 +50,7 @@ const mockRunningActivity: Activity = {
     // Central Park loop - simplified GPS track
     {
       lat: 40.7829,
-      lng: -73.9654,
+      lon: -73.9654,
       timestamp: "2022-01-01T08:00:00Z",
       distance: 0,
       heart_rate: 140,
@@ -60,7 +60,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7849,
-      lng: -73.9634,
+      lon: -73.9634,
       timestamp: "2022-01-01T08:02:00Z",
       distance: 300,
       heart_rate: 145,
@@ -70,7 +70,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7869,
-      lng: -73.9614,
+      lon: -73.9614,
       timestamp: "2022-01-01T08:04:00Z",
       distance: 600,
       heart_rate: 150,
@@ -80,7 +80,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7889,
-      lng: -73.9594,
+      lon: -73.9594,
       timestamp: "2022-01-01T08:06:00Z",
       distance: 900,
       heart_rate: 155,
@@ -90,7 +90,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7909,
-      lng: -73.9574,
+      lon: -73.9574,
       timestamp: "2022-01-01T08:08:00Z",
       distance: 1200,
       heart_rate: 160,
@@ -100,7 +100,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7929,
-      lng: -73.9554,
+      lon: -73.9554,
       timestamp: "2022-01-01T08:10:00Z",
       distance: 1500,
       heart_rate: 162,
@@ -110,7 +110,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7939,
-      lng: -73.9544,
+      lon: -73.9544,
       timestamp: "2022-01-01T08:12:00Z",
       distance: 1800,
       heart_rate: 165,
@@ -120,7 +120,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7949,
-      lng: -73.9534,
+      lon: -73.9534,
       timestamp: "2022-01-01T08:14:00Z",
       distance: 2100,
       heart_rate: 168,
@@ -130,7 +130,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7959,
-      lng: -73.9524,
+      lon: -73.9524,
       timestamp: "2022-01-01T08:16:00Z",
       distance: 2400,
       heart_rate: 170,
@@ -140,7 +140,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7949,
-      lng: -73.9504,
+      lon: -73.9504,
       timestamp: "2022-01-01T08:18:00Z",
       distance: 2700,
       heart_rate: 172,
@@ -150,7 +150,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7939,
-      lng: -73.9484,
+      lon: -73.9484,
       timestamp: "2022-01-01T08:20:00Z",
       distance: 3000,
       heart_rate: 175,
@@ -161,7 +161,7 @@ const mockRunningActivity: Activity = {
     // Continue back to start
     {
       lat: 40.7919,
-      lng: -73.9504,
+      lon: -73.9504,
       timestamp: "2022-01-01T08:25:00Z",
       distance: 4000,
       heart_rate: 168,
@@ -171,7 +171,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7889,
-      lng: -73.9534,
+      lon: -73.9534,
       timestamp: "2022-01-01T08:30:00Z",
       distance: 5000,
       heart_rate: 162,
@@ -181,7 +181,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7859,
-      lng: -73.9564,
+      lon: -73.9564,
       timestamp: "2022-01-01T08:35:00Z",
       distance: 6000,
       heart_rate: 158,
@@ -191,7 +191,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7829,
-      lng: -73.9594,
+      lon: -73.9594,
       timestamp: "2022-01-01T08:40:00Z",
       distance: 7000,
       heart_rate: 155,
@@ -201,7 +201,7 @@ const mockRunningActivity: Activity = {
     },
     {
       lat: 40.7829,
-      lng: -73.9654,
+      lon: -73.9654,
       timestamp: "2022-01-01T08:45:00Z",
       distance: 10000,
       heart_rate: 150,
@@ -260,7 +260,7 @@ const mockCyclingActivity: Activity = {
     // Simplified cycling route
     {
       lat: 45.4215,
-      lng: -123.1815,
+      lon: -123.1815,
       timestamp: "2022-01-01T20:20:00Z",
       distance: 0,
       heart_rate: 120,
@@ -270,7 +270,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4315,
-      lng: -123.1715,
+      lon: -123.1715,
       timestamp: "2022-01-01T20:25:00Z",
       distance: 2000,
       heart_rate: 135,
@@ -280,7 +280,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4415,
-      lng: -123.1615,
+      lon: -123.1615,
       timestamp: "2022-01-01T20:30:00Z",
       distance: 4000,
       heart_rate: 142,
@@ -290,7 +290,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4515,
-      lng: -123.1515,
+      lon: -123.1515,
       timestamp: "2022-01-01T20:35:00Z",
       distance: 6000,
       heart_rate: 148,
@@ -300,7 +300,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4615,
-      lng: -123.1415,
+      lon: -123.1415,
       timestamp: "2022-01-01T20:40:00Z",
       distance: 8000,
       heart_rate: 155,
@@ -310,7 +310,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4715,
-      lng: -123.1315,
+      lon: -123.1315,
       timestamp: "2022-01-01T20:50:00Z",
       distance: 12000,
       heart_rate: 162,
@@ -320,7 +320,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4815,
-      lng: -123.1215,
+      lon: -123.1215,
       timestamp: "2022-01-01T21:00:00Z",
       distance: 16000,
       heart_rate: 168,
@@ -330,7 +330,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4915,
-      lng: -123.1115,
+      lon: -123.1115,
       timestamp: "2022-01-01T21:10:00Z",
       distance: 20000,
       heart_rate: 175,
@@ -340,7 +340,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.5015,
-      lng: -123.1015,
+      lon: -123.1015,
       timestamp: "2022-01-01T21:20:00Z",
       distance: 24000,
       heart_rate: 180,
@@ -350,7 +350,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.5115,
-      lng: -123.0915,
+      lon: -123.0915,
       timestamp: "2022-01-01T21:30:00Z",
       distance: 28000,
       heart_rate: 185,
@@ -361,7 +361,7 @@ const mockCyclingActivity: Activity = {
     // Return journey
     {
       lat: 45.5015,
-      lng: -123.1015,
+      lon: -123.1015,
       timestamp: "2022-01-01T21:40:00Z",
       distance: 32000,
       heart_rate: 165,
@@ -371,7 +371,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4915,
-      lng: -123.1115,
+      lon: -123.1115,
       timestamp: "2022-01-01T21:50:00Z",
       distance: 36000,
       heart_rate: 155,
@@ -381,7 +381,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4815,
-      lng: -123.1215,
+      lon: -123.1215,
       timestamp: "2022-01-01T22:00:00Z",
       distance: 40000,
       heart_rate: 148,
@@ -391,7 +391,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4715,
-      lng: -123.1315,
+      lon: -123.1315,
       timestamp: "2022-01-01T22:10:00Z",
       distance: 48000,
       heart_rate: 142,
@@ -401,7 +401,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4615,
-      lng: -123.1415,
+      lon: -123.1415,
       timestamp: "2022-01-01T22:15:00Z",
       distance: 52000,
       heart_rate: 138,
@@ -411,7 +411,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4515,
-      lng: -123.1515,
+      lon: -123.1515,
       timestamp: "2022-01-01T22:18:00Z",
       distance: 56000,
       heart_rate: 135,
@@ -421,7 +421,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4415,
-      lng: -123.1615,
+      lon: -123.1615,
       timestamp: "2022-01-01T22:19:00Z",
       distance: 60000,
       heart_rate: 132,
@@ -431,7 +431,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4315,
-      lng: -123.1715,
+      lon: -123.1715,
       timestamp: "2022-01-01T22:19:30Z",
       distance: 62500,
       heart_rate: 130,
@@ -441,7 +441,7 @@ const mockCyclingActivity: Activity = {
     },
     {
       lat: 45.4215,
-      lng: -123.1815,
+      lon: -123.1815,
       timestamp: "2022-01-01T22:20:00Z",
       distance: 65000,
       heart_rate: 125,

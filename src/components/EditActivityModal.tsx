@@ -44,8 +44,9 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
     setError(null);
 
     const updates: ActivityUpdate = {};
-    if (title.trim() !== activity.title) {
-      updates.title = title.trim();
+    const trimmedTitle = title.trim();
+    if (trimmedTitle !== activity.title) {
+      updates.title = trimmedTitle;
     }
     if (race !== activity.race) {
       updates.race = race;
