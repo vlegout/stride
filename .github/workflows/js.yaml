@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.56.0-jammy
-    needs: test
+    needs: lint
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
