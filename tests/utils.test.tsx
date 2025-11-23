@@ -5,7 +5,6 @@ import {
   formatDuration,
   formatDateTime,
   formatInterval,
-  formatPace,
   formatDate,
   isTokenValid,
   processTracePointData,
@@ -15,18 +14,45 @@ import type { TracePoint } from "../src/types";
 
 describe("utils", () => {
   describe("formatSpeed", () => {
-    it("should format speed with 2 decimal places and km/h unit", () => {
-      expect(formatSpeed(25.5)).toBe("25.50 km/h");
-      expect(formatSpeed(10.123)).toBe("10.12 km/h");
-      expect(formatSpeed(0)).toBe("0.00 km/h");
+    it("should format speed with 1 decimal place and km/h unit for default/cycling", () => {
+      expect(formatSpeed(25.5)).toBe("25.5 km/h");
+      expect(formatSpeed(10.123)).toBe("10.1 km/h");
+      expect(formatSpeed(25.5, "cycling")).toBe("25.5 km/h");
     });
 
-    it("should return empty string for null speed", () => {
+    it("should format running speed as pace per km", () => {
+      // 12 km/h = 5:00 /km
+      expect(formatSpeed(12, "running")).toBe("5:00 /km");
+      // 10 km/h = 6:00 /km
+      expect(formatSpeed(10, "running")).toBe("6:00 /km");
+      // 15 km/h = 4:00 /km
+      expect(formatSpeed(15, "running")).toBe("4:00 /km");
+      // 13.5 km/h = 4:27 /km
+      expect(formatSpeed(13.5, "running")).toBe("4:27 /km");
+    });
+
+    it("should format swimming speed as pace per 100m", () => {
+      // 3 km/h = 2:00 /100m (6000 / 3 = 2000 seconds = 33:20, wait that's wrong)
+      // Let me recalculate: 3 km/h means 3000m in 60 minutes, so 100m in 60/30 = 2 minutes
+      expect(formatSpeed(3, "swimming")).toBe("2:00 /100m");
+      // 6 km/h = 1:00 /100m
+      expect(formatSpeed(6, "swimming")).toBe("1:00 /100m");
+      // 2 km/h = 3:00 /100m
+      expect(formatSpeed(2, "swimming")).toBe("3:00 /100m");
+      // 4.8 km/h = 1:15 /100m
+      expect(formatSpeed(4.8, "swimming")).toBe("1:15 /100m");
+    });
+
+    it("should return empty string for null/undefined/zero speed by default", () => {
       expect(formatSpeed(null as unknown as number)).toBe("");
+      expect(formatSpeed(undefined as unknown as number)).toBe("");
+      expect(formatSpeed(0)).toBe("");
     });
 
-    it("should return empty string for undefined speed", () => {
-      expect(formatSpeed(undefined as unknown as number)).toBe("");
+    it("should return custom fallback for null/undefined/zero speed", () => {
+      expect(formatSpeed(null as unknown as number, undefined, "--")).toBe("--");
+      expect(formatSpeed(undefined as unknown as number, "cycling", "--")).toBe("--");
+      expect(formatSpeed(0, "running", "--")).toBe("--");
     });
   });
 
@@ -89,27 +115,10 @@ describe("utils", () => {
     });
   });
 
-  describe("formatPace", () => {
-    it("should return '--' for null, undefined, or zero speed", () => {
-      expect(formatPace(null as unknown as number, "running")).toBe("--");
-      expect(formatPace(undefined as unknown as number, "cycling")).toBe("--");
-      expect(formatPace(0, "running")).toBe("--");
-    });
-
-    it("should format running pace as min/km", () => {
-      // 12 km/h = 5:00 /km
-      expect(formatPace(12, "running")).toBe("5:00 /km");
-      // 10 km/h = 6:00 /km
-      expect(formatPace(10, "running")).toBe("6:00 /km");
-      // 15 km/h = 4:00 /km
-      expect(formatPace(15, "running")).toBe("4:00 /km");
-      // 13.5 km/h = 4:27 /km
-      expect(formatPace(13.5, "running")).toBe("4:27 /km");
-    });
-
-    it("should format cycling pace as km/h with 1 decimal", () => {
-      expect(formatPace(25.123, "cycling")).toBe("25.1 km/h");
-      expect(formatPace(30, "cycling")).toBe("30.0 km/h");
+  describe("formatSpeed with fallback parameter", () => {
+    it("should format cycling speed as km/h with 1 decimal when using fallback", () => {
+      expect(formatSpeed(25.123, "cycling", "--")).toBe("25.1 km/h");
+      expect(formatSpeed(30, "cycling", "--")).toBe("30.0 km/h");
     });
   });
 

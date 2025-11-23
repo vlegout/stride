@@ -9,10 +9,26 @@ export interface ProcessedChartData {
   powerData: number[];
 }
 
-export function formatSpeed(speed: number): string {
-  if (speed == null) return "";
+function formatRunningPace(speed: number): string {
+  const minPerKm = 60 / speed;
+  const minutes = Math.floor(minPerKm);
+  const seconds = Math.round((minPerKm - minutes) * 60);
+  return `${minutes}:${seconds.toString().padStart(2, "0")} /km`;
+}
 
-  return `${speed.toFixed(2)} km/h`;
+export function formatSpeed(speed: number, sport?: Sport, fallback = ""): string {
+  if (speed == null || speed === 0) return fallback;
+
+  if (sport === "swimming") {
+    const pacePerHundredMeters = 6 / speed;
+    const minutes = Math.floor(pacePerHundredMeters);
+    const seconds = Math.round((pacePerHundredMeters - minutes) * 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")} /100m`;
+  } else if (sport === "running") {
+    return formatRunningPace(speed);
+  } else {
+    return `${speed.toFixed(1)} km/h`;
+  }
 }
 
 export function formatDistance(distance: number): string {
@@ -37,19 +53,6 @@ export function formatInterval(timedelta: string): string {
 
 export function formatDate(date: Date): string {
   return DateTime.fromJSDate(date).toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
-}
-
-export function formatPace(speed: number, sport: Sport): string {
-  if (!speed || speed === 0) return "--";
-
-  if (sport === "running") {
-    const minPerKm = 60 / speed;
-    const minutes = Math.floor(minPerKm);
-    const seconds = Math.round((minPerKm - minutes) * 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")} /km`;
-  } else {
-    return `${speed.toFixed(1)} km/h`;
-  }
 }
 
 export function isTokenValid(token: string | null, tokenExpiry: number | null): boolean {
