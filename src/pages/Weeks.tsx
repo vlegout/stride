@@ -5,7 +5,7 @@ import MuiLink from "@mui/material/Link";
 
 import { fetchWeeks } from "../api";
 import type { Sport } from "../types";
-import { formatDate, formatDuration, formatDistance, formatPace } from "../utils";
+import { formatDate, formatDuration, formatDistance, formatSpeed } from "../utils";
 import ActivityLogo from "../components/ActivityLogo";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../components/ui";
@@ -92,7 +92,7 @@ const WeeksPage = () => {
       id: "avg_speed",
       label: "Pace",
       align: "right" as const,
-      render: (value, row) => formatPace(value as number, row.sport as Sport),
+      render: (value, row) => formatSpeed(value as number, row.sport as Sport, "--"),
     },
   ];
 

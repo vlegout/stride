@@ -73,7 +73,7 @@ const ActivitiesTable = () => {
       id: "avg_speed",
       label: "Average Speed",
       sortable: true,
-      format: (value) => formatSpeed(value as number),
+      render: (value, row) => formatSpeed(value as number, row.sport as Sport),
     },
     {
       id: "avg_power",
