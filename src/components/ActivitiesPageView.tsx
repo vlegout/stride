@@ -25,6 +25,7 @@ const ActivitiesPageView = ({
     { value: "", label: "All" },
     { value: "cycling", label: "Cycling" },
     { value: "running", label: "Running" },
+    { value: "swimming", label: "Swimming" },
   ];
 
   const handleDistanceChange = (_event: React.SyntheticEvent | Event, value: number | number[]): void => {
@@ -39,7 +40,7 @@ const ActivitiesPageView = ({
     if (typeof value === "string") {
       if (value === "") {
         onSportChange(undefined);
-      } else if (value === "cycling" || value === "running") {
+      } else if (value === "cycling" || value === "running" || value === "swimming") {
         onSportChange(value as Sport);
       } else {
         console.warn("Invalid sport value received:", value);
