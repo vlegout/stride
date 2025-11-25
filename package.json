@@ -61,7 +61,7 @@
     "@vitest/browser": "^4.0.13",
     "@vitest/browser-playwright": "^4.0.13",
     "@vitest/coverage-istanbul": "^4.0.13",
-    "@vitest/coverage-v8": "^4.0.13",
+    "@vitest/coverage-v8": "^4.0.14",
     "@vitest/ui": "^4.0.13",
     "chromatic": "^13.3.4",
     "eslint": "^9.39.1",
