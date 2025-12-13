@@ -66,7 +66,10 @@ export const processTracePointData = (tracePoints: TracePoint[]): ProcessedChart
     labels: safeTracePoints.map((point: TracePoint) => (point?.distance ?? 0) / 1000),
     speedData: safeTracePoints.map((point: TracePoint) => point?.speed ?? 0),
     hrData: safeTracePoints.map((point: TracePoint) => point?.heart_rate ?? 0),
-    altitudeData: safeTracePoints.map((point: TracePoint) => point?.altitude ?? 0),
+    altitudeData: safeTracePoints.map((point: TracePoint) => {
+      const altitude = point?.altitude ?? 0;
+      return altitude > 10000 ? NaN : altitude;
+    }),
     powerData: safeTracePoints.map((point: TracePoint) => point?.power ?? 0),
   };
 };
