@@ -67,7 +67,7 @@ class ActivityUpdate(BaseModel):
 class ActivityBase(SQLModel):
     id: uuid.UUID = Field(default=None, primary_key=True)
 
-    fit: str = Field(unique=True)
+    fit: str
 
     status: str = Field(default="created")
 
