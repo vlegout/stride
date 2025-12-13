@@ -240,6 +240,18 @@ def create_activity(
     if not fit_file.filename or not fit_file.filename.endswith(".fit"):
         raise HTTPException(status_code=400, detail="File must be a .fit file")
 
+    existing_activity = session.exec(
+        select(Activity).where(
+            Activity.fit == fit_file.filename,
+            Activity.user_id == user_id,
+            Activity.status == "created",
+        )
+    ).first()
+    if existing_activity:
+        raise HTTPException(
+            status_code=409, detail="Activity with this FIT file already exists"
+        )
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".fit") as temp_file:
         temp_file.write(fit_file.file.read())
         temp_fit_path = temp_file.name
@@ -263,12 +275,6 @@ def create_activity(
         MAX_DATA_POINTS = 500
         while len(tracepoints) > MAX_DATA_POINTS:
             tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
-
-        existing_activity = session.get(Activity, activity.id)
-        if existing_activity:
-            raise HTTPException(
-                status_code=409, detail="Activity with this FIT file already exists"
-            )
 
         fit_s3_key = f"data/fit/{fit_file.filename}"
 
