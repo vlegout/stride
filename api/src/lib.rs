@@ -190,7 +190,8 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 fit.activity.max_power = sanitize_u16(raw_max_power);
                             }
                             22 => {
-                                fit.activity.total_ascent = extract_u16(&value.value);
+                                let raw_ascent: u16 = extract_u16(&value.value);
+                                fit.activity.total_ascent = sanitize_u16(raw_ascent);
                             }
                             24 => {
                                 fit.activity.total_training_effect = extract_u8(&value.value);
