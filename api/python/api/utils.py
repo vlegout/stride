@@ -211,81 +211,89 @@ def get_best_performance_power(
 def detect_best_effort_achievements(
     session: Session, activity: Activity, performances: list[Performance]
 ) -> list[Notification]:
-    """Detect if this activity achieved best 10km for year or all-time."""
+    """Detect if this activity achieved best efforts for year or all-time."""
 
     if activity.sport != "running":
         return []
 
-    target_distance = 10000
-    current_perf = next(
-        (p for p in performances if p.distance == target_distance), None
-    )
+    distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+    current_year = datetime.date.fromtimestamp(activity.start_time).year
 
-    if not current_perf or not current_perf.time:
+    current_perfs = {
+        p.distance: p for p in performances if p.distance in distances and p.time
+    }
+
+    if not current_perfs:
         return []
 
     stmt = (
-        select(Performance)
+        select(Performance, Activity.start_time)
         .join(Activity)
         .where(
             Activity.user_id == activity.user_id,
             Activity.sport == "running",
             Activity.status == "created",
             Activity.id != activity.id,
-            Performance.distance == target_distance,
+            Performance.distance.in_(list(current_perfs.keys())),  # type: ignore
             Performance.time != None,  # noqa: E711
         )
     )
-    historical_perfs = session.exec(stmt).all()
+    historical_results = session.exec(stmt).all()
 
-    if not historical_perfs:
-        return [
-            Notification(
-                activity_id=activity.id,
-                type="best_effort_all_time",
-                distance=target_distance,
-                message="",
-            )
-        ]
-
-    current_year = datetime.date.fromtimestamp(activity.start_time).year
-
-    yearly_perfs = []
-    historical_times = [p.time for p in historical_perfs if p.time is not None]
-
-    if not historical_times:
-        return []
-
-    all_time_best = min(historical_times)
-
-    for perf in historical_perfs:
-        perf_activity = session.get(Activity, perf.activity_id)
-        if perf_activity and perf.time is not None:
-            perf_year = datetime.date.fromtimestamp(perf_activity.start_time).year
-            if perf_year == current_year:
-                yearly_perfs.append(perf.time)
+    historical_by_distance: Dict[float, list[tuple[datetime.timedelta, int]]] = {}
+    for perf, start_time in historical_results:
+        if perf.time is None:
+            continue
+        if perf.distance not in historical_by_distance:
+            historical_by_distance[perf.distance] = []
+        perf_year = datetime.date.fromtimestamp(start_time).year
+        historical_by_distance[perf.distance].append((perf.time, perf_year))
 
     notifications = []
 
-    if current_perf.time < all_time_best:
-        notifications.append(
-            Notification(
-                activity_id=activity.id,
-                type="best_effort_all_time",
-                distance=target_distance,
-                message="",
+    for target_distance, current_perf in current_perfs.items():
+        if current_perf.time is None:
+            continue
+
+        historical_data = historical_by_distance.get(target_distance, [])
+
+        if not historical_data:
+            notifications.append(
+                Notification(
+                    activity_id=activity.id,
+                    type="best_effort_all_time",
+                    distance=target_distance,
+                    achievement_year=None,
+                    message="",
+                )
             )
-        )
-    elif not yearly_perfs or current_perf.time < min(yearly_perfs):
-        notifications.append(
-            Notification(
-                activity_id=activity.id,
-                type="best_effort_yearly",
-                distance=target_distance,
-                achievement_year=current_year,
-                message="",
+            continue
+
+        all_times = [time for time, _ in historical_data]
+        yearly_times = [time for time, year in historical_data if year == current_year]
+
+        all_time_best = min(all_times)
+
+        if current_perf.time < all_time_best:
+            notifications.append(
+                Notification(
+                    activity_id=activity.id,
+                    type="best_effort_all_time",
+                    distance=target_distance,
+                    achievement_year=None,
+                    message="",
+                )
             )
-        )
+        elif not yearly_times or current_perf.time < min(yearly_times):
+            notifications.append(
+                Notification(
+                    activity_id=activity.id,
+                    type="best_effort_yearly",
+                    distance=target_distance,
+                    achievement_year=current_year,
+                    message="",
+                )
+            )
 
     return notifications
 
