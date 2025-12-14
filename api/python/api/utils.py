@@ -244,7 +244,7 @@ def detect_best_effort_achievements(
                 activity_id=activity.id,
                 type="best_effort_all_time",
                 distance=target_distance,
-                message="Personal Best 10km!",
+                message="",
             )
         ]
 
@@ -273,7 +273,7 @@ def detect_best_effort_achievements(
                 activity_id=activity.id,
                 type="best_effort_all_time",
                 distance=target_distance,
-                message="Personal Best 10km!",
+                message="",
             )
         )
     elif not yearly_perfs or current_perf.time < min(yearly_perfs):
@@ -283,7 +283,7 @@ def detect_best_effort_achievements(
                 type="best_effort_yearly",
                 distance=target_distance,
                 achievement_year=current_year,
-                message=f"Best 10km of {current_year}!",
+                message="",
             )
         )
 
