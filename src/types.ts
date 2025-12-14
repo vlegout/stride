@@ -43,6 +43,17 @@ export const PowerPerformance = type({
 });
 export type PowerPerformance = typeof PowerPerformance.infer;
 
+export const Notification = type({
+  id: "string.uuid.v4",
+  activity_id: "string.uuid.v5",
+  type: "'best_effort_yearly'|'best_effort_all_time'",
+  distance: "number",
+  achievement_year: "number?",
+  message: "string",
+  created_at: "string",
+});
+export type Notification = typeof Notification.infer;
+
 export const Lap = type({
   index: "number",
   start_time: "number",
@@ -113,6 +124,7 @@ export const Activity = type({
   tracepoints: TracePoint.array().optional(),
   performances: Performance.array().optional(),
   performance_power: PowerPerformance.array().optional(),
+  notifications: Notification.array().optional(),
 });
 export type Activity = typeof Activity.infer;
 

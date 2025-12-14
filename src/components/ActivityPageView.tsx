@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 
 import ActivityBox from "./ActivityBox";
+import ActivityNotifications from "./ActivityNotifications";
 import LapChart from "./LapChart";
 import Performances from "./Performances";
 import PowerPerformances from "./PowerPerformances";
@@ -30,6 +31,9 @@ const ActivityPageView = ({ data }: ActivityPageViewProps) => {
     <Box sx={{ width: "100%" }}>
       <SectionContainer spacing="compact">
         <ActivityBox activity={data} isDetailed={true} />
+        {data.notifications && data.notifications.length > 0 && (
+          <ActivityNotifications notifications={data.notifications} />
+        )}
       </SectionContainer>
 
       <SectionContainer maxWidth={{ xs: "100%", sm: "600px", md: "500px" }} centered>
