@@ -226,6 +226,20 @@ export async function updateActivity(id: string, updates: ActivityUpdate): Promi
   return validateResponse(response.data, ActivityValidator, "updateActivity");
 }
 
+export async function deleteActivity(id: string): Promise<void> {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error("No valid authentication token available");
+  }
+
+  await axios.delete(`${API_URL}/activities/${id}/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
 export async function fetchCurrentUser(): Promise<User> {
   const data = await apiCall("/users/me/");
   return validateResponse(data, UserValidator, "fetchCurrentUser");
