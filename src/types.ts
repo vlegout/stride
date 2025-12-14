@@ -317,6 +317,7 @@ export const FitnessResponse = type({
   weekly_tss: WeeklyTSS.array(),
   weekly_running: WeeklyActivityData.array(),
   weekly_cycling: WeeklyActivityData.array(),
+  weekly_swimming: WeeklyActivityData.array(),
   weekly_zones: WeeklyZoneData.array(),
   ftp: FtpData.array(),
 });

@@ -153,6 +153,7 @@ def calculate_fitness_scores(session: Session, user_id: str):
     weekly_tss_data = []
     weekly_running_data = []
     weekly_cycling_data = []
+    weekly_swimming_data = []
     current_date = datetime.datetime.now()
 
     for weeks_back in range(52):
@@ -188,6 +189,13 @@ def calculate_fitness_scores(session: Session, user_id: str):
         cycling_time = sum(
             (a.total_timer_time or 0) / 3600.0 for a in cycling_activities
         )
+        swimming_activities = [a for a in week_activities if a.sport == "swimming"]
+        swimming_distance = sum(
+            (a.total_distance or 0) / 1000.0 for a in swimming_activities
+        )
+        swimming_time = sum(
+            (a.total_timer_time or 0) / 3600.0 for a in swimming_activities
+        )
 
         week_str = week_start.strftime("%Y-%m-%d")
 
@@ -209,9 +217,18 @@ def calculate_fitness_scores(session: Session, user_id: str):
             }
         )
 
+        weekly_swimming_data.append(
+            {
+                "week_start": week_str,
+                "distance": round(swimming_distance, 2),
+                "time": round(swimming_time, 2),
+            }
+        )
+
     weekly_tss_data.reverse()
     weekly_running_data.reverse()
     weekly_cycling_data.reverse()
+    weekly_swimming_data.reverse()
 
     # Get FTP data for the same time period (past 1 year)
     ftp_start_date = current_date - datetime.timedelta(days=365)
@@ -236,6 +253,7 @@ def calculate_fitness_scores(session: Session, user_id: str):
         "weekly_tss": weekly_tss_data,
         "weekly_running": weekly_running_data,
         "weekly_cycling": weekly_cycling_data,
+        "weekly_swimming": weekly_swimming_data,
         "weekly_zones": weekly_zones,
         "ftp": ftp_data,
     }

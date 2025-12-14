@@ -39,6 +39,7 @@ export const Default: Story = {
   args: {
     weeklyRunning: generateWeeklyData(52, 35, 4.5),
     weeklyCycling: generateWeeklyData(52, 120, 6.2),
+    weeklySwimming: generateWeeklyData(52, 3.5, 1.5),
   },
 };
 
@@ -46,6 +47,7 @@ export const LowActivity: Story = {
   args: {
     weeklyRunning: generateWeeklyData(52, 15, 2.0),
     weeklyCycling: generateWeeklyData(52, 50, 2.5),
+    weeklySwimming: generateWeeklyData(52, 1.5, 0.8),
   },
 };
 
@@ -53,6 +55,7 @@ export const HighActivity: Story = {
   args: {
     weeklyRunning: generateWeeklyData(52, 65, 8.0),
     weeklyCycling: generateWeeklyData(52, 250, 12.5),
+    weeklySwimming: generateWeeklyData(52, 6.5, 3.0),
   },
 };
 
@@ -60,5 +63,6 @@ export const ShortPeriod: Story = {
   args: {
     weeklyRunning: generateWeeklyData(12, 35, 4.5),
     weeklyCycling: generateWeeklyData(12, 120, 6.2),
+    weeklySwimming: generateWeeklyData(12, 3.5, 1.5),
   },
 };
