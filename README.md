@@ -27,4 +27,5 @@ JWT_SECRET_KEY=your-super-secret-jwt-key-here-make-it-long-and-random
 ```bash
 VITE_API_URL=http://localhost:8000
 VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+VITE_MAPBOX_TOKEN=your-mapbox-access-token
 ```
