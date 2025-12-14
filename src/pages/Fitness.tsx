@@ -75,6 +75,7 @@ const Fitness = () => {
   const filteredWeeklyTss = filterWeeklyDataByDateRange(fitnessData.weekly_tss, selectedRange);
   const filteredWeeklyRunning = filterWeeklyDataByDateRange(fitnessData.weekly_running, selectedRange);
   const filteredWeeklyCycling = filterWeeklyDataByDateRange(fitnessData.weekly_cycling, selectedRange);
+  const filteredWeeklySwimming = filterWeeklyDataByDateRange(fitnessData.weekly_swimming || [], selectedRange);
   const filteredWeeklyZones = fitnessData.weekly_zones
     ? filterWeeklyDataByDateRange(fitnessData.weekly_zones, selectedRange)
     : [];
@@ -140,7 +141,11 @@ const Fitness = () => {
       </SectionContainer>
 
       <SectionContainer>
-        <WeeklyMetricsCharts weeklyRunning={filteredWeeklyRunning} weeklyCycling={filteredWeeklyCycling} />
+        <WeeklyMetricsCharts
+          weeklyRunning={filteredWeeklyRunning}
+          weeklyCycling={filteredWeeklyCycling}
+          weeklySwimming={filteredWeeklySwimming}
+        />
       </SectionContainer>
 
       <SectionContainer>

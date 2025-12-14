@@ -8,9 +8,10 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 interface WeeklyMetricsChartsProps {
   weeklyRunning: WeeklyActivityData[];
   weeklyCycling: WeeklyActivityData[];
+  weeklySwimming: WeeklyActivityData[];
 }
 
-const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChartsProps) => {
+const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: WeeklyMetricsChartsProps) => {
   const createChartOptions = (title: string, yAxisLabel: string): object => ({
     responsive: true,
     maintainAspectRatio: false,
@@ -50,6 +51,10 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
   const weeklyCyclingDistances = weeklyCycling.map((week) => week.distance);
   const weeklyCyclingTimes = weeklyCycling.map((week) => week.time);
   const weeklyCyclingLabels = weeklyCycling.map((week) => week.week_start);
+
+  const weeklySwimmingDistances = weeklySwimming.map((week) => week.distance);
+  const weeklySwimmingTimes = weeklySwimming.map((week) => week.time);
+  const weeklySwimmingLabels = weeklySwimming.map((week) => week.week_start);
 
   const runningDistanceChartData = {
     labels: weeklyRunningLabels,
@@ -95,6 +100,28 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
     ],
   };
 
+  const swimmingDistanceChartData = {
+    labels: weeklySwimmingLabels,
+    datasets: [
+      {
+        label: "Weekly Distance (km)",
+        data: weeklySwimmingDistances,
+        backgroundColor: "rgba(153, 102, 255, 0.7)",
+      },
+    ],
+  };
+
+  const swimmingTimeChartData = {
+    labels: weeklySwimmingLabels,
+    datasets: [
+      {
+        label: "Weekly Time (hours)",
+        data: weeklySwimmingTimes,
+        backgroundColor: "rgba(255, 193, 7, 0.7)",
+      },
+    ],
+  };
+
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
@@ -128,6 +155,19 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling }: WeeklyMetricsChar
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 300, width: "100%" }}>
             <Bar data={cyclingTimeChartData} options={createChartOptions("Weekly Cycling Time", "Time (hours)")} />
+          </Box>
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Box sx={{ height: 300, width: "100%" }}>
+            <Bar
+              data={swimmingDistanceChartData}
+              options={createChartOptions("Weekly Swimming Distance", "Distance (km)")}
+            />
+          </Box>
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Box sx={{ height: 300, width: "100%" }}>
+            <Bar data={swimmingTimeChartData} options={createChartOptions("Weekly Swimming Time", "Time (hours)")} />
           </Box>
         </Grid>
       </Grid>
