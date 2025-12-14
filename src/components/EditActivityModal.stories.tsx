@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
 import EditActivityModal from "./EditActivityModal";
 import type { Activity } from "../types";
 
@@ -120,11 +121,13 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <QueryClientProvider client={createQueryClient()}>
-        <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Story />
-        </div>
-      </QueryClientProvider>
+      <MemoryRouter>
+        <QueryClientProvider client={createQueryClient()}>
+          <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Story />
+          </div>
+        </QueryClientProvider>
+      </MemoryRouter>
     ),
   ],
 } satisfies Meta<typeof EditActivityModal>;

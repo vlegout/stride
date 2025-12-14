@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Alert, CircularProgress } from "@mui/material";
 import { AxiosError } from "axios";
 
-import { updateActivity } from "../api";
+import { updateActivity, deleteActivity } from "../api";
 import { FormField } from "./ui";
 import type { Activity, ActivityUpdate } from "../types";
 
@@ -17,8 +18,10 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
   const [title, setTitle] = useState(activity.title);
   const [race, setRace] = useState(activity.race);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const updateMutation = useMutation({
     mutationFn: (updates: ActivityUpdate) => updateActivity(activity.id, updates),
@@ -30,6 +33,21 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
     },
     onError: (error: AxiosError<{ detail: string }>) => {
       setError(error.response?.data?.detail || "Failed to update activity");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteActivity(activity.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+      queryClient.invalidateQueries({ queryKey: ["activityId", activity.id] });
+      onClose();
+      setError(null);
+      navigate("/activities");
+    },
+    onError: (error: AxiosError<{ detail: string }>) => {
+      setError(error.response?.data?.detail || "Failed to delete activity");
+      setConfirmDelete(false);
     },
   });
 
@@ -60,11 +78,20 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
     updateMutation.mutate(updates);
   };
 
+  const handleDelete = () => {
+    if (confirmDelete) {
+      deleteMutation.mutate();
+    } else {
+      setConfirmDelete(true);
+    }
+  };
+
   const handleClose = () => {
-    if (updateMutation.isPending) return;
+    if (updateMutation.isPending || deleteMutation.isPending) return;
     setTitle(activity.title);
     setRace(activity.race);
     setError(null);
+    setConfirmDelete(false);
     onClose();
   };
 
@@ -85,7 +112,7 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
             value={title}
             onChange={(value) => setTitle(value as string)}
             required
-            disabled={updateMutation.isPending}
+            disabled={updateMutation.isPending || deleteMutation.isPending}
             placeholder="Enter activity title"
           />
 
@@ -96,24 +123,46 @@ const EditActivityModal = ({ open, onClose, activity }: EditActivityModalProps) 
               checked: race,
               onChange: (e) => setRace(e.target.checked),
             }}
-            disabled={updateMutation.isPending}
+            disabled={updateMutation.isPending || deleteMutation.isPending}
           />
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} disabled={updateMutation.isPending}>
-          Cancel
-        </Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={updateMutation.isPending || !title.trim()}>
-          {updateMutation.isPending ? (
+      <DialogActions sx={{ justifyContent: "space-between" }}>
+        <Button
+          onClick={handleDelete}
+          color={confirmDelete ? "error" : "inherit"}
+          disabled={updateMutation.isPending || deleteMutation.isPending}
+        >
+          {deleteMutation.isPending ? (
             <>
               <CircularProgress size={20} sx={{ mr: 1 }} />
-              Updating...
+              Deleting...
             </>
+          ) : confirmDelete ? (
+            "Confirm Delete?"
           ) : (
-            "Update Activity"
+            "Delete"
           )}
         </Button>
+        <Box>
+          <Button onClick={handleClose} disabled={updateMutation.isPending || deleteMutation.isPending} sx={{ mr: 1 }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            disabled={updateMutation.isPending || deleteMutation.isPending || !title.trim()}
+          >
+            {updateMutation.isPending ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Updating...
+              </>
+            ) : (
+              "Update Activity"
+            )}
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );
