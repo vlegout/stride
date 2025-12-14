@@ -48,7 +48,7 @@ export const Notification = type({
   activity_id: "string.uuid.v5",
   type: "'best_effort_yearly'|'best_effort_all_time'",
   distance: "number",
-  achievement_year: "number?",
+  achievement_year: "number | null",
   message: "string",
   created_at: "string",
 });
