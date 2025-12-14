@@ -55,6 +55,7 @@ from api.model import (
 )
 from api.utils import (
     calculate_activity_zone_data,
+    detect_best_effort_achievements,
     get_best_performances,
     get_best_performance_power,
     generate_random_string,
@@ -302,6 +303,11 @@ def create_activity(
 
         for performance_power in performance_powers:
             session.add(performance_power)
+
+        # Detect and create notifications for best efforts
+        notifications = detect_best_effort_achievements(session, activity, performances)
+        for notification in notifications:
+            session.add(notification)
 
         calculate_activity_zone_data(session, activity, original_tracepoints)
 

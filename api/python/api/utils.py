@@ -18,6 +18,7 @@ from api.model import (
     ActivityZonePace,
     ActivityZonePower,
     Location,
+    Notification,
     Performance,
     PerformancePower,
     Tracepoint,
@@ -205,6 +206,88 @@ def get_best_performance_power(
         perf.power = best_power
 
     return performance_powers
+
+
+def detect_best_effort_achievements(
+    session: Session, activity: Activity, performances: list[Performance]
+) -> list[Notification]:
+    """Detect if this activity achieved best 10km for year or all-time."""
+
+    if activity.sport != "running":
+        return []
+
+    target_distance = 10000
+    current_perf = next(
+        (p for p in performances if p.distance == target_distance), None
+    )
+
+    if not current_perf or not current_perf.time:
+        return []
+
+    stmt = (
+        select(Performance)
+        .join(Activity)
+        .where(
+            Activity.user_id == activity.user_id,
+            Activity.sport == "running",
+            Activity.status == "created",
+            Activity.id != activity.id,
+            Performance.distance == target_distance,
+            Performance.time != None,  # noqa: E711
+        )
+    )
+    historical_perfs = session.exec(stmt).all()
+
+    if not historical_perfs:
+        return [
+            Notification(
+                activity_id=activity.id,
+                type="best_effort_all_time",
+                distance=target_distance,
+                message="Personal Best 10km!",
+            )
+        ]
+
+    current_year = datetime.date.fromtimestamp(activity.start_time).year
+
+    yearly_perfs = []
+    historical_times = [p.time for p in historical_perfs if p.time is not None]
+
+    if not historical_times:
+        return []
+
+    all_time_best = min(historical_times)
+
+    for perf in historical_perfs:
+        perf_activity = session.get(Activity, perf.activity_id)
+        if perf_activity and perf.time is not None:
+            perf_year = datetime.date.fromtimestamp(perf_activity.start_time).year
+            if perf_year == current_year:
+                yearly_perfs.append(perf.time)
+
+    notifications = []
+
+    if current_perf.time < all_time_best:
+        notifications.append(
+            Notification(
+                activity_id=activity.id,
+                type="best_effort_all_time",
+                distance=target_distance,
+                message="Personal Best 10km!",
+            )
+        )
+    elif not yearly_perfs or current_perf.time < min(yearly_perfs):
+        notifications.append(
+            Notification(
+                activity_id=activity.id,
+                type="best_effort_yearly",
+                distance=target_distance,
+                achievement_year=current_year,
+                message=f"Best 10km of {current_year}!",
+            )
+        )
+
+    return notifications
 
 
 def get_s3_client():

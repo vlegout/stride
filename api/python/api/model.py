@@ -119,6 +119,7 @@ class Activity(ActivityBase, table=True):
     performance_power: list["PerformancePower"] = Relationship(
         back_populates="activity"
     )
+    notifications: list["Notification"] = Relationship(back_populates="activity")
     tracepoints: list["Tracepoint"] = Relationship(back_populates="activity")
     zone_paces: list["ActivityZonePace"] = Relationship(back_populates="activity")
     zone_powers: list["ActivityZonePower"] = Relationship(back_populates="activity")
@@ -132,6 +133,7 @@ class ActivityPublic(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
     performance_power: list["PerformancePower"] = []
+    notifications: list["NotificationPublic"] = []
     tracepoints: list["Tracepoint"] = []
 
     @field_serializer("tracepoints")
@@ -193,6 +195,26 @@ class PerformancePower(PerformancePowerBase, table=True):
     id: uuid.UUID = Field(primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
     activity: Activity = Relationship(back_populates="performance_power")
+
+
+class NotificationBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    activity_id: uuid.UUID = Field(foreign_key="activity.id")
+    type: str
+    distance: float
+    achievement_year: int | None = None
+    message: str
+    created_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+
+
+class Notification(NotificationBase, table=True):
+    activity: Activity = Relationship(back_populates="notifications")
+
+
+class NotificationPublic(NotificationBase):
+    pass
 
 
 class TracepointBase(SQLModel):
