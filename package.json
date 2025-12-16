@@ -60,7 +60,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/browser": "^4.0.15",
     "@vitest/browser-playwright": "^4.0.15",
-    "@vitest/coverage-istanbul": "^4.0.15",
+    "@vitest/coverage-istanbul": "^4.0.16",
     "@vitest/coverage-v8": "^4.0.15",
     "@vitest/ui": "^4.0.15",
     "chromatic": "^13.3.4",
