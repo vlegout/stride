@@ -233,8 +233,8 @@ class TestApp(unittest.TestCase):
     def test_create_activity_invalid_file(self):
         """Test create_activity with invalid file extension"""
         files = {"fit_file": ("test.txt", b"not a fit file", "text/plain")}
-        data = {"title": "Test Activity", "race": False}
-        response = self.client.post("/activities/", files=files, data=data)
+        data = {"title": "Test Activity", "race": "false"}
+        response = self.client.post("/activities/", files=files, data=data)  # type: ignore[arg-type]
 
         self.assertEqual(response.status_code, 401)  # Should fail auth first
 
@@ -333,7 +333,7 @@ class TestActivityStatusFunctionality(unittest.TestCase):
         activity_delete_routes = [
             route
             for route in delete_routes
-            if "/activities/{activity_id}/" in str(route.path)
+            if "/activities/{activity_id}/" in str(route.path)  # type: ignore[attr-defined]
         ]
 
         self.assertTrue(

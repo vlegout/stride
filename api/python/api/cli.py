@@ -45,7 +45,7 @@ NB_CPUS = 2
 app = typer.Typer()
 
 
-def fetch_location(lat: float, lon: float, activity_id: int) -> Location | None:
+def fetch_location(lat: float, lon: float, activity_id: uuid.UUID) -> Location | None:
     url = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}&localityLanguage=en"
 
     try:
@@ -408,7 +408,7 @@ def update_locations():
             first_tracepoint = session.exec(
                 select(Tracepoint)
                 .where(Tracepoint.activity_id == activity.id)
-                .order_by(Tracepoint.timestamp)
+                .order_by(Tracepoint.timestamp)  # type: ignore[arg-type]
             ).first()
 
             if first_tracepoint is None:
@@ -574,7 +574,7 @@ def update_ftp():
     cycling_activities = session.exec(
         select(Activity)
         .where(Activity.sport == "cycling", Activity.status == "created")
-        .order_by(Activity.start_time)
+        .order_by(Activity.start_time)  # type: ignore[arg-type]
     ).all()
 
     print(f"Found {len(cycling_activities)} cycling activities to process...")
@@ -654,7 +654,7 @@ def update_activity_zones():
     activities = session.exec(
         select(Activity)
         .where(Activity.status == "created")
-        .order_by(Activity.start_time)
+        .order_by(Activity.start_time)  # type: ignore[arg-type]
     ).all()
 
     print(f"Found {len(activities)} activities to process...")
