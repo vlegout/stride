@@ -13,8 +13,8 @@ dependencies = [
     "typer>=0.15.3",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "alembic>=1.14.0",
     "maturin>=1.8.6",
     "mypy>=1.15.0",
