@@ -391,7 +391,7 @@ def read_profile(
 ):
     current_date = datetime.datetime.now()
 
-    overall_stats = session.exec(  # type: ignore[attr-defined]
+    overall_stats = session.exec(  # type: ignore[attr-defined,call-overload]
         text("""
             SELECT
                 COUNT(*) as total_activities,
@@ -407,7 +407,7 @@ def read_profile(
         {"user_id": user_id},
     ).one()
 
-    yearly_stats = session.exec(  # type: ignore[attr-defined]
+    yearly_stats = session.exec(  # type: ignore[attr-defined,call-overload]
         text("""
             SELECT
                 EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
@@ -574,7 +574,7 @@ def read_best_performances(
 
         query += " ORDER BY pp.power DESC LIMIT 10"
 
-        power_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined]
+        power_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined,call-overload]
 
         for row in power_performances:
             power = row[0]
@@ -616,7 +616,7 @@ def read_best_performances(
 
         query += " ORDER BY p.time ASC LIMIT 10"
 
-        running_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined]
+        running_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined,call-overload]
 
         for row in running_performances:
             time_seconds = row[0]
