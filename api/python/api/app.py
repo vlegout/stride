@@ -70,7 +70,7 @@ from api.fitness import calculate_fitness_scores, update_ftp_for_date
 app = FastAPI()
 
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,  # type: ignore[arg-type]
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -78,7 +78,7 @@ app.add_middleware(
 )
 
 
-app.add_middleware(BaseHTTPMiddleware, dispatch=verify_jwt_token)
+app.add_middleware(BaseHTTPMiddleware, dispatch=verify_jwt_token)  # type: ignore[arg-type]
 
 
 @app.get("/activities/", response_model=ActivityList)
@@ -391,7 +391,7 @@ def read_profile(
 ):
     current_date = datetime.datetime.now()
 
-    overall_stats = session.execute(
+    overall_stats = session.exec(  # type: ignore[attr-defined,call-overload]
         text("""
             SELECT
                 COUNT(*) as total_activities,
@@ -407,7 +407,7 @@ def read_profile(
         {"user_id": user_id},
     ).one()
 
-    yearly_stats = session.execute(
+    yearly_stats = session.exec(  # type: ignore[attr-defined,call-overload]
         text("""
             SELECT
                 EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
@@ -574,7 +574,7 @@ def read_best_performances(
 
         query += " ORDER BY pp.power DESC LIMIT 10"
 
-        power_performances = session.execute(text(query), params).all()
+        power_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined,call-overload]
 
         for row in power_performances:
             power = row[0]
@@ -616,7 +616,7 @@ def read_best_performances(
 
         query += " ORDER BY p.time ASC LIMIT 10"
 
-        running_performances = session.execute(text(query), params).all()
+        running_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined,call-overload]
 
         for row in running_performances:
             time_seconds = row[0]
