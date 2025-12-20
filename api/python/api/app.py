@@ -574,7 +574,7 @@ def read_best_performances(
 
         query += " ORDER BY pp.power DESC LIMIT 10"
 
-        power_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined,call-overload]
+        power_performances = session.exec(text(query).bindparams(**params)).all()  # type: ignore[attr-defined,call-overload]
 
         for row in power_performances:
             power = row[0]
@@ -616,7 +616,7 @@ def read_best_performances(
 
         query += " ORDER BY p.time ASC LIMIT 10"
 
-        running_performances = session.exec(text(query), params).all()  # type: ignore[attr-defined,call-overload]
+        running_performances = session.exec(text(query).bindparams(**params)).all()  # type: ignore[attr-defined,call-overload]
 
         for row in running_performances:
             time_seconds = row[0]
