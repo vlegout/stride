@@ -112,6 +112,13 @@ class ActivityBase(SQLModel):
 
     user_id: str | None = Field(foreign_key="user.id", default=None)
 
+    created_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+    updated_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+
 
 class Activity(ActivityBase, table=True):
     laps: list["Lap"] = Relationship()
