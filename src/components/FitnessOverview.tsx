@@ -10,6 +10,9 @@ interface FitnessOverviewProps {
   currentCycling: number;
   maxCycling: number;
   avgCycling: number;
+  currentSwimming: number;
+  maxSwimming: number;
+  avgSwimming: number;
   currentWeeklyTss: number;
   maxWeeklyTss: number;
   avgWeeklyTss: number;
@@ -28,6 +31,9 @@ const FitnessOverview = ({
   currentCycling,
   maxCycling,
   avgCycling,
+  currentSwimming,
+  maxSwimming,
+  avgSwimming,
   currentWeeklyTss,
   maxWeeklyTss,
   avgWeeklyTss,
@@ -40,7 +46,7 @@ const FitnessOverview = ({
       <Typography variant="h6" gutterBottom>
         Fitness Overview
       </Typography>
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 2, mb: 3 }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 2, mb: 3 }}>
         <Box>
           <Typography variant="subtitle2" color="text.secondary">
             Overall Fitness
@@ -64,6 +70,14 @@ const FitnessOverview = ({
           <Typography variant="body2">Current: {currentCycling}</Typography>
           <Typography variant="body2">Peak: {maxCycling}</Typography>
           <Typography variant="body2">Average: {avgCycling}</Typography>
+        </Box>
+        <Box>
+          <Typography variant="subtitle2" color="text.secondary">
+            Swimming Fitness
+          </Typography>
+          <Typography variant="body2">Current: {currentSwimming}</Typography>
+          <Typography variant="body2">Peak: {maxSwimming}</Typography>
+          <Typography variant="body2">Average: {avgSwimming}</Typography>
         </Box>
         <Box>
           <Typography variant="subtitle2" color="text.secondary">

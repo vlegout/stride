@@ -25,12 +25,14 @@ const generateMockScores = (days: number) => {
     const overall = Math.max(0, 75 + Math.sin(i / 30) * 15 + Math.cos(i / 20) * 5);
     const running = Math.max(0, overall * (0.8 + Math.sin(i / 40) * 0.2));
     const cycling = Math.max(0, overall * (0.6 + Math.cos(i / 35) * 0.2));
+    const swimming = Math.max(0, overall * (0.5 + Math.sin(i / 45) * 0.2));
 
     scores.push({
       date: date.toISOString().split("T")[0],
       overall: Math.round(overall),
       running: Math.round(running),
       cycling: Math.round(cycling),
+      swimming: Math.round(swimming),
     });
   }
 
@@ -56,6 +58,7 @@ export const HighVariability: Story = {
       overall: Math.max(0, score.overall + Math.sin(i / 25) * 15),
       running: Math.round(Math.max(0, score.running + Math.cos(i / 20) * 12.5)),
       cycling: Math.round(Math.max(0, score.cycling + Math.sin(i / 18) * 12.5)),
+      swimming: Math.round(Math.max(0, score.swimming + Math.cos(i / 22) * 10)),
     })),
   },
 };
