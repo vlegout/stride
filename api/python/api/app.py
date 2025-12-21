@@ -403,8 +403,7 @@ def read_profile(
                 COALESCE(SUM(CASE WHEN sport = 'swimming' THEN total_distance END), 0) as swimming_distance
              FROM activity
             WHERE user_id = :user_id AND status = 'created'
-        """),
-        {"user_id": user_id},
+        """).bindparams(user_id=user_id)
     ).one()
 
     yearly_stats = session.exec(  # type: ignore[attr-defined,call-overload]
@@ -419,8 +418,7 @@ def read_profile(
             AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
             GROUP BY year, sport
             ORDER BY year, sport
-        """),
-        {"user_id": user_id},
+        """).bindparams(user_id=user_id)
     ).all()
 
     yearly_dict: dict[int, dict[str, dict[str, int | float]]] = {}
