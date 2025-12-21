@@ -352,6 +352,7 @@ def delete_activity(
         raise HTTPException(status_code=404, detail="Activity not found")
 
     activity.status = "deleted"
+    activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
     session.add(activity)
     session.commit()
 
@@ -376,6 +377,8 @@ def update_activity(
     update_data = activity_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(activity, field, value)
+
+    activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
     session.add(activity)
     session.commit()

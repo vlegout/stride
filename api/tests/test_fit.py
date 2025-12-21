@@ -38,7 +38,10 @@ class TestFit(unittest.TestCase):
                 data = json.load(f)
 
             self.maxDiff = None
-            self.assertEqual(activity.model_dump(mode="json"), data)
+            activity_data = activity.model_dump(mode="json")
+            activity_data.pop("created_at", None)
+            activity_data.pop("updated_at", None)
+            self.assertEqual(activity_data, data)
 
 
 if __name__ == "__main__":
