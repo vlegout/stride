@@ -84,14 +84,17 @@ const Fitness = () => {
   const overallScores = filteredScores.map((score) => score.overall);
   const runningScores = filteredScores.map((score) => score.running);
   const cyclingScores = filteredScores.map((score) => score.cycling);
+  const swimmingScores = filteredScores.map((score) => score.swimming);
 
   const currentOverall = overallScores[overallScores.length - 1] || 0;
   const currentRunning = runningScores[runningScores.length - 1] || 0;
   const currentCycling = cyclingScores[cyclingScores.length - 1] || 0;
+  const currentSwimming = swimmingScores[swimmingScores.length - 1] || 0;
 
   const maxOverall = overallScores.length > 0 ? Math.max(...overallScores) : 0;
   const maxRunning = runningScores.length > 0 ? Math.max(...runningScores) : 0;
   const maxCycling = cyclingScores.length > 0 ? Math.max(...cyclingScores) : 0;
+  const maxSwimming = swimmingScores.length > 0 ? Math.max(...swimmingScores) : 0;
 
   const avgOverall =
     overallScores.length > 0 ? Math.round(overallScores.reduce((a, b) => a + b, 0) / overallScores.length) : 0;
@@ -99,6 +102,8 @@ const Fitness = () => {
     runningScores.length > 0 ? Math.round(runningScores.reduce((a, b) => a + b, 0) / runningScores.length) : 0;
   const avgCycling =
     cyclingScores.length > 0 ? Math.round(cyclingScores.reduce((a, b) => a + b, 0) / cyclingScores.length) : 0;
+  const avgSwimming =
+    swimmingScores.length > 0 ? Math.round(swimmingScores.reduce((a, b) => a + b, 0) / swimmingScores.length) : 0;
 
   const weeklyTssValues = filteredWeeklyTss.map((week) => week.total_tss);
   const currentWeeklyTss = weeklyTssValues[weeklyTssValues.length - 1] || 0;
@@ -126,6 +131,9 @@ const Fitness = () => {
           currentCycling={currentCycling}
           maxCycling={maxCycling}
           avgCycling={avgCycling}
+          currentSwimming={currentSwimming}
+          maxSwimming={maxSwimming}
+          avgSwimming={avgSwimming}
           currentWeeklyTss={currentWeeklyTss}
           maxWeeklyTss={maxWeeklyTss}
           avgWeeklyTss={avgWeeklyTss}

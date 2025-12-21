@@ -25,11 +25,13 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
   const overallScores = scores.map((score) => score.overall);
   const runningScores = scores.map((score) => score.running);
   const cyclingScores = scores.map((score) => score.cycling);
+  const swimmingScores = scores.map((score) => score.swimming);
 
   const sampledLabels = labels.filter((_, index) => index % 7 === 0);
   const sampledOverall = overallScores.filter((_, index) => index % 7 === 0);
   const sampledRunning = runningScores.filter((_, index) => index % 7 === 0);
   const sampledCycling = cyclingScores.filter((_, index) => index % 7 === 0);
+  const sampledSwimming = swimmingScores.filter((_, index) => index % 7 === 0);
 
   const chartData = {
     labels: sampledLabels,
@@ -53,6 +55,13 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
         data: sampledCycling,
         borderColor: "rgb(54, 162, 235)",
         backgroundColor: "rgba(54, 162, 235, 0.1)",
+        tension: 0.1,
+      },
+      {
+        label: "Swimming",
+        data: sampledSwimming,
+        borderColor: "rgb(75, 192, 75)",
+        backgroundColor: "rgba(75, 192, 75, 0.1)",
         tension: 0.1,
       },
     ],
@@ -83,6 +92,8 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
               actualScore = scores[index]?.running || 0;
             } else if (datasetLabel === "Cycling") {
               actualScore = scores[index]?.cycling || 0;
+            } else if (datasetLabel === "Swimming") {
+              actualScore = scores[index]?.swimming || 0;
             }
 
             return `${datasetLabel}: ${actualScore}`;

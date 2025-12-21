@@ -285,6 +285,7 @@ export const FitnessScore = type({
   overall: "number",
   running: "number",
   cycling: "number",
+  swimming: "number",
 });
 export type FitnessScore = typeof FitnessScore.infer;
 

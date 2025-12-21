@@ -34,6 +34,14 @@ def calculate_activity_score(activity, sport_filter=None):
         activity_score += distance_km * 0.005
         if distance_km > 100:  # Century ride
             activity_score += distance_km * 0.001
+    elif activity.sport == "swimming":
+        # Swimming: 0.3 points per km (higher than running due to shorter distances)
+        distance_km = activity.total_distance / 1000
+        activity_score += distance_km * 0.3
+        if distance_km > 3:  # Long swim
+            activity_score += distance_km * 0.05
+        if distance_km > 5:  # Very long swim
+            activity_score += distance_km * 0.05
 
     # Time/endurance contribution - sport-specific
     duration_hours = activity.total_timer_time / 3600
@@ -48,6 +56,11 @@ def calculate_activity_score(activity, sport_filter=None):
             activity_score += (duration_hours - 3) * 0.02
         if duration_hours > 5:
             activity_score += (duration_hours - 5) * 0.005
+    elif activity.sport == "swimming":
+        if duration_hours > 0.5:
+            activity_score += (duration_hours - 0.5) * 0.2
+        if duration_hours > 1.5:
+            activity_score += (duration_hours - 1.5) * 0.1
 
     # Elevation gain contribution - sport-specific
     if activity.total_ascent:
@@ -113,11 +126,17 @@ def calculate_fitness_scores(session: Session, user_id: str):
                     "overall": 0,
                     "running": 0,
                     "cycling": 0,
+                    "swimming": 0,
                 }
             )
             continue
 
-        weighted_scores = {"overall": 0.0, "running": 0.0, "cycling": 0.0}
+        weighted_scores = {
+            "overall": 0.0,
+            "running": 0.0,
+            "cycling": 0.0,
+            "swimming": 0.0,
+        }
 
         for activity in relevant_activities:
             days_before = (day_end_ts - activity.start_time) / 86400
@@ -127,10 +146,14 @@ def calculate_fitness_scores(session: Session, user_id: str):
             overall_score = calculate_activity_score(activity) * decay_factor
             running_score = calculate_activity_score(activity, "running") * decay_factor
             cycling_score = calculate_activity_score(activity, "cycling") * decay_factor
+            swimming_score = (
+                calculate_activity_score(activity, "swimming") * decay_factor
+            )
 
             weighted_scores["overall"] += overall_score
             weighted_scores["running"] += running_score
             weighted_scores["cycling"] += cycling_score
+            weighted_scores["swimming"] += swimming_score
 
         final_scores = {
             sport: min(200, max(0, int(score * 0.5)))
@@ -143,6 +166,7 @@ def calculate_fitness_scores(session: Session, user_id: str):
                 "overall": final_scores["overall"],
                 "running": final_scores["running"],
                 "cycling": final_scores["cycling"],
+                "swimming": final_scores["swimming"],
             }
         )
 
