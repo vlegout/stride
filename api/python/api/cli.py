@@ -253,6 +253,22 @@ def read_fit(
         print(tp)
     if len(tracepoints) > 10:
         print(f"... ({len(tracepoints) - 10} more tracepoints)")
+
+    # Temperature analysis
+    temps_with_data = [
+        tp.temperature
+        for tp in tracepoints
+        if tp.temperature is not None and tp.temperature != 0
+    ]
+    if temps_with_data:
+        avg_temp = sum(temps_with_data) / len(temps_with_data)
+        min_temp = min(temps_with_data)
+        max_temp = max(temps_with_data)
+        print("\nTemperature:")
+        print(f"  Min: {min_temp}°C")
+        print(f"  Max: {max_temp}°C")
+        print(f"  Avg: {avg_temp:.1f}°C")
+
     print("\nRunning Performances:")
     for performance in performances:
         print(f"  {performance.distance}m: {performance.time}")

@@ -30,5 +30,7 @@
     "city": "Nantes",
     "subdivision": null,
     "country": "France",
-    "user_id": null
+    "user_id": null,
+    "max_temperature": 26,
+    "avg_temperature": 0
 }
