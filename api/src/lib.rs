@@ -8,7 +8,10 @@ use pyo3::prelude::*;
 use std::fs;
 
 use types::{Activity, Device, FitStruct, Lap, Point};
-use utils::{extract_f32, extract_u8, extract_u16, extract_u32, sanitize_u16, sanitize_u32};
+use utils::{
+    extract_f32, extract_i8, extract_u8, extract_u16, extract_u32, sanitize_i8, sanitize_u16,
+    sanitize_u32,
+};
 
 #[pyfunction]
 fn get_fit(file_name: &str) -> FitStruct {
@@ -37,6 +40,8 @@ fn get_fit(file_name: &str) -> FitStruct {
             total_training_effect: 0,
             training_stress_score: 0,
             intensity_factor: 0,
+            avg_temperature: 0,
+            max_temperature: 0,
         },
         laps: Vec::new(),
         data_points: Vec::new(),
@@ -62,6 +67,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                         total_distance: 0,
                         avg_heart_rate: 0,
                         max_heart_rate: 0,
+                        avg_temperature: 0,
                     };
 
                     for value in &msg.data.values {
@@ -85,6 +91,10 @@ fn get_fit(file_name: &str) -> FitStruct {
                             16 => {
                                 new_lap.max_heart_rate = extract_u8(&value.value);
                             }
+                            23 => {
+                                let raw_temp: i8 = extract_i8(&value.value);
+                                new_lap.avg_temperature = sanitize_i8(raw_temp);
+                            }
                             _ => {}
                         }
                     }
@@ -102,6 +112,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                         speed: 0,
                         power: 0,
                         altitude: 0,
+                        temperature: 0,
                     };
 
                     for value in &msg.data.values {
@@ -124,6 +135,10 @@ fn get_fit(file_name: &str) -> FitStruct {
                             7 => {
                                 let raw_power: u16 = extract_u16(&value.value);
                                 point.power = sanitize_u16(raw_power);
+                            }
+                            13 => {
+                                let raw_temp: i8 = extract_i8(&value.value);
+                                point.temperature = sanitize_i8(raw_temp);
                             }
                             73 => {
                                 point.speed = extract_u32(&value.value);
@@ -207,6 +222,14 @@ fn get_fit(file_name: &str) -> FitStruct {
                             36 => {
                                 let raw_if: u16 = extract_u16(&value.value);
                                 fit.activity.intensity_factor = sanitize_u16(raw_if);
+                            }
+                            23 => {
+                                let raw_temp: i8 = extract_i8(&value.value);
+                                fit.activity.avg_temperature = sanitize_i8(raw_temp);
+                            }
+                            58 => {
+                                let raw_temp: i8 = extract_i8(&value.value);
+                                fit.activity.max_temperature = sanitize_i8(raw_temp);
                             }
                             124 => {
                                 let raw_avg_speed: u32 = extract_u32(&value.value);

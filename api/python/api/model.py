@@ -102,6 +102,9 @@ class ActivityBase(SQLModel):
     training_stress_score: float | None = None
     intensity_factor: float | None = None
 
+    avg_temperature: int | None = None
+    max_temperature: int | None = None
+
     lat: float | None = None
     lon: float | None = None
     delta_lat: float | None = None
@@ -176,6 +179,7 @@ class LapBase(SQLModel):
     max_speed: float | None = None
     max_heart_rate: int | None = None
     avg_heart_rate: int | None = None
+    avg_temperature: int | None = None
 
 
 class Lap(LapBase, table=True):
@@ -235,6 +239,7 @@ class TracepointBase(SQLModel):
     speed: float
     power: int | None = None
     altitude: float | None = None
+    temperature: int | None = None
 
 
 class Tracepoint(TracepointBase, table=True):
