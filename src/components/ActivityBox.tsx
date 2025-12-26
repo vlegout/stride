@@ -100,6 +100,24 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
               <StatsCard title="Max HR" value={activity.max_heart_rate} size="small" />
             </Grid>
           )}
+          {isDetailed && activity.sport === "cycling" && (
+            <>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard
+                  title="Avg Cadence"
+                  value={activity.avg_cadence ? `${activity.avg_cadence} rpm` : "—"}
+                  size="small"
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard
+                  title="Max Cadence"
+                  value={activity.max_cadence ? `${activity.max_cadence} rpm` : "—"}
+                  size="small"
+                />
+              </Grid>
+            </>
+          )}
           <Grid size={{ xs: 6, sm: 4 }}>
             <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
           </Grid>

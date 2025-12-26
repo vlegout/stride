@@ -114,6 +114,8 @@ describe("validation", () => {
       avg_speed: 10,
       avg_heart_rate: 150,
       max_heart_rate: 180,
+      avg_cadence: null,
+      max_cadence: null,
       avg_power: 200,
       max_power: 300,
       np_power: 210,

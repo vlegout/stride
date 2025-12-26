@@ -20,6 +20,7 @@ const createSampleLaps = (numLaps: number, baseTimeSeconds = 330): Lap[] => {
       max_heart_rate: 160 + (index % 3) * 5,
       avg_heart_rate: 140 + (index % 4) * 5,
       max_speed: 0,
+      avg_cadence: null,
     };
   });
 };

@@ -10,6 +10,7 @@ const mockRunningChartData: ProcessedChartData = {
   speedData: [0, 3.5, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2, 4.0, 3.9, 3.2],
   hrData: [140, 145, 150, 155, 160, 162, 165, 168, 170, 168, 150],
   altitudeData: [20, 22, 25, 28, 30, 32, 35, 38, 40, 35, 20],
+  cadenceData: [160, 165, 168, 170, 172, 174, 176, 178, 175, 172, 165],
   powerData: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   temperatureData: [18, 19, 19, 20, 21, 22, 23, 24, 24, 23, 22],
 };
@@ -19,6 +20,7 @@ const mockCyclingChartData: ProcessedChartData = {
   speedData: [0, 8.5, 9.2, 9.8, 10.5, 11.2, 12.0, 13.5, 15.0, 14.0, 12.5, 11.0, 9.8, 7.5],
   hrData: [120, 135, 142, 148, 155, 162, 168, 175, 180, 165, 155, 148, 142, 125],
   altitudeData: [50, 80, 120, 180, 250, 350, 450, 550, 650, 550, 450, 350, 250, 50],
+  cadenceData: [80, 85, 88, 90, 92, 95, 98, 100, 102, 98, 92, 88, 85, 80],
   powerData: [0, 180, 200, 220, 250, 280, 320, 380, 450, 350, 280, 240, 200, 120],
   temperatureData: [15, 16, 17, 18, 19, 20, 21, 22, 23, 22, 21, 20, 19, 18],
 };
@@ -28,6 +30,7 @@ const mockLimitedData: ProcessedChartData = {
   speedData: [0, 3.8, 3.5],
   hrData: [140, 155, 150],
   altitudeData: [0, 0, 0],
+  cadenceData: [0, 0, 0],
   powerData: [0, 0, 0],
   temperatureData: [0, 0, 0],
 };
@@ -88,6 +91,7 @@ export const NoValidData: Story = {
       speedData: [],
       hrData: [],
       altitudeData: [],
+      cadenceData: [],
       powerData: [],
       temperatureData: [],
     },

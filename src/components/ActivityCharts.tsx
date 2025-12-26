@@ -7,7 +7,7 @@ interface ActivityChartsProps {
 }
 
 const ActivityCharts = ({ chartData }: ActivityChartsProps) => {
-  const { labels, speedData, hrData, altitudeData, powerData, temperatureData } = chartData;
+  const { labels, speedData, hrData, altitudeData, cadenceData, powerData, temperatureData } = chartData;
 
   return (
     <>
@@ -43,6 +43,18 @@ const ActivityCharts = ({ chartData }: ActivityChartsProps) => {
             title="Altitude"
             xAxisLabel="Distance (km)"
             yAxisLabel="Altitude (m)"
+          />
+        </SectionContainer>
+      )}
+
+      {hasValidData(cadenceData) && (
+        <SectionContainer spacing="compact">
+          <LineChart
+            labels={labels}
+            data={cadenceData}
+            title="Cadence"
+            xAxisLabel="Distance (km)"
+            yAxisLabel="Cadence (rpm)"
           />
         </SectionContainer>
       )}
