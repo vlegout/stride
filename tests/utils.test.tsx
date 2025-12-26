@@ -180,6 +180,7 @@ describe("utils", () => {
       distance: 5000,
       heart_rate: 150,
       speed: 12.5,
+      cadence: null,
       power: 250,
       temperature: null,
       altitude: 100,
@@ -194,6 +195,7 @@ describe("utils", () => {
         speedData: [12.5],
         hrData: [150],
         altitudeData: [100],
+        cadenceData: [0],
         powerData: [250],
         temperatureData: [0],
       });
@@ -206,6 +208,7 @@ describe("utils", () => {
         speedData: [],
         hrData: [],
         altitudeData: [],
+        cadenceData: [],
         powerData: [],
         temperatureData: [],
       });
@@ -218,6 +221,7 @@ describe("utils", () => {
         speedData: [],
         hrData: [],
         altitudeData: [],
+        cadenceData: [],
         powerData: [],
         temperatureData: [],
       });
@@ -242,6 +246,7 @@ describe("utils", () => {
         speedData: [12.5, 15.0],
         hrData: [150, 160],
         altitudeData: [100, 120],
+        cadenceData: [0, 0],
         powerData: [250, 280],
         temperatureData: [0, 0],
       });
@@ -265,6 +270,7 @@ describe("utils", () => {
         speedData: [0], // undefined speed becomes 0
         hrData: [0], // null heart_rate becomes 0
         altitudeData: [0], // undefined altitude becomes 0
+        cadenceData: [0], // null cadence becomes 0
         powerData: [0], // null power becomes 0
         temperatureData: [0],
       });
@@ -289,6 +295,7 @@ describe("utils", () => {
         speedData: [12.5, 20.0],
         hrData: [150, 0],
         altitudeData: [100, 150],
+        cadenceData: [0, 0],
         powerData: [250, 0],
         temperatureData: [0, 0],
       });

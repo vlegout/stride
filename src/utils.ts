@@ -6,6 +6,7 @@ export interface ProcessedChartData {
   speedData: number[];
   hrData: number[];
   altitudeData: number[];
+  cadenceData: number[];
   powerData: number[];
   temperatureData: number[];
 }
@@ -71,6 +72,7 @@ export const processTracePointData = (tracePoints: TracePoint[]): ProcessedChart
       const altitude = point?.altitude ?? 0;
       return altitude > 10000 ? NaN : altitude;
     }),
+    cadenceData: safeTracePoints.map((point: TracePoint) => point?.cadence ?? 0),
     powerData: safeTracePoints.map((point: TracePoint) => point?.power ?? 0),
     temperatureData: safeTracePoints.map((point: TracePoint) => point?.temperature ?? 0),
   };

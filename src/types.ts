@@ -73,6 +73,7 @@ export const TracePoint = type({
   distance: "number",
   heart_rate: "number",
   speed: "number",
+  cadence: "number | null",
   power: "number",
   altitude: "number?",
   temperature: "number | null",
@@ -103,6 +104,9 @@ export const Activity = type({
 
   avg_heart_rate: "number",
   max_heart_rate: "number",
+
+  avg_cadence: "number | null",
+  max_cadence: "number | null",
 
   avg_power: "number",
   max_power: "number",

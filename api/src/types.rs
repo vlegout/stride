@@ -59,6 +59,7 @@ pub struct Point {
     pub power: u16,
     pub altitude: u32,
     pub temperature: i8,
+    pub cadence: u8,
 }
 
 #[derive(pyo3::IntoPyObject)]
@@ -74,6 +75,8 @@ pub struct Activity {
     pub avg_speed: u32,
     pub avg_heart_rate: u8,
     pub max_heart_rate: u8,
+    pub avg_cadence: u8,
+    pub max_cadence: u8,
     pub avg_power: u16,
     pub max_power: u16,
     pub np_power: u16,
