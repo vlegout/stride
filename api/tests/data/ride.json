@@ -33,5 +33,7 @@
     "user_id": null,
     "max_temperature": 26,
     "avg_temperature": 25,
-    "min_temperature": 22
+    "min_temperature": 22,
+    "avg_cadence": 74,
+    "max_cadence": 99
 }

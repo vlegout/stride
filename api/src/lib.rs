@@ -33,6 +33,8 @@ fn get_fit(file_name: &str) -> FitStruct {
             avg_speed: 0,
             avg_heart_rate: 0,
             max_heart_rate: 0,
+            avg_cadence: 0,
+            max_cadence: 0,
             avg_power: 0,
             max_power: 0,
             np_power: 0,
@@ -109,6 +111,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                         power: 0,
                         altitude: 0,
                         temperature: 0,
+                        cadence: 0,
                     };
 
                     for value in &msg.data.values {
@@ -124,6 +127,9 @@ fn get_fit(file_name: &str) -> FitStruct {
                             }
                             3 => {
                                 point.heart_rate = extract_u8(&value.value);
+                            }
+                            4 => {
+                                point.cadence = extract_u8(&value.value);
                             }
                             5 => {
                                 point.distance = extract_u32(&value.value) / 100;
@@ -191,6 +197,12 @@ fn get_fit(file_name: &str) -> FitStruct {
                             }
                             17 => {
                                 fit.activity.max_heart_rate = extract_u8(&value.value);
+                            }
+                            18 => {
+                                fit.activity.avg_cadence = extract_u8(&value.value);
+                            }
+                            19 => {
+                                fit.activity.max_cadence = extract_u8(&value.value);
                             }
                             20 => {
                                 let raw_avg_power: u16 = extract_u16(&value.value);

@@ -92,6 +92,9 @@ class ActivityBase(SQLModel):
     avg_heart_rate: float | None = None
     max_heart_rate: float | None = None
 
+    avg_cadence: int | None = None
+    max_cadence: int | None = None
+
     avg_power: float | None = None
     max_power: float | None = None
     np_power: float | None = None
@@ -237,6 +240,7 @@ class TracepointBase(SQLModel):
     distance: float
     heart_rate: int | None
     speed: float
+    cadence: int | None = None
     power: int | None = None
     altitude: float | None = None
     temperature: int | None = None
