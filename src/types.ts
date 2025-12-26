@@ -75,6 +75,7 @@ export const TracePoint = type({
   speed: "number",
   power: "number",
   altitude: "number?",
+  temperature: "number | null",
 });
 export type TracePoint = typeof TracePoint.infer;
 
@@ -112,6 +113,10 @@ export const Activity = type({
   total_training_effect: "number",
   training_stress_score: "number",
   intensity_factor: "number",
+
+  avg_temperature: "number | null",
+  max_temperature: "number | null",
+  min_temperature: "number | null",
 
   lat: "number",
   lon: "number",
