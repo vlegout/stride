@@ -95,18 +95,64 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
           <Grid size={{ xs: 6, sm: 4 }}>
             <StatsCard title="Avg HR" value={activity.avg_heart_rate || 0} size="small" />
           </Grid>
+          {isDetailed && (
+            <Grid size={{ xs: 6, sm: 4 }}>
+              <StatsCard title="Max HR" value={activity.max_heart_rate} size="small" />
+            </Grid>
+          )}
           <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard title="Max HR" value={activity.max_heart_rate} size="small" />
+            <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
           </Grid>
+          {isDetailed && (
+            <>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard title="Max Power" value={activity.max_power} size="small" />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard title="NP Power" value={activity.np_power} size="small" />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard title="TSS" value={activity.training_stress_score} size="small" />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard title="Intensity Factor" value={activity.intensity_factor} size="small" />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard title="Training Effect" value={activity.total_training_effect} size="small" />
+              </Grid>
+            </>
+          )}
           <Grid size={{ xs: 6, sm: 4 }}>
             <StatsCard title="Calories" value={activity.total_calories} size="small" />
           </Grid>
           <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
-          </Grid>
-          <Grid size={{ xs: 6, sm: 4 }}>
             <StatsCard title="Ascent" value={activity.total_ascent ? `${activity.total_ascent} m` : "—"} size="small" />
           </Grid>
+          <Grid size={{ xs: 6, sm: 4 }}>
+            <StatsCard
+              title="Avg Temp"
+              value={activity.avg_temperature !== null ? `${activity.avg_temperature}°C` : "—"}
+              size="small"
+            />
+          </Grid>
+          {isDetailed && (
+            <>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard
+                  title="Min Temp"
+                  value={activity.min_temperature !== null ? `${activity.min_temperature}°C` : "—"}
+                  size="small"
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard
+                  title="Max Temp"
+                  value={activity.max_temperature !== null ? `${activity.max_temperature}°C` : "—"}
+                  size="small"
+                />
+              </Grid>
+            </>
+          )}
           {activity.device && (
             <Grid size={{ xs: 6, sm: 4 }}>
               <StatsCard title="Device" value={activity.device} size="small" />
