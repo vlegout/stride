@@ -46,7 +46,6 @@ pub struct Lap {
     pub total_distance: u32,
     pub avg_heart_rate: u8,
     pub max_heart_rate: u8,
-    pub avg_temperature: i8,
 }
 
 #[derive(pyo3::IntoPyObject)]
@@ -84,6 +83,7 @@ pub struct Activity {
     pub intensity_factor: u16,
     pub avg_temperature: i8,
     pub max_temperature: i8,
+    pub min_temperature: i8,
 }
 
 #[derive(pyo3::IntoPyObject)]

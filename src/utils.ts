@@ -7,6 +7,7 @@ export interface ProcessedChartData {
   hrData: number[];
   altitudeData: number[];
   powerData: number[];
+  temperatureData: number[];
 }
 
 function formatRunningPace(speed: number): string {
@@ -71,6 +72,7 @@ export const processTracePointData = (tracePoints: TracePoint[]): ProcessedChart
       return altitude > 10000 ? NaN : altitude;
     }),
     powerData: safeTracePoints.map((point: TracePoint) => point?.power ?? 0),
+    temperatureData: safeTracePoints.map((point: TracePoint) => point?.temperature ?? 0),
   };
 };
 

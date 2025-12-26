@@ -28,6 +28,9 @@ const mockRunningActivity: Activity = {
   total_training_effect: 3.2,
   training_stress_score: 85,
   intensity_factor: 0.85,
+  avg_temperature: 18,
+  max_temperature: 22,
+  min_temperature: 15,
   lat: 40.7829, // Central Park coordinates
   lon: -73.9654,
   delta_lat: 0.005,
@@ -56,6 +59,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 140,
       speed: 0,
       power: 0,
+      temperature: null,
       altitude: 20,
     },
     {
@@ -66,6 +70,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 145,
       speed: 3.5,
       power: 0,
+      temperature: null,
       altitude: 22,
     },
     {
@@ -76,6 +81,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 150,
       speed: 3.7,
       power: 0,
+      temperature: null,
       altitude: 25,
     },
     {
@@ -86,6 +92,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 155,
       speed: 3.8,
       power: 0,
+      temperature: null,
       altitude: 28,
     },
     {
@@ -96,6 +103,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 160,
       speed: 3.9,
       power: 0,
+      temperature: null,
       altitude: 30,
     },
     {
@@ -106,6 +114,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 162,
       speed: 4.0,
       power: 0,
+      temperature: null,
       altitude: 32,
     },
     {
@@ -116,6 +125,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 165,
       speed: 4.1,
       power: 0,
+      temperature: null,
       altitude: 35,
     },
     {
@@ -126,6 +136,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 168,
       speed: 4.2,
       power: 0,
+      temperature: null,
       altitude: 38,
     },
     {
@@ -136,6 +147,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 170,
       speed: 4.0,
       power: 0,
+      temperature: null,
       altitude: 40,
     },
     {
@@ -146,6 +158,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 172,
       speed: 3.9,
       power: 0,
+      temperature: null,
       altitude: 42,
     },
     {
@@ -156,6 +169,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 175,
       speed: 3.8,
       power: 0,
+      temperature: null,
       altitude: 45,
     },
     // Continue back to start
@@ -167,6 +181,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 168,
       speed: 3.7,
       power: 0,
+      temperature: null,
       altitude: 40,
     },
     {
@@ -177,6 +192,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 162,
       speed: 3.6,
       power: 0,
+      temperature: null,
       altitude: 35,
     },
     {
@@ -187,6 +203,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 158,
       speed: 3.5,
       power: 0,
+      temperature: null,
       altitude: 30,
     },
     {
@@ -197,6 +214,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 155,
       speed: 3.4,
       power: 0,
+      temperature: null,
       altitude: 25,
     },
     {
@@ -207,6 +225,7 @@ const mockRunningActivity: Activity = {
       heart_rate: 150,
       speed: 3.2,
       power: 0,
+      temperature: null,
       altitude: 20,
     },
   ],
@@ -238,6 +257,9 @@ const mockCyclingActivity: Activity = {
   total_training_effect: 4.2,
   training_stress_score: 180,
   intensity_factor: 0.92,
+  avg_temperature: 15,
+  max_temperature: 18,
+  min_temperature: 12,
   lat: 45.4215, // Portland, OR area
   lon: -123.1815,
   delta_lat: 0.15,
@@ -266,6 +288,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 120,
       speed: 0,
       power: 0,
+      temperature: null,
       altitude: 50,
     },
     {
@@ -276,6 +299,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 135,
       speed: 8.5,
       power: 180,
+      temperature: null,
       altitude: 80,
     },
     {
@@ -286,6 +310,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 142,
       speed: 9.2,
       power: 200,
+      temperature: null,
       altitude: 120,
     },
     {
@@ -296,6 +321,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 148,
       speed: 9.8,
       power: 220,
+      temperature: null,
       altitude: 180,
     },
     {
@@ -306,6 +332,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 155,
       speed: 10.5,
       power: 250,
+      temperature: null,
       altitude: 250,
     },
     {
@@ -316,6 +343,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 162,
       speed: 11.2,
       power: 280,
+      temperature: null,
       altitude: 350,
     },
     {
@@ -326,6 +354,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 168,
       speed: 12.0,
       power: 320,
+      temperature: null,
       altitude: 450,
     },
     {
@@ -336,6 +365,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 175,
       speed: 13.5,
       power: 380,
+      temperature: null,
       altitude: 550,
     },
     {
@@ -346,6 +376,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 180,
       speed: 15.0,
       power: 450,
+      temperature: null,
       altitude: 650,
     },
     {
@@ -356,6 +387,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 185,
       speed: 16.5,
       power: 580,
+      temperature: null,
       altitude: 750,
     },
     // Return journey
@@ -367,6 +399,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 165,
       speed: 14.0,
       power: 350,
+      temperature: null,
       altitude: 650,
     },
     {
@@ -377,6 +410,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 155,
       speed: 12.5,
       power: 280,
+      temperature: null,
       altitude: 550,
     },
     {
@@ -387,6 +421,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 148,
       speed: 11.0,
       power: 240,
+      temperature: null,
       altitude: 450,
     },
     {
@@ -397,6 +432,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 142,
       speed: 9.8,
       power: 200,
+      temperature: null,
       altitude: 350,
     },
     {
@@ -407,6 +443,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 138,
       speed: 9.2,
       power: 180,
+      temperature: null,
       altitude: 250,
     },
     {
@@ -417,6 +454,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 135,
       speed: 8.8,
       power: 160,
+      temperature: null,
       altitude: 180,
     },
     {
@@ -427,6 +465,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 132,
       speed: 8.5,
       power: 150,
+      temperature: null,
       altitude: 120,
     },
     {
@@ -437,6 +476,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 130,
       speed: 8.2,
       power: 140,
+      temperature: null,
       altitude: 80,
     },
     {
@@ -447,6 +487,7 @@ const mockCyclingActivity: Activity = {
       heart_rate: 125,
       speed: 7.5,
       power: 120,
+      temperature: null,
       altitude: 50,
     },
   ],

@@ -42,6 +42,7 @@ fn get_fit(file_name: &str) -> FitStruct {
             intensity_factor: 0,
             avg_temperature: 0,
             max_temperature: 0,
+            min_temperature: 0,
         },
         laps: Vec::new(),
         data_points: Vec::new(),
@@ -67,7 +68,6 @@ fn get_fit(file_name: &str) -> FitStruct {
                         total_distance: 0,
                         avg_heart_rate: 0,
                         max_heart_rate: 0,
-                        avg_temperature: 0,
                     };
 
                     for value in &msg.data.values {
@@ -90,10 +90,6 @@ fn get_fit(file_name: &str) -> FitStruct {
                             }
                             16 => {
                                 new_lap.max_heart_rate = extract_u8(&value.value);
-                            }
-                            23 => {
-                                let raw_temp: i8 = extract_i8(&value.value);
-                                new_lap.avg_temperature = sanitize_i8(raw_temp);
                             }
                             _ => {}
                         }
@@ -223,13 +219,17 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 let raw_if: u16 = extract_u16(&value.value);
                                 fit.activity.intensity_factor = sanitize_u16(raw_if);
                             }
-                            23 => {
+                            57 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
                                 fit.activity.avg_temperature = sanitize_i8(raw_temp);
                             }
                             58 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
                                 fit.activity.max_temperature = sanitize_i8(raw_temp);
+                            }
+                            150 => {
+                                let raw_temp: i8 = extract_i8(&value.value);
+                                fit.activity.min_temperature = sanitize_i8(raw_temp);
                             }
                             124 => {
                                 let raw_avg_speed: u32 = extract_u32(&value.value);
