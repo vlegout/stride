@@ -104,6 +104,7 @@ class ActivityBase(SQLModel):
 
     avg_temperature: int | None = None
     max_temperature: int | None = None
+    min_temperature: int | None = None
 
     lat: float | None = None
     lon: float | None = None
@@ -179,7 +180,6 @@ class LapBase(SQLModel):
     max_speed: float | None = None
     max_heart_rate: int | None = None
     avg_heart_rate: int | None = None
-    avg_temperature: int | None = None
 
 
 class Lap(LapBase, table=True):
