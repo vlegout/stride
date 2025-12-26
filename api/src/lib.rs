@@ -223,7 +223,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 let raw_if: u16 = extract_u16(&value.value);
                                 fit.activity.intensity_factor = sanitize_u16(raw_if);
                             }
-                            23 => {
+                            57 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
                                 fit.activity.avg_temperature = sanitize_i8(raw_temp);
                             }
