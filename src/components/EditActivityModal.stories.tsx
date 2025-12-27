@@ -34,6 +34,8 @@ const mockActivity: Activity = {
   avg_temperature: 18,
   max_temperature: 22,
   min_temperature: 15,
+  pool_length: null,
+  num_lengths: null,
   lat: 40.7829,
   lon: -73.9654,
   delta_lat: 0.005,

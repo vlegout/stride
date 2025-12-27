@@ -126,6 +126,8 @@ describe("validation", () => {
       avg_temperature: 20,
       max_temperature: 25,
       min_temperature: 15,
+      pool_length: null,
+      num_lengths: null,
       lat: 45.0,
       lon: 2.0,
       delta_lat: 0.1,

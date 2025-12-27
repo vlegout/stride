@@ -109,6 +109,9 @@ class ActivityBase(SQLModel):
     max_temperature: int | None = None
     min_temperature: int | None = None
 
+    pool_length: int | None = None
+    num_lengths: int | None = None
+
     lat: float | None = None
     lon: float | None = None
     delta_lat: float | None = None

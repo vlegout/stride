@@ -35,5 +35,7 @@
     "avg_temperature": 0,
     "min_temperature": 0,
     "avg_cadence": 87,
-    "max_cadence": 104
+    "max_cadence": 104,
+    "pool_length": 0,
+    "num_lengths": 0
 }

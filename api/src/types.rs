@@ -87,6 +87,8 @@ pub struct Activity {
     pub avg_temperature: i8,
     pub max_temperature: i8,
     pub min_temperature: i8,
+    pub pool_length: u16,
+    pub num_lengths: u16,
 }
 
 #[derive(pyo3::IntoPyObject)]

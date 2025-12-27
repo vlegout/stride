@@ -33,6 +33,8 @@ const mockRunningActivity: Activity = {
   avg_temperature: 18,
   max_temperature: 22,
   min_temperature: 15,
+  pool_length: null,
+  num_lengths: null,
   lat: 40.7829, // Central Park coordinates
   lon: -73.9654,
   delta_lat: 0.005,
@@ -280,6 +282,8 @@ const mockCyclingActivity: Activity = {
   avg_temperature: 15,
   max_temperature: 18,
   min_temperature: 12,
+  pool_length: null,
+  num_lengths: null,
   lat: 45.4215, // Portland, OR area
   lon: -123.1815,
   delta_lat: 0.15,
