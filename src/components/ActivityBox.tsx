@@ -118,10 +118,26 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
               </Grid>
             </>
           )}
-          <Grid size={{ xs: 6, sm: 4 }}>
-            <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
-          </Grid>
-          {isDetailed && (
+          {isDetailed && activity.sport === "swimming" && (
+            <>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard
+                  title="Pool Length"
+                  value={activity.pool_length ? `${activity.pool_length} m` : "—"}
+                  size="small"
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <StatsCard title="Num Lengths" value={activity.num_lengths || "—"} size="small" />
+              </Grid>
+            </>
+          )}
+          {activity.sport !== "swimming" && (
+            <Grid size={{ xs: 6, sm: 4 }}>
+              <StatsCard title="Avg Power" value={activity.avg_power} size="small" />
+            </Grid>
+          )}
+          {isDetailed && activity.sport !== "swimming" && (
             <>
               <Grid size={{ xs: 6, sm: 4 }}>
                 <StatsCard title="Max Power" value={activity.max_power} size="small" />

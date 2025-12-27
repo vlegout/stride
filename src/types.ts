@@ -122,6 +122,9 @@ export const Activity = type({
   max_temperature: "number | null",
   min_temperature: "number | null",
 
+  pool_length: "number | null",
+  num_lengths: "number | null",
+
   lat: "number",
   lon: "number",
   delta_lat: "number",
