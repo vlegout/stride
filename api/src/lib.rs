@@ -45,6 +45,8 @@ fn get_fit(file_name: &str) -> FitStruct {
             avg_temperature: 0,
             max_temperature: 0,
             min_temperature: 0,
+            pool_length: 0,
+            num_lengths: 0,
         },
         laps: Vec::new(),
         data_points: Vec::new(),
@@ -219,6 +221,10 @@ fn get_fit(file_name: &str) -> FitStruct {
                             24 => {
                                 fit.activity.total_training_effect = extract_u8(&value.value);
                             }
+                            33 => {
+                                let raw_num_lengths: u16 = extract_u16(&value.value);
+                                fit.activity.num_lengths = sanitize_u16(raw_num_lengths);
+                            }
                             34 => {
                                 let raw_np_power: u16 = extract_u16(&value.value);
                                 fit.activity.np_power = sanitize_u16(raw_np_power);
@@ -230,6 +236,10 @@ fn get_fit(file_name: &str) -> FitStruct {
                             36 => {
                                 let raw_if: u16 = extract_u16(&value.value);
                                 fit.activity.intensity_factor = sanitize_u16(raw_if);
+                            }
+                            44 => {
+                                let raw_pool_length: u16 = extract_u16(&value.value);
+                                fit.activity.pool_length = sanitize_u16(raw_pool_length) / 100;
                             }
                             57 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
