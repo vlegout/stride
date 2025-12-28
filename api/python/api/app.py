@@ -63,9 +63,11 @@ from api.utils import (
     upload_content_to_s3,
     create_default_zones,
     update_user_zones_from_activities,
+    MAX_TRACEPOINTS_FOR_RESPONSE,
 )
 from api.fitness import calculate_fitness_scores, update_ftp_for_date
 
+STATISTICS_START_YEAR = 2013
 
 app = FastAPI()
 
@@ -273,8 +275,7 @@ def create_activity(
         # Store original tracepoints for zone calculation before filtering
         original_tracepoints = tracepoints.copy()
 
-        MAX_DATA_POINTS = 500
-        while len(tracepoints) > MAX_DATA_POINTS:
+        while len(tracepoints) > MAX_TRACEPOINTS_FOR_RESPONSE:
             tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
 
         fit_s3_key = f"data/fit/{fit_file.filename}"
@@ -435,7 +436,7 @@ def read_profile(
         }
 
     years_data = []
-    for year in range(2013, current_date.year + 1):
+    for year in range(STATISTICS_START_YEAR, current_date.year + 1):
         year_data = yearly_dict.get(year, {})
         years_data.append(
             YearsStatistics(

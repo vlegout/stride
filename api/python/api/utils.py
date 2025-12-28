@@ -25,6 +25,80 @@ from api.model import (
     Zone,
 )
 
+# Training zone percentages - Heart Rate
+HR_ZONE_1_MAX_PCT = 0.60  # Recovery zone
+HR_ZONE_2_MAX_PCT = 0.70  # Aerobic base zone
+HR_ZONE_3_MAX_PCT = 0.80  # Aerobic zone
+HR_ZONE_4_MAX_PCT = 0.90  # Lactate threshold zone
+HR_ZONE_5_MAX_PCT = 1.00  # VO2 max zone
+
+# Training zone multipliers - Pace (relative to threshold pace)
+PACE_ZONE_1_MULTIPLIER = 1.30  # Easy/Recovery (30% slower)
+PACE_ZONE_2_MULTIPLIER = 1.20  # Aerobic (20% slower)
+PACE_ZONE_3_MULTIPLIER = 1.10  # Marathon (10% slower)
+PACE_ZONE_4_MULTIPLIER = 1.00  # Threshold (baseline)
+PACE_ZONE_5_MULTIPLIER = 0.90  # VO2 max (10% faster)
+
+# Training zone percentages - Power (relative to FTP)
+POWER_ZONE_1_MAX_PCT = 0.55  # Recovery
+POWER_ZONE_2_MAX_PCT = 0.75  # Endurance
+POWER_ZONE_3_MAX_PCT = 0.90  # Tempo
+POWER_ZONE_4_MAX_PCT = 1.05  # Lactate threshold
+POWER_ZONE_5_MAX_PCT = 1.20  # VO2 max
+
+# Default zone values for new users
+DEFAULT_HR_ZONE_1_MAX = 114.0  # Recovery
+DEFAULT_HR_ZONE_2_MAX = 133.0  # Aerobic base
+DEFAULT_HR_ZONE_3_MAX = 152.0  # Aerobic
+DEFAULT_HR_ZONE_4_MAX = 171.0  # Lactate threshold
+DEFAULT_HR_ZONE_5_MAX = 190.0  # VO2 max
+
+DEFAULT_PACE_ZONE_1_MAX = 390.0  # Recovery pace (sec/km)
+DEFAULT_PACE_ZONE_2_MAX = 360.0  # Easy pace (sec/km)
+DEFAULT_PACE_ZONE_3_MAX = 330.0  # Marathon pace (sec/km)
+DEFAULT_PACE_ZONE_4_MAX = 300.0  # Lactate threshold (sec/km)
+DEFAULT_PACE_ZONE_5_MAX = 270.0  # VO2 max pace (sec/km)
+
+DEFAULT_POWER_ZONE_1_MAX = 138.0  # Recovery (watts)
+DEFAULT_POWER_ZONE_2_MAX = 184.0  # Endurance (watts)
+DEFAULT_POWER_ZONE_3_MAX = 230.0  # Tempo (watts)
+DEFAULT_POWER_ZONE_4_MAX = 264.0  # Lactate threshold (watts)
+DEFAULT_POWER_ZONE_5_MAX = 310.0  # VO2 max (watts)
+
+# Estimation constants
+FTP_FROM_MAX_POWER_MULTIPLIER = 0.85  # Estimate FTP as 85% of max power
+MAX_HR_SAFETY_CAP = 200  # Cap estimated max HR at 200 bpm
+HR_PERCENTILE_95_INDEX = 0.05  # Use 95th percentile (top 5%)
+PACE_CONSERVATIVENESS_FACTOR = 1.15  # Add 15% when estimating from short runs
+LONG_RUN_MIN_DISTANCE_METERS = 5000  # Minimum distance for "long run" (5km)
+THRESHOLD_RUN_MIN_DISTANCE_METERS = 5000  # Min distance for threshold pace (5km)
+THRESHOLD_RUN_MAX_DISTANCE_METERS = 15000  # Max distance for threshold pace (15km)
+FASTEST_RUNS_PERCENTILE = 0.20  # Use fastest 20% for threshold estimation
+
+# Time periods
+ONE_YEAR_IN_DAYS = 365
+SECONDS_PER_KM_CONVERSION = 3600
+
+# Geolocation constants
+EARTH_RADIUS_METERS = 6371000
+METERS_PER_DEGREE = 111139
+LOCATION_SEARCH_LAT_DELTA = 0.0045
+LOCATION_SEARCH_LON_DELTA_BASE = 0.0045
+
+# Performance tracking distances (meters)
+DISTANCE_1KM = 1000
+DISTANCE_1MILE = 1609.344
+DISTANCE_5KM = 5000
+DISTANCE_10KM = 10000
+DISTANCE_HALF_MARATHON = 21097.5
+DISTANCE_FULL_MARATHON = 42195
+
+# Time zone calculation tolerance
+POWER_TIME_TOLERANCE_SECONDS = 1
+
+# API response limits
+MAX_TRACEPOINTS_FOR_RESPONSE = 500
+
 
 def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
     x = y = z = 0.0
@@ -55,10 +129,11 @@ def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
 
 
 def get_delta_lat_lon(lat: float, max_distance: float) -> Tuple[float, float]:
-    earth_radius = 6371000
-    delta_lat = max_distance / earth_radius * (180 / math.pi)
+    delta_lat = max_distance / EARTH_RADIUS_METERS * (180 / math.pi)
     delta_lon = (
-        max_distance / (earth_radius * math.cos(math.radians(lat))) * (180 / math.pi)
+        max_distance
+        / (EARTH_RADIUS_METERS * math.cos(math.radians(lat)))
+        * (180 / math.pi)
     )
 
     return (delta_lat, delta_lon)
@@ -77,7 +152,14 @@ def get_best_performances(
     if activity.sport != "running":
         return []
 
-    distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+    distances = [
+        DISTANCE_1KM,
+        DISTANCE_1MILE,
+        DISTANCE_5KM,
+        DISTANCE_10KM,
+        DISTANCE_HALF_MARATHON,
+        DISTANCE_FULL_MARATHON,
+    ]
     max_distance = tracepoints[-1].distance
     performances = [
         Performance(id=uuid.uuid4(), activity_id=activity.id, distance=d)
@@ -196,7 +278,7 @@ def get_best_performance_power(
                 time_diff = (
                     tracepoints[right].timestamp - tracepoints[left].timestamp
                 ).total_seconds()
-                if time_diff >= target_seconds - 1:  # Allow 1 second tolerance
+                if time_diff >= target_seconds - POWER_TIME_TOLERANCE_SECONDS:
                     avg_power = power_sum / power_count
                     max_power = max(max_power, avg_power)
 
@@ -216,7 +298,14 @@ def detect_best_effort_achievements(
     if activity.sport != "running":
         return []
 
-    distances = [1000, 1609.344, 5000, 10000, 21097.5, 42195]
+    distances = [
+        DISTANCE_1KM,
+        DISTANCE_1MILE,
+        DISTANCE_5KM,
+        DISTANCE_10KM,
+        DISTANCE_HALF_MARATHON,
+        DISTANCE_FULL_MARATHON,
+    ]
     current_year = datetime.date.fromtimestamp(activity.start_time).year
 
     current_perfs = {
@@ -346,8 +435,8 @@ def upload_content_to_s3(content: str, s3_key: str) -> None:
 def get_activity_location(
     session: Session, lat: float, lon: float
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
-    lat_delta = 0.0045
-    lon_delta = 0.0045 / math.cos(math.radians(lat))
+    lat_delta = LOCATION_SEARCH_LAT_DELTA
+    lon_delta = LOCATION_SEARCH_LON_DELTA_BASE / math.cos(math.radians(lat))
 
     location = session.exec(
         select(Location).where(
@@ -366,7 +455,7 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
     """Update user's training zones based on their existing activities from the last year"""
 
     # Calculate timestamp for one year ago
-    one_year_ago = datetime.datetime.now() - datetime.timedelta(days=365)
+    one_year_ago = datetime.datetime.now() - datetime.timedelta(days=ONE_YEAR_IN_DAYS)
     one_year_ago_timestamp = int(one_year_ago.timestamp())
 
     # Get user activities from the last year only
@@ -386,37 +475,37 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
     if heart_rates:
         # Use 95th percentile of max heart rates to avoid outliers, but ensure it's realistic
         sorted_hrs = sorted(heart_rates, reverse=True)
-        percentile_95_index = max(0, int(len(sorted_hrs) * 0.05))
+        percentile_95_index = max(0, int(len(sorted_hrs) * HR_PERCENTILE_95_INDEX))
         estimated_max_hr = sorted_hrs[percentile_95_index]
 
         # Additional safety: ensure the estimated max HR is reasonable
         # If it seems too high, cap it at a more conservative value
-        if estimated_max_hr > 200:
-            estimated_max_hr = min(estimated_max_hr, 200)
+        if estimated_max_hr > MAX_HR_SAFETY_CAP:
+            estimated_max_hr = min(estimated_max_hr, MAX_HR_SAFETY_CAP)
 
         # Using standard 5-zone heart rate model based on estimated max HR
         # These percentages represent the upper limit of each zone
         hr_zones = [
             {
                 "index": 1,
-                "max_value": estimated_max_hr * 0.60,
-            },  # Zone 1: Recovery (50-60% max HR)
+                "max_value": estimated_max_hr * HR_ZONE_1_MAX_PCT,
+            },
             {
                 "index": 2,
-                "max_value": estimated_max_hr * 0.70,
-            },  # Zone 2: Aerobic base (60-70% max HR)
+                "max_value": estimated_max_hr * HR_ZONE_2_MAX_PCT,
+            },
             {
                 "index": 3,
-                "max_value": estimated_max_hr * 0.80,
-            },  # Zone 3: Aerobic (70-80% max HR)
+                "max_value": estimated_max_hr * HR_ZONE_3_MAX_PCT,
+            },
             {
                 "index": 4,
-                "max_value": estimated_max_hr * 0.90,
-            },  # Zone 4: Lactate threshold (80-90% max HR)
+                "max_value": estimated_max_hr * HR_ZONE_4_MAX_PCT,
+            },
             {
                 "index": 5,
-                "max_value": estimated_max_hr * 1.00,
-            },  # Zone 5: VO2 max (90-100% max HR)
+                "max_value": estimated_max_hr * HR_ZONE_5_MAX_PCT,
+            },
         ]
 
         # Update heart rate zones
@@ -438,13 +527,19 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
         # Filter for longer runs (>= 5km) to get more realistic threshold pace estimates
         # Shorter runs tend to be much faster and not representative of threshold pace
         longer_runs = [
-            a for a in running_activities if a.total_distance >= 5000
-        ]  # >= 5km
+            a
+            for a in running_activities
+            if a.total_distance >= LONG_RUN_MIN_DISTANCE_METERS
+        ]
 
         if longer_runs:
             # Use activities between 5-15km as they're more likely to be at sustainable paces
             threshold_candidates = [
-                a for a in longer_runs if 5000 <= a.total_distance <= 15000
+                a
+                for a in longer_runs
+                if THRESHOLD_RUN_MIN_DISTANCE_METERS
+                <= a.total_distance
+                <= THRESHOLD_RUN_MAX_DISTANCE_METERS
             ]
 
             if not threshold_candidates:
@@ -452,7 +547,9 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
                 threshold_candidates = longer_runs
 
             # Take the fastest 20% of these longer runs to estimate threshold pace
-            num_candidates = max(1, len(threshold_candidates) // 5)
+            num_candidates = max(
+                1, int(len(threshold_candidates) * FASTEST_RUNS_PERCENTILE)
+            )
             fastest_longer_runs = sorted(
                 threshold_candidates, key=lambda x: x.avg_speed, reverse=True
             )[:num_candidates]
@@ -462,9 +559,7 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
             avg_threshold_speed_kmh = sum(
                 a.avg_speed for a in fastest_longer_runs
             ) / len(fastest_longer_runs)
-            threshold_pace = (
-                3600 / avg_threshold_speed_kmh
-            )  # seconds per km (3600 sec/hr ÷ km/h)
+            threshold_pace = SECONDS_PER_KM_CONVERSION / avg_threshold_speed_kmh
         else:
             # Fallback: if no long runs, use all running activities but be more conservative
             # Take only the middle 50% of speeds to avoid extremes
@@ -474,20 +569,32 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
             middle_speeds = speeds[start_idx:end_idx] if end_idx > start_idx else speeds
             avg_speed_kmh = sum(middle_speeds) / len(middle_speeds)
             threshold_pace = (
-                3600 / avg_speed_kmh
-            ) * 1.15  # Add 15% to make it more conservative
+                SECONDS_PER_KM_CONVERSION / avg_speed_kmh
+            ) * PACE_CONSERVATIVENESS_FACTOR
 
         # Using standard 5-zone pace model based on threshold pace
         # Note: Higher pace values = slower, so multipliers work differently
         pace_zones = [
             {
                 "index": 1,
-                "max_value": threshold_pace * 1.30,
-            },  # Easy/Recovery (30% slower)
-            {"index": 2, "max_value": threshold_pace * 1.20},  # Aerobic (20% slower)
-            {"index": 3, "max_value": threshold_pace * 1.10},  # Marathon (10% slower)
-            {"index": 4, "max_value": threshold_pace * 1.00},  # Threshold (baseline)
-            {"index": 5, "max_value": threshold_pace * 0.90},  # VO2 max (10% faster)
+                "max_value": threshold_pace * PACE_ZONE_1_MULTIPLIER,
+            },
+            {
+                "index": 2,
+                "max_value": threshold_pace * PACE_ZONE_2_MULTIPLIER,
+            },
+            {
+                "index": 3,
+                "max_value": threshold_pace * PACE_ZONE_3_MULTIPLIER,
+            },
+            {
+                "index": 4,
+                "max_value": threshold_pace * PACE_ZONE_4_MULTIPLIER,
+            },
+            {
+                "index": 5,
+                "max_value": threshold_pace * PACE_ZONE_5_MULTIPLIER,
+            },
         ]
 
         # Update pace zones
@@ -513,18 +620,30 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
         max_powers = [
             a.max_power for a in cycling_activities if a.max_power is not None
         ]
-        estimated_ftp = max(max_powers) * 0.85  # Rough estimate: max power * 0.85
+        estimated_ftp = max(max_powers) * FTP_FROM_MAX_POWER_MULTIPLIER
 
         # Using standard 5-zone power model based on FTP
         power_zones = [
-            {"index": 1, "max_value": estimated_ftp * 0.55},  # Recovery (< 55% FTP)
-            {"index": 2, "max_value": estimated_ftp * 0.75},  # Endurance (55-75% FTP)
-            {"index": 3, "max_value": estimated_ftp * 0.90},  # Tempo (75-90% FTP)
+            {
+                "index": 1,
+                "max_value": estimated_ftp * POWER_ZONE_1_MAX_PCT,
+            },
+            {
+                "index": 2,
+                "max_value": estimated_ftp * POWER_ZONE_2_MAX_PCT,
+            },
+            {
+                "index": 3,
+                "max_value": estimated_ftp * POWER_ZONE_3_MAX_PCT,
+            },
             {
                 "index": 4,
-                "max_value": estimated_ftp * 1.05,
-            },  # Lactate threshold (90-105% FTP)
-            {"index": 5, "max_value": estimated_ftp * 1.20},  # VO2 max (105-120% FTP)
+                "max_value": estimated_ftp * POWER_ZONE_4_MAX_PCT,
+            },
+            {
+                "index": 5,
+                "max_value": estimated_ftp * POWER_ZONE_5_MAX_PCT,
+            },
         ]
 
         # Update power zones
@@ -548,23 +667,71 @@ def create_default_zones(session: Session, user_id: str):
     """Create default zones for a new user"""
     default_zones = [
         # Heart rate zones (typical zones based on max HR)
-        {"type": "heart_rate", "index": 1, "max_value": 114.0},  # Recovery
-        {"type": "heart_rate", "index": 2, "max_value": 133.0},  # Aerobic base
-        {"type": "heart_rate", "index": 3, "max_value": 152.0},  # Aerobic
-        {"type": "heart_rate", "index": 4, "max_value": 171.0},  # Lactate threshold
-        {"type": "heart_rate", "index": 5, "max_value": 190.0},  # VO2 max
+        {
+            "type": "heart_rate",
+            "index": 1,
+            "max_value": DEFAULT_HR_ZONE_1_MAX,
+        },
+        {
+            "type": "heart_rate",
+            "index": 2,
+            "max_value": DEFAULT_HR_ZONE_2_MAX,
+        },
+        {
+            "type": "heart_rate",
+            "index": 3,
+            "max_value": DEFAULT_HR_ZONE_3_MAX,
+        },
+        {
+            "type": "heart_rate",
+            "index": 4,
+            "max_value": DEFAULT_HR_ZONE_4_MAX,
+        },
+        {
+            "type": "heart_rate",
+            "index": 5,
+            "max_value": DEFAULT_HR_ZONE_5_MAX,
+        },
         # Pace zones (in seconds per km - typical marathon runner)
-        {"type": "pace", "index": 1, "max_value": 390.0},  # Recovery pace
-        {"type": "pace", "index": 2, "max_value": 360.0},  # Easy pace
-        {"type": "pace", "index": 3, "max_value": 330.0},  # Marathon pace
-        {"type": "pace", "index": 4, "max_value": 300.0},  # Lactate threshold
-        {"type": "pace", "index": 5, "max_value": 270.0},  # VO2 max pace
+        {
+            "type": "pace",
+            "index": 1,
+            "max_value": DEFAULT_PACE_ZONE_1_MAX,
+        },
+        {"type": "pace", "index": 2, "max_value": DEFAULT_PACE_ZONE_2_MAX},
+        {
+            "type": "pace",
+            "index": 3,
+            "max_value": DEFAULT_PACE_ZONE_3_MAX,
+        },
+        {
+            "type": "pace",
+            "index": 4,
+            "max_value": DEFAULT_PACE_ZONE_4_MAX,
+        },
+        {
+            "type": "pace",
+            "index": 5,
+            "max_value": DEFAULT_PACE_ZONE_5_MAX,
+        },
         # Power zones (in watts - typical recreational cyclist)
-        {"type": "power", "index": 1, "max_value": 138.0},  # Recovery
-        {"type": "power", "index": 2, "max_value": 184.0},  # Endurance
-        {"type": "power", "index": 3, "max_value": 230.0},  # Tempo
-        {"type": "power", "index": 4, "max_value": 264.0},  # Lactate threshold
-        {"type": "power", "index": 5, "max_value": 310.0},  # VO2 max
+        {
+            "type": "power",
+            "index": 1,
+            "max_value": DEFAULT_POWER_ZONE_1_MAX,
+        },
+        {
+            "type": "power",
+            "index": 2,
+            "max_value": DEFAULT_POWER_ZONE_2_MAX,
+        },
+        {"type": "power", "index": 3, "max_value": DEFAULT_POWER_ZONE_3_MAX},
+        {
+            "type": "power",
+            "index": 4,
+            "max_value": DEFAULT_POWER_ZONE_4_MAX,
+        },
+        {"type": "power", "index": 5, "max_value": DEFAULT_POWER_ZONE_5_MAX},
     ]
 
     for zone_data in default_zones:
@@ -688,7 +855,7 @@ def _calculate_pace_zones(
         # Calculate pace in seconds per km
         speed_kmh = current_tp.speed  # Treat as km/h directly
         if speed_kmh > 0:
-            pace = 3600 / speed_kmh  # sec/km
+            pace = SECONDS_PER_KM_CONVERSION / speed_kmh
         else:
             continue  # Skip points with zero speed
 
