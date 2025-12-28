@@ -212,15 +212,6 @@ const Header = () => {
                 >
                   <LogoutIcon />
                 </IconButton>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: colors.text.onLight,
-                    display: { xs: "none", sm: "block" },
-                  }}
-                >
-                  Version: {__APP_VERSION__}
-                </Typography>
               </Box>
             </>
           )}
