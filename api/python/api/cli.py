@@ -36,10 +36,10 @@ from api.utils import (
     get_activity_location,
     update_user_zones_from_activities,
     create_default_zones,
+    MAX_TRACEPOINTS_FOR_RESPONSE,
 )
 from api.fitness import update_ftp_for_date
 
-MAX_DATA_POINTS = 500
 NB_CPUS = 2
 
 app = typer.Typer()
@@ -116,7 +116,7 @@ def get_data(
     # Store original tracepoints for zone calculation before filtering
     original_tracepoints = tracepoints.copy()
 
-    while len(tracepoints) > MAX_DATA_POINTS:
+    while len(tracepoints) > MAX_TRACEPOINTS_FOR_RESPONSE:
         tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
 
     return (

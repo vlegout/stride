@@ -20,16 +20,25 @@ from api.utils import (
     get_uuid,
     get_delta_lat_lon,
     get_activity_location,
+    METERS_PER_DEGREE,
 )
 
 import api.api
+
+SPEED_MS_TO_KMH = 3.6
+SPEED_CONVERSION_DIVISOR = 1000.0
+ALTITUDE_CONVERSION_DIVISOR = 5.0
+ALTITUDE_CONVERSION_OFFSET = 500.0
+TOTAL_TRAINING_EFFECT_DIVISOR = 10.0
+
+SPEED_SMOOTHING_WINDOW_SIZE = 10
 
 
 class ActivityCreate(ActivityBase):
     @field_validator("total_training_effect", mode="before")
     @classmethod
     def tte(cls, value: int) -> float:
-        return value / 10.0
+        return value / TOTAL_TRAINING_EFFECT_DIVISOR
 
     @field_validator("avg_speed", mode="before")
     @classmethod
@@ -40,9 +49,9 @@ class ActivityCreate(ActivityBase):
             and info.data.get("total_timer_time", 0) > 0
         ):
             avg_speed = info.data["total_distance"] / info.data["total_timer_time"]
-            return round(avg_speed * 3.6, 2)
+            return round(avg_speed * SPEED_MS_TO_KMH, 2)
 
-        return round(value * 3.6 / 1000, 2)
+        return round(value * SPEED_MS_TO_KMH / SPEED_CONVERSION_DIVISOR, 2)
 
 
 class LapCreate(LapBase):
@@ -53,12 +62,12 @@ class TracepointCreate(TracepointBase):
     @field_validator("speed", mode="before")
     @classmethod
     def speed_ms(cls, value: int) -> float:
-        return value * 60.0 * 60.0 / 1000.0 / 1000.0
+        return value * SPEED_MS_TO_KMH / SPEED_CONVERSION_DIVISOR
 
     @field_validator("altitude", mode="before")
     @classmethod
     def altitude_m(cls, value: int) -> float:
-        return value / 5 - 500.0
+        return value / ALTITUDE_CONVERSION_DIVISOR - ALTITUDE_CONVERSION_OFFSET
 
 
 def get_activity_from_fit(
@@ -105,13 +114,13 @@ def get_activity_from_fit(
     max_distance = 1.0
     for dp in tracepoints:
         values.append(dp.speed)
-        if len(values) >= 10:
+        if len(values) >= SPEED_SMOOTHING_WINDOW_SIZE:
             dp.speed = sum(values) / len(values)
             values.pop(0)
 
         distance = (
             math.sqrt((dp.lat - activity.lat) ** 2 + (dp.lon - activity.lon) ** 2)
-            * 111139
+            * METERS_PER_DEGREE
         )
         max_distance = max(max_distance, distance)
 
