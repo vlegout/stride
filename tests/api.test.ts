@@ -98,7 +98,7 @@ describe("API", () => {
 
       const result = await api.apiCall("/test");
 
-      expect(mockedAxios.get).toHaveBeenCalledWith("/test", {
+      expect(mockedAxios.get).toHaveBeenCalledWith("http://localhost:8000/test", {
         headers: { Authorization: `Bearer ${mockToken}` },
       });
       expect(result).toEqual(mockData);
@@ -150,7 +150,7 @@ describe("API", () => {
       });
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/activities/?page=1&limit=20&order=desc",
+        "http://localhost:8000/activities/?page=1&limit=20&order=desc",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -222,7 +222,7 @@ describe("API", () => {
       const result = await api.fetchLastActivities();
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/activities/",
+        "http://localhost:8000/activities/",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -239,7 +239,7 @@ describe("API", () => {
       const result = await api.fetchActivity("activity-123");
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/activities/activity-123/",
+        "http://localhost:8000/activities/activity-123/",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -398,7 +398,7 @@ describe("API", () => {
       const result = await api.fetchProfile();
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/profile/",
+        "http://localhost:8000/profile/",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -415,7 +415,7 @@ describe("API", () => {
       const result = await api.fetchWeeks();
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/weeks/",
+        "http://localhost:8000/weeks/",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -432,7 +432,7 @@ describe("API", () => {
       const result = await api.fetchFitness();
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/fitness/",
+        "http://localhost:8000/fitness/",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -449,7 +449,7 @@ describe("API", () => {
       await api.fetchBestPerformances("running");
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/best/?sport=running",
+        "http://localhost:8000/best/?sport=running",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -491,7 +491,7 @@ describe("API", () => {
 
       const result = await api.uploadActivity(mockFile, "New Activity", true);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith("/activities/", expect.any(FormData), {
+      expect(mockedAxios.post).toHaveBeenCalledWith("http://localhost:8000/activities/", expect.any(FormData), {
         headers: {
           Authorization: `Bearer ${mockToken}`,
           "Content-Type": "multipart/form-data",
@@ -534,7 +534,7 @@ describe("API", () => {
       const updates = { title: "Updated Title", race: true };
       const result = await api.updateActivity("activity-123", updates);
 
-      expect(mockedAxios.patch).toHaveBeenCalledWith("/activities/activity-123/", updates, {
+      expect(mockedAxios.patch).toHaveBeenCalledWith("http://localhost:8000/activities/activity-123/", updates, {
         headers: {
           Authorization: `Bearer ${mockToken}`,
           "Content-Type": "application/json",
@@ -567,7 +567,7 @@ describe("API", () => {
 
       await api.deleteActivity("activity-123");
 
-      expect(mockedAxios.delete).toHaveBeenCalledWith("/activities/activity-123/", {
+      expect(mockedAxios.delete).toHaveBeenCalledWith("http://localhost:8000/activities/activity-123/", {
         headers: {
           Authorization: `Bearer ${mockToken}`,
         },
@@ -598,7 +598,7 @@ describe("API", () => {
       const result = await api.fetchCurrentUser();
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/users/me/",
+        "http://localhost:8000/users/me/",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
@@ -615,7 +615,7 @@ describe("API", () => {
       const updates = { map: "mapbox" as const };
       const result = await api.updateUser(updates);
 
-      expect(mockedAxios.patch).toHaveBeenCalledWith("/users/me/", updates, {
+      expect(mockedAxios.patch).toHaveBeenCalledWith("http://localhost:8000/users/me/", updates, {
         headers: {
           Authorization: `Bearer ${mockToken}`,
           "Content-Type": "application/json",
@@ -653,7 +653,7 @@ describe("API", () => {
 
       const result = await api.authenticateWithGoogle(mockUserData);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith("/auth/google/", mockUserData, {
+      expect(mockedAxios.post).toHaveBeenCalledWith("http://localhost:8000/auth/google/", mockUserData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -686,7 +686,7 @@ describe("API", () => {
 
       expect(result).toEqual(mockResponse);
       // Should not include Authorization header
-      expect(mockedAxios.post).toHaveBeenCalledWith("/auth/google/", mockUserData, {
+      expect(mockedAxios.post).toHaveBeenCalledWith("http://localhost:8000/auth/google/", mockUserData, {
         headers: {
           "Content-Type": "application/json",
         },

@@ -26,6 +26,10 @@ export default defineConfig({
           exclude: ['**/node_modules/**', '**/e2e/**'],
           globals: false,
           setupFiles: ['./tests/setup.ts'],
+          env: {
+            VITE_GOOGLE_CLIENT_ID: 'test-google-client-id',
+            VITE_API_URL: 'http://localhost:8000',
+          },
         },
       },
       // Storybook tests
@@ -47,12 +51,6 @@ export default defineConfig({
                 browser: 'chromium',
               },
             ],
-          },
-          coverage: {
-            provider: 'istanbul',
-            reportsDirectory: './coverage-storybook',
-            include: ['src/**/*.tsx', 'src/**/*.ts'],
-            exclude: ['**/*.stories.tsx', '**/*.d.ts', '**/vite-env.d.ts'],
           },
           setupFiles: ['./.storybook/vitest.setup.ts'],
         },
