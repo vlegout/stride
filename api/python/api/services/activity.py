@@ -63,13 +63,6 @@ class ActivityService:
         while len(tracepoints) > MAX_TRACEPOINTS_FOR_RESPONSE:
             tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
 
-        self.storage.upload_activity_files(
-            fit_file_path=fit_file_path,
-            fit_filename=fit_filename,
-            title=title,
-            race=race,
-        )
-
         activity.user_id = user_id
 
         self._persist_activity_data(
@@ -81,10 +74,21 @@ class ActivityService:
             self.session.add(notification)
 
         self.zone.calculate_activity_zones(activity, original_tracepoints)
+        self.zone.update_user_zones(user_id)
 
         self.session.commit()
 
-        self.zone.update_user_zones(user_id)
+        try:
+            self.storage.upload_activity_files(
+                fit_file_path=fit_file_path,
+                fit_filename=fit_filename,
+                title=title,
+                race=race,
+            )
+        except Exception as e:
+            raise Exception(
+                f"Failed to upload files for activity '{title}' (ID: {activity.id}): {str(e)}"
+            ) from e
 
         if activity.sport == "cycling":
             activity_date = datetime.date.fromtimestamp(activity.start_time)

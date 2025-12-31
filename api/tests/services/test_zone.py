@@ -269,7 +269,6 @@ class TestZoneService:
         service.update_user_zones("test-user")
 
         mock_session.add.assert_called()
-        mock_session.commit.assert_called_once()
 
     def test_update_user_zones_updates_pace(self, service, mock_session):
         activities = [
@@ -304,7 +303,7 @@ class TestZoneService:
 
         service.update_user_zones("test-user")
 
-        mock_session.commit.assert_called_once()
+        mock_session.add.assert_called()
 
     def test_update_user_zones_updates_power(self, service, mock_session):
         activities = [
@@ -339,7 +338,7 @@ class TestZoneService:
 
         service.update_user_zones("test-user")
 
-        mock_session.commit.assert_called_once()
+        mock_session.add.assert_called()
 
     def test_create_default_zones(self, service, mock_session):
         service.create_default_zones("test-user")

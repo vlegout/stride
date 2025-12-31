@@ -48,8 +48,23 @@ from api.model import (
     WeeksResponse,
     Zone,
 )
-from api.utils import create_default_zones
+from api.services import get_activity_service, get_profile_service, get_zone_service
+from api.services.activity import ActivityService
+from api.services.profile import ProfileService
 from api.fitness import calculate_fitness_scores
+
+
+def get_activity_service_dependency(
+    session: Session = Depends(get_session),
+) -> ActivityService:
+    return get_activity_service(session)
+
+
+def get_profile_service_dependency(
+    session: Session = Depends(get_session),
+) -> ProfileService:
+    return get_profile_service(session)
+
 
 app = FastAPI()
 
@@ -219,11 +234,10 @@ def create_activity(
     fit_file: UploadFile = File(...),
     title: str = Form(...),
     race: bool = Form(False),
-    session: Session = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
+    activity_service: ActivityService = Depends(get_activity_service_dependency),
+    session: Session = Depends(get_session),
 ):
-    from api.services import get_activity_service
-
     if not fit_file.filename or not fit_file.filename.endswith(".fit"):
         raise HTTPException(status_code=400, detail="File must be a .fit file")
 
@@ -244,7 +258,6 @@ def create_activity(
         temp_fit_path = temp_file.name
 
     try:
-        activity_service = get_activity_service(session)
         activity = activity_service.create_activity(
             user_id=user_id,
             fit_file_path=temp_fit_path,
@@ -320,12 +333,9 @@ def update_activity(
 
 @app.get("/profile/", response_model=Profile)
 def read_profile(
-    session: Session = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
+    profile_service: ProfileService = Depends(get_profile_service_dependency),
 ):
-    from api.services import get_profile_service
-
-    profile_service = get_profile_service(session)
     return profile_service.get_user_profile(user_id)
 
 
@@ -632,8 +642,8 @@ def google_auth(
             session.commit()
             session.refresh(user)
 
-            # Create default zones for the new user
-            create_default_zones(session, user.id)
+            zone_service = get_zone_service(session)
+            zone_service.create_default_zones(user.id)
             session.commit()
 
             user_public = UserPublic.model_validate(user)

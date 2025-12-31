@@ -254,8 +254,6 @@ class ZoneService:
                     zone.max_value = zone_data["max_value"]
                     self.session.add(zone)
 
-        self.session.commit()
-
     def create_default_zones(self, user_id: str):
         default_zones = [
             {"type": "heart_rate", "index": 1, "max_value": DEFAULT_HR_ZONE_1_MAX},

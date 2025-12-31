@@ -121,16 +121,15 @@ class TestStorageService:
         mock_boto_client.return_value = mock_s3
 
         service = StorageService()
-        fit_key, yaml_key = service.upload_activity_files(
-            "/tmp/test.fit", "test.fit", "Morning Run", True
-        )
-
-        assert fit_key == "data/fit/test.fit"
-        assert yaml_key == "data/2024/03/abc12345.yaml"
+        service.upload_activity_files("/tmp/test.fit", "test.fit", "Morning Run", True)
 
         assert mock_s3.upload_file.call_count == 1
-        assert mock_s3.put_object.call_count == 1
+        upload_file_call = mock_s3.upload_file.call_args[0]
+        assert upload_file_call[0] == "/tmp/test.fit"
+        assert upload_file_call[1] == "test-bucket"
+        assert upload_file_call[2] == "data/fit/test.fit"
 
+        assert mock_s3.put_object.call_count == 1
         put_object_call = mock_s3.put_object.call_args[1]
         assert put_object_call["Key"] == "data/2024/03/abc12345.yaml"
         assert put_object_call["ContentType"] == "text/yaml"

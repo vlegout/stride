@@ -1,6 +1,5 @@
 import datetime
 import os
-from typing import Tuple
 
 import boto3
 import yaml
@@ -29,7 +28,7 @@ class StorageService:
         fit_filename: str,
         title: str,
         race: bool,
-    ) -> Tuple[str, str]:
+    ) -> None:
         fit_s3_key = f"data/fit/{fit_filename}"
         self.upload_file(fit_file_path, fit_s3_key)
 
@@ -38,8 +37,6 @@ class StorageService:
         yaml_content = {"fit": fit_filename, "title": title, "race": race}
         yaml_string = yaml.dump(yaml_content, default_flow_style=False)
         self.upload_content(yaml_string, yaml_s3_key, content_type="text/yaml")
-
-        return fit_s3_key, yaml_s3_key
 
     def upload_file(self, file_path: str, s3_key: str) -> None:
         try:
