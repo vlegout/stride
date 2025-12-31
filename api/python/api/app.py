@@ -4,7 +4,6 @@ import tempfile
 import uuid
 from enum import Enum
 
-import yaml
 from fastapi import (
     FastAPI,
     Depends,
@@ -24,7 +23,6 @@ from sqlalchemy.orm import selectinload
 
 from api.auth import create_token_response, Token
 from api.dependencies import get_session, get_current_user_id, verify_jwt_token
-from api.fit import get_activity_from_fit
 from api.model import (
     Activity,
     ActivityList,
@@ -41,7 +39,6 @@ from api.model import (
     BestPerformanceResponse,
     Pagination,
     Profile,
-    Statistic,
     User,
     UserCreate,
     UserPublic,
@@ -49,25 +46,25 @@ from api.model import (
     WeeklyActivitySummary,
     WeeklySummary,
     WeeksResponse,
-    YearsStatistics,
     Zone,
-    ZonePublic,
 )
-from api.utils import (
-    calculate_activity_zone_data,
-    detect_best_effort_achievements,
-    get_best_performances,
-    get_best_performance_power,
-    generate_random_string,
-    upload_file_to_s3,
-    upload_content_to_s3,
-    create_default_zones,
-    update_user_zones_from_activities,
-    MAX_TRACEPOINTS_FOR_RESPONSE,
-)
-from api.fitness import calculate_fitness_scores, update_ftp_for_date
+from api.services import get_activity_service, get_profile_service, get_zone_service
+from api.services.activity import ActivityService
+from api.services.profile import ProfileService
+from api.fitness import calculate_fitness_scores
 
-STATISTICS_START_YEAR = 2013
+
+def get_activity_service_dependency(
+    session: Session = Depends(get_session),
+) -> ActivityService:
+    return get_activity_service(session)
+
+
+def get_profile_service_dependency(
+    session: Session = Depends(get_session),
+) -> ProfileService:
+    return get_profile_service(session)
+
 
 app = FastAPI()
 
@@ -237,8 +234,9 @@ def create_activity(
     fit_file: UploadFile = File(...),
     title: str = Form(...),
     race: bool = Form(False),
-    session: Session = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
+    activity_service: ActivityService = Depends(get_activity_service_dependency),
+    session: Session = Depends(get_session),
 ):
     if not fit_file.filename or not fit_file.filename.endswith(".fit"):
         raise HTTPException(status_code=400, detail="File must be a .fit file")
@@ -260,68 +258,13 @@ def create_activity(
         temp_fit_path = temp_file.name
 
     try:
-        activity, laps, tracepoints = get_activity_from_fit(
-            session=session,
-            fit_file=temp_fit_path,
+        activity = activity_service.create_activity(
+            user_id=user_id,
+            fit_file_path=temp_fit_path,
+            fit_filename=fit_file.filename,
             title=title,
-            description="",
             race=race,
-            fit_name=fit_file.filename,
         )
-
-        performances = get_best_performances(activity, tracepoints)
-        performance_powers = get_best_performance_power(activity, tracepoints)
-
-        # Store original tracepoints for zone calculation before filtering
-        original_tracepoints = tracepoints.copy()
-
-        while len(tracepoints) > MAX_TRACEPOINTS_FOR_RESPONSE:
-            tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
-
-        fit_s3_key = f"data/fit/{fit_file.filename}"
-
-        now = datetime.datetime.now()
-        yaml_s3_key = f"data/{now.year}/{now.month:02d}/{generate_random_string()}.yaml"
-        yaml_content = {"fit": fit_file.filename, "title": title, "race": race}
-        yaml_string = yaml.dump(yaml_content, default_flow_style=False)
-
-        upload_file_to_s3(temp_fit_path, fit_s3_key)
-        upload_content_to_s3(yaml_string, yaml_s3_key)
-
-        # Set user_id from JWT token
-        activity.user_id = user_id
-
-        session.add(activity)
-
-        for lap in laps:
-            session.add(lap)
-
-        for tracepoint in tracepoints:
-            session.add(tracepoint)
-
-        for performance in performances:
-            session.add(performance)
-
-        for performance_power in performance_powers:
-            session.add(performance_power)
-
-        # Detect and create notifications for best efforts
-        notifications = detect_best_effort_achievements(session, activity, performances)
-        for notification in notifications:
-            session.add(notification)
-
-        calculate_activity_zone_data(session, activity, original_tracepoints)
-
-        session.commit()
-
-        # Update user's training zones based on this new activity
-        update_user_zones_from_activities(session, user_id)
-
-        # Update FTP if this is a cycling activity
-        if activity.sport == "cycling":
-            activity_date = datetime.date.fromtimestamp(activity.start_time)
-            update_ftp_for_date(session, user_id, activity_date)
-
         return ActivityPublic.model_validate(activity)
 
     except Exception as e:
@@ -390,107 +333,10 @@ def update_activity(
 
 @app.get("/profile/", response_model=Profile)
 def read_profile(
-    session: Session = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
+    profile_service: ProfileService = Depends(get_profile_service_dependency),
 ):
-    current_date = datetime.datetime.now()
-
-    overall_stats = session.exec(  # type: ignore[attr-defined,call-overload]
-        text("""
-            SELECT
-                COUNT(*) as total_activities,
-                COUNT(CASE WHEN sport = 'running' THEN 1 END) as run_activities,
-                COALESCE(SUM(CASE WHEN sport = 'running' THEN total_distance END), 0) as run_distance,
-                COUNT(CASE WHEN sport = 'cycling' THEN 1 END) as cycling_activities,
-                COALESCE(SUM(CASE WHEN sport = 'cycling' THEN total_distance END), 0) as cycling_distance,
-                COUNT(CASE WHEN sport = 'swimming' THEN 1 END) as swimming_activities,
-                COALESCE(SUM(CASE WHEN sport = 'swimming' THEN total_distance END), 0) as swimming_distance
-             FROM activity
-            WHERE user_id = :user_id AND status = 'created'
-        """).bindparams(user_id=user_id)
-    ).one()
-
-    yearly_stats = session.exec(  # type: ignore[attr-defined,call-overload]
-        text("""
-            SELECT
-                EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
-                sport,
-                COUNT(*) as n_activities,
-                COALESCE(SUM(total_distance), 0) as total_distance
-            FROM activity
-            WHERE user_id = :user_id AND status = 'created'
-            AND EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) >= 2013
-            GROUP BY year, sport
-            ORDER BY year, sport
-        """).bindparams(user_id=user_id)
-    ).all()
-
-    yearly_dict: dict[int, dict[str, dict[str, int | float]]] = {}
-    for row in yearly_stats:
-        year = int(row[0])
-        if year not in yearly_dict:
-            yearly_dict[year] = {}
-        yearly_dict[year][row[1]] = {
-            "n_activities": row[2],
-            "total_distance": row[3] or 0,
-        }
-
-    years_data = []
-    for year in range(STATISTICS_START_YEAR, current_date.year + 1):
-        year_data = yearly_dict.get(year, {})
-        years_data.append(
-            YearsStatistics(
-                year=year,
-                statistics=[
-                    Statistic(
-                        sport="running",
-                        n_activities=int(
-                            year_data.get("running", {}).get("n_activities", 0)
-                        ),
-                        total_distance=year_data.get("running", {}).get(
-                            "total_distance", 0.0
-                        ),
-                    ),
-                    Statistic(
-                        sport="cycling",
-                        n_activities=int(
-                            year_data.get("cycling", {}).get("n_activities", 0)
-                        ),
-                        total_distance=year_data.get("cycling", {}).get(
-                            "total_distance", 0.0
-                        ),
-                    ),
-                    Statistic(
-                        sport="swimming",
-                        n_activities=int(
-                            year_data.get("swimming", {}).get("n_activities", 0)
-                        ),
-                        total_distance=year_data.get("swimming", {}).get(
-                            "total_distance", 0.0
-                        ),
-                    ),
-                ],
-            )
-        )
-
-    # Get user zones
-    zones = session.exec(
-        select(Zone).where(Zone.user_id == user_id).order_by(Zone.type, Zone.index)  # type: ignore
-    ).all()
-
-    zones_public = [ZonePublic.model_validate(zone) for zone in zones]
-
-    return Profile(
-        n_activities=overall_stats[0],
-        run_n_activities=overall_stats[1],
-        run_total_distance=overall_stats[2] or 0.0,
-        cycling_n_activities=overall_stats[3],
-        cycling_total_distance=overall_stats[4] or 0.0,
-        swimming_n_activities=overall_stats[5],
-        swimming_total_distance=overall_stats[6] or 0.0,
-        years=years_data,
-        zones=zones_public,
-    )
+    return profile_service.get_user_profile(user_id)
 
 
 class Sport(str, Enum):
@@ -796,8 +642,8 @@ def google_auth(
             session.commit()
             session.refresh(user)
 
-            # Create default zones for the new user
-            create_default_zones(session, user.id)
+            zone_service = get_zone_service(session)
+            zone_service.create_default_zones(user.id)
             session.commit()
 
             user_public = UserPublic.model_validate(user)
