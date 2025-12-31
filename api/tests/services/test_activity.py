@@ -18,13 +18,6 @@ class TestActivityService:
         return Mock()
 
     @pytest.fixture
-    def mock_performance_service(self):
-        service = Mock()
-        service.calculate_running_performances.return_value = []
-        service.calculate_cycling_performances.return_value = []
-        return service
-
-    @pytest.fixture
     def mock_zone_service(self):
         return Mock()
 
@@ -39,17 +32,18 @@ class TestActivityService:
         self,
         mock_session,
         mock_storage_service,
-        mock_performance_service,
         mock_zone_service,
         mock_notification_service,
     ):
-        return ActivityService(
+        service = ActivityService(
             session=mock_session,
             storage_service=mock_storage_service,
-            performance_service=mock_performance_service,
             zone_service=mock_zone_service,
             notification_service=mock_notification_service,
         )
+        service.performance.calculate_running_performances = Mock(return_value=[])  # type: ignore
+        service.performance.calculate_cycling_performances = Mock(return_value=[])  # type: ignore
+        return service
 
     @pytest.fixture
     def running_activity(self):
@@ -115,7 +109,6 @@ class TestActivityService:
         sample_tracepoints,
         mock_session,
         mock_storage_service,
-        mock_performance_service,
         mock_zone_service,
         mock_notification_service,
     ):
@@ -128,9 +121,7 @@ class TestActivityService:
         performances = [
             Performance(id=uuid.uuid4(), activity_id=running_activity.id, distance=1000)
         ]
-        mock_performance_service.calculate_running_performances.return_value = (
-            performances
-        )
+        service.performance.calculate_running_performances.return_value = performances
 
         notifications = []
         mock_notification_service.detect_achievements.return_value = notifications
@@ -155,8 +146,8 @@ class TestActivityService:
             fit_name="test.fit",
         )
 
-        mock_performance_service.calculate_running_performances.assert_called_once()
-        mock_performance_service.calculate_cycling_performances.assert_called_once()
+        service.performance.calculate_running_performances.assert_called_once()
+        service.performance.calculate_cycling_performances.assert_called_once()
 
         mock_session.add.assert_called()
         mock_session.commit.assert_called()

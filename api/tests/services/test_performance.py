@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from unittest.mock import Mock
 
 import pytest
 
@@ -11,8 +10,7 @@ from api.services.performance import PerformanceService
 class TestPerformanceService:
     @pytest.fixture
     def service(self):
-        mock_session = Mock()
-        return PerformanceService(mock_session)
+        return PerformanceService()
 
     @pytest.fixture
     def running_activity(self):

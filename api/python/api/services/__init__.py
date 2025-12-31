@@ -12,8 +12,8 @@ def get_storage_service() -> StorageService:
     return StorageService()
 
 
-def get_performance_service(session: Session) -> PerformanceService:
-    return PerformanceService(session)
+def get_performance_service() -> PerformanceService:
+    return PerformanceService()
 
 
 def get_zone_service(session: Session) -> ZoneService:
@@ -30,14 +30,12 @@ def get_profile_service(session: Session) -> ProfileService:
 
 def get_activity_service(session: Session) -> ActivityService:
     storage = get_storage_service()
-    performance = get_performance_service(session)
     zone = get_zone_service(session)
     notification = get_notification_service(session)
 
     return ActivityService(
         session=session,
         storage_service=storage,
-        performance_service=performance,
         zone_service=zone,
         notification_service=notification,
     )

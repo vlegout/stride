@@ -24,13 +24,12 @@ class ActivityService:
         self,
         session: Session,
         storage_service: StorageService,
-        performance_service: PerformanceService,
         zone_service: ZoneService,
         notification_service: NotificationService,
     ):
         self.session = session
         self.storage = storage_service
-        self.performance = performance_service
+        self.performance = PerformanceService()
         self.zone = zone_service
         self.notification = notification_service
 
@@ -76,8 +75,6 @@ class ActivityService:
         self.zone.calculate_activity_zones(activity, original_tracepoints)
         self.zone.update_user_zones(user_id)
 
-        self.session.commit()
-
         try:
             self.storage.upload_activity_files(
                 fit_file_path=fit_file_path,
@@ -87,8 +84,10 @@ class ActivityService:
             )
         except Exception as e:
             raise Exception(
-                f"Failed to upload files for activity '{title}' (ID: {activity.id}): {str(e)}"
+                f"Failed to upload files for activity '{title}': {str(e)}"
             ) from e
+
+        self.session.commit()
 
         if activity.sport == "cycling":
             activity_date = datetime.date.fromtimestamp(activity.start_time)

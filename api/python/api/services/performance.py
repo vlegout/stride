@@ -2,8 +2,6 @@ import datetime
 import uuid
 from typing import List
 
-from sqlmodel import Session
-
 from api.model import Activity, Performance, PerformancePower, Tracepoint
 from api.utils import (
     DISTANCE_1KM,
@@ -17,9 +15,6 @@ from api.utils import (
 
 
 class PerformanceService:
-    def __init__(self, session: Session):
-        self.session = session
-
     def calculate_running_performances(
         self, activity: Activity, tracepoints: List[Tracepoint]
     ) -> List[Performance]:
