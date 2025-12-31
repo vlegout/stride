@@ -1,5 +1,4 @@
 import datetime
-from typing import Dict, List
 
 from sqlmodel import Session, select
 
@@ -19,8 +18,8 @@ class NotificationService:
         self.session = session
 
     def detect_achievements(
-        self, activity: Activity, performances: List[Performance]
-    ) -> List[Notification]:
+        self, activity: Activity, performances: list[Performance]
+    ) -> list[Notification]:
         if activity.sport != "running":
             return []
 
@@ -55,7 +54,7 @@ class NotificationService:
         )
         historical_results = self.session.exec(stmt).all()
 
-        historical_by_distance: Dict[float, List[tuple[datetime.timedelta, int]]] = {}
+        historical_by_distance: dict[float, list[tuple[datetime.timedelta, int]]] = {}
         for perf, start_time in historical_results:
             if perf.time is None:
                 continue

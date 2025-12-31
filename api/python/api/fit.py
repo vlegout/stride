@@ -2,8 +2,6 @@ import math
 import os
 import uuid
 
-from typing import List
-
 from pydantic import field_validator, ValidationInfo
 from sqlmodel import Session
 
@@ -77,7 +75,7 @@ def get_activity_from_fit(
     description: str = "",
     race: bool = False,
     fit_name: str | None = None,
-) -> tuple[Activity, List[Lap], List[Tracepoint]]:
+) -> tuple[Activity, list[Lap], list[Tracepoint]]:
     fit = api.api.get_fit(fit_file)
 
     activity_create = ActivityCreate(

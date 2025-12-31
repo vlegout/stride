@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import Dict, List
 
 from sqlmodel import Session, select
 
@@ -61,7 +60,7 @@ class ZoneService:
         self.session = session
 
     def calculate_activity_zones(
-        self, activity: Activity, tracepoints: List[Tracepoint]
+        self, activity: Activity, tracepoints: list[Tracepoint]
     ) -> None:
         if not tracepoints or not activity.user_id:
             return
@@ -283,9 +282,9 @@ class ZoneService:
             self.session.add(zone)
 
     def _calculate_heart_rate_zones(
-        self, zones: List[Zone], tracepoints: List[Tracepoint]
-    ) -> Dict[uuid.UUID, float]:
-        zone_data: Dict[uuid.UUID, float] = {}
+        self, zones: list[Zone], tracepoints: list[Tracepoint]
+    ) -> dict[uuid.UUID, float]:
+        zone_data: dict[uuid.UUID, float] = {}
 
         sorted_zones = sorted(zones, key=lambda z: z.max_value)
 
@@ -310,9 +309,9 @@ class ZoneService:
         return zone_data
 
     def _calculate_pace_zones(
-        self, zones: List[Zone], tracepoints: List[Tracepoint]
-    ) -> Dict[uuid.UUID, float]:
-        zone_data: Dict[uuid.UUID, float] = {}
+        self, zones: list[Zone], tracepoints: list[Tracepoint]
+    ) -> dict[uuid.UUID, float]:
+        zone_data: dict[uuid.UUID, float] = {}
 
         zones_by_index = sorted(zones, key=lambda z: z.index)
 
@@ -346,9 +345,9 @@ class ZoneService:
         return zone_data
 
     def _calculate_power_zones(
-        self, zones: List[Zone], tracepoints: List[Tracepoint]
-    ) -> Dict[uuid.UUID, float]:
-        zone_data: Dict[uuid.UUID, float] = {}
+        self, zones: list[Zone], tracepoints: list[Tracepoint]
+    ) -> dict[uuid.UUID, float]:
+        zone_data: dict[uuid.UUID, float] = {}
 
         sorted_zones = sorted(zones, key=lambda z: z.max_value)
 

@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import List
 
 from api.model import Activity, Performance, PerformancePower, Tracepoint
 from api.utils import (
@@ -16,8 +15,8 @@ from api.utils import (
 
 class PerformanceService:
     def calculate_running_performances(
-        self, activity: Activity, tracepoints: List[Tracepoint]
-    ) -> List[Performance]:
+        self, activity: Activity, tracepoints: list[Tracepoint]
+    ) -> list[Performance]:
         if not tracepoints:
             return []
 
@@ -69,8 +68,8 @@ class PerformanceService:
         return performances
 
     def calculate_cycling_performances(
-        self, activity: Activity, tracepoints: List[Tracepoint]
-    ) -> List[PerformancePower]:
+        self, activity: Activity, tracepoints: list[Tracepoint]
+    ) -> list[PerformancePower]:
         if not tracepoints:
             return []
 
