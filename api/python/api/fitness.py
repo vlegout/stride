@@ -11,6 +11,9 @@ from api.model import (
     Zone,
 )
 
+type ZonesByType = dict[str, list[Zone]]
+type ZoneTimeData = dict[uuid.UUID, float]
+
 
 def calculate_activity_score(activity, sport_filter=None):
     """Calculate the base score for an activity, optionally filtered by sport"""
@@ -416,7 +419,7 @@ def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 52):
     user_zones = session.exec(select(Zone).where(Zone.user_id == user_id)).all()
 
     # Group zones by type
-    zones_by_type: dict[str, list[Zone]] = {}
+    zones_by_type: ZonesByType = {}
     for zone in user_zones:
         if zone.type not in zones_by_type:
             zones_by_type[zone.type] = []
@@ -470,9 +473,9 @@ def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 52):
                 activity.id: activity.sport for activity in week_activities
             }
 
-            hr_zone_totals: dict[uuid.UUID, float] = {}
-            hr_zone_running_totals: dict[uuid.UUID, float] = {}
-            hr_zone_cycling_totals: dict[uuid.UUID, float] = {}
+            hr_zone_totals: ZoneTimeData = {}
+            hr_zone_running_totals: ZoneTimeData = {}
+            hr_zone_cycling_totals: ZoneTimeData = {}
 
             for zone_time in hr_zone_times:
                 zone_id = zone_time.zone_id
@@ -513,7 +516,7 @@ def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 52):
                 )
             ).all()
 
-            pace_zone_totals: dict[uuid.UUID, float] = {}
+            pace_zone_totals: ZoneTimeData = {}
             for pace_zone_time in pace_zone_times:
                 zone_id = pace_zone_time.zone_id
                 if zone_id not in pace_zone_totals:
@@ -538,7 +541,7 @@ def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 52):
                 )
             ).all()
 
-            power_zone_totals: dict[uuid.UUID, float] = {}
+            power_zone_totals: ZoneTimeData = {}
             for power_zone_time in power_zone_times:
                 zone_id = power_zone_time.zone_id
                 if zone_id not in power_zone_totals:

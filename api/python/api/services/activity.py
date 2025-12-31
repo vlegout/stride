@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 from sqlmodel import Session
 
@@ -98,10 +97,10 @@ class ActivityService:
     def _persist_activity_data(
         self,
         activity: Activity,
-        laps: List[Lap],
-        tracepoints: List[Tracepoint],
-        performances: List[Performance],
-        performance_powers: List[PerformancePower],
+        laps: list[Lap],
+        tracepoints: list[Tracepoint],
+        performances: list[Performance],
+        performance_powers: list[PerformancePower],
     ) -> None:
         self.session.add(activity)
 

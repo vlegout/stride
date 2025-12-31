@@ -5,8 +5,6 @@ import os
 import time
 import uuid
 
-from typing import List
-
 import httpx
 import typer
 import yaml
@@ -74,7 +72,7 @@ def fetch_location(lat: float, lon: float, activity_id: uuid.UUID) -> Location |
 
 def get_activity_from_yaml(
     session: Session, yaml_file: str
-) -> tuple[Activity, List[Lap], List[Tracepoint]]:
+) -> tuple[Activity, list[Lap], list[Tracepoint]]:
     with open(yaml_file, "r") as file:
         config = yaml.safe_load(file)
 
@@ -93,11 +91,11 @@ def get_data(
     session: Session, input_file: str
 ) -> tuple[
     Activity,
-    List[Lap],
-    List[Tracepoint],
-    List[Tracepoint],
-    List[Performance],
-    List[PerformancePower],
+    list[Lap],
+    list[Tracepoint],
+    list[Tracepoint],
+    list[Performance],
+    list[PerformancePower],
 ]:
     if input_file.endswith(".yaml"):
         activity, laps, tracepoints = get_activity_from_yaml(

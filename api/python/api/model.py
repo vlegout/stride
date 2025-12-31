@@ -1,8 +1,6 @@
 import datetime
 import uuid
 
-from typing import List
-
 from pydantic import BaseModel, field_serializer, field_validator
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -154,7 +152,7 @@ class ActivityPublic(ActivityBase):
     tracepoints: list["Tracepoint"] = []
 
     @field_serializer("tracepoints")
-    def serialize_tracepoints(self, tracepoints: List["Tracepoint"]):
+    def serialize_tracepoints(self, tracepoints: list["Tracepoint"]):
         return sorted(tracepoints, key=lambda a: a.timestamp)
 
 
@@ -171,7 +169,7 @@ class Pagination(BaseModel):
 
 
 class ActivityList(BaseModel):
-    activities: List[ActivityPublic | ActivityPublicWithoutTracepoints] = []
+    activities: list[ActivityPublic | ActivityPublicWithoutTracepoints] = []
     pagination: Pagination = Pagination()
 
 
@@ -349,13 +347,13 @@ class Statistic(BaseModel):
 
 class YearsStatistics(BaseModel):
     year: int
-    statistics: List[Statistic]
+    statistics: list[Statistic]
 
 
 class WeeksStatistics(BaseModel):
     start: datetime.datetime
     week: int
-    statistics: List[Statistic]
+    statistics: list[Statistic]
 
 
 class Profile(BaseModel):
@@ -366,8 +364,8 @@ class Profile(BaseModel):
     cycling_total_distance: float = 0.0
     swimming_n_activities: int = 0
     swimming_total_distance: float = 0.0
-    years: List[YearsStatistics] = []
-    zones: List[ZonePublic] = []
+    years: list[YearsStatistics] = []
+    zones: list[ZonePublic] = []
 
 
 class BestPerformanceItem(BaseModel):
@@ -378,7 +376,7 @@ class BestPerformanceItem(BaseModel):
 class BestPerformanceResponse(BaseModel):
     sport: str
     parameter: str
-    performances: List[BestPerformanceItem]
+    performances: list[BestPerformanceItem]
 
 
 class WeeklyActivitySummary(BaseModel):
@@ -398,7 +396,7 @@ class WeeklySummary(BaseModel):
     week_start: datetime.datetime
     week_number: int
     year: int
-    activities: List[WeeklyActivitySummary]
+    activities: list[WeeklyActivitySummary]
     total_activities: int
     total_distance: float
     total_time: float
@@ -409,4 +407,4 @@ class WeeklySummary(BaseModel):
 
 
 class WeeksResponse(BaseModel):
-    weeks: List[WeeklySummary]
+    weeks: list[WeeklySummary]

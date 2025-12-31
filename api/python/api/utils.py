@@ -5,8 +5,6 @@ import random
 import string
 import uuid
 
-from typing import List, Tuple, Optional, Dict
-
 import boto3
 from sqlmodel import Session, select
 from botocore.exceptions import ClientError
@@ -100,7 +98,7 @@ POWER_TIME_TOLERANCE_SECONDS = 1
 MAX_TRACEPOINTS_FOR_RESPONSE = 500
 
 
-def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
+def get_lat_lon(points: list[Tracepoint]) -> tuple[float, float]:
     x = y = z = 0.0
 
     if len(points) == 0:
@@ -128,7 +126,7 @@ def get_lat_lon(points: List[Tracepoint]) -> Tuple[float, float]:
     return lat, lon
 
 
-def get_delta_lat_lon(lat: float, max_distance: float) -> Tuple[float, float]:
+def get_delta_lat_lon(lat: float, max_distance: float) -> tuple[float, float]:
     delta_lat = max_distance / EARTH_RADIUS_METERS * (180 / math.pi)
     delta_lon = (
         max_distance
@@ -144,8 +142,8 @@ def get_uuid(filename: str) -> uuid.UUID:
 
 
 def get_best_performances(
-    activity: Activity, tracepoints: List[Tracepoint]
-) -> List[Performance]:
+    activity: Activity, tracepoints: list[Tracepoint]
+) -> list[Performance]:
     if not tracepoints:
         return []
 
@@ -195,8 +193,8 @@ def get_best_performances(
 
 
 def get_best_performance_power(
-    activity: Activity, tracepoints: List[Tracepoint]
-) -> List[PerformancePower]:
+    activity: Activity, tracepoints: list[Tracepoint]
+) -> list[PerformancePower]:
     if not tracepoints:
         return []
 
@@ -329,7 +327,7 @@ def detect_best_effort_achievements(
     )
     historical_results = session.exec(stmt).all()
 
-    historical_by_distance: Dict[float, list[tuple[datetime.timedelta, int]]] = {}
+    historical_by_distance: dict[float, list[tuple[datetime.timedelta, int]]] = {}
     for perf, start_time in historical_results:
         if perf.time is None:
             continue
@@ -434,7 +432,7 @@ def upload_content_to_s3(content: str, s3_key: str) -> None:
 
 def get_activity_location(
     session: Session, lat: float, lon: float
-) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+) -> tuple[str | None, str | None, str | None]:
     lat_delta = LOCATION_SEARCH_LAT_DELTA
     lon_delta = LOCATION_SEARCH_LON_DELTA_BASE / math.cos(math.radians(lat))
 
@@ -745,7 +743,7 @@ def create_default_zones(session: Session, user_id: str):
 
 
 def calculate_activity_zone_data(
-    session: Session, activity: Activity, tracepoints: List[Tracepoint]
+    session: Session, activity: Activity, tracepoints: list[Tracepoint]
 ) -> None:
     """Calculate and save time spent in each zone for an activity"""
     if not tracepoints or not activity.user_id:
@@ -806,10 +804,10 @@ def calculate_activity_zone_data(
 
 
 def _calculate_heart_rate_zones(
-    zones: List[Zone], tracepoints: List[Tracepoint]
-) -> Dict[uuid.UUID, float]:
+    zones: list[Zone], tracepoints: list[Tracepoint]
+) -> dict[uuid.UUID, float]:
     """Calculate time spent in each heart rate zone"""
-    zone_data: Dict[uuid.UUID, float] = {}
+    zone_data: dict[uuid.UUID, float] = {}
 
     # Sort zones by max_value for proper zone assignment
     sorted_zones = sorted(zones, key=lambda z: z.max_value)
@@ -838,10 +836,10 @@ def _calculate_heart_rate_zones(
 
 
 def _calculate_pace_zones(
-    zones: List[Zone], tracepoints: List[Tracepoint]
-) -> Dict[uuid.UUID, float]:
+    zones: list[Zone], tracepoints: list[Tracepoint]
+) -> dict[uuid.UUID, float]:
     """Calculate time spent in each pace zone"""
-    zone_data: Dict[uuid.UUID, float] = {}
+    zone_data: dict[uuid.UUID, float] = {}
 
     zones_by_index = sorted(zones, key=lambda z: z.index)
 
@@ -881,10 +879,10 @@ def _calculate_pace_zones(
 
 
 def _calculate_power_zones(
-    zones: List[Zone], tracepoints: List[Tracepoint]
-) -> Dict[uuid.UUID, float]:
+    zones: list[Zone], tracepoints: list[Tracepoint]
+) -> dict[uuid.UUID, float]:
     """Calculate time spent in each power zone"""
-    zone_data: Dict[uuid.UUID, float] = {}
+    zone_data: dict[uuid.UUID, float] = {}
 
     # Sort zones by max_value for proper zone assignment
     sorted_zones = sorted(zones, key=lambda z: z.max_value)

@@ -6,6 +6,8 @@ from api.model import Profile, Statistic, YearsStatistics, Zone, ZonePublic
 
 STATISTICS_START_YEAR = 2013
 
+type YearlyStats = dict[int, dict[str, dict[str, int | float]]]
+
 
 class ProfileService:
     def __init__(self, session: Session):
@@ -44,7 +46,7 @@ class ProfileService:
             """).bindparams(user_id=user_id)
         ).all()
 
-        yearly_dict: dict[int, dict[str, dict[str, int | float]]] = {}
+        yearly_dict: YearlyStats = {}
         for row in yearly_stats:
             year = int(row[0])
             if year not in yearly_dict:
