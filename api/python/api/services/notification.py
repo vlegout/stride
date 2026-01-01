@@ -2,7 +2,7 @@ import datetime
 
 from sqlmodel import Session, select
 
-from api.model import Activity, Notification, Performance
+from api.model import Activity, Notification, Performance, PerformancePower
 from api.utils import (
     DISTANCE_1KM,
     DISTANCE_1MILE,
@@ -10,6 +10,11 @@ from api.utils import (
     DISTANCE_10KM,
     DISTANCE_HALF_MARATHON,
     DISTANCE_FULL_MARATHON,
+    DURATION_5S,
+    DURATION_1MIN,
+    DURATION_5MIN,
+    DURATION_20MIN,
+    DURATION_1HR,
 )
 
 
@@ -106,6 +111,104 @@ class NotificationService:
                         activity_id=activity.id,
                         type="best_effort_yearly",
                         distance=target_distance,
+                        achievement_year=current_year,
+                        message="",
+                    )
+                )
+
+        return notifications
+
+    def detect_power_achievements(
+        self, activity: Activity, performance_powers: list[PerformancePower]
+    ) -> list[Notification]:
+        if activity.sport != "cycling":
+            return []
+
+        durations = [
+            DURATION_5S,
+            DURATION_1MIN,
+            DURATION_5MIN,
+            DURATION_20MIN,
+            DURATION_1HR,
+        ]
+        current_year = datetime.date.fromtimestamp(activity.start_time).year
+
+        current_perfs = {
+            p.time: p
+            for p in performance_powers
+            if p.time in durations and p.power and p.power > 0
+        }
+
+        if not current_perfs:
+            return []
+
+        stmt = (
+            select(PerformancePower, Activity.start_time)
+            .join(Activity)
+            .where(
+                Activity.user_id == activity.user_id,
+                Activity.sport == "cycling",
+                Activity.status == "created",
+                Activity.id != activity.id,
+                PerformancePower.time.in_(list(current_perfs.keys())),  # type: ignore[attr-defined]
+                PerformancePower.power.is_not(None),  # type: ignore[attr-defined]
+                PerformancePower.power > 0,  # type: ignore[operator]
+            )
+        )
+        historical_results = self.session.exec(stmt).all()
+
+        historical_by_duration: dict[datetime.timedelta, list[tuple[float, int]]] = {}
+        for perf, start_time in historical_results:
+            if perf.power is None or perf.power <= 0:
+                continue
+            if perf.time not in historical_by_duration:
+                historical_by_duration[perf.time] = []
+            perf_year = datetime.date.fromtimestamp(start_time).year
+            historical_by_duration[perf.time].append((perf.power, perf_year))
+
+        notifications = []
+
+        for target_duration, current_perf in current_perfs.items():
+            if current_perf.power is None or current_perf.power <= 0:
+                continue
+
+            historical_data = historical_by_duration.get(target_duration, [])
+
+            if not historical_data:
+                notifications.append(
+                    Notification(
+                        activity_id=activity.id,
+                        type="best_effort_all_time",
+                        duration=target_duration,
+                        achievement_year=None,
+                        message="",
+                    )
+                )
+                continue
+
+            all_powers = [power for power, _ in historical_data]
+            yearly_powers = [
+                power for power, year in historical_data if year == current_year
+            ]
+
+            all_time_best = max(all_powers)
+
+            if current_perf.power > all_time_best:
+                notifications.append(
+                    Notification(
+                        activity_id=activity.id,
+                        type="best_effort_all_time",
+                        duration=target_duration,
+                        achievement_year=None,
+                        message="",
+                    )
+                )
+            elif not yearly_powers or current_perf.power > max(yearly_powers):
+                notifications.append(
+                    Notification(
+                        activity_id=activity.id,
+                        type="best_effort_yearly",
+                        duration=target_duration,
                         achievement_year=current_year,
                         message="",
                     )

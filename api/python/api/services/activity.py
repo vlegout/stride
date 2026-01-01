@@ -71,6 +71,12 @@ class ActivityService:
         for notification in notifications:
             self.session.add(notification)
 
+        power_notifications = self.notification.detect_power_achievements(
+            activity, performance_powers
+        )
+        for notification in power_notifications:
+            self.session.add(notification)
+
         self.zone.calculate_activity_zones(activity, original_tracepoints)
         self.zone.update_user_zones(user_id)
 

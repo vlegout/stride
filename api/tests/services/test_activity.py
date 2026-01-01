@@ -25,6 +25,7 @@ class TestActivityService:
     def mock_notification_service(self):
         service = Mock()
         service.detect_achievements.return_value = []
+        service.detect_power_achievements.return_value = []
         return service
 
     @pytest.fixture
