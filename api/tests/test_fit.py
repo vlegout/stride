@@ -1,3 +1,4 @@
+import glob
 import json
 import os
 import unittest
@@ -24,10 +25,12 @@ class TestFit(unittest.TestCase):
         mock_session.exec.return_value.first.return_value = mock_location
 
         test_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(test_dir, "data")
 
-        for sport in ["run", "ride", "swim"]:
-            fit_path = os.path.join(test_dir, "data", f"{sport}.fit")
-            json_path = os.path.join(test_dir, "data", f"{sport}.json")
+        fit_files = glob.glob(os.path.join(data_dir, "*.fit"))
+
+        for fit_path in fit_files:
+            json_path = os.path.splitext(fit_path)[0] + ".json"
 
             activity, _, _, _, _, _ = get_data(
                 mock_session,
