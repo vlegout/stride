@@ -218,6 +218,7 @@ class NotificationBase(SQLModel):
     type: str
     distance: float | None = None
     duration: datetime.timedelta | None = None
+    power: float | None = None
     achievement_year: int | None = None
     message: str
     created_at: datetime.datetime = Field(

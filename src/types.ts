@@ -49,6 +49,7 @@ export const Notification = type({
   type: "'best_effort_yearly'|'best_effort_all_time'",
   distance: "number | null",
   duration: "string | null",
+  power: "number | null",
   achievement_year: "number | null",
   message: "string",
   created_at: "string",
