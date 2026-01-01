@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from pydantic import BaseModel, field_serializer, field_validator
+from pydantic import BaseModel, field_serializer, field_validator, model_validator
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -216,12 +216,21 @@ class NotificationBase(SQLModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     activity_id: uuid.UUID = Field(foreign_key="activity.id")
     type: str
-    distance: float
+    distance: float | None = None
+    duration: datetime.timedelta | None = None
     achievement_year: int | None = None
     message: str
     created_at: datetime.datetime = Field(
         default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
     )
+
+    @model_validator(mode="after")
+    def validate_distance_or_duration(self):
+        if self.distance is None and self.duration is None:
+            raise ValueError("Either distance or duration must be set")
+        if self.distance is not None and self.duration is not None:
+            raise ValueError("Cannot set both distance and duration")
+        return self
 
 
 class Notification(NotificationBase, table=True):

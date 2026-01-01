@@ -5,16 +5,43 @@ interface ActivityNotificationsProps {
   notifications: Notification[];
 }
 
-const getNotificationMessage = (notification: Notification): string => {
-  const distanceKm = notification.distance / 1000;
-  const distanceLabel = `${distanceKm}km`;
+const formatDuration = (duration: string): string => {
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/);
+  if (!match) return duration;
 
-  if (notification.type === "best_effort_all_time") {
-    return `Personal Best ${distanceLabel}!`;
+  const hours = parseInt(match[1] || "0");
+  const minutes = parseInt(match[2] || "0");
+  const seconds = parseFloat(match[3] || "0");
+
+  if (hours > 0) return `${hours}hr`;
+  if (minutes > 0) return `${minutes}min`;
+  return `${Math.round(seconds)}s`;
+};
+
+const getNotificationMessage = (notification: Notification): string => {
+  if (notification.duration) {
+    const durationLabel = formatDuration(notification.duration);
+
+    if (notification.type === "best_effort_all_time") {
+      return `Personal Best Power ${durationLabel}!`;
+    }
+
+    if (notification.type === "best_effort_yearly" && notification.achievement_year) {
+      return `Best Power ${durationLabel} of ${notification.achievement_year}!`;
+    }
   }
 
-  if (notification.type === "best_effort_yearly" && notification.achievement_year) {
-    return `Best ${distanceLabel} of ${notification.achievement_year}!`;
+  if (notification.distance) {
+    const distanceKm = notification.distance / 1000;
+    const distanceLabel = `${distanceKm}km`;
+
+    if (notification.type === "best_effort_all_time") {
+      return `Personal Best ${distanceLabel}!`;
+    }
+
+    if (notification.type === "best_effort_yearly" && notification.achievement_year) {
+      return `Best ${distanceLabel} of ${notification.achievement_year}!`;
+    }
   }
 
   return "";
