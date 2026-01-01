@@ -180,6 +180,7 @@ class NotificationService:
                         activity_id=activity.id,
                         type="best_effort_all_time",
                         duration=target_duration,
+                        power=current_perf.power,
                         achievement_year=None,
                         message="",
                     )
@@ -199,6 +200,7 @@ class NotificationService:
                         activity_id=activity.id,
                         type="best_effort_all_time",
                         duration=target_duration,
+                        power=current_perf.power,
                         achievement_year=None,
                         message="",
                     )
@@ -209,6 +211,7 @@ class NotificationService:
                         activity_id=activity.id,
                         type="best_effort_yearly",
                         duration=target_duration,
+                        power=current_perf.power,
                         achievement_year=current_year,
                         message="",
                     )

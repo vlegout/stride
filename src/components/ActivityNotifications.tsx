@@ -21,13 +21,14 @@ const formatDuration = (duration: string): string => {
 const getNotificationMessage = (notification: Notification): string => {
   if (notification.duration) {
     const durationLabel = formatDuration(notification.duration);
+    const powerLabel = notification.power ? `${Math.round(notification.power)}W` : "";
 
     if (notification.type === "best_effort_all_time") {
-      return `Personal Best Power ${durationLabel}!`;
+      return `Personal Best Power ${durationLabel}: ${powerLabel}!`;
     }
 
     if (notification.type === "best_effort_yearly" && notification.achievement_year) {
-      return `Best Power ${durationLabel} of ${notification.achievement_year}!`;
+      return `Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
     }
   }
 
