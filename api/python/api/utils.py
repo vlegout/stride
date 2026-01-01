@@ -549,19 +549,21 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
                 1, int(len(threshold_candidates) * FASTEST_RUNS_PERCENTILE)
             )
             fastest_longer_runs = sorted(
-                threshold_candidates, key=lambda x: x.avg_speed, reverse=True
+                threshold_candidates, key=lambda x: x.avg_speed or 0, reverse=True
             )[:num_candidates]
 
             # Calculate threshold pace from these more realistic activities
             # avg_speed is in km/h, so convert to pace (seconds per km)
             avg_threshold_speed_kmh = sum(
-                a.avg_speed for a in fastest_longer_runs
+                a.avg_speed for a in fastest_longer_runs if a.avg_speed is not None
             ) / len(fastest_longer_runs)
             threshold_pace = SECONDS_PER_KM_CONVERSION / avg_threshold_speed_kmh
         else:
             # Fallback: if no long runs, use all running activities but be more conservative
             # Take only the middle 50% of speeds to avoid extremes
-            speeds = sorted([a.avg_speed for a in running_activities])
+            speeds = sorted(
+                [a.avg_speed for a in running_activities if a.avg_speed is not None]
+            )
             start_idx = len(speeds) // 4
             end_idx = start_idx + len(speeds) // 2
             middle_speeds = speeds[start_idx:end_idx] if end_idx > start_idx else speeds

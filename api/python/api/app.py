@@ -112,11 +112,11 @@ def read_activities(
     if order_by == "total_distance":
         order_column = Activity.total_distance
     elif order_by == "avg_speed":
-        order_column = Activity.avg_speed
+        order_column = Activity.avg_speed  # type: ignore
     elif order_by == "avg_power":
         order_column = Activity.avg_power  # type: ignore
     elif order_by == "total_ascent":
-        order_column = Activity.total_ascent
+        order_column = Activity.total_ascent  # type: ignore
     elif order_by == "total_calories":
         order_column = Activity.total_calories  # type: ignore
     elif order_by == "training_stress_score":
