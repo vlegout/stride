@@ -8,10 +8,7 @@ use pyo3::prelude::*;
 use std::fs;
 
 use types::{Activity, Device, FitStruct, Lap, Point};
-use utils::{
-    extract_f32, extract_i8, extract_u8, extract_u16, extract_u32, sanitize_i8, sanitize_u16,
-    sanitize_u32,
-};
+use utils::{extract_f32, extract_i8, extract_u8, extract_u16, extract_u32};
 
 #[pyfunction]
 fn get_fit(file_name: &str) -> FitStruct {
@@ -29,24 +26,24 @@ fn get_fit(file_name: &str) -> FitStruct {
             total_timer_time: 0,
             total_elapsed_time: 0,
             total_distance: 0,
-            total_ascent: 0,
-            avg_speed: 0,
+            total_ascent: None,
+            avg_speed: None,
             avg_heart_rate: 0,
             max_heart_rate: 0,
-            avg_cadence: 0,
-            max_cadence: 0,
-            avg_power: 0,
-            max_power: 0,
-            np_power: 0,
-            total_calories: 0,
-            total_training_effect: 0,
-            training_stress_score: 0,
-            intensity_factor: 0,
-            avg_temperature: 0,
-            max_temperature: 0,
-            min_temperature: 0,
-            pool_length: 0,
-            num_lengths: 0,
+            avg_cadence: None,
+            max_cadence: None,
+            avg_power: None,
+            max_power: None,
+            np_power: None,
+            total_calories: None,
+            total_training_effect: None,
+            training_stress_score: None,
+            intensity_factor: None,
+            avg_temperature: None,
+            max_temperature: None,
+            min_temperature: None,
+            pool_length: None,
+            num_lengths: None,
         },
         laps: Vec::new(),
         data_points: Vec::new(),
@@ -110,9 +107,9 @@ fn get_fit(file_name: &str) -> FitStruct {
                         distance: 0,
                         heart_rate: 0,
                         speed: 0,
-                        power: 0,
+                        power: None,
                         altitude: 0,
-                        temperature: 0,
+                        temperature: None,
                         cadence: 0,
                     };
 
@@ -138,11 +135,19 @@ fn get_fit(file_name: &str) -> FitStruct {
                             }
                             7 => {
                                 let raw_power: u16 = extract_u16(&value.value);
-                                point.power = sanitize_u16(raw_power);
+                                point.power = if raw_power == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_power)
+                                };
                             }
                             13 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
-                                point.temperature = sanitize_i8(raw_temp);
+                                point.temperature = if raw_temp == i8::MAX {
+                                    None
+                                } else {
+                                    Some(raw_temp)
+                                };
                             }
                             73 => {
                                 point.speed = extract_u32(&value.value);
@@ -192,7 +197,12 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 fit.activity.total_distance = fit.activity.total_distance / 100;
                             }
                             11 => {
-                                fit.activity.total_calories = extract_u16(&value.value);
+                                let raw_calories: u16 = extract_u16(&value.value);
+                                fit.activity.total_calories = if raw_calories == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_calories)
+                                };
                             }
                             16 => {
                                 fit.activity.avg_heart_rate = extract_u8(&value.value);
@@ -201,61 +211,124 @@ fn get_fit(file_name: &str) -> FitStruct {
                                 fit.activity.max_heart_rate = extract_u8(&value.value);
                             }
                             18 => {
-                                fit.activity.avg_cadence = extract_u8(&value.value);
+                                let raw_cadence: u8 = extract_u8(&value.value);
+                                fit.activity.avg_cadence = if raw_cadence == u8::MAX {
+                                    None
+                                } else {
+                                    Some(raw_cadence)
+                                };
                             }
                             19 => {
-                                fit.activity.max_cadence = extract_u8(&value.value);
+                                let raw_cadence: u8 = extract_u8(&value.value);
+                                fit.activity.max_cadence = if raw_cadence == u8::MAX {
+                                    None
+                                } else {
+                                    Some(raw_cadence)
+                                };
                             }
                             20 => {
                                 let raw_avg_power: u16 = extract_u16(&value.value);
-                                fit.activity.avg_power = sanitize_u16(raw_avg_power);
+                                fit.activity.avg_power = if raw_avg_power == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_avg_power)
+                                };
                             }
                             21 => {
                                 let raw_max_power: u16 = extract_u16(&value.value);
-                                fit.activity.max_power = sanitize_u16(raw_max_power);
+                                fit.activity.max_power = if raw_max_power == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_max_power)
+                                };
                             }
                             22 => {
                                 let raw_ascent: u16 = extract_u16(&value.value);
-                                fit.activity.total_ascent = sanitize_u16(raw_ascent);
+                                fit.activity.total_ascent = if raw_ascent == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_ascent)
+                                };
                             }
                             24 => {
-                                fit.activity.total_training_effect = extract_u8(&value.value);
+                                let raw_tte: u8 = extract_u8(&value.value);
+                                fit.activity.total_training_effect = if raw_tte == u8::MAX {
+                                    None
+                                } else {
+                                    Some(raw_tte)
+                                };
                             }
                             33 => {
                                 let raw_num_lengths: u16 = extract_u16(&value.value);
-                                fit.activity.num_lengths = sanitize_u16(raw_num_lengths);
+                                fit.activity.num_lengths = if raw_num_lengths == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_num_lengths)
+                                };
                             }
                             34 => {
                                 let raw_np_power: u16 = extract_u16(&value.value);
-                                fit.activity.np_power = sanitize_u16(raw_np_power);
+                                fit.activity.np_power = if raw_np_power == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_np_power)
+                                };
                             }
                             35 => {
                                 let raw_tss: u16 = extract_u16(&value.value);
-                                fit.activity.training_stress_score = sanitize_u16(raw_tss);
+                                fit.activity.training_stress_score = if raw_tss == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_tss)
+                                };
                             }
                             36 => {
                                 let raw_if: u16 = extract_u16(&value.value);
-                                fit.activity.intensity_factor = sanitize_u16(raw_if);
+                                fit.activity.intensity_factor = if raw_if == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_if)
+                                };
                             }
                             44 => {
                                 let raw_pool_length: u16 = extract_u16(&value.value);
-                                fit.activity.pool_length = sanitize_u16(raw_pool_length) / 100;
+                                fit.activity.pool_length = if raw_pool_length == u16::MAX {
+                                    None
+                                } else {
+                                    Some(raw_pool_length / 100)
+                                };
                             }
                             57 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
-                                fit.activity.avg_temperature = sanitize_i8(raw_temp);
+                                fit.activity.avg_temperature = if raw_temp == i8::MAX {
+                                    None
+                                } else {
+                                    Some(raw_temp)
+                                };
                             }
                             58 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
-                                fit.activity.max_temperature = sanitize_i8(raw_temp);
+                                fit.activity.max_temperature = if raw_temp == i8::MAX {
+                                    None
+                                } else {
+                                    Some(raw_temp)
+                                };
                             }
                             150 => {
                                 let raw_temp: i8 = extract_i8(&value.value);
-                                fit.activity.min_temperature = sanitize_i8(raw_temp);
+                                fit.activity.min_temperature = if raw_temp == i8::MAX {
+                                    None
+                                } else {
+                                    Some(raw_temp)
+                                };
                             }
                             124 => {
                                 let raw_avg_speed: u32 = extract_u32(&value.value);
-                                fit.activity.avg_speed = sanitize_u32(raw_avg_speed);
+                                fit.activity.avg_speed = if raw_avg_speed == u32::MAX {
+                                    None
+                                } else {
+                                    Some(raw_avg_speed)
+                                };
                             }
                             253 => {
                                 fit.activity.timestamp = extract_u32(&value.value);

@@ -74,7 +74,7 @@ export const TracePoint = type({
   heart_rate: "number",
   speed: "number",
   cadence: "number | null",
-  power: "number",
+  power: "number | null",
   altitude: "number?",
   temperature: "number | null",
 });
@@ -98,9 +98,9 @@ export const Activity = type({
   total_elapsed_time: "number",
 
   total_distance: "number",
-  total_ascent: "number",
+  total_ascent: "number | null",
 
-  avg_speed: "number",
+  avg_speed: "number | null",
 
   avg_heart_rate: "number",
   max_heart_rate: "number",
@@ -108,15 +108,15 @@ export const Activity = type({
   avg_cadence: "number | null",
   max_cadence: "number | null",
 
-  avg_power: "number",
-  max_power: "number",
-  np_power: "number",
+  avg_power: "number | null",
+  max_power: "number | null",
+  np_power: "number | null",
 
-  total_calories: "number",
+  total_calories: "number | null",
 
-  total_training_effect: "number",
-  training_stress_score: "number",
-  intensity_factor: "number",
+  total_training_effect: "number | null",
+  training_stress_score: "number | null",
+  intensity_factor: "number | null",
 
   avg_temperature: "number | null",
   max_temperature: "number | null",
@@ -261,7 +261,7 @@ export const WeeklyActivitySummary = type({
   start_time: "number",
   total_distance: "number",
   total_timer_time: "number",
-  avg_speed: "number",
+  avg_speed: "number | null",
   avg_heart_rate: "number?",
   avg_power: "number?",
   race: "boolean",

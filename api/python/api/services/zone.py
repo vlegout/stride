@@ -185,15 +185,17 @@ class ZoneService:
                     1, int(len(threshold_candidates) * FASTEST_RUNS_PERCENTILE)
                 )
                 fastest_longer_runs = sorted(
-                    threshold_candidates, key=lambda x: x.avg_speed, reverse=True
+                    threshold_candidates, key=lambda x: x.avg_speed or 0, reverse=True
                 )[:num_candidates]
 
                 avg_threshold_speed_kmh = sum(
-                    a.avg_speed for a in fastest_longer_runs
+                    a.avg_speed for a in fastest_longer_runs if a.avg_speed is not None
                 ) / len(fastest_longer_runs)
                 threshold_pace = SECONDS_PER_KM_CONVERSION / avg_threshold_speed_kmh
             else:
-                speeds = sorted([a.avg_speed for a in running_activities])
+                speeds = sorted(
+                    [a.avg_speed for a in running_activities if a.avg_speed is not None]
+                )
                 start_idx = len(speeds) // 4
                 end_idx = start_idx + len(speeds) // 2
                 middle_speeds = (

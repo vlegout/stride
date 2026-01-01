@@ -6,7 +6,7 @@ import { colors } from "../../colors";
 
 interface StatsCardProps {
   title: string;
-  value: string | number;
+  value: string | number | null;
   variant?: "primary" | "default";
   size?: "small" | "large";
 }

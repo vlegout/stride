@@ -83,9 +83,9 @@ class ActivityBase(SQLModel):
     total_elapsed_time: float
 
     total_distance: float
-    total_ascent: float
+    total_ascent: float | None = None
 
-    avg_speed: float
+    avg_speed: float | None = None
 
     avg_heart_rate: float | None = None
     max_heart_rate: float | None = None
@@ -386,7 +386,7 @@ class WeeklyActivitySummary(BaseModel):
     start_time: int
     total_distance: float
     total_timer_time: float
-    avg_speed: float
+    avg_speed: float | None = None
     avg_heart_rate: float | None = None
     avg_power: float | None = None
     race: bool

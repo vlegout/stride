@@ -73,24 +73,31 @@ const ActivitiesTable = () => {
       id: "avg_speed",
       label: "Average Speed",
       sortable: true,
-      render: (value, row) => formatSpeed(value as number, row.sport as Sport),
+      render: (value, row) => formatSpeed(value as number, row.sport as Sport, "—"),
     },
     {
       id: "avg_power",
       label: "Avg Power",
       sortable: true,
+      format: (value) => (value ? Math.round(value as number).toString() : "—"),
     },
     {
       id: "total_ascent",
       label: "Total Ascent",
       sortable: true,
+      format: (value) => (value ? `${value}` : "—"),
     },
     {
       id: "total_calories",
       label: "Calories",
       sortable: true,
+      format: (value) => (value ? Math.round(value as number).toString() : "—"),
     },
-    { id: "total_training_effect", label: "Training Effect" },
+    {
+      id: "total_training_effect",
+      label: "Training Effect",
+      format: (value) => (value ? (value as number).toFixed(1) : "—"),
+    },
     {
       id: "training_stress_score",
       label: "TSS",

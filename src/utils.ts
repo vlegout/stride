@@ -18,7 +18,7 @@ function formatRunningPace(speed: number): string {
   return `${minutes}:${seconds.toString().padStart(2, "0")} /km`;
 }
 
-export function formatSpeed(speed: number, sport?: Sport, fallback = ""): string {
+export function formatSpeed(speed: number | null, sport?: Sport, fallback = ""): string {
   if (speed == null || speed === 0) return fallback;
 
   if (sport === "swimming") {

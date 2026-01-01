@@ -21,8 +21,8 @@
     "np_power": 334.0,
     "total_calories": 663.0,
     "total_training_effect": 3.4,
-    "training_stress_score": 0.0,
-    "intensity_factor": 0.0,
+    "training_stress_score": null,
+    "intensity_factor": null,
     "lat": 47.20601903868707,
     "lon": -1.5467374319897398,
     "delta_lat": 0.029992654522151677,
@@ -31,11 +31,11 @@
     "subdivision": null,
     "country": "France",
     "user_id": null,
-    "max_temperature": 0,
-    "avg_temperature": 0,
-    "min_temperature": 0,
+    "max_temperature": null,
+    "avg_temperature": null,
+    "min_temperature": null,
     "avg_cadence": 87,
     "max_cadence": 104,
-    "pool_length": 0,
-    "num_lengths": 0
+    "pool_length": null,
+    "num_lengths": null
 }
