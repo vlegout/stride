@@ -12,3 +12,7 @@ updates:
   directory: "/api"
   schedule:
     interval: "daily"
+- package-ecosystem: "cargo"
+  directory: "/api"
+  schedule:
+    interval: "daily"
