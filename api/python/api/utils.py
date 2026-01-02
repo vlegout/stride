@@ -242,7 +242,7 @@ def get_best_performance_power(
     ]
 
     if not valid_tracepoints:
-        return performance_powers
+        return []
 
     # For each time period, use efficient sliding window
     for period_idx, target_seconds in enumerate(period_seconds):
