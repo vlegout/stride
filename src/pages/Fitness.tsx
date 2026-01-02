@@ -15,7 +15,7 @@ import {
 
 import PageHeader from "../components/ui/PageHeader";
 import SectionContainer from "../components/ui/SectionContainer";
-import LoadingIndicator from "../components/LoadingIndicator";
+import QueryBoundary from "../components/QueryBoundary";
 import FitnessOverview from "../components/FitnessOverview";
 import FitnessScoreChart from "../components/FitnessScoreChart";
 import WeeklyMetricsCharts from "../components/WeeklyMetricsCharts";
@@ -31,46 +31,40 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const Fitness = () => {
   const [selectedRange, setSelectedRange] = useState<DateRangeOption>("1y");
 
-  const {
-    data: fitnessData,
-    isLoading,
-    error,
-  } = useQuery({
+  const query = useQuery({
     queryKey: ["fitness"],
     queryFn: fetchFitness,
   });
 
-  if (isLoading) {
-    return (
-      <Box sx={{ width: "100%" }}>
-        <PageHeader title="Fitness" />
-        <LoadingIndicator />
-      </Box>
-    );
-  }
+  return (
+    <QueryBoundary query={query} loadingMessage="Loading fitness data...">
+      {(fitnessData) => {
+        if (!fitnessData?.scores || !fitnessData?.weekly_tss) {
+          return (
+            <Box sx={{ width: "100%" }}>
+              <PageHeader title="Fitness" />
+              <SectionContainer>
+                <Typography>No fitness data available</Typography>
+              </SectionContainer>
+            </Box>
+          );
+        }
 
-  if (error) {
-    return (
-      <Box sx={{ width: "100%" }}>
-        <PageHeader title="Fitness" />
-        <SectionContainer>
-          <Typography color="error">Failed to load fitness data</Typography>
-        </SectionContainer>
-      </Box>
-    );
-  }
+        return (
+          <FitnessContent fitnessData={fitnessData} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
+        );
+      }}
+    </QueryBoundary>
+  );
+};
 
-  if (!fitnessData?.scores || !fitnessData?.weekly_tss) {
-    return (
-      <Box sx={{ width: "100%" }}>
-        <PageHeader title="Fitness" />
-        <SectionContainer>
-          <Typography>No fitness data available</Typography>
-        </SectionContainer>
-      </Box>
-    );
-  }
+interface FitnessContentProps {
+  fitnessData: NonNullable<Awaited<ReturnType<typeof fetchFitness>>>;
+  selectedRange: DateRangeOption;
+  setSelectedRange: (range: DateRangeOption) => void;
+}
 
+const FitnessContent = ({ fitnessData, selectedRange, setSelectedRange }: FitnessContentProps) => {
   const filteredScores = filterDataByDateRange(fitnessData.scores, selectedRange);
   const filteredWeeklyTss = filterWeeklyDataByDateRange(fitnessData.weekly_tss, selectedRange);
   const filteredWeeklyRunning = filterWeeklyDataByDateRange(fitnessData.weekly_running, selectedRange);

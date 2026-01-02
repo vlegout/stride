@@ -1,22 +1,22 @@
 import { useParams } from "react-router-dom";
 import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
 
-import LoadingIndicator from "../components/LoadingIndicator";
+import QueryBoundary from "../components/QueryBoundary";
 import ActivityPageView from "../components/ActivityPageView";
 
 import { useActivityData } from "../hooks";
 
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
+
 const ActivityPage = () => {
   const params = useParams();
-  const { data, error, isPending, isFetching } = useActivityData(params.id as string);
+  const query = useActivityData(params.id as string);
 
-  if (isPending || isFetching || error) {
-    return <LoadingIndicator message="Loading activity..." />;
-  }
-
-  ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
-
-  return <ActivityPageView data={data} />;
+  return (
+    <QueryBoundary query={query} loadingMessage="Loading activity...">
+      {(data) => <ActivityPageView data={data} />}
+    </QueryBoundary>
+  );
 };
 
 export default ActivityPage;
