@@ -54,6 +54,7 @@ class NotificationService:
                 Activity.sport == "running",
                 Activity.status == "created",
                 Activity.id != activity.id,
+                Activity.start_time < activity.start_time,
                 Performance.distance.in_(list(current_perfs.keys())),  # type: ignore[attr-defined]
                 Performance.time.is_not(None),  # type: ignore[union-attr]
             )
@@ -176,6 +177,7 @@ class NotificationService:
                 Activity.sport == "cycling",
                 Activity.status == "created",
                 Activity.id != activity.id,
+                Activity.start_time < activity.start_time,
                 PerformancePower.time.in_(list(current_perfs.keys())),  # type: ignore[attr-defined]
                 PerformancePower.power.is_not(None),  # type: ignore[attr-defined]
                 PerformancePower.power > 0,  # type: ignore[operator]
