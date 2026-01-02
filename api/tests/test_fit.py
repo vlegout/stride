@@ -5,8 +5,8 @@ import unittest
 import uuid
 from unittest.mock import Mock
 
-from api.cli import get_data
 from api.model import Location
+from api.services.fit_file import FitFileService
 
 
 class TestFit(unittest.TestCase):
@@ -32,10 +32,8 @@ class TestFit(unittest.TestCase):
         for fit_path in fit_files:
             json_path = os.path.splitext(fit_path)[0] + ".json"
 
-            activity, _, _, _, _, _ = get_data(
-                mock_session,
-                fit_path,
-            )
+            fit_service = FitFileService(mock_session)
+            activity, _, _ = fit_service.read_fit_file(fit_path)
 
             with open(json_path, "r") as f:
                 data = json.load(f)
