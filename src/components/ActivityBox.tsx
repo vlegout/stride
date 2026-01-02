@@ -4,7 +4,9 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Badge from "@mui/material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
@@ -40,11 +42,18 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
       ?.filter((point) => point.lat != null && point.lon != null)
       .map((point) => [point.lat, point.lon] as [number, number]) ?? [];
 
+  const notificationCount = activity.notifications?.length || 0;
+
   const title = isDetailed ? (
     <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
       <Box sx={{ flexGrow: 1 }}>
         <PageHeader title={activity.title} subtitle={locationText} />
       </Box>
+      {notificationCount > 0 && (
+        <Badge badgeContent={notificationCount} color="primary">
+          <EmojiEventsIcon color="action" />
+        </Badge>
+      )}
       <Button
         variant="outlined"
         size="small"
@@ -55,11 +64,18 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
       </Button>
     </Box>
   ) : (
-    <Typography variant={isSmall ? "h6" : "h5"}>
-      <MuiLink component={Link} to={`/activities/${activity.id}`}>
-        {activity.title}
-      </MuiLink>
-    </Typography>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Typography variant={isSmall ? "h6" : "h5"}>
+        <MuiLink component={Link} to={`/activities/${activity.id}`}>
+          {activity.title}
+        </MuiLink>
+      </Typography>
+      {notificationCount > 0 && (
+        <Badge badgeContent={notificationCount} color="primary">
+          <EmojiEventsIcon color="action" />
+        </Badge>
+      )}
+    </Box>
   );
 
   return (
