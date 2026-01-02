@@ -140,6 +140,7 @@ export const Activity = type({
   performances: Performance.array().optional(),
   performance_power: PowerPerformance.array().optional(),
   notifications: Notification.array().optional(),
+  "notification_count?": "number | null",
 });
 export type Activity = typeof Activity.infer;
 

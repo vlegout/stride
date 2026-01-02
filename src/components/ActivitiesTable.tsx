@@ -109,6 +109,11 @@ const ActivitiesTable = () => {
       label: "Race",
       render: (value) => (value ? "Yes" : "No"),
     },
+    {
+      id: "notification_count",
+      label: "Notifications",
+      format: (value) => (value ? `${value}` : "—"),
+    },
     { id: "device", label: "Device" },
   ];
 

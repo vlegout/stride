@@ -160,6 +160,7 @@ class ActivityPublicWithoutTracepoints(ActivityBase):
     laps: list["Lap"] = []
     performances: list["Performance"] = []
     performance_power: list["PerformancePower"] = []
+    notification_count: int = 0
 
 
 class Pagination(BaseModel):

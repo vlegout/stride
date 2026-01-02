@@ -18,7 +18,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import func, text
-from sqlmodel import Session, select
+from sqlmodel import Session, select, col
 from sqlalchemy.orm import selectinload
 
 from api.auth import create_token_response, Token
@@ -37,6 +37,7 @@ from api.model import (
     ActivityZoneHeartRatePublic,
     BestPerformanceItem,
     BestPerformanceResponse,
+    Notification,
     Pagination,
     Profile,
     User,
@@ -135,12 +136,31 @@ def read_activities(
 
     activities = session.exec(query).all()
 
+    notification_counts = {}
+    if not map:
+        activity_ids = [a.id for a in activities]
+        notification_count_query = (
+            select(col(Notification.activity_id), func.count(col(Notification.id)))
+            .where(col(Notification.activity_id).in_(activity_ids))
+            .group_by(col(Notification.activity_id))
+        )
+        notification_count_results = session.exec(notification_count_query).all()
+        notification_counts = {
+            activity_id: count for activity_id, count in notification_count_results
+        }
+
     activity_models: list[ActivityPublic | ActivityPublicWithoutTracepoints] = []
     if map:
         activity_models = [ActivityPublic.model_validate(a) for a in activities]
     else:
         activity_models = [
-            ActivityPublicWithoutTracepoints.model_validate(a) for a in activities
+            ActivityPublicWithoutTracepoints.model_validate(
+                {
+                    **a.model_dump(),
+                    "notification_count": notification_counts.get(a.id, 0),
+                }
+            )
+            for a in activities
         ]
 
     return ActivityList(
