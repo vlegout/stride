@@ -428,3 +428,87 @@ class TestNotificationService:
 
         assert len(notifications) == 1
         assert notifications[0].duration == datetime.timedelta(seconds=1200)
+
+    def test_detect_achievements_past_activity_ignores_future_same_year(
+        self, service, mock_session
+    ):
+        past_activity = Activity(
+            id=uuid.uuid4(),
+            sport="running",
+            user_id="test-user",
+            title="Past Run",
+            start_time=int(datetime.datetime(2024, 1, 15).timestamp()),
+            total_distance=10000,
+            total_elapsed_time=3000,
+            total_timer_time=3000,
+        )
+
+        performances = [
+            Performance(
+                id=uuid.uuid4(),
+                activity_id=past_activity.id,
+                distance=1000,
+                time=datetime.timedelta(minutes=3, seconds=45),
+            ),
+        ]
+
+        mock_historical_perf_future = Mock()
+        mock_historical_perf_future.time = datetime.timedelta(minutes=3, seconds=30)
+        mock_historical_perf_future.distance = 1000
+
+        future_same_year_timestamp = int(datetime.datetime(2024, 12, 15).timestamp())
+
+        mock_exec = Mock()
+        mock_exec.all.return_value = [
+            (mock_historical_perf_future, future_same_year_timestamp)
+        ]
+        mock_session.exec.return_value = mock_exec
+
+        notifications = service.detect_achievements(past_activity, performances)
+
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_yearly"
+        assert notifications[0].achievement_year == 2024
+
+    def test_detect_power_achievements_past_activity_ignores_future_same_year(
+        self, service, mock_session
+    ):
+        past_activity = Activity(
+            id=uuid.uuid4(),
+            sport="cycling",
+            user_id="test-user",
+            title="Past Ride",
+            start_time=int(datetime.datetime(2024, 1, 15).timestamp()),
+            total_distance=20000,
+            total_elapsed_time=3600,
+            total_timer_time=3600,
+        )
+
+        performance_powers = [
+            PerformancePower(
+                id=uuid.uuid4(),
+                activity_id=past_activity.id,
+                time=datetime.timedelta(seconds=300),
+                power=380.0,
+            ),
+        ]
+
+        mock_historical_perf_future = Mock()
+        mock_historical_perf_future.power = 400.0
+        mock_historical_perf_future.time = datetime.timedelta(seconds=300)
+
+        future_same_year_timestamp = int(datetime.datetime(2024, 12, 15).timestamp())
+
+        mock_exec = Mock()
+        mock_exec.all.return_value = [
+            (mock_historical_perf_future, future_same_year_timestamp)
+        ]
+        mock_session.exec.return_value = mock_exec
+
+        notifications = service.detect_power_achievements(
+            past_activity, performance_powers
+        )
+
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_yearly"
+        assert notifications[0].achievement_year == 2024
