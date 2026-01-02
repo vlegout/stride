@@ -51,6 +51,7 @@ export const Notification = type({
   duration: "string | null",
   power: "number | null",
   achievement_year: "number | null",
+  rank: "number | null",
   message: "string",
   created_at: "string",
 });

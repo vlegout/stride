@@ -88,6 +88,7 @@ class TestNotificationService:
         assert len(notifications) == 2
         assert all(n.type == "best_effort_all_time" for n in notifications)
         assert all(n.activity_id == running_activity.id for n in notifications)
+        assert all(n.rank == 1 for n in notifications)
         assert {n.distance for n in notifications} == {1000, 5000}
 
     def test_detect_achievements_new_all_time_best(
@@ -117,6 +118,7 @@ class TestNotificationService:
         assert len(notifications) == 1
         assert notifications[0].type == "best_effort_all_time"
         assert notifications[0].distance == 1000
+        assert notifications[0].rank == 1
         assert notifications[0].achievement_year is None
 
     def test_detect_achievements_new_yearly_best(
@@ -143,10 +145,11 @@ class TestNotificationService:
 
         notifications = service.detect_achievements(running_activity, performances)
 
+        # With top-5 logic, this creates all-time notification (rank 2)
         assert len(notifications) == 1
-        assert notifications[0].type == "best_effort_yearly"
+        assert notifications[0].type == "best_effort_all_time"
         assert notifications[0].distance == 1000
-        assert notifications[0].achievement_year == 2024
+        assert notifications[0].rank == 2
 
     def test_detect_achievements_no_improvement(
         self, service, running_activity, mock_session
@@ -174,7 +177,10 @@ class TestNotificationService:
 
         notifications = service.detect_achievements(running_activity, performances)
 
-        assert len(notifications) == 0
+        # With top-5 logic, this performance still makes top 5 (rank 2)
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_all_time"
+        assert notifications[0].rank == 2
 
     def test_detect_achievements_multiple_distances(
         self, service, running_activity, mock_session
@@ -215,6 +221,7 @@ class TestNotificationService:
 
         assert len(notifications) == 2
         assert all(n.type == "best_effort_all_time" for n in notifications)
+        assert all(n.rank == 1 for n in notifications)
         assert {n.distance for n in notifications} == {1000, 5000}
 
     def test_detect_achievements_filters_none_times(
@@ -295,6 +302,7 @@ class TestNotificationService:
         assert len(notifications) == 2
         assert all(n.type == "best_effort_all_time" for n in notifications)
         assert all(n.activity_id == cycling_activity.id for n in notifications)
+        assert all(n.rank == 1 for n in notifications)
         assert {n.duration for n in notifications} == {
             datetime.timedelta(seconds=5),
             datetime.timedelta(seconds=60),
@@ -329,6 +337,7 @@ class TestNotificationService:
         assert len(notifications) == 1
         assert notifications[0].type == "best_effort_all_time"
         assert notifications[0].duration == datetime.timedelta(seconds=300)
+        assert notifications[0].rank == 1
         assert notifications[0].achievement_year is None
 
     def test_detect_power_achievements_new_yearly_best(
@@ -357,10 +366,11 @@ class TestNotificationService:
             cycling_activity, performance_powers
         )
 
+        # With top-5 logic, this creates all-time notification (rank 2)
         assert len(notifications) == 1
-        assert notifications[0].type == "best_effort_yearly"
+        assert notifications[0].type == "best_effort_all_time"
         assert notifications[0].duration == datetime.timedelta(seconds=300)
-        assert notifications[0].achievement_year == 2024
+        assert notifications[0].rank == 2
 
     def test_detect_power_achievements_no_improvement(
         self, service, cycling_activity, mock_session
@@ -398,7 +408,10 @@ class TestNotificationService:
             cycling_activity, performance_powers
         )
 
-        assert len(notifications) == 0
+        # With top-5 logic, this performance still makes top 5 (rank 3)
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_all_time"
+        assert notifications[0].rank == 3
 
     def test_detect_power_achievements_filters_zero_power(
         self, service, cycling_activity, mock_session
@@ -466,9 +479,10 @@ class TestNotificationService:
 
         notifications = service.detect_achievements(past_activity, performances)
 
+        # With top-5 logic, this creates all-time notification (rank 2)
         assert len(notifications) == 1
-        assert notifications[0].type == "best_effort_yearly"
-        assert notifications[0].achievement_year == 2024
+        assert notifications[0].type == "best_effort_all_time"
+        assert notifications[0].rank == 2
 
     def test_detect_power_achievements_past_activity_ignores_future_same_year(
         self, service, mock_session
@@ -509,6 +523,192 @@ class TestNotificationService:
             past_activity, performance_powers
         )
 
+        # With top-5 logic, this creates all-time notification (rank 2)
         assert len(notifications) == 1
-        assert notifications[0].type == "best_effort_yearly"
-        assert notifications[0].achievement_year == 2024
+        assert notifications[0].type == "best_effort_all_time"
+        assert notifications[0].rank == 2
+
+    def test_detect_achievements_top_5_ranks(
+        self, service, running_activity, mock_session
+    ):
+        """Test that ranks 2-5 create notifications correctly."""
+        # Create 4 historical performances better than current
+        historical_perfs = []
+        for i, minutes in enumerate([3, 3.5, 4, 4.5]):
+            perf = Mock()
+            perf.time = datetime.timedelta(minutes=minutes)
+            perf.distance = 1000
+            historical_perfs.append(
+                (perf, int(datetime.datetime(2023, i + 1, 15).timestamp()))
+            )
+
+        mock_exec = Mock()
+        mock_exec.all.return_value = historical_perfs
+        mock_session.exec.return_value = mock_exec
+
+        # Current performance: 5 minutes (rank 5)
+        performances = [
+            Performance(
+                id=uuid.uuid4(),
+                activity_id=running_activity.id,
+                distance=1000,
+                time=datetime.timedelta(minutes=5),
+            ),
+        ]
+
+        notifications = service.detect_achievements(running_activity, performances)
+
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_all_time"
+        assert notifications[0].rank == 5
+        assert notifications[0].distance == 1000
+
+    def test_detect_achievements_sixth_place_no_notification(
+        self, service, running_activity, mock_session
+    ):
+        """Test that 6th place doesn't create a notification."""
+        # Create 5 historical performances better than current
+        historical_perfs = []
+        for i, minutes in enumerate([3, 3.5, 4, 4.5, 5]):
+            perf = Mock()
+            perf.time = datetime.timedelta(minutes=minutes)
+            perf.distance = 1000
+            historical_perfs.append(
+                (perf, int(datetime.datetime(2023, i + 1, 15).timestamp()))
+            )
+
+        mock_exec = Mock()
+        mock_exec.all.return_value = historical_perfs
+        mock_session.exec.return_value = mock_exec
+
+        # Current performance: 5.5 minutes (rank 6)
+        performances = [
+            Performance(
+                id=uuid.uuid4(),
+                activity_id=running_activity.id,
+                distance=1000,
+                time=datetime.timedelta(minutes=5.5),
+            ),
+        ]
+
+        notifications = service.detect_achievements(running_activity, performances)
+
+        assert len(notifications) == 0
+
+    def test_detect_power_achievements_top_5_ranks(
+        self, service, cycling_activity, mock_session
+    ):
+        """Test that ranks 2-5 create notifications correctly for power."""
+        # Create 3 historical performances better than current
+        historical_perfs = []
+        for i, power in enumerate([500, 450, 400]):
+            perf = Mock()
+            perf.power = power
+            perf.time = datetime.timedelta(seconds=300)
+            historical_perfs.append(
+                (perf, int(datetime.datetime(2023, i + 1, 15).timestamp()))
+            )
+
+        mock_exec = Mock()
+        mock_exec.all.return_value = historical_perfs
+        mock_session.exec.return_value = mock_exec
+
+        # Current performance: 350W (rank 4)
+        performance_powers = [
+            PerformancePower(
+                id=uuid.uuid4(),
+                activity_id=cycling_activity.id,
+                time=datetime.timedelta(seconds=300),
+                power=350.0,
+            ),
+        ]
+
+        notifications = service.detect_power_achievements(
+            cycling_activity, performance_powers
+        )
+
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_all_time"
+        assert notifications[0].rank == 4
+        assert notifications[0].duration == datetime.timedelta(seconds=300)
+
+    def test_detect_power_achievements_sixth_place_no_notification(
+        self, service, cycling_activity, mock_session
+    ):
+        """Test that 6th place doesn't create a notification for power."""
+        # Create 5 historical performances better than current
+        historical_perfs = []
+        for i, power in enumerate([500, 450, 400, 380, 360]):
+            perf = Mock()
+            perf.power = power
+            perf.time = datetime.timedelta(seconds=300)
+            historical_perfs.append(
+                (perf, int(datetime.datetime(2023, i + 1, 15).timestamp()))
+            )
+
+        mock_exec = Mock()
+        mock_exec.all.return_value = historical_perfs
+        mock_session.exec.return_value = mock_exec
+
+        # Current performance: 340W (rank 6)
+        performance_powers = [
+            PerformancePower(
+                id=uuid.uuid4(),
+                activity_id=cycling_activity.id,
+                time=datetime.timedelta(seconds=300),
+                power=340.0,
+            ),
+        ]
+
+        notifications = service.detect_power_achievements(
+            cycling_activity, performance_powers
+        )
+
+        assert len(notifications) == 0
+
+    def test_detect_achievements_yearly_top_5(
+        self, service, running_activity, mock_session
+    ):
+        """Test yearly top 5 notifications."""
+        # Create historical performances: 2 from previous year, 2 from current year
+        historical_perfs = [
+            # All-time bests from 2023
+            (
+                Mock(time=datetime.timedelta(minutes=3), distance=1000),
+                int(datetime.datetime(2023, 6, 15).timestamp()),
+            ),
+            (
+                Mock(time=datetime.timedelta(minutes=3.2), distance=1000),
+                int(datetime.datetime(2023, 7, 15).timestamp()),
+            ),
+            # Current year performances
+            (
+                Mock(time=datetime.timedelta(minutes=3.8), distance=1000),
+                int(datetime.datetime(2024, 3, 15).timestamp()),
+            ),
+            (
+                Mock(time=datetime.timedelta(minutes=4), distance=1000),
+                int(datetime.datetime(2024, 4, 15).timestamp()),
+            ),
+        ]
+
+        mock_exec = Mock()
+        mock_exec.all.return_value = historical_perfs
+        mock_session.exec.return_value = mock_exec
+
+        # Current performance: 3.9 minutes (rank 2 for 2024, rank 5 all-time)
+        performances = [
+            Performance(
+                id=uuid.uuid4(),
+                activity_id=running_activity.id,
+                distance=1000,
+                time=datetime.timedelta(minutes=3.9),
+            ),
+        ]
+
+        notifications = service.detect_achievements(running_activity, performances)
+
+        # Should create all-time notification (rank 4 - sorted: 3, 3.2, 3.8, 3.9, 4)
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_all_time"
+        assert notifications[0].rank == 4

@@ -1,3 +1,4 @@
+import bisect
 import datetime
 
 from sqlmodel import Session, select
@@ -87,6 +88,7 @@ class NotificationService:
                         type="best_effort_all_time",
                         distance=target_distance,
                         achievement_year=None,
+                        rank=1,
                         message="",
                     )
                 )
@@ -99,28 +101,46 @@ class NotificationService:
                 if year == current_year and start_time < activity.start_time
             ]
 
-            all_time_best = min(all_times)
+            # Check all-time top 5
+            all_times_sorted = sorted(all_times)
+            if len(all_times) < 5 or current_perf.time <= all_times_sorted[4]:
+                rank = bisect.bisect_left(all_times_sorted, current_perf.time) + 1
+                if rank <= 5:
+                    notifications.append(
+                        Notification(
+                            activity_id=activity.id,
+                            type="best_effort_all_time",
+                            distance=target_distance,
+                            achievement_year=None,
+                            rank=rank,
+                            message="",
+                        )
+                    )
 
-            if current_perf.time < all_time_best:
-                notifications.append(
-                    Notification(
-                        activity_id=activity.id,
-                        type="best_effort_all_time",
-                        distance=target_distance,
-                        achievement_year=None,
-                        message="",
+            # Check yearly top 5
+            if yearly_times:
+                yearly_times_sorted = sorted(yearly_times)
+                if len(yearly_times) < 5 or current_perf.time <= yearly_times_sorted[4]:
+                    rank = (
+                        bisect.bisect_left(yearly_times_sorted, current_perf.time) + 1
                     )
-                )
-            elif not yearly_times or current_perf.time < min(yearly_times):
-                notifications.append(
-                    Notification(
-                        activity_id=activity.id,
-                        type="best_effort_yearly",
-                        distance=target_distance,
-                        achievement_year=current_year,
-                        message="",
-                    )
-                )
+                    if rank <= 5:
+                        # Only create yearly notification if not already created all-time
+                        if not any(
+                            n.type == "best_effort_all_time"
+                            and n.distance == target_distance
+                            for n in notifications
+                        ):
+                            notifications.append(
+                                Notification(
+                                    activity_id=activity.id,
+                                    type="best_effort_yearly",
+                                    distance=target_distance,
+                                    achievement_year=current_year,
+                                    rank=rank,
+                                    message="",
+                                )
+                            )
 
         return notifications
 
@@ -192,6 +212,7 @@ class NotificationService:
                         duration=target_duration,
                         power=current_perf.power,
                         achievement_year=None,
+                        rank=1,
                         message="",
                     )
                 )
@@ -204,29 +225,58 @@ class NotificationService:
                 if year == current_year and start_time < activity.start_time
             ]
 
-            all_time_best = max(all_powers)
+            # Check all-time top 5 (higher power is better, so sort descending)
+            all_powers_sorted = sorted(all_powers, reverse=True)
+            if len(all_powers) < 5 or current_perf.power >= all_powers_sorted[4]:
+                rank = (
+                    bisect.bisect_left(
+                        [-p for p in all_powers_sorted], -current_perf.power
+                    )
+                    + 1
+                )
+                if rank <= 5:
+                    notifications.append(
+                        Notification(
+                            activity_id=activity.id,
+                            type="best_effort_all_time",
+                            duration=target_duration,
+                            power=current_perf.power,
+                            achievement_year=None,
+                            rank=rank,
+                            message="",
+                        )
+                    )
 
-            if current_perf.power > all_time_best:
-                notifications.append(
-                    Notification(
-                        activity_id=activity.id,
-                        type="best_effort_all_time",
-                        duration=target_duration,
-                        power=current_perf.power,
-                        achievement_year=None,
-                        message="",
+            # Check yearly top 5
+            if yearly_powers:
+                yearly_powers_sorted = sorted(yearly_powers, reverse=True)
+                if (
+                    len(yearly_powers) < 5
+                    or current_perf.power >= yearly_powers_sorted[4]
+                ):
+                    rank = (
+                        bisect.bisect_left(
+                            [-p for p in yearly_powers_sorted], -current_perf.power
+                        )
+                        + 1
                     )
-                )
-            elif not yearly_powers or current_perf.power > max(yearly_powers):
-                notifications.append(
-                    Notification(
-                        activity_id=activity.id,
-                        type="best_effort_yearly",
-                        duration=target_duration,
-                        power=current_perf.power,
-                        achievement_year=current_year,
-                        message="",
-                    )
-                )
+                    if rank <= 5:
+                        # Only create yearly notification if not already created all-time
+                        if not any(
+                            n.type == "best_effort_all_time"
+                            and n.duration == target_duration
+                            for n in notifications
+                        ):
+                            notifications.append(
+                                Notification(
+                                    activity_id=activity.id,
+                                    type="best_effort_yearly",
+                                    duration=target_duration,
+                                    power=current_perf.power,
+                                    achievement_year=current_year,
+                                    rank=rank,
+                                    message="",
+                                )
+                            )
 
         return notifications
