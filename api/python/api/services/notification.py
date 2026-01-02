@@ -59,14 +59,18 @@ class NotificationService:
         )
         historical_results = self.session.exec(stmt).all()
 
-        historical_by_distance: dict[float, list[tuple[datetime.timedelta, int]]] = {}
+        historical_by_distance: dict[
+            float, list[tuple[datetime.timedelta, int, int]]
+        ] = {}
         for perf, start_time in historical_results:
             if perf.time is None:
                 continue
             if perf.distance not in historical_by_distance:
                 historical_by_distance[perf.distance] = []
             perf_year = datetime.date.fromtimestamp(start_time).year
-            historical_by_distance[perf.distance].append((perf.time, perf_year))
+            historical_by_distance[perf.distance].append(
+                (perf.time, perf_year, start_time)
+            )
 
         notifications = []
 
@@ -88,9 +92,11 @@ class NotificationService:
                 )
                 continue
 
-            all_times = [time for time, _ in historical_data]
+            all_times = [time for time, _, _ in historical_data]
             yearly_times = [
-                time for time, year in historical_data if year == current_year
+                time
+                for time, year, start_time in historical_data
+                if year == current_year and start_time < activity.start_time
             ]
 
             all_time_best = min(all_times)
@@ -157,14 +163,18 @@ class NotificationService:
         )
         historical_results = self.session.exec(stmt).all()
 
-        historical_by_duration: dict[datetime.timedelta, list[tuple[float, int]]] = {}
+        historical_by_duration: dict[
+            datetime.timedelta, list[tuple[float, int, int]]
+        ] = {}
         for perf, start_time in historical_results:
             if perf.power is None or perf.power <= 0:
                 continue
             if perf.time not in historical_by_duration:
                 historical_by_duration[perf.time] = []
             perf_year = datetime.date.fromtimestamp(start_time).year
-            historical_by_duration[perf.time].append((perf.power, perf_year))
+            historical_by_duration[perf.time].append(
+                (perf.power, perf_year, start_time)
+            )
 
         notifications = []
 
@@ -187,9 +197,11 @@ class NotificationService:
                 )
                 continue
 
-            all_powers = [power for power, _ in historical_data]
+            all_powers = [power for power, _, _ in historical_data]
             yearly_powers = [
-                power for power, year in historical_data if year == current_year
+                power
+                for power, year, start_time in historical_data
+                if year == current_year and start_time < activity.start_time
             ]
 
             all_time_best = max(all_powers)
