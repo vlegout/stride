@@ -944,7 +944,6 @@ def recompute_activities(
                 original_title = activity.title
                 original_description = activity.description
                 original_race = activity.race
-                original_user_id = activity.user_id
 
                 fit_path, _ = get_fit_file_path(
                     activity, fit_dir, storage_service, download_from_s3
@@ -966,7 +965,7 @@ def recompute_activities(
                     continue
 
                 try:
-                    new_activity, new_laps, new_tracepoints = get_activity_from_fit(
+                    parsed_activity, new_laps, new_tracepoints = get_activity_from_fit(
                         session,
                         fit_path,
                         title=original_title,
@@ -979,8 +978,48 @@ def recompute_activities(
                     error_count += 1
                     continue
 
-                print("  Deleting old data...")
+                print("  Updating activity with new FIT data...")
 
+                # Update existing activity object with parsed FIT data
+                # Note: Activity object is NOT deleted, only updated in place
+                # Only update fields that come from FIT file parsing
+                fit_fields_to_update = [
+                    "sport",
+                    "device",
+                    "timestamp",
+                    "total_timer_time",
+                    "total_elapsed_time",
+                    "total_distance",
+                    "total_ascent",
+                    "avg_speed",
+                    "avg_heart_rate",
+                    "max_heart_rate",
+                    "avg_cadence",
+                    "max_cadence",
+                    "avg_power",
+                    "max_power",
+                    "np_power",
+                    "total_calories",
+                    "total_training_effect",
+                    "training_stress_score",
+                    "intensity_factor",
+                    "avg_temperature",
+                    "max_temperature",
+                    "min_temperature",
+                    "pool_length",
+                    "num_lengths",
+                ]
+
+                for field in fit_fields_to_update:
+                    value = getattr(parsed_activity, field, None)
+                    setattr(activity, field, value)
+
+                activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
+
+                print("  Deleting and recreating related resources...")
+
+                # Delete related resources (laps, tracepoints, performances, zones, notifications)
+                # These will be recreated from the FIT file
                 session.exec(delete(Lap).where(Lap.activity_id == activity.id))  # type: ignore[arg-type]
                 session.exec(
                     delete(Tracepoint).where(Tracepoint.activity_id == activity.id)  # type: ignore[arg-type]
@@ -1011,16 +1050,6 @@ def recompute_activities(
                 session.exec(
                     delete(Notification).where(Notification.activity_id == activity.id)  # type: ignore[arg-type]
                 )
-
-                print("  Updating activity data...")
-
-                for field, value in new_activity.model_dump(exclude={"id"}).items():
-                    if field not in ["title", "description", "race", "user_id"]:
-                        setattr(activity, field, value)
-
-                activity.user_id = original_user_id
-                activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
-                session.add(activity)
 
                 for lap in new_laps:
                     lap.activity_id = activity.id
