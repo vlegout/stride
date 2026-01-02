@@ -18,17 +18,33 @@ const formatDuration = (duration: string): string => {
   return `${Math.round(seconds)}s`;
 };
 
+const getOrdinal = (rank: number | null): string => {
+  if (!rank) return "";
+  const suffixes = ["th", "st", "nd", "rd"];
+  const v = rank % 100;
+  return rank + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+};
+
 const getNotificationMessage = (notification: Notification): string => {
+  const rank = notification.rank || 1;
+  const ordinal = getOrdinal(rank);
+
   if (notification.duration) {
     const durationLabel = formatDuration(notification.duration);
     const powerLabel = notification.power ? `${Math.round(notification.power)}W` : "";
 
     if (notification.type === "best_effort_all_time") {
-      return `Personal Best Power ${durationLabel}: ${powerLabel}!`;
+      if (rank === 1) {
+        return `Personal Best Power ${durationLabel}: ${powerLabel}!`;
+      }
+      return `${ordinal} Best Power ${durationLabel} of All Time: ${powerLabel}!`;
     }
 
     if (notification.type === "best_effort_yearly" && notification.achievement_year) {
-      return `Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
+      if (rank === 1) {
+        return `Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
+      }
+      return `${ordinal} Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
     }
   }
 
@@ -37,11 +53,17 @@ const getNotificationMessage = (notification: Notification): string => {
     const distanceLabel = `${distanceKm}km`;
 
     if (notification.type === "best_effort_all_time") {
-      return `Personal Best ${distanceLabel}!`;
+      if (rank === 1) {
+        return `Personal Best ${distanceLabel}!`;
+      }
+      return `${ordinal} Best ${distanceLabel} of All Time!`;
     }
 
     if (notification.type === "best_effort_yearly" && notification.achievement_year) {
-      return `Best ${distanceLabel} of ${notification.achievement_year}!`;
+      if (rank === 1) {
+        return `Best ${distanceLabel} of ${notification.achievement_year}!`;
+      }
+      return `${ordinal} Best ${distanceLabel} of ${notification.achievement_year}!`;
     }
   }
 
