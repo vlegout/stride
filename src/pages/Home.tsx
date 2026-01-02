@@ -1,15 +1,15 @@
-import LoadingIndicator from "../components/LoadingIndicator";
+import QueryBoundary from "../components/QueryBoundary";
 import HomePageView from "../components/HomePageView";
 import { useHomeActivities } from "../hooks";
 
 const Home = () => {
-  const { data, error, isPending, isFetching } = useHomeActivities();
+  const query = useHomeActivities();
 
-  if (isPending || isFetching || error) {
-    return <LoadingIndicator message="Loading activities..." />;
-  }
-
-  return <HomePageView activities={data.activities} />;
+  return (
+    <QueryBoundary query={query} loadingMessage="Loading activities...">
+      {(data) => <HomePageView activities={data.activities} />}
+    </QueryBoundary>
+  );
 };
 
 export default Home;

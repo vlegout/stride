@@ -8,7 +8,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { fetchBestPerformances } from "../api";
 import { formatDistance, formatDuration } from "../utils";
-import LoadingIndicator from "../components/LoadingIndicator";
+import QueryBoundary from "../components/QueryBoundary";
 import PerformanceFilters from "../components/PerformanceFilters";
 import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
 
@@ -21,7 +21,7 @@ const Best = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { data, error, isPending, isFetching } = useQuery({
+  const query = useQuery({
     queryKey: ["best", sport, selectedDistance, selectedTime, selectedYear],
     queryFn: () =>
       fetchBestPerformances(
@@ -43,82 +43,84 @@ const Best = () => {
     }
   };
 
-  if (isPending || isFetching || error) {
-    return <LoadingIndicator message="Loading best performances..." />;
-  }
-
-  const columns: Column[] = [
-    {
-      id: "rank",
-      label: "#",
-      width: "10%",
-      align: "center" as const,
-    },
-    {
-      id: "value",
-      label: sport === "cycling" ? "Power (W)" : "Time",
-      width: "20%",
-      align: "center" as const,
-    },
-    {
-      id: "activity_title",
-      label: "Activity",
-      width: "35%",
-      render: (value, row) => (
-        <MuiLink component={Link} to={`/activities/${row.id}`}>
-          {value as string}
-        </MuiLink>
-      ),
-    },
-    {
-      id: "activity_date",
-      label: "Date",
-      width: "20%",
-      align: "center" as const,
-    },
-    {
-      id: "activity_distance",
-      label: "Distance",
-      width: "15%",
-      align: "center" as const,
-    },
-  ];
-
-  const rows =
-    data?.performances.map((performance, index) => ({
-      id: performance.activity.id,
-      rank: index + 1,
-      value: sport === "cycling" ? `${Math.round(performance.value)} W` : formatDuration(performance.value),
-      activity_title: performance.activity.title,
-      activity_date: new Date(performance.activity.start_time * 1000).toLocaleDateString(),
-      activity_distance: formatDistance(performance.activity.total_distance),
-    })) || [];
-
   return (
-    <Box sx={{ width: "100%" }}>
-      <PageHeader title="Best Performances" />
+    <QueryBoundary query={query} loadingMessage="Loading best performances...">
+      {(data) => {
+        const columns: Column[] = [
+          {
+            id: "rank",
+            label: "#",
+            width: "10%",
+            align: "center" as const,
+          },
+          {
+            id: "value",
+            label: sport === "cycling" ? "Power (W)" : "Time",
+            width: "20%",
+            align: "center" as const,
+          },
+          {
+            id: "activity_title",
+            label: "Activity",
+            width: "35%",
+            render: (value, row) => (
+              <MuiLink component={Link} to={`/activities/${row.id}`}>
+                {value as string}
+              </MuiLink>
+            ),
+          },
+          {
+            id: "activity_date",
+            label: "Date",
+            width: "20%",
+            align: "center" as const,
+          },
+          {
+            id: "activity_distance",
+            label: "Distance",
+            width: "15%",
+            align: "center" as const,
+          },
+        ];
 
-      <SectionContainer maxWidth={{ xs: "100%", sm: "800px", md: "1000px" }} centered variant="paper">
-        <PerformanceFilters
-          sport={sport}
-          selectedDistance={selectedDistance}
-          selectedTime={selectedTime}
-          selectedYear={selectedYear}
-          onSportChange={handleSportChange}
-          onDistanceChange={setSelectedDistance}
-          onTimeChange={setSelectedTime}
-          onYearChange={setSelectedYear}
-        />
+        const rows =
+          data?.performances.map((performance, index) => ({
+            id: performance.activity.id,
+            rank: index + 1,
+            value: sport === "cycling" ? `${Math.round(performance.value)} W` : formatDuration(performance.value),
+            activity_title: performance.activity.title,
+            activity_date: new Date(performance.activity.start_time * 1000).toLocaleDateString(),
+            activity_distance: formatDistance(performance.activity.total_distance),
+          })) || [];
 
-        <DataTable
-          columns={columns}
-          rows={rows}
-          minWidth={isMobile ? 400 : 700}
-          responsive
-          emptyMessage={`No ${sport} performances found`}
-        />
-      </SectionContainer>
-    </Box>
+        return (
+          <Box sx={{ width: "100%" }}>
+            <PageHeader title="Best Performances" />
+
+            <SectionContainer maxWidth={{ xs: "100%", sm: "800px", md: "1000px" }} centered variant="paper">
+              <PerformanceFilters
+                sport={sport}
+                selectedDistance={selectedDistance}
+                selectedTime={selectedTime}
+                selectedYear={selectedYear}
+                onSportChange={handleSportChange}
+                onDistanceChange={setSelectedDistance}
+                onTimeChange={setSelectedTime}
+                onYearChange={setSelectedYear}
+              />
+
+              <DataTable
+                columns={columns}
+                rows={rows}
+                minWidth={isMobile ? 400 : 700}
+                responsive
+                emptyMessage={`No ${sport} performances found`}
+              />
+            </SectionContainer>
+          </Box>
+        );
+      }}
+    </QueryBoundary>
   );
 };
 

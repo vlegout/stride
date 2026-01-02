@@ -7,7 +7,7 @@ import { fetchWeeks } from "../api";
 import type { Sport } from "../types";
 import { formatDate, formatDuration, formatDistance, formatSpeed } from "../utils";
 import ActivityLogo from "../components/ActivityLogo";
-import LoadingIndicator from "../components/LoadingIndicator";
+import QueryBoundary from "../components/QueryBoundary";
 import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../components/ui";
 
 interface ActivityRow {
@@ -17,35 +17,33 @@ interface ActivityRow {
 }
 
 const WeeksPage = () => {
-  const {
-    data: weeksData,
-    isLoading,
-    error,
-  } = useQuery({
+  const query = useQuery({
     queryKey: ["weeks"],
     queryFn: fetchWeeks,
   });
 
-  if (isLoading) {
-    return <LoadingIndicator message="Loading weekly summary..." />;
-  }
+  return (
+    <QueryBoundary query={query} loadingMessage="Loading weekly summary...">
+      {(weeksData) => {
+        if (!weeksData || !weeksData.weeks) {
+          return (
+            <Box sx={{ mt: 2 }}>
+              <Alert severity="info">No weeks data available</Alert>
+            </Box>
+          );
+        }
 
-  if (error) {
-    return (
-      <Box sx={{ mt: 2 }}>
-        <Alert severity="error">Failed to load weeks data</Alert>
-      </Box>
-    );
-  }
+        return <WeeksContent weeksData={weeksData} />;
+      }}
+    </QueryBoundary>
+  );
+};
 
-  if (!weeksData || !weeksData.weeks) {
-    return (
-      <Box sx={{ mt: 2 }}>
-        <Alert severity="info">No weeks data available</Alert>
-      </Box>
-    );
-  }
+interface WeeksContentProps {
+  weeksData: NonNullable<Awaited<ReturnType<typeof fetchWeeks>>>;
+}
 
+const WeeksContent = ({ weeksData }: WeeksContentProps) => {
   const activityColumns: Column<ActivityRow>[] = [
     {
       id: "start_time",
