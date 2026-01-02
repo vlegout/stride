@@ -61,3 +61,14 @@ class StorageService:
             raise StorageServiceError(
                 f"Failed to upload content to S3: {str(e)}"
             ) from e
+
+    def download_file(self, s3_key: str, local_path: str) -> None:
+        try:
+            self.client.download_file(self.bucket, s3_key, local_path)
+        except ClientError as e:
+            error_code = e.response.get("Error", {}).get("Code", "")
+            if error_code == "404" or error_code == "NoSuchKey":
+                raise StorageServiceError(f"File not found in S3: {s3_key}") from e
+            raise StorageServiceError(
+                f"Failed to download file from S3: {str(e)}"
+            ) from e

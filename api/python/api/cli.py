@@ -9,34 +9,36 @@ import httpx
 import typer
 import yaml
 
-from sqlmodel import Session, SQLModel, select
+from sqlmodel import Session, SQLModel, delete, select
 
 from api.db import engine
 from api.fit import get_activity_from_fit
+from api.fitness import update_ftp_for_date
 from api.model import (
     Activity,
     ActivityZoneHeartRate,
     ActivityZonePace,
     ActivityZonePower,
+    Ftp,
     Lap,
     Location,
+    Notification,
     Performance,
     PerformancePower,
     Tracepoint,
     User,
     Zone,
-    Ftp,
 )
+from api.services.storage import StorageService
 from api.utils import (
-    calculate_activity_zone_data,
-    get_best_performances,
-    get_best_performance_power,
-    get_activity_location,
-    update_user_zones_from_activities,
-    create_default_zones,
     MAX_TRACEPOINTS_FOR_RESPONSE,
+    calculate_activity_zone_data,
+    create_default_zones,
+    get_activity_location,
+    get_best_performance_power,
+    get_best_performances,
+    update_user_zones_from_activities,
 )
-from api.fitness import update_ftp_for_date
 
 NB_CPUS = 2
 
@@ -68,6 +70,43 @@ def fetch_location(lat: float, lon: float, activity_id: uuid.UUID) -> Location |
         subdivision=data.get("principalSubdivision"),
         country=data.get("countryName"),
     )
+
+
+def get_fit_file_path(
+    activity: Activity,
+    fit_dir: str,
+    storage_service: StorageService | None,
+    download_from_s3: bool,
+) -> tuple[str | None, bool]:
+    path = os.path.join(fit_dir, activity.fit)
+
+    # Validate path to prevent directory traversal attacks
+    if not os.path.abspath(path).startswith(os.path.abspath(fit_dir)):
+        raise ValueError(
+            f"Invalid FIT filename (path traversal detected): {activity.fit}"
+        )
+
+    if os.path.exists(path):
+        return path, False
+
+    if download_from_s3 and storage_service:
+        # Validate filename doesn't contain path traversal characters
+        if ".." in activity.fit or activity.fit.startswith("/"):
+            raise ValueError(
+                f"Invalid FIT filename for S3 (contains path traversal): {activity.fit}"
+            )
+
+        s3_key = f"data/fit/{activity.fit}"
+
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            storage_service.download_file(s3_key, path)
+            return path, True
+        except Exception as e:
+            print(f"  Failed to download from S3: {e}")
+            return None, False
+
+    return None, False
 
 
 def get_activity_from_yaml(
@@ -115,7 +154,7 @@ def get_data(
     original_tracepoints = tracepoints.copy()
 
     while len(tracepoints) > MAX_TRACEPOINTS_FOR_RESPONSE:
-        tracepoints = [tp for idx, tp in enumerate(tracepoints) if idx % 2 == 0]
+        tracepoints = [tp for i, tp in enumerate(tracepoints) if i % 2 == 0]
 
     return (
         activity,
@@ -806,6 +845,259 @@ def update_activity_zones():
     print(f"  Processed: {processed_count} activities")
     print(f"  Skipped: {skipped_count} activities")
     print(f"  Errors: {error_count} activities")
+
+
+@app.command()
+def recompute_activities(
+    fit_dir: str = typer.Option(
+        "./data/fit",
+        "--fit-dir",
+        "-d",
+        help="Directory containing FIT files",
+    ),
+    user_email: str | None = typer.Option(
+        None, "--user", "-u", help="Only recompute for specific user"
+    ),
+    activity_id: str | None = typer.Option(
+        None, "--activity-id", "-a", help="Recompute specific activity by ID"
+    ),
+    start_date: str | None = typer.Option(
+        None, "--start-date", "-s", help="Start date (YYYY-MM-DD)"
+    ),
+    end_date: str | None = typer.Option(
+        None, "--end-date", "-e", help="End date (YYYY-MM-DD)"
+    ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview without changes"),
+    download_from_s3: bool = typer.Option(
+        True, "--download-s3/--no-download-s3", help="Download from S3 if missing"
+    ),
+    batch_size: int = typer.Option(
+        10, "--batch-size", "-b", help="Commit every N activities"
+    ),
+):
+    """Recompute activity data from FIT files while preserving title, description, and race."""
+    from api.services.notification import NotificationService
+
+    session = Session(engine)
+
+    try:
+        query = select(Activity).where(Activity.status == "created")
+
+        if user_email:
+            user = session.exec(select(User).where(User.email == user_email)).first()
+            if not user:
+                print(f"User with email {user_email} not found")
+                return
+            query = query.where(Activity.user_id == user.id)
+
+        if activity_id:
+            try:
+                activity_uuid = uuid.UUID(activity_id)
+                query = query.where(Activity.id == activity_uuid)
+            except ValueError:
+                print(f"Invalid activity ID: {activity_id}")
+                return
+
+        if start_date:
+            try:
+                start_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+                start_timestamp = int(start_dt.timestamp())
+                query = query.where(Activity.start_time >= start_timestamp)
+            except ValueError:
+                print(f"Invalid start date format: {start_date}. Use YYYY-MM-DD")
+                return
+
+        if end_date:
+            try:
+                end_dt = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+                end_timestamp = int(end_dt.timestamp())
+                query = query.where(Activity.start_time <= end_timestamp)
+            except ValueError:
+                print(f"Invalid end date format: {end_date}. Use YYYY-MM-DD")
+                return
+
+        query = query.order_by(Activity.start_time)  # type: ignore[arg-type]
+
+        activities = session.exec(query).all()
+
+        print(f"Found {len(activities)} activities to recompute")
+        if dry_run:
+            print("DRY RUN MODE - No changes will be made")
+
+        storage_service = None
+        if download_from_s3:
+            try:
+                storage_service = StorageService()
+            except Exception as e:
+                print(f"Warning: Could not initialize S3 storage: {e}")
+                print("Will only use local FIT files")
+
+        processed_count = 0
+        skipped_count = 0
+        error_count = 0
+
+        for idx, activity in enumerate(activities, 1):
+            try:
+                print(f"\n[{idx}/{len(activities)}] Processing activity {activity.id}")
+                print(f"  Current: {activity.title} ({activity.sport}, {activity.fit})")
+
+                original_title = activity.title
+                original_description = activity.description
+                original_race = activity.race
+                original_user_id = activity.user_id
+
+                fit_path, _ = get_fit_file_path(
+                    activity, fit_dir, storage_service, download_from_s3
+                )
+
+                if not fit_path:
+                    print(f"  SKIPPED: FIT file not found - {activity.fit}")
+                    skipped_count += 1
+                    continue
+
+                print(f"  Using FIT file: {fit_path}")
+
+                if dry_run:
+                    print(f"  DRY RUN: Would recompute from {fit_path}")
+                    print(
+                        f"  DRY RUN: Would preserve - Title: '{original_title}', Race: {original_race}"
+                    )
+                    processed_count += 1
+                    continue
+
+                try:
+                    new_activity, new_laps, new_tracepoints = get_activity_from_fit(
+                        session,
+                        fit_path,
+                        title=original_title,
+                        description=original_description or "",
+                        race=original_race,
+                        fit_name=activity.fit,
+                    )
+                except Exception as e:
+                    print(f"  ERROR parsing FIT file: {e}")
+                    error_count += 1
+                    continue
+
+                print("  Deleting old data...")
+
+                session.exec(delete(Lap).where(Lap.activity_id == activity.id))  # type: ignore[arg-type]
+                session.exec(
+                    delete(Tracepoint).where(Tracepoint.activity_id == activity.id)  # type: ignore[arg-type]
+                )
+                session.exec(
+                    delete(Performance).where(Performance.activity_id == activity.id)  # type: ignore[arg-type]
+                )
+                session.exec(
+                    delete(PerformancePower).where(
+                        PerformancePower.activity_id == activity.id  # type: ignore[arg-type]
+                    )
+                )
+                session.exec(
+                    delete(ActivityZonePace).where(
+                        ActivityZonePace.activity_id == activity.id  # type: ignore[arg-type]
+                    )
+                )
+                session.exec(
+                    delete(ActivityZonePower).where(
+                        ActivityZonePower.activity_id == activity.id  # type: ignore[arg-type]
+                    )
+                )
+                session.exec(
+                    delete(ActivityZoneHeartRate).where(
+                        ActivityZoneHeartRate.activity_id == activity.id  # type: ignore[arg-type]
+                    )
+                )
+                session.exec(
+                    delete(Notification).where(Notification.activity_id == activity.id)  # type: ignore[arg-type]
+                )
+
+                print("  Updating activity data...")
+
+                for field, value in new_activity.model_dump(exclude={"id"}).items():
+                    if field not in ["title", "description", "race", "user_id"]:
+                        setattr(activity, field, value)
+
+                activity.user_id = original_user_id
+                activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
+                session.add(activity)
+
+                for lap in new_laps:
+                    lap.activity_id = activity.id
+                    session.add(lap)
+
+                performances = get_best_performances(activity, new_tracepoints)
+                for perf in performances:
+                    session.add(perf)
+
+                performance_powers = get_best_performance_power(
+                    activity, new_tracepoints
+                )
+                for pp in performance_powers:
+                    session.add(pp)
+
+                original_tracepoints = new_tracepoints.copy()
+
+                while len(new_tracepoints) > MAX_TRACEPOINTS_FOR_RESPONSE:
+                    new_tracepoints = [
+                        tp for i, tp in enumerate(new_tracepoints) if i % 2 == 0
+                    ]
+
+                for tp in new_tracepoints:
+                    tp.activity_id = activity.id
+                    session.add(tp)
+
+                if activity.user_id:
+                    calculate_activity_zone_data(
+                        session, activity, original_tracepoints
+                    )
+
+                notification_service = NotificationService(session)
+                notifications = notification_service.detect_achievements(
+                    activity, performances
+                )
+                for notif in notifications:
+                    session.add(notif)
+
+                if activity.user_id:
+                    update_user_zones_from_activities(session, activity.user_id)
+
+                if activity.sport == "cycling" and activity.user_id:
+                    activity_date = datetime.date.fromtimestamp(activity.start_time)
+                    update_ftp_for_date(session, activity.user_id, activity_date)
+
+                print(
+                    f"  SUCCESS: Recomputed {len(new_laps)} laps, "
+                    f"{len(new_tracepoints)} tracepoints, "
+                    f"{len(performances)} running perfs, "
+                    f"{len(performance_powers)} power perfs, "
+                    f"{len(notifications)} notifications"
+                )
+
+                processed_count += 1
+
+                if processed_count % batch_size == 0:
+                    session.commit()
+                    print(f"  Committed batch (processed {processed_count} activities)")
+
+            except Exception as e:
+                print(f"  ERROR processing activity {activity.id}: {e}")
+                error_count += 1
+                session.rollback()
+                continue
+
+        if not dry_run and processed_count % batch_size != 0:
+            session.commit()
+
+        print("\n" + "=" * 60)
+        print("Recompute completed:")
+        print(f"  Processed: {processed_count} activities")
+        print(f"  Skipped:   {skipped_count} activities")
+        print(f"  Errors:    {error_count} activities")
+        print("=" * 60)
+
+    finally:
+        session.close()
 
 
 if __name__ == "__main__":
