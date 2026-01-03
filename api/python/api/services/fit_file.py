@@ -1,3 +1,4 @@
+import logging
 import os
 
 import yaml
@@ -6,6 +7,8 @@ from sqlmodel import Session
 from api.fit import get_activity_from_fit
 from api.model import Activity, Lap, Tracepoint
 from api.services.storage import StorageService
+
+logger = logging.getLogger(__name__)
 
 
 class FitFileService:
@@ -18,7 +21,7 @@ class FitFileService:
         activity: Activity,
         fit_dir: str,
         download_from_s3: bool = False,
-    ) -> tuple[str | None, bool]:
+    ) -> str | None:
         path = os.path.join(fit_dir, activity.fit)
 
         if not os.path.abspath(path).startswith(os.path.abspath(fit_dir)):
@@ -27,7 +30,7 @@ class FitFileService:
             )
 
         if os.path.exists(path):
-            return path, False
+            return path
 
         if download_from_s3 and self.storage_service:
             if ".." in activity.fit or activity.fit.startswith("/"):
@@ -40,11 +43,12 @@ class FitFileService:
             try:
                 os.makedirs(os.path.dirname(path), exist_ok=True)
                 self.storage_service.download_file(s3_key, path)
-                return path, True
-            except Exception:
-                return None, False
+                return path
+            except Exception as e:
+                logger.debug(f"Failed to download {s3_key} from S3: {e}")
+                return None
 
-        return None, False
+        return None
 
     def read_fit_from_yaml(
         self, yaml_file: str

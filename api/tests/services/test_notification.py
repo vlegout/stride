@@ -566,7 +566,7 @@ class TestNotificationService:
     def test_detect_achievements_sixth_place_no_notification(
         self, service, running_activity, mock_session
     ):
-        """Test that 6th place doesn't create a notification."""
+        """Test that 6th place all-time creates yearly rank 1 if first of year."""
         # Create 5 historical performances better than current
         historical_perfs = []
         for i, minutes in enumerate([3, 3.5, 4, 4.5, 5]):
@@ -581,7 +581,7 @@ class TestNotificationService:
         mock_exec.all.return_value = historical_perfs
         mock_session.exec.return_value = mock_exec
 
-        # Current performance: 5.5 minutes (rank 6)
+        # Current performance: 5.5 minutes (rank 6 all-time, rank 1 for 2024)
         performances = [
             Performance(
                 id=uuid.uuid4(),
@@ -593,7 +593,11 @@ class TestNotificationService:
 
         notifications = service.detect_achievements(running_activity, performances)
 
-        assert len(notifications) == 0
+        # Should create yearly notification since it's the first of 2024
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_yearly"
+        assert notifications[0].rank == 1
+        assert notifications[0].achievement_year == 2024
 
     def test_detect_power_achievements_top_5_ranks(
         self, service, cycling_activity, mock_session
@@ -635,7 +639,7 @@ class TestNotificationService:
     def test_detect_power_achievements_sixth_place_no_notification(
         self, service, cycling_activity, mock_session
     ):
-        """Test that 6th place doesn't create a notification for power."""
+        """Test that 6th place all-time creates yearly rank 1 if first of year."""
         # Create 5 historical performances better than current
         historical_perfs = []
         for i, power in enumerate([500, 450, 400, 380, 360]):
@@ -650,7 +654,7 @@ class TestNotificationService:
         mock_exec.all.return_value = historical_perfs
         mock_session.exec.return_value = mock_exec
 
-        # Current performance: 340W (rank 6)
+        # Current performance: 340W (rank 6 all-time, rank 1 for 2024)
         performance_powers = [
             PerformancePower(
                 id=uuid.uuid4(),
@@ -664,7 +668,11 @@ class TestNotificationService:
             cycling_activity, performance_powers
         )
 
-        assert len(notifications) == 0
+        # Should create yearly notification since it's the first of 2024
+        assert len(notifications) == 1
+        assert notifications[0].type == "best_effort_yearly"
+        assert notifications[0].rank == 1
+        assert notifications[0].achievement_year == 2024
 
     def test_detect_achievements_yearly_top_5(
         self, service, running_activity, mock_session

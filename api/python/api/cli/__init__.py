@@ -18,7 +18,7 @@ from api.utils import MAX_TRACEPOINTS_FOR_RESPONSE, calculate_activity_zone_data
 
 NB_CPUS = 2
 
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
 
 
 def process_file(input_file: str) -> None:
