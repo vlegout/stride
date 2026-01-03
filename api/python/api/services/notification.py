@@ -119,7 +119,23 @@ class NotificationService:
                     )
 
             # Check yearly top 5
-            if yearly_times:
+            if not yearly_times:
+                # First activity of the year - always rank 1
+                if not any(
+                    n.type == "best_effort_all_time" and n.distance == target_distance
+                    for n in notifications
+                ):
+                    notifications.append(
+                        Notification(
+                            activity_id=activity.id,
+                            type="best_effort_yearly",
+                            distance=target_distance,
+                            achievement_year=current_year,
+                            rank=1,
+                            message="",
+                        )
+                    )
+            else:
                 yearly_times_sorted = sorted(yearly_times)
                 if len(yearly_times) < 5 or current_perf.time <= yearly_times_sorted[4]:
                     rank = (
@@ -250,7 +266,24 @@ class NotificationService:
                     )
 
             # Check yearly top 5
-            if yearly_powers:
+            if not yearly_powers:
+                # First activity of the year - always rank 1
+                if not any(
+                    n.type == "best_effort_all_time" and n.duration == target_duration
+                    for n in notifications
+                ):
+                    notifications.append(
+                        Notification(
+                            activity_id=activity.id,
+                            type="best_effort_yearly",
+                            duration=target_duration,
+                            power=current_perf.power,
+                            achievement_year=current_year,
+                            rank=1,
+                            message="",
+                        )
+                    )
+            else:
                 yearly_powers_sorted = sorted(yearly_powers, reverse=True)
                 if (
                     len(yearly_powers) < 5

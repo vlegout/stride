@@ -368,7 +368,7 @@ class BulkOperationService:
                 original_description = activity.description
                 original_race = activity.race
 
-                fit_path, _ = self.fit_file_service.get_fit_file_path(
+                fit_path = self.fit_file_service.get_fit_file_path(
                     activity, fit_dir, download_from_s3
                 )
 
@@ -496,6 +496,14 @@ class BulkOperationService:
                     activity, performances
                 )
                 for notif in notifications:
+                    self.session.add(notif)
+
+                power_notifications = (
+                    self.notification_service.detect_power_achievements(
+                        activity, performance_powers
+                    )
+                )
+                for notif in power_notifications:
                     self.session.add(notif)
 
                 if activity.user_id:

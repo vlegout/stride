@@ -41,12 +41,11 @@ def test_get_fit_file_path_exists_locally(session, fit_file_service):
             timestamp=1234567890,
         )
 
-        path, downloaded = fit_file_service.get_fit_file_path(
+        path = fit_file_service.get_fit_file_path(
             activity, tmpdir, download_from_s3=False
         )
 
         assert path == fit_path
-        assert downloaded is False
 
 
 def test_get_fit_file_path_not_found(session, fit_file_service):
@@ -58,12 +57,11 @@ def test_get_fit_file_path_not_found(session, fit_file_service):
             timestamp=1234567890,
         )
 
-        path, downloaded = fit_file_service.get_fit_file_path(
+        path = fit_file_service.get_fit_file_path(
             activity, tmpdir, download_from_s3=False
         )
 
         assert path is None
-        assert downloaded is False
 
 
 def test_get_fit_file_path_path_traversal_detected(session, fit_file_service):
@@ -93,12 +91,11 @@ def test_get_fit_file_path_download_from_s3(session):
             timestamp=1234567890,
         )
 
-        path, downloaded = fit_file_service.get_fit_file_path(
+        path = fit_file_service.get_fit_file_path(
             activity, tmpdir, download_from_s3=True
         )
 
         assert path == os.path.join(tmpdir, "test.fit")
-        assert downloaded is True
         mock_storage.download_file.assert_called_once_with(
             "data/fit/test.fit", os.path.join(tmpdir, "test.fit")
         )
