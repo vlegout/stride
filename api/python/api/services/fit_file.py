@@ -38,15 +38,18 @@ class FitFileService:
                     f"Invalid FIT filename for S3 (contains path traversal): {activity.fit}"
                 )
 
-            s3_key = f"data/fit/{activity.fit}"
+            s3_keys = [f"data/fit/{activity.fit}", f"data/files/{activity.fit}"]
 
-            try:
-                os.makedirs(os.path.dirname(path), exist_ok=True)
-                self.storage_service.download_file(s3_key, path)
-                return path
-            except Exception as e:
-                logger.debug(f"Failed to download {s3_key} from S3: {e}")
-                return None
+            for s3_key in s3_keys:
+                try:
+                    os.makedirs(os.path.dirname(path), exist_ok=True)
+                    self.storage_service.download_file(s3_key, path)
+                    return path
+                except Exception as e:
+                    logger.debug(f"Failed to download {s3_key} from S3: {e}")
+                    continue
+
+            return None
 
         return None
 
