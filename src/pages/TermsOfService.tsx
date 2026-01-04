@@ -169,7 +169,7 @@ export default function TermsOfService() {
             </Typography>
             <Typography variant="body1" paragraph>
               <strong>Third-Party Services:</strong> We are not responsible for the availability, content, or actions of
-              third-party services (Google OAuth, Garmin Connect, AWS, etc.).
+              third-party services (Google OAuth, Garmin Connect, Scaleway, etc.).
             </Typography>
           </LegalSection>
 

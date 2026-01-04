@@ -35,7 +35,7 @@ class FitFileService:
         if download_from_s3 and self.storage_service:
             if ".." in activity.fit or activity.fit.startswith("/"):
                 raise ValueError(
-                    f"Invalid FIT filename for S3 (contains path traversal): {activity.fit}"
+                    f"Invalid FIT filename for object storage (contains path traversal): {activity.fit}"
                 )
 
             s3_keys = [f"data/fit/{activity.fit}", f"data/files/{activity.fit}"]
@@ -46,7 +46,9 @@ class FitFileService:
                     self.storage_service.download_file(s3_key, path)
                     return path
                 except Exception as e:
-                    logger.debug(f"Failed to download {s3_key} from S3: {e}")
+                    logger.debug(
+                        f"Failed to download {s3_key} from object storage: {e}"
+                    )
                     continue
 
             return None
