@@ -20,6 +20,8 @@ const Upload = lazy(() => import("./pages/Upload"));
 const Fitness = lazy(() => import("./pages/Fitness"));
 const Best = lazy(() => import("./pages/Best"));
 const Login = lazy(() => import("./pages/Login"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 
 import "leaflet/dist/leaflet.css";
 
@@ -30,6 +32,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/privacy",
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: "/terms",
+    element: <TermsOfService />,
   },
   {
     path: "/",
