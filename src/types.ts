@@ -266,8 +266,8 @@ export const WeeklyActivitySummary = type({
   total_distance: "number",
   total_timer_time: "number",
   avg_speed: "number | null",
-  avg_heart_rate: "number?",
-  avg_power: "number?",
+  avg_heart_rate: "number | null",
+  avg_power: "number | null",
   race: "boolean",
 });
 export type WeeklyActivitySummary = typeof WeeklyActivitySummary.infer;
