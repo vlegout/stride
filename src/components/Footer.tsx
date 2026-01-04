@@ -3,6 +3,9 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import DescriptionIcon from "@mui/icons-material/Description";
+import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
+import GavelIcon from "@mui/icons-material/Gavel";
+import { Link as RouterLink } from "react-router-dom";
 
 import { colors } from "../colors";
 
@@ -27,6 +30,40 @@ const Footer = () => {
           flexWrap: "wrap",
         }}
       >
+        <Link
+          component={RouterLink}
+          to="/privacy"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            color: colors.text.onLight,
+            textDecoration: "none",
+            "&:hover": {
+              textDecoration: "underline",
+            },
+          }}
+        >
+          <PrivacyTipIcon fontSize="small" />
+          <Typography variant="body2">Privacy Policy</Typography>
+        </Link>
+        <Link
+          component={RouterLink}
+          to="/terms"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            color: colors.text.onLight,
+            textDecoration: "none",
+            "&:hover": {
+              textDecoration: "underline",
+            },
+          }}
+        >
+          <GavelIcon fontSize="small" />
+          <Typography variant="body2">Terms of Service</Typography>
+        </Link>
         <Link
           href="https://docs.stride.ovh"
           target="_blank"
@@ -63,7 +100,6 @@ const Footer = () => {
           <GitHubIcon fontSize="small" />
           <Typography variant="body2">GitHub</Typography>
         </Link>
-        <Typography variant="body2">Version: {__APP_VERSION__}</Typography>
       </Box>
     </Box>
   );
