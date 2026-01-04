@@ -11,11 +11,15 @@ const formatDuration = (duration: string): string => {
 
   const hours = parseInt(match[1] || "0");
   const minutes = parseInt(match[2] || "0");
-  const seconds = parseFloat(match[3] || "0");
+  const seconds = Math.round(parseFloat(match[3] || "0"));
 
-  if (hours > 0) return `${hours}hr`;
-  if (minutes > 0) return `${minutes}min`;
-  return `${Math.round(seconds)}s`;
+  if (hours > 0) {
+    return minutes > 0 ? `${hours}hr ${minutes}min` : `${hours}hr`;
+  }
+  if (minutes > 0) {
+    return seconds > 0 ? `${minutes}min ${seconds}s` : `${minutes}min`;
+  }
+  return `${seconds}s`;
 };
 
 const getOrdinal = (rank: number | null): string => {
@@ -29,9 +33,10 @@ const getNotificationMessage = (notification: Notification): string => {
   const rank = notification.rank || 1;
   const ordinal = getOrdinal(rank);
 
-  if (notification.duration) {
+  // Power achievements (cycling) - have duration and power
+  if (notification.power && notification.duration) {
     const durationLabel = formatDuration(notification.duration);
-    const powerLabel = notification.power ? `${Math.round(notification.power)}W` : "";
+    const powerLabel = `${Math.round(notification.power)}W`;
 
     if (notification.type === "best_effort_all_time") {
       if (rank === 1) {
@@ -48,22 +53,24 @@ const getNotificationMessage = (notification: Notification): string => {
     }
   }
 
+  // Distance achievements (running) - have distance and optionally duration
   if (notification.distance) {
     const distanceKm = notification.distance / 1000;
     const distanceLabel = `${distanceKm}km`;
+    const timeLabel = notification.duration ? ` in ${formatDuration(notification.duration)}` : "";
 
     if (notification.type === "best_effort_all_time") {
       if (rank === 1) {
-        return `Personal Best ${distanceLabel}!`;
+        return `Personal Best ${distanceLabel}${timeLabel}!`;
       }
-      return `${ordinal} Best ${distanceLabel} of All Time!`;
+      return `${ordinal} Best ${distanceLabel}${timeLabel} of All Time!`;
     }
 
     if (notification.type === "best_effort_yearly" && notification.achievement_year) {
       if (rank === 1) {
-        return `Best ${distanceLabel} of ${notification.achievement_year}!`;
+        return `Best ${distanceLabel}${timeLabel} of ${notification.achievement_year}!`;
       }
-      return `${ordinal} Best ${distanceLabel} of ${notification.achievement_year}!`;
+      return `${ordinal} Best ${distanceLabel}${timeLabel} of ${notification.achievement_year}!`;
     }
   }
 
