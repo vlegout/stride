@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Typography, Alert, CircularProgress } from "@mui/material";
+import { useNavigate, Link } from "react-router-dom";
+import { Box, Typography, Alert, CircularProgress, Link as MuiLink } from "@mui/material";
 import { useAuthStore } from "../store";
 import { authenticateWithGoogle } from "../api";
 import type { UserCreate } from "../types";
@@ -143,6 +143,60 @@ export default function Login() {
           </Box>
         )}
       </SectionContainer>
+
+      <Box
+        sx={{
+          mt: 4,
+          pb: 3,
+          display: "flex",
+          justifyContent: "center",
+          gap: 2,
+        }}
+      >
+        <MuiLink
+          href="https://docs.stride.ovh"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{
+            color: "text.secondary",
+            textDecoration: "none",
+            fontSize: "0.875rem",
+            "&:hover": { color: "text.primary" },
+          }}
+        >
+          Documentation
+        </MuiLink>
+        <Typography variant="body2" sx={{ color: "text.disabled" }}>
+          •
+        </Typography>
+        <Typography
+          variant="body2"
+          component={Link}
+          to="/terms"
+          sx={{
+            color: "text.secondary",
+            textDecoration: "none",
+            "&:hover": { color: "text.primary" },
+          }}
+        >
+          Terms of Service
+        </Typography>
+        <Typography variant="body2" sx={{ color: "text.disabled" }}>
+          •
+        </Typography>
+        <Typography
+          variant="body2"
+          component={Link}
+          to="/privacy"
+          sx={{
+            color: "text.secondary",
+            textDecoration: "none",
+            "&:hover": { color: "text.primary" },
+          }}
+        >
+          Privacy Policy
+        </Typography>
+      </Box>
     </Box>
   );
 }
