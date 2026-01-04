@@ -231,8 +231,6 @@ class NotificationBase(SQLModel):
     def validate_distance_or_duration(self):
         if self.distance is None and self.duration is None:
             raise ValueError("Either distance or duration must be set")
-        if self.distance is not None and self.duration is not None:
-            raise ValueError("Cannot set both distance and duration")
         return self
 
 
