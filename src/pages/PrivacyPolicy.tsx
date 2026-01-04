@@ -145,7 +145,7 @@ export default function PrivacyPolicy() {
                     <strong>Database</strong>: PostgreSQL database with access controls
                   </li>
                   <li>
-                    <strong>File Storage</strong>: AWS S3 for secure storage of FIT files and metadata
+                    <strong>File Storage</strong>: Scaleway Object Storage for secure storage of FIT files and metadata
                   </li>
                   <li>
                     <strong>Authentication</strong>: JWT tokens with 7-day expiration
@@ -228,9 +228,13 @@ export default function PrivacyPolicy() {
                     )
                   </li>
                   <li>
-                    <strong>AWS S3</strong>: For file storage (subject to{" "}
-                    <MuiLink href="https://aws.amazon.com/privacy/" target="_blank" rel="noopener noreferrer">
-                      AWS Privacy Notice
+                    <strong>Scaleway Object Storage</strong>: For file storage (subject to{" "}
+                    <MuiLink
+                      href="https://www.scaleway.com/en/privacy-policy/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Scaleway Privacy Policy
                     </MuiLink>
                     )
                   </li>
@@ -273,9 +277,9 @@ export default function PrivacyPolicy() {
 
           <LegalSection title="11. International Data Transfers">
             <Typography variant="body1" paragraph>
-              Your data is primarily processed and stored within the European Union. Some third-party services (AWS S3,
-              Google OAuth) may transfer data outside the EU. These transfers are protected by appropriate safeguards
-              such as Standard Contractual Clauses approved by the European Commission.
+              Your data is primarily processed and stored within the European Union. Some third-party services
+              (Scaleway, Google OAuth) may transfer data outside the EU. These transfers are protected by appropriate
+              safeguards such as Standard Contractual Clauses approved by the European Commission.
             </Typography>
           </LegalSection>
 
