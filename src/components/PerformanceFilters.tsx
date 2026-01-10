@@ -33,6 +33,8 @@ const PerformanceFilters = ({
     { value: "10", label: "10 minutes" },
     { value: "20", label: "20 minutes" },
     { value: "60", label: "1 hour" },
+    { value: "120", label: "2 hours" },
+    { value: "240", label: "4 hours" },
   ];
 
   const runningDistances = [
