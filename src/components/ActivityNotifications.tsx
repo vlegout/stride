@@ -33,27 +33,8 @@ const getNotificationMessage = (notification: Notification): string => {
   const rank = notification.rank || 1;
   const ordinal = getOrdinal(rank);
 
-  // Power achievements (cycling) - have duration and power
-  if (notification.power && notification.duration) {
-    const durationLabel = formatDuration(notification.duration);
-    const powerLabel = `${Math.round(notification.power)}W`;
-
-    if (notification.type === "best_effort_all_time") {
-      if (rank === 1) {
-        return `Personal Best Power ${durationLabel}: ${powerLabel}!`;
-      }
-      return `${ordinal} Best Power ${durationLabel} of All Time: ${powerLabel}!`;
-    }
-
-    if (notification.type === "best_effort_yearly" && notification.achievement_year) {
-      if (rank === 1) {
-        return `Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
-      }
-      return `${ordinal} Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
-    }
-  }
-
   // Distance achievements (running) - have distance and optionally duration
+  // Check this first to prioritize running notifications
   if (notification.distance) {
     const distanceKm = notification.distance / 1000;
     const distanceLabel = `${distanceKm}km`;
@@ -71,6 +52,26 @@ const getNotificationMessage = (notification: Notification): string => {
         return `Best ${distanceLabel}${timeLabel} of ${notification.achievement_year}!`;
       }
       return `${ordinal} Best ${distanceLabel}${timeLabel} of ${notification.achievement_year}!`;
+    }
+  }
+
+  // Power achievements (cycling) - have duration and power but no distance
+  if (notification.power && notification.duration && !notification.distance) {
+    const durationLabel = formatDuration(notification.duration);
+    const powerLabel = `${Math.round(notification.power)}W`;
+
+    if (notification.type === "best_effort_all_time") {
+      if (rank === 1) {
+        return `Personal Best Power ${durationLabel}: ${powerLabel}!`;
+      }
+      return `${ordinal} Best Power ${durationLabel} of All Time: ${powerLabel}!`;
+    }
+
+    if (notification.type === "best_effort_yearly" && notification.achievement_year) {
+      if (rank === 1) {
+        return `Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
+      }
+      return `${ordinal} Best Power ${durationLabel} of ${notification.achievement_year}: ${powerLabel}!`;
     }
   }
 
