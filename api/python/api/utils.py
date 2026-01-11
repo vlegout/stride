@@ -97,6 +97,8 @@ DURATION_1MIN = datetime.timedelta(seconds=60)
 DURATION_5MIN = datetime.timedelta(seconds=300)
 DURATION_20MIN = datetime.timedelta(seconds=1200)
 DURATION_1HR = datetime.timedelta(seconds=3600)
+DURATION_2HR = datetime.timedelta(seconds=7200)
+DURATION_4HR = datetime.timedelta(seconds=14400)
 
 # Time zone calculation tolerance
 POWER_TIME_TOLERANCE_SECONDS = 1

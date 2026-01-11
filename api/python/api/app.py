@@ -371,6 +371,8 @@ class CyclingDistance(str, Enum):
     ten_minutes = "10"
     twenty_minutes = "20"
     one_hour = "60"
+    two_hours = "120"
+    four_hours = "240"
 
 
 class RunningDistance(str, Enum):
@@ -422,6 +424,8 @@ def read_best_performances(
             CyclingDistance.ten_minutes: datetime.timedelta(minutes=10),
             CyclingDistance.twenty_minutes: datetime.timedelta(minutes=20),
             CyclingDistance.one_hour: datetime.timedelta(minutes=60),
+            CyclingDistance.two_hours: datetime.timedelta(minutes=120),
+            CyclingDistance.four_hours: datetime.timedelta(minutes=240),
         }
 
         target_time = distance_mapping[distance]

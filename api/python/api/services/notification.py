@@ -16,6 +16,8 @@ from api.utils import (
     DURATION_5MIN,
     DURATION_20MIN,
     DURATION_1HR,
+    DURATION_2HR,
+    DURATION_4HR,
 )
 
 
@@ -177,6 +179,8 @@ class NotificationService:
             DURATION_5MIN,
             DURATION_20MIN,
             DURATION_1HR,
+            DURATION_2HR,
+            DURATION_4HR,
         ]
         current_year = datetime.date.fromtimestamp(activity.start_time).year
 
