@@ -9,6 +9,37 @@ from api.services.exceptions import StorageServiceError
 from api.utils import generate_random_string
 
 
+def create_s3_client():
+    """Create and return a configured S3 client for Scaleway Object Storage."""
+    endpoint_url = os.environ.get("OBJECT_STORAGE_ENDPOINT")
+    region = os.environ.get("OBJECT_STORAGE_REGION")
+    access_key = os.environ.get("SCW_ACCESS_KEY")
+    secret_key = os.environ.get("SCW_SECRET_KEY")
+
+    if not all([endpoint_url, region, access_key, secret_key]):
+        missing = []
+        if not endpoint_url:
+            missing.append("OBJECT_STORAGE_ENDPOINT")
+        if not region:
+            missing.append("OBJECT_STORAGE_REGION")
+        if not access_key:
+            missing.append("SCW_ACCESS_KEY")
+        if not secret_key:
+            missing.append("SCW_SECRET_KEY")
+
+        raise StorageServiceError(
+            f"Object storage credentials not properly configured. Missing: {', '.join(missing)}"
+        )
+
+    return boto3.client(
+        "s3",
+        endpoint_url=endpoint_url,
+        region_name=region,
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+    )
+
+
 class StorageService:
     def __init__(self):
         self.bucket = os.environ.get("BUCKET")
@@ -19,7 +50,7 @@ class StorageService:
     @property
     def client(self):
         if self._client is None:
-            self._client = boto3.client("s3")
+            self._client = create_s3_client()
         return self._client
 
     def upload_activity_files(
@@ -42,7 +73,9 @@ class StorageService:
         try:
             self.client.upload_file(file_path, self.bucket, s3_key)
         except ClientError as e:
-            raise StorageServiceError(f"Failed to upload file to S3: {str(e)}") from e
+            raise StorageServiceError(
+                f"Failed to upload file to object storage: {str(e)}"
+            ) from e
 
     def upload_content(
         self,
@@ -59,7 +92,7 @@ class StorageService:
             )
         except ClientError as e:
             raise StorageServiceError(
-                f"Failed to upload content to S3: {str(e)}"
+                f"Failed to upload content to object storage: {str(e)}"
             ) from e
 
     def download_file(self, s3_key: str, local_path: str) -> None:
@@ -68,7 +101,9 @@ class StorageService:
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             if error_code == "404" or error_code == "NoSuchKey":
-                raise StorageServiceError(f"File not found in S3: {s3_key}") from e
+                raise StorageServiceError(
+                    f"File not found in object storage: {s3_key}"
+                ) from e
             raise StorageServiceError(
-                f"Failed to download file from S3: {str(e)}"
+                f"Failed to download file from object storage: {str(e)}"
             ) from e
