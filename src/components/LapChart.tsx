@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { Lap, Sport } from "../types";
+import { colors, hexToRgb } from "../colors";
 
 interface LapData {
   index: number;
@@ -66,20 +67,16 @@ const LineChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
 
   const getColor = (value: number): string => {
     const normalizedValue = isCycling ? (value - minValue) / valueRange : (maxValue - value) / valueRange;
-
     const intensity = Math.max(0, Math.min(1, normalizedValue));
 
-    if (intensity < 0.7) {
-      const grayVariation = 50 + intensity * 20;
-      return `hsl(0, 0%, ${grayVariation}%)`;
-    }
+    const slowRgb = hexToRgb(colors.chart.lap.slow);
+    const fastRgb = hexToRgb(colors.chart.lap.fast);
 
-    const fastRange = (intensity - 0.7) / 0.3;
-    const hue = 180 + fastRange * 60;
-    const saturation = 60 + fastRange * 30;
-    const lightness = 60 - fastRange * 20;
+    const r = Math.round(slowRgb.r + (fastRgb.r - slowRgb.r) * intensity);
+    const g = Math.round(slowRgb.g + (fastRgb.g - slowRgb.g) * intensity);
+    const b = Math.round(slowRgb.b + (fastRgb.b - slowRgb.b) * intensity);
 
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    return `rgb(${r}, ${g}, ${b})`;
   };
 
   const totalDistance = laps.reduce((sum, lap) => sum + lap.total_distance, 0);

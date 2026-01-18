@@ -11,6 +11,7 @@ import {
   TooltipItem,
 } from "chart.js";
 import { WeeklyTSS } from "../types";
+import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -28,7 +29,7 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
       {
         label: "Weekly TSS",
         data: weeklyTssValues,
-        backgroundColor: "rgba(153, 102, 255, 0.7)",
+        backgroundColor: colors.chart.primary,
       },
     ],
   };

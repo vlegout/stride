@@ -2,6 +2,7 @@ import { Box, Typography, Grid } from "@mui/material";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { WeeklyZoneData } from "../types";
+import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -45,18 +46,8 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
     },
   });
 
-  // Generate colors for each zone
-  const generateZoneColors = (numZones: number): string[] => {
-    const colors = [
-      "rgba(75, 192, 192, 0.7)", // Zone 1 - Teal
-      "rgba(54, 162, 235, 0.7)", // Zone 2 - Blue
-      "rgba(255, 206, 86, 0.7)", // Zone 3 - Yellow
-      "rgba(255, 99, 132, 0.7)", // Zone 4 - Pink
-      "rgba(153, 102, 255, 0.7)", // Zone 5 - Purple
-      "rgba(255, 159, 64, 0.7)", // Zone 6 - Orange
-      "rgba(199, 199, 199, 0.7)", // Zone 7 - Gray
-    ];
-    return colors.slice(0, numZones);
+  const getZoneColors = (numZones: number): string[] => {
+    return colors.chart.zones.slice(0, numZones);
   };
 
   // Create heart rate zones chart data for running
@@ -66,7 +57,7 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.heart_rate_zones.length));
-    const colors = generateZoneColors(maxZones);
+    const colors = getZoneColors(maxZones);
 
     const datasets = [];
     for (let i = 0; i < maxZones; i++) {
@@ -90,7 +81,7 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.heart_rate_zones.length));
-    const colors = generateZoneColors(maxZones);
+    const colors = getZoneColors(maxZones);
 
     const datasets = [];
     for (let i = 0; i < maxZones; i++) {
@@ -114,7 +105,7 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.pace_zones.length));
-    const colors = generateZoneColors(maxZones);
+    const colors = getZoneColors(maxZones);
 
     const datasets = [];
     for (let i = 0; i < maxZones; i++) {
@@ -138,7 +129,7 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
   } => {
     const labels = weeklyZones.map((week) => week.week_start);
     const maxZones = Math.max(...weeklyZones.map((week) => week.power_zones.length));
-    const colors = generateZoneColors(maxZones);
+    const colors = getZoneColors(maxZones);
 
     const datasets = [];
     for (let i = 0; i < maxZones; i++) {
