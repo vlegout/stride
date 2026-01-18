@@ -2,6 +2,7 @@ import { Box, Typography, Grid } from "@mui/material";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { WeeklyActivityData } from "../types";
+import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -62,7 +63,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
       {
         label: "Weekly Distance (km)",
         data: weeklyRunningDistances,
-        backgroundColor: "rgba(255, 99, 132, 0.7)",
+        backgroundColor: colors.chart.metrics.runningDistance,
       },
     ],
   };
@@ -73,7 +74,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
       {
         label: "Weekly Time (hours)",
         data: weeklyRunningTimes,
-        backgroundColor: "rgba(255, 159, 64, 0.7)",
+        backgroundColor: colors.chart.metrics.runningTime,
       },
     ],
   };
@@ -84,7 +85,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
       {
         label: "Weekly Distance (km)",
         data: weeklyCyclingDistances,
-        backgroundColor: "rgba(54, 162, 235, 0.7)",
+        backgroundColor: colors.chart.metrics.cyclingDistance,
       },
     ],
   };
@@ -95,7 +96,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
       {
         label: "Weekly Time (hours)",
         data: weeklyCyclingTimes,
-        backgroundColor: "rgba(75, 192, 192, 0.7)",
+        backgroundColor: colors.chart.metrics.cyclingTime,
       },
     ],
   };
@@ -106,7 +107,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
       {
         label: "Weekly Distance (km)",
         data: weeklySwimmingDistances,
-        backgroundColor: "rgba(153, 102, 255, 0.7)",
+        backgroundColor: colors.chart.metrics.swimmingDistance,
       },
     ],
   };
@@ -117,7 +118,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
       {
         label: "Weekly Time (hours)",
         data: weeklySwimmingTimes,
-        backgroundColor: "rgba(255, 193, 7, 0.7)",
+        backgroundColor: colors.chart.metrics.swimmingTime,
       },
     ],
   };

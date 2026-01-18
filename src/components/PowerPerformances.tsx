@@ -7,6 +7,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import { Link } from "react-router-dom";
+import { colors } from "../colors";
 
 const PowerPerformances = ({
   performances,
@@ -129,8 +130,8 @@ const PowerPerformances = ({
       {
         data: chartData,
         borderWidth: 2,
-        backgroundColor: "rgba(54, 162, 235, 0.1)",
-        borderColor: "rgba(54, 162, 235, 1)",
+        backgroundColor: colors.chart.powerLight,
+        borderColor: colors.chart.power,
         fill: false,
       },
     ],

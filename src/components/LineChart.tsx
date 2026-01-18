@@ -3,6 +3,7 @@ import { Line } from "react-chartjs-2";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
+import { colors } from "../colors";
 
 interface LineChartProps {
   labels: number[];
@@ -106,8 +107,8 @@ const LineChart = ({ labels, data, title, xAxisLabel, yAxisLabel }: LineChartPro
       {
         data: data,
         borderWidth: isMobile ? 3 : 2, // Thicker line on mobile
-        backgroundColor: "rgba(54, 162, 235, 0.1)",
-        borderColor: "rgba(54, 162, 235, 1)",
+        backgroundColor: colors.chart.primaryLight,
+        borderColor: colors.chart.primary,
       },
     ],
   };

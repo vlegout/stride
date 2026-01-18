@@ -13,6 +13,7 @@ import {
   TooltipItem,
 } from "chart.js";
 import { FtpData } from "../types";
+import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
@@ -30,8 +31,8 @@ const FTPChart = ({ ftp }: FTPChartProps) => {
       {
         label: "FTP (W)",
         data: ftpValues,
-        borderColor: "rgb(255, 206, 84)",
-        backgroundColor: "rgba(255, 206, 84, 0.1)",
+        borderColor: colors.chart.power,
+        backgroundColor: colors.chart.powerLight,
         tension: 0.1,
         fill: true,
       },

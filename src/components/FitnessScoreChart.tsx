@@ -12,6 +12,7 @@ import {
   TooltipItem,
 } from "chart.js";
 import { FitnessScore } from "../types";
+import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -39,29 +40,29 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
       {
         label: "Overall",
         data: sampledOverall,
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.1)",
+        borderColor: colors.chart.overall,
+        backgroundColor: colors.chart.overallLight,
         tension: 0.1,
       },
       {
         label: "Running",
         data: sampledRunning,
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.1)",
+        borderColor: colors.chart.running,
+        backgroundColor: colors.chart.runningLight,
         tension: 0.1,
       },
       {
         label: "Cycling",
         data: sampledCycling,
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgba(54, 162, 235, 0.1)",
+        borderColor: colors.chart.cycling,
+        backgroundColor: colors.chart.cyclingLight,
         tension: 0.1,
       },
       {
         label: "Swimming",
         data: sampledSwimming,
-        borderColor: "rgb(75, 192, 75)",
-        backgroundColor: "rgba(75, 192, 75, 0.1)",
+        borderColor: colors.chart.swimming,
+        backgroundColor: colors.chart.swimmingLight,
         tension: 0.1,
       },
     ],

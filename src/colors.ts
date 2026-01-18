@@ -39,6 +39,56 @@ export const colors = {
     onPrimary: "#FFFFFF", // White text on primary background
     onLight: "#424242", // Dark text on light backgrounds
   },
+
+  // Chart colors - unified data visualization palette
+  chart: {
+    // Primary chart color (derived from brand)
+    primary: "#FF6B35",
+    primaryLight: "rgba(255, 107, 53, 0.15)",
+
+    // Sport-specific colors (harmonious with primary orange)
+    running: "#E85D4A", // Warm red-orange
+    runningLight: "rgba(232, 93, 74, 0.15)",
+    cycling: "#3B82F6", // Vibrant blue
+    cyclingLight: "rgba(59, 130, 246, 0.15)",
+    swimming: "#0EA5E9", // Sky blue
+    swimmingLight: "rgba(14, 165, 233, 0.15)",
+
+    // Secondary metrics
+    overall: "#1E293B", // Slate for overall/aggregate data
+    overallLight: "rgba(30, 41, 59, 0.15)",
+
+    // Single metric charts (power, TSS, FTP)
+    power: "#FF6B35", // Primary orange for power metrics
+    powerLight: "rgba(255, 107, 53, 0.15)",
+
+    // Training zone colors (progressive intensity scale)
+    zones: [
+      "rgba(148, 163, 184, 0.75)", // Zone 1 - Recovery (slate gray)
+      "rgba(59, 130, 246, 0.75)", // Zone 2 - Endurance (blue)
+      "rgba(34, 197, 94, 0.75)", // Zone 3 - Tempo (green)
+      "rgba(250, 204, 21, 0.75)", // Zone 4 - Threshold (yellow)
+      "rgba(249, 115, 22, 0.75)", // Zone 5 - VO2max (orange)
+      "rgba(239, 68, 68, 0.75)", // Zone 6 - Anaerobic (red)
+      "rgba(168, 85, 247, 0.75)", // Zone 7 - Neuromuscular (purple)
+    ],
+
+    // Distance/Time chart pairs (for weekly metrics)
+    metrics: {
+      runningDistance: "#E85D4A",
+      runningTime: "rgba(232, 93, 74, 0.65)",
+      cyclingDistance: "#3B82F6",
+      cyclingTime: "rgba(59, 130, 246, 0.65)",
+      swimmingDistance: "#0EA5E9",
+      swimmingTime: "rgba(14, 165, 233, 0.65)",
+    },
+
+    // Lap chart color scale (performance gradient)
+    lap: {
+      slow: "#94A3B8", // Slate for slower laps
+      fast: "#FF6B35", // Primary orange for fast laps
+    },
+  },
 } as const;
 
 export type Colors = typeof colors;
