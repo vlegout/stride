@@ -39,6 +39,7 @@ from api.model import (
     BestPerformanceResponse,
     Notification,
     Pagination,
+    PowerProfileResponse,
     Profile,
     User,
     UserCreate,
@@ -505,6 +506,85 @@ def read_best_performances(
         sport=sport.value,
         parameter=parameter,
         performances=performances,
+    )
+
+
+@app.get("/best/power-profile/", response_model=PowerProfileResponse)
+def read_power_profile(
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    # Define time periods for power profile
+    time_periods = [
+        (datetime.timedelta(seconds=5), "5s"),
+        (datetime.timedelta(seconds=15), "15s"),
+        (datetime.timedelta(seconds=30), "30s"),
+        (datetime.timedelta(minutes=1), "1min"),
+        (datetime.timedelta(minutes=2), "2min"),
+        (datetime.timedelta(minutes=5), "5min"),
+        (datetime.timedelta(minutes=10), "10min"),
+        (datetime.timedelta(minutes=20), "20min"),
+        (datetime.timedelta(minutes=30), "30min"),
+        (datetime.timedelta(minutes=60), "1h"),
+        (datetime.timedelta(minutes=90), "1h30"),
+        (datetime.timedelta(minutes=120), "2h"),
+    ]
+
+    labels = [label for _, label in time_periods]
+
+    time_values = [t for t, _ in time_periods]
+
+    # Single query to get max power per time period, both overall and by year
+    query = """
+        SELECT
+            pp.time,
+            MAX(pp.power) as max_power,
+            EXTRACT(YEAR FROM to_timestamp(a.start_time))::int as year
+        FROM performancepower pp
+        JOIN activity a ON pp.activity_id = a.id
+        WHERE a.user_id = :user_id
+        AND a.status = 'created'
+        AND pp.time = ANY(:time_values)
+        GROUP BY pp.time, year
+        ORDER BY year DESC, pp.time
+    """
+    results = session.execute(
+        text(query).bindparams(user_id=user_id, time_values=time_values)
+    ).all()
+
+    # Build lookup: (time, year) -> power, and (time, None) -> overall max
+    power_by_time_year: dict[tuple[datetime.timedelta, int | None], float] = {}
+    available_years_set: set[int] = set()
+    for row in results:
+        time_val, power, year = row
+        available_years_set.add(year)
+        key = (time_val, year)
+        power_by_time_year[key] = float(power) if power else 0.0
+        # Track overall max
+        overall_key = (time_val, None)
+        if overall_key not in power_by_time_year:
+            power_by_time_year[overall_key] = 0.0
+        power_by_time_year[overall_key] = max(
+            power_by_time_year[overall_key], float(power) if power else 0.0
+        )
+
+    available_years = sorted(available_years_set, reverse=True)
+
+    # Build overall powers list
+    overall_powers = [power_by_time_year.get((t, None), 0.0) for t, _ in time_periods]
+
+    # Build years data
+    years_data: dict[int, list[float]] = {}
+    for year in available_years:
+        years_data[year] = [
+            power_by_time_year.get((t, year), 0.0) for t, _ in time_periods
+        ]
+
+    return PowerProfileResponse(
+        labels=labels,
+        overall=overall_powers,
+        years=years_data,
+        available_years=available_years,
     )
 
 
