@@ -7,7 +7,7 @@ dependencies = [
     "fastapi[standard]>=0.115.12",
     "psycopg2>=2.9.10",
     "pydantic>=2.11.4",
-    "python-jose[cryptography]>=3.3.0",
+    "pyjwt>=2.0.0",
     "pyyaml>=6.0.2",
     "sqlmodel>=0.0.24",
     "typer>=0.15.3",
@@ -24,7 +24,6 @@ dev = [
     "ruff>=0.14.9",
     "types-pyyaml>=6.0.12.20250915",
     "types-boto3>=1.42.11",
-    "types-python-jose>=3.5.0.20250531",
     "ty>=0.0.2",
     "hypothesis>=6.148.7",
 ]

@@ -2,7 +2,8 @@ import datetime
 import os
 
 from fastapi import HTTPException, status
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import PyJWTError
 from pydantic import BaseModel
 
 
@@ -38,7 +39,7 @@ def verify_token(token: str) -> TokenData:
             raise credentials_exception
 
         return TokenData(user_id=user_id, email=email)
-    except JWTError:
+    except PyJWTError:
         raise credentials_exception from None
 
 

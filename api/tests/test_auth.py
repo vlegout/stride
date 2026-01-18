@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi import HTTPException
-from jose import jwt
+import jwt
 
 from api.auth import (
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
