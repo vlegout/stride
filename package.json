@@ -19,6 +19,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@fontsource/inter": "^5.2.8",
     "@fontsource/roboto": "^5.2.9",
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.6",
@@ -26,6 +27,7 @@
     "arktype": "^2.1.29",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
+    "framer-motion": "^12.26.2",
     "jszip": "^3.10.1",
     "konva": "^10.2.0",
     "leaflet": "^1.9.4",

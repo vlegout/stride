@@ -2,6 +2,9 @@ import { ReactNode } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { motion } from "framer-motion";
+import { fadeInVariants } from "../../animations";
+import { spacing } from "../../colors";
 
 interface SectionContainerProps {
   children: ReactNode;
@@ -17,7 +20,7 @@ const SectionContainer = ({
   children,
   title,
   variant,
-  spacing,
+  spacing: spacingProp,
   maxWidth,
   centered = false,
   elevation = 1,
@@ -25,17 +28,17 @@ const SectionContainer = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const getSpacing = (): { xs: number; sm: number } => {
-    if (spacing === "compact") {
-      return { xs: 1, sm: 2 };
+  const getSpacingValue = () => {
+    if (spacingProp === "compact") {
+      return spacing.sectionCompact;
     }
-    return { xs: 2, sm: 3 };
+    return spacing.section;
   };
 
   const getContainerProps = (): Record<string, unknown> => {
     const baseProps = {
       sx: {
-        mb: getSpacing(),
+        mb: getSpacingValue(),
         mx: centered ? "auto" : 0,
         ...(maxWidth && { maxWidth }),
         ...(centered && { textAlign: "center" }),
@@ -48,7 +51,7 @@ const SectionContainer = ({
         elevation,
         sx: {
           ...baseProps.sx,
-          p: getSpacing(),
+          p: getSpacingValue(),
         },
       };
     }
@@ -80,7 +83,14 @@ const SectionContainer = ({
   };
 
   return (
-    <Box {...getContainerProps()}>
+    <Box
+      component={motion.div}
+      initial="initial"
+      whileInView="animate"
+      viewport={{ once: true, margin: "-50px" }}
+      variants={fadeInVariants}
+      {...getContainerProps()}
+    >
       {renderHeader()}
       {children}
     </Box>

@@ -7,18 +7,19 @@ import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 import GavelIcon from "@mui/icons-material/Gavel";
 import { Link as RouterLink } from "react-router-dom";
 
-import { colors } from "../colors";
+import { colors, gradients } from "../colors";
 
 const Footer = () => {
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: colors.primarySoft,
+        background: gradients.primarySubtle,
         color: colors.text.onLight,
-        py: 2,
+        py: 2.5,
         px: 3,
         mt: "auto",
+        borderTop: `1px solid ${colors.grey[200]}`,
       }}
     >
       <Box

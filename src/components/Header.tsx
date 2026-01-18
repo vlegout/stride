@@ -15,7 +15,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
-import { colors } from "../colors";
+import { colors, shadows, gradients } from "../colors";
 import { useAuthStore } from "../store";
 
 const menus = [
@@ -47,7 +47,16 @@ const Header = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ bgcolor: colors.primarySoft, color: colors.text.onLight }}>
+      <AppBar
+        position="static"
+        elevation={0}
+        sx={{
+          background: gradients.primarySubtle,
+          color: colors.text.onLight,
+          boxShadow: shadows.header,
+          borderBottom: `1px solid ${colors.grey[200]}`,
+        }}
+      >
         <Toolbar sx={{ minHeight: { xs: 56, sm: 64 } }}>
           <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
             <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
@@ -86,6 +95,18 @@ const Header = () => {
                 onClose={handleMenuClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      mt: 1,
+                      boxShadow: shadows.lg,
+                      borderRadius: 2,
+                      border: `1px solid ${colors.grey[200]}`,
+                      backdropFilter: "blur(8px)",
+                      bgcolor: "rgba(255, 255, 255, 0.95)",
+                    },
+                  },
+                }}
               >
                 {menus.map(({ to, label }) => (
                   <MenuItem key={to} onClick={handleMenuClose}>
