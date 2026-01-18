@@ -3,7 +3,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { motion } from "framer-motion";
 
-import { colors } from "../../colors";
+import { colors, shadows } from "../../colors";
 
 interface StatsCardProps {
   title: string;
@@ -58,7 +58,7 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       whileHover={{
         y: -3,
-        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+        boxShadow: shadows.cardHover,
         transition: { duration: 0.2 },
       }}
       sx={{
@@ -67,6 +67,7 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
         bgcolor: getBackgroundColor(),
         borderRadius: 2,
         border: variant === "primary" ? `1px solid ${colors.primary}` : `1px solid ${colors.grey[200]}`,
+        boxShadow: shadows.card,
       }}
     >
       <Typography

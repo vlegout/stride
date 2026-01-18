@@ -9,6 +9,49 @@ export const hexToRgb = (hex: string) => {
     : { r: 0, g: 0, b: 0 };
 };
 
+// Shadow tokens for consistent depth
+export const shadows = {
+  sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
+  md: "0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04)",
+  lg: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)",
+  xl: "0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03)",
+  inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.04)",
+  glow: "0 0 20px rgba(255, 107, 53, 0.15)",
+  card: "0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)",
+  cardHover: "0 10px 40px rgba(0, 0, 0, 0.12)",
+  header: "0 1px 3px rgba(0, 0, 0, 0.05)",
+} as const;
+
+// Gradient tokens for backgrounds
+export const gradients = {
+  primarySubtle: "linear-gradient(135deg, #FFF4F1 0%, #FFE8E1 100%)",
+  warmGlow: "linear-gradient(180deg, rgba(255, 107, 53, 0.03) 0%, transparent 100%)",
+  coolFade: "linear-gradient(180deg, #FAFAFA 0%, #FFFFFF 100%)",
+  headerShine:
+    "linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%)",
+} as const;
+
+// Spacing tokens for consistent rhythm (in MUI spacing units, 1 unit = 8px)
+export const spacing = {
+  // Section spacing
+  section: { xs: 4, sm: 5, md: 6 }, // 32px / 40px / 48px
+  sectionCompact: { xs: 2, sm: 3, md: 4 }, // 16px / 24px / 32px
+
+  // Page padding
+  page: { xs: 2, sm: 3, md: 4 }, // 16px / 24px / 32px
+
+  // Card/container internal padding
+  card: { xs: 2, sm: 2.5, md: 3 }, // 16px / 20px / 24px
+  cardCompact: { xs: 1.5, sm: 2, md: 2.5 }, // 12px / 16px / 20px
+
+  // Content max-width for readability
+  contentMaxWidth: "75ch",
+
+  // Gap between items
+  gap: { xs: 2, sm: 2.5, md: 3 }, // 16px / 20px / 24px
+  gapSmall: { xs: 1, sm: 1.5, md: 2 }, // 8px / 12px / 16px
+} as const;
+
 export const colors = {
   primary: "#FF6B35", // Main orange-red from logo
   primaryLight: "#FF8C60", // Lighter shade used in logo highlights

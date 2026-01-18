@@ -6,6 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageTransition from "../components/ui/PageTransition";
+import { gradients, spacing } from "../colors";
 
 const Layout = () => {
   const location = useLocation();
@@ -23,9 +24,10 @@ const Layout = () => {
         component="main"
         sx={{
           width: "100%",
-          px: { xs: 1, sm: 2, md: 3 },
-          py: { xs: 2, sm: 3 },
+          px: spacing.page,
+          py: spacing.section,
           flexGrow: 1,
+          background: gradients.warmGlow,
         }}
       >
         <Container

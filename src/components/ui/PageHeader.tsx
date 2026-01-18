@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { motion } from "framer-motion";
+import { spacing as spacingTokens } from "../../colors";
 
 interface PageHeaderProps {
   title: string;
@@ -28,14 +29,14 @@ const PageHeader = ({ title, subtitle, variant = "h4", spacing = "normal" }: Pag
     return variant;
   };
 
-  const getSpacing = (): { xs: number; sm: number } => {
+  const getSpacing = () => {
     switch (spacing) {
       case "compact":
-        return { xs: 1, sm: 2 };
+        return spacingTokens.sectionCompact;
       case "spacious":
-        return { xs: 3, sm: 4 };
+        return { xs: 5, sm: 6, md: 8 };
       default:
-        return { xs: 2, sm: 3 };
+        return spacingTokens.section;
     }
   };
 

@@ -25,13 +25,7 @@ const AnimatedCard = ({ children, enableHover = true, className }: AnimatedCardP
   const hoverProps = enableHover ? { whileHover: "hover" as const } : {};
 
   return (
-    <motion.div
-      initial="initial"
-      variants={cardHoverVariants}
-      className={className}
-      style={style}
-      {...hoverProps}
-    >
+    <motion.div initial="initial" variants={cardHoverVariants} className={className} style={style} {...hoverProps}>
       {children}
     </motion.div>
   );
