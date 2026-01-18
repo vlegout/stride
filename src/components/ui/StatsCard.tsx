@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { motion } from "framer-motion";
 
 import { colors } from "../../colors";
 
@@ -51,17 +52,21 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
 
   return (
     <Box
+      component={motion.div}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      whileHover={{
+        y: -3,
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+        transition: { duration: 0.2 },
+      }}
       sx={{
         textAlign: "center",
         p: getPadding(),
         bgcolor: getBackgroundColor(),
-        borderRadius: 1,
-        border: variant === "primary" ? `1px solid ${colors.primary}` : "1px solid transparent",
-        transition: "all 0.2s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-1px)",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        },
+        borderRadius: 2,
+        border: variant === "primary" ? `1px solid ${colors.primary}` : `1px solid ${colors.grey[200]}`,
       }}
     >
       <Typography

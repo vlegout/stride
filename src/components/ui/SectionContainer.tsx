@@ -2,6 +2,8 @@ import { ReactNode } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { motion } from "framer-motion";
+import { fadeInVariants } from "../../animations";
 
 interface SectionContainerProps {
   children: ReactNode;
@@ -80,7 +82,14 @@ const SectionContainer = ({
   };
 
   return (
-    <Box {...getContainerProps()}>
+    <Box
+      component={motion.div}
+      initial="initial"
+      whileInView="animate"
+      viewport={{ once: true, margin: "-50px" }}
+      variants={fadeInVariants}
+      {...getContainerProps()}
+    >
       {renderHeader()}
       {children}
     </Box>
