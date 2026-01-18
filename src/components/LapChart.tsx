@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { Lap, Sport } from "../types";
+import { colors, hexToRgb } from "../colors";
 
 interface LapData {
   index: number;
@@ -68,10 +69,8 @@ const LineChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     const normalizedValue = isCycling ? (value - minValue) / valueRange : (maxValue - value) / valueRange;
     const intensity = Math.max(0, Math.min(1, normalizedValue));
 
-    // Interpolate between slow (slate gray) and fast (primary orange)
-    // colors.chart.lap.slow = #94A3B8, colors.chart.lap.fast = #FF6B35
-    const slowRgb = { r: 148, g: 163, b: 184 };
-    const fastRgb = { r: 255, g: 107, b: 53 };
+    const slowRgb = hexToRgb(colors.chart.lap.slow);
+    const fastRgb = hexToRgb(colors.chart.lap.fast);
 
     const r = Math.round(slowRgb.r + (fastRgb.r - slowRgb.r) * intensity);
     const g = Math.round(slowRgb.g + (fastRgb.g - slowRgb.g) * intensity);
