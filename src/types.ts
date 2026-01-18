@@ -218,6 +218,14 @@ export const BestPerformanceResponse = type({
 });
 export type BestPerformanceResponse = typeof BestPerformanceResponse.infer;
 
+export const PowerProfileResponse = type({
+  labels: "string[]",
+  overall: "number[]",
+  years: { "[string]": "number[]" },
+  available_years: "number[]",
+});
+export type PowerProfileResponse = typeof PowerProfileResponse.infer;
+
 export const User = type({
   id: "string",
   first_name: "string",

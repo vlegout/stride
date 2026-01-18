@@ -389,6 +389,13 @@ class BestPerformanceResponse(BaseModel):
     performances: list[BestPerformanceItem]
 
 
+class PowerProfileResponse(BaseModel):
+    labels: list[str]
+    overall: list[float]
+    years: dict[int, list[float]]
+    available_years: list[int]
+
+
 class WeeklyActivitySummary(BaseModel):
     id: uuid.UUID
     title: str

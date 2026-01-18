@@ -8,6 +8,7 @@ import type {
   ActivityUpdate,
   BestPerformanceResponse,
   FitnessResponse,
+  PowerProfileResponse,
   Profile,
   User,
   UserCreate,
@@ -21,6 +22,7 @@ import {
   ActivityZonesRawResponse as ActivityZonesRawResponseValidator,
   BestPerformanceResponse as BestPerformanceResponseValidator,
   FitnessResponse as FitnessResponseValidator,
+  PowerProfileResponse as PowerProfileResponseValidator,
   Profile as ProfileValidator,
   User as UserValidator,
   GoogleAuthResponse as GoogleAuthResponseValidator,
@@ -185,6 +187,11 @@ export async function fetchBestPerformances(
 
   const data = await apiCall(`/best/?${params.toString()}`);
   return validateResponse(data, BestPerformanceResponseValidator, "fetchBestPerformances");
+}
+
+export async function fetchPowerProfile(): Promise<PowerProfileResponse> {
+  const data = await apiCall("/best/power-profile/");
+  return validateResponse(data, PowerProfileResponseValidator, "fetchPowerProfile");
 }
 
 export async function uploadActivity(fitFile: File, title: string, race: boolean): Promise<Activity> {
