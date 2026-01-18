@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -36,19 +37,7 @@ const ActivityZones = ({ zones, title }: ActivityZonesProps) => {
   }
 
   const getZoneColor = (zone: number): string => {
-    const colors = [
-      "#64B5F6", // Zone 1 - Light Blue
-      "#4FC3F7", // Zone 2 - Cyan
-      "#26C6DA", // Zone 3 - Light Cyan
-      "#26A69A", // Zone 4 - Teal
-      "#66BB6A", // Zone 5 - Light Green
-      "#9CCC65", // Zone 6 - Light Lime
-      "#FFCA28", // Zone 7 - Amber
-      "#FF7043", // Zone 8 - Deep Orange
-      "#EF5350", // Zone 9 - Red
-      "#E91E63", // Zone 10 - Pink
-    ];
-    return colors[zone - 1] || "#9E9E9E";
+    return colors.chart.zones[zone - 1] || colors.grey[500];
   };
 
   const formatTime = (seconds: number): string => {

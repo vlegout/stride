@@ -71,6 +71,9 @@ export const colors = {
       "rgba(249, 115, 22, 0.75)", // Zone 5 - VO2max (orange)
       "rgba(239, 68, 68, 0.75)", // Zone 6 - Anaerobic (red)
       "rgba(168, 85, 247, 0.75)", // Zone 7 - Neuromuscular (purple)
+      "rgba(236, 72, 153, 0.75)", // Zone 8 - Extended (pink)
+      "rgba(139, 92, 246, 0.75)", // Zone 9 - Extended (violet)
+      "rgba(99, 102, 241, 0.75)", // Zone 10 - Extended (indigo)
     ],
 
     // Distance/Time chart pairs (for weekly metrics)
