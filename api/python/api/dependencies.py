@@ -1,5 +1,3 @@
-import os
-
 from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
@@ -17,10 +15,6 @@ def get_current_user_id(request: Request) -> str:
     if not hasattr(request.state, "user_id") or not request.state.user_id:
         raise HTTPException(status_code=401, detail="User not authenticated")
     return request.state.user_id
-
-
-if "JWT_SECRET_KEY" not in os.environ:
-    raise ValueError("Missing environment variables: JWT_SECRET_KEY")
 
 
 async def verify_jwt_token(request: Request, call_next):

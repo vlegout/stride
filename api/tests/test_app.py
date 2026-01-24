@@ -9,8 +9,6 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-for-testing")
-
 from api.app import app
 from api.dependencies import get_session, get_current_user_id, verify_jwt_token
 from api.auth import create_token_response

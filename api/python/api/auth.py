@@ -1,10 +1,11 @@
 import datetime
-import os
 
 from fastapi import HTTPException, status
 import jwt
 from jwt.exceptions import PyJWTError
 from pydantic import BaseModel
+
+from api.config import JWT_SECRET_KEY
 
 
 class TokenData(BaseModel):
@@ -18,7 +19,6 @@ class Token(BaseModel):
     expires_in: int
 
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-here")
 JWT_ALGORITHM = "HS256"
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 

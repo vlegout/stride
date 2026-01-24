@@ -1,50 +1,34 @@
 import datetime
-import os
 
 import boto3
 import yaml
 from botocore.exceptions import ClientError
 
+from api.config import (
+    BUCKET,
+    OBJECT_STORAGE_ENDPOINT,
+    OBJECT_STORAGE_REGION,
+    SCW_ACCESS_KEY,
+    SCW_SECRET_KEY,
+)
 from api.services.exceptions import StorageServiceError
 from api.utils import generate_random_string
 
 
 def create_s3_client():
     """Create and return a configured S3 client for Scaleway Object Storage."""
-    endpoint_url = os.environ.get("OBJECT_STORAGE_ENDPOINT")
-    region = os.environ.get("OBJECT_STORAGE_REGION")
-    access_key = os.environ.get("SCW_ACCESS_KEY")
-    secret_key = os.environ.get("SCW_SECRET_KEY")
-
-    if not all([endpoint_url, region, access_key, secret_key]):
-        missing = []
-        if not endpoint_url:
-            missing.append("OBJECT_STORAGE_ENDPOINT")
-        if not region:
-            missing.append("OBJECT_STORAGE_REGION")
-        if not access_key:
-            missing.append("SCW_ACCESS_KEY")
-        if not secret_key:
-            missing.append("SCW_SECRET_KEY")
-
-        raise StorageServiceError(
-            f"Object storage credentials not properly configured. Missing: {', '.join(missing)}"
-        )
-
     return boto3.client(
         "s3",
-        endpoint_url=endpoint_url,
-        region_name=region,
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_key,
+        endpoint_url=OBJECT_STORAGE_ENDPOINT,
+        region_name=OBJECT_STORAGE_REGION,
+        aws_access_key_id=SCW_ACCESS_KEY,
+        aws_secret_access_key=SCW_SECRET_KEY,
     )
 
 
 class StorageService:
     def __init__(self):
-        self.bucket = os.environ.get("BUCKET")
-        if not self.bucket:
-            raise StorageServiceError("BUCKET environment variable not set")
+        self.bucket = BUCKET
         self._client = None
 
     @property

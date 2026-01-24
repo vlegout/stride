@@ -5,36 +5,37 @@ import uuid
 from enum import Enum
 
 from fastapi import (
-    FastAPI,
     Depends,
-    HTTPException,
-    Query,
-    status,
-    UploadFile,
+    FastAPI,
     File,
     Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
 )
-from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import func, text
-from sqlmodel import Session, select, col
 from sqlalchemy.orm import selectinload
+from sqlmodel import Session, col, select
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from api.auth import create_token_response, Token
-from api.dependencies import get_session, get_current_user_id, verify_jwt_token
+from api.auth import Token, create_token_response
+from api.dependencies import get_current_user_id, get_session, verify_jwt_token
+from api.fitness import calculate_fitness_scores
 from api.model import (
     Activity,
     ActivityList,
     ActivityPublic,
     ActivityPublicWithoutTracepoints,
     ActivityUpdate,
+    ActivityZoneHeartRate,
+    ActivityZoneHeartRatePublic,
     ActivityZonePace,
     ActivityZonePacePublic,
     ActivityZonePower,
     ActivityZonePowerPublic,
-    ActivityZoneHeartRate,
-    ActivityZoneHeartRatePublic,
     BestPerformanceItem,
     BestPerformanceResponse,
     Notification,
@@ -53,7 +54,6 @@ from api.model import (
 from api.services import get_activity_service, get_profile_service, get_zone_service
 from api.services.activity import ActivityService
 from api.services.profile import ProfileService
-from api.fitness import calculate_fitness_scores
 
 
 def get_activity_service_dependency(
