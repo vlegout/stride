@@ -2,11 +2,12 @@ import datetime
 from collections import defaultdict
 from collections.abc import Sequence
 
+from shapely.geometry import LineString
 from sqlmodel import Session, col, select
 
 from api.model import Activity, Heatmap, HeatmapPolyline, HeatmapPublic, Tracepoint
 
-MAX_POINTS_PER_ACTIVITY = 100
+SIMPLIFICATION_TOLERANCE = 0.0001  # ~11 meters at equator
 
 
 class HeatmapService:
@@ -123,11 +124,11 @@ class HeatmapService:
     def _simplify_tracepoints(
         self, tracepoints: Sequence[Tracepoint]
     ) -> list[list[float]]:
-        if len(tracepoints) <= MAX_POINTS_PER_ACTIVITY:
+        if len(tracepoints) < 2:
             return [[tp.lat, tp.lon] for tp in tracepoints]
 
-        step = len(tracepoints) / MAX_POINTS_PER_ACTIVITY
-        indices = [int(i * step) for i in range(MAX_POINTS_PER_ACTIVITY)]
-        indices[-1] = len(tracepoints) - 1
+        coords = [(tp.lon, tp.lat) for tp in tracepoints]
+        line = LineString(coords)
+        simplified = line.simplify(SIMPLIFICATION_TOLERANCE, preserve_topology=False)
 
-        return [[tracepoints[i].lat, tracepoints[i].lon] for i in indices]
+        return [[lat, lon] for lon, lat in simplified.coords]

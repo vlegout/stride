@@ -2,8 +2,6 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { Zone } from "../types";
 import { DataTable, Column, SectionContainer } from "./ui";
@@ -13,9 +11,6 @@ interface ZoneTablesProps {
 }
 
 const ZoneTables: React.FC<ZoneTablesProps> = ({ zones }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   // Group zones by type
   const heartRateZones = zones.filter((zone) => zone.type === "heart_rate");
   const paceZones = zones.filter((zone) => zone.type === "pace");
@@ -76,7 +71,7 @@ const ZoneTables: React.FC<ZoneTablesProps> = ({ zones }) => {
         {heartRateZones.length > 0 && (
           <Grid size={{ xs: 12, md: 4 }}>
             <SectionContainer title="Heart Rate Zones" maxWidth="100%" centered variant="paper">
-              <DataTable columns={zoneColumns} rows={heartRateRows} minWidth={isMobile ? 250 : 300} responsive />
+              <DataTable columns={zoneColumns} rows={heartRateRows} minWidth={0} responsive />
             </SectionContainer>
           </Grid>
         )}
@@ -84,7 +79,7 @@ const ZoneTables: React.FC<ZoneTablesProps> = ({ zones }) => {
         {paceZones.length > 0 && (
           <Grid size={{ xs: 12, md: 4 }}>
             <SectionContainer title="Pace Zones" maxWidth="100%" centered variant="paper">
-              <DataTable columns={zoneColumns} rows={paceRows} minWidth={isMobile ? 250 : 300} responsive />
+              <DataTable columns={zoneColumns} rows={paceRows} minWidth={0} responsive />
             </SectionContainer>
           </Grid>
         )}
@@ -92,7 +87,7 @@ const ZoneTables: React.FC<ZoneTablesProps> = ({ zones }) => {
         {powerZones.length > 0 && (
           <Grid size={{ xs: 12, md: 4 }}>
             <SectionContainer title="Power Zones" maxWidth="100%" centered variant="paper">
-              <DataTable columns={zoneColumns} rows={powerRows} minWidth={isMobile ? 250 : 300} responsive />
+              <DataTable columns={zoneColumns} rows={powerRows} minWidth={0} responsive />
             </SectionContainer>
           </Grid>
         )}

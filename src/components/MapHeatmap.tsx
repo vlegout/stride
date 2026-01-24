@@ -44,7 +44,7 @@ const MapHeatmap = ({ polylines, height = "600px", width = "100%" }: MapHeatmapP
   const bounds = calculateBounds(polylines);
 
   return (
-    <MapContainer bounds={bounds} style={{ height, width }}>
+    <MapContainer bounds={bounds} style={{ height, width }} preferCanvas={true}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       {polylines.map((polyline, index) => (
         <Polyline
