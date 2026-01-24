@@ -8,7 +8,7 @@ Stride is a web app to visualize run & ride activities from FIT files with chart
 - Frontend: React + TypeScript
 - Backend: Python + Rust API
 - Database: PostgreSQL
-- Storage: AWS S3
+- Storage: Scaleway Object Storage
 
 ## Project Structure
 
@@ -96,9 +96,11 @@ npx playwright test
 ### Backend (`.env`)
 ```bash
 DATABASE_URL=postgresql://username:password@localhost:5432/sport_db
-AWS_ACCESS_KEY_ID=your-aws-access-key-id
-AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
-BUCKET=your-s3-bucket-name
+SCW_ACCESS_KEY=your-scaleway-access-key
+SCW_SECRET_KEY=your-scaleway-secret-key
+BUCKET=your-scaleway-bucket-name
+OBJECT_STORAGE_ENDPOINT=https://s3.fr-par.scw.cloud
+OBJECT_STORAGE_REGION=fr-par
 JWT_SECRET_KEY=your-jwt-secret-key
 ```
 

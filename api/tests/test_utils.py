@@ -423,19 +423,43 @@ class TestGenerateRandomString:
 
 
 class TestGetS3Client:
-    @patch("api.utils.boto3.client")
+    @patch.dict(
+        os.environ,
+        {
+            "SCW_ACCESS_KEY": "test-key",
+            "SCW_SECRET_KEY": "test-secret",
+            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
+            "OBJECT_STORAGE_REGION": "fr-par",
+        },
+    )
+    @patch("api.services.storage.boto3.client")
     def test_returns_s3_client(self, mock_boto_client):
         mock_client = Mock()
         mock_boto_client.return_value = mock_client
 
         result = get_s3_client()
 
-        mock_boto_client.assert_called_once_with("s3")
+        mock_boto_client.assert_called_once_with(
+            "s3",
+            endpoint_url="https://s3.fr-par.scw.cloud",
+            region_name="fr-par",
+            aws_access_key_id="test-key",
+            aws_secret_access_key="test-secret",
+        )
         assert result == mock_client
 
 
 class TestUploadFileToS3:
-    @patch.dict(os.environ, {"BUCKET": "test-bucket"})
+    @patch.dict(
+        os.environ,
+        {
+            "BUCKET": "test-bucket",
+            "SCW_ACCESS_KEY": "test-key",
+            "SCW_SECRET_KEY": "test-secret",
+            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
+            "OBJECT_STORAGE_REGION": "fr-par",
+        },
+    )
     @patch("api.utils.get_s3_client")
     def test_upload_success(self, mock_get_client):
         mock_client = Mock()
@@ -454,7 +478,16 @@ class TestUploadFileToS3:
         with pytest.raises(HTTPException, match="BUCKET environment variable not set"):
             upload_file_to_s3("/tmp/test.fit", "data/fit/test.fit")
 
-    @patch.dict(os.environ, {"BUCKET": "test-bucket"})
+    @patch.dict(
+        os.environ,
+        {
+            "BUCKET": "test-bucket",
+            "SCW_ACCESS_KEY": "test-key",
+            "SCW_SECRET_KEY": "test-secret",
+            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
+            "OBJECT_STORAGE_REGION": "fr-par",
+        },
+    )
     @patch("api.utils.get_s3_client")
     def test_client_error(self, mock_get_client):
         from botocore.exceptions import ClientError
@@ -466,12 +499,23 @@ class TestUploadFileToS3:
         )
         mock_get_client.return_value = mock_client
 
-        with pytest.raises(HTTPException, match="Failed to upload file to S3"):
+        with pytest.raises(
+            HTTPException, match="Failed to upload file to object storage"
+        ):
             upload_file_to_s3("/tmp/test.fit", "data/fit/test.fit")
 
 
 class TestUploadContentToS3:
-    @patch.dict(os.environ, {"BUCKET": "test-bucket"})
+    @patch.dict(
+        os.environ,
+        {
+            "BUCKET": "test-bucket",
+            "SCW_ACCESS_KEY": "test-key",
+            "SCW_SECRET_KEY": "test-secret",
+            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
+            "OBJECT_STORAGE_REGION": "fr-par",
+        },
+    )
     @patch("api.utils.get_s3_client")
     def test_upload_success(self, mock_get_client):
         mock_client = Mock()
@@ -493,7 +537,16 @@ class TestUploadContentToS3:
         with pytest.raises(HTTPException, match="BUCKET environment variable not set"):
             upload_content_to_s3("test", "data/test.yaml")
 
-    @patch.dict(os.environ, {"BUCKET": "test-bucket"})
+    @patch.dict(
+        os.environ,
+        {
+            "BUCKET": "test-bucket",
+            "SCW_ACCESS_KEY": "test-key",
+            "SCW_SECRET_KEY": "test-secret",
+            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
+            "OBJECT_STORAGE_REGION": "fr-par",
+        },
+    )
     @patch("api.utils.get_s3_client")
     def test_client_error(self, mock_get_client):
         from botocore.exceptions import ClientError
@@ -505,7 +558,9 @@ class TestUploadContentToS3:
         )
         mock_get_client.return_value = mock_client
 
-        with pytest.raises(HTTPException, match="Failed to upload content to S3"):
+        with pytest.raises(
+            HTTPException, match="Failed to upload content to object storage"
+        ):
             upload_content_to_s3("test", "data/test.yaml")
 
 

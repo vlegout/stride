@@ -255,7 +255,9 @@ def recompute_activities(
     ),
     dry_run: bool = typer.Option(False, "--dry-run", help="Preview without changes"),
     download_from_s3: bool = typer.Option(
-        True, "--download-s3/--no-download-s3", help="Download from S3 if missing"
+        True,
+        "--download-s3/--no-download-s3",
+        help="Download from object storage if missing",
     ),
     batch_size: int = typer.Option(
         10, "--batch-size", "-b", help="Commit every N activities"
@@ -270,7 +272,7 @@ def recompute_activities(
             try:
                 storage_service = StorageService()
             except Exception as e:
-                print(f"Warning: Could not initialize S3 storage: {e}")
+                print(f"Warning: Could not initialize object storage: {e}")
                 print("Will only use local FIT files")
 
         bulk_service = BulkOperationService(session, storage_service)
