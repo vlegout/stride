@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2.11.4",
     "pyjwt>=2.0.0",
     "pyyaml>=6.0.2",
+    "shapely>=2.1.2",
     "sqlmodel>=0.0.24",
     "typer>=0.15.3",
 ]
@@ -26,6 +27,7 @@ dev = [
     "types-boto3>=1.42.11",
     "ty>=0.0.2",
     "hypothesis>=6.148.7",
+    "types-shapely>=2.1.0.20250917",
 ]
 
 [build-system]
