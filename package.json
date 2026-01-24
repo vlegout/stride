@@ -27,6 +27,7 @@
     "arktype": "^2.1.29",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
+    "chartjs-plugin-zoom": "^2.2.0",
     "framer-motion": "^12.29.0",
     "jszip": "^3.10.1",
     "konva": "^10.2.0",

@@ -1,9 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Chart as ChartJS, CategoryScale, BarElement, LinearScale, Tooltip, LineElement, PointElement } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  BarElement,
+  LinearScale,
+  Tooltip,
+  LineElement,
+  PointElement,
+  Filler,
+} from "chart.js";
 import ActivityCharts from "./ActivityCharts";
 import { ProcessedChartData } from "../utils";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip);
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Filler);
 
 const mockRunningChartData: ProcessedChartData = {
   labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
