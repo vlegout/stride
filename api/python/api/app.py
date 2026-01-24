@@ -38,6 +38,7 @@ from api.model import (
     ActivityZonePowerPublic,
     BestPerformanceItem,
     BestPerformanceResponse,
+    HeatmapPublic,
     Notification,
     Pagination,
     PowerProfileResponse,
@@ -51,8 +52,14 @@ from api.model import (
     WeeksResponse,
     Zone,
 )
-from api.services import get_activity_service, get_profile_service, get_zone_service
+from api.services import (
+    get_activity_service,
+    get_heatmap_service,
+    get_profile_service,
+    get_zone_service,
+)
 from api.services.activity import ActivityService
+from api.services.heatmap import HeatmapService
 from api.services.profile import ProfileService
 
 
@@ -66,6 +73,12 @@ def get_profile_service_dependency(
     session: Session = Depends(get_session),
 ) -> ProfileService:
     return get_profile_service(session)
+
+
+def get_heatmap_service_dependency(
+    session: Session = Depends(get_session),
+) -> HeatmapService:
+    return get_heatmap_service(session)
 
 
 app = FastAPI()
@@ -766,3 +779,22 @@ def read_fitness_score(
     user_id: str = Depends(get_current_user_id),
 ):
     return calculate_fitness_scores(session, user_id)
+
+
+@app.get("/heatmap/", response_model=HeatmapPublic)
+def read_heatmap(
+    user_id: str = Depends(get_current_user_id),
+    heatmap_service: HeatmapService = Depends(get_heatmap_service_dependency),
+):
+    heatmap = heatmap_service.get_heatmap(user_id)
+    if not heatmap:
+        raise HTTPException(status_code=404, detail="Heatmap not found")
+    return heatmap
+
+
+@app.post("/heatmap/", response_model=HeatmapPublic)
+def compute_heatmap(
+    user_id: str = Depends(get_current_user_id),
+    heatmap_service: HeatmapService = Depends(get_heatmap_service_dependency),
+):
+    return heatmap_service.compute_heatmap(user_id)

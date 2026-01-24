@@ -19,6 +19,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Upload = lazy(() => import("./pages/Upload"));
 const Fitness = lazy(() => import("./pages/Fitness"));
 const Best = lazy(() => import("./pages/Best"));
+const Heatmap = lazy(() => import("./pages/Heatmap"));
 const Login = lazy(() => import("./pages/Login"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
@@ -87,6 +88,10 @@ const router = createBrowserRouter([
       {
         path: "/best",
         element: <Best />,
+      },
+      {
+        path: "/heatmap",
+        element: <Heatmap />,
       },
     ],
   },

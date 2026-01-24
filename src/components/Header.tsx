@@ -24,6 +24,7 @@ const menus = [
   { to: "/weeks", label: "Weeks" },
   { to: "/fitness", label: "Fitness" },
   { to: "/best", label: "Best" },
+  { to: "/heatmap", label: "Heatmap" },
 ];
 
 const Header = () => {

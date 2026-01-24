@@ -381,3 +381,17 @@ export const ActivityZonesRawResponse = type({
   heart_rate: ActivityZoneRaw.array().optional(),
 });
 export type ActivityZonesRawResponse = typeof ActivityZonesRawResponse.infer;
+
+export const HeatmapPolyline = type({
+  coordinates: type(["number", "number"]).array(),
+  sport: Sport,
+});
+export type HeatmapPolyline = typeof HeatmapPolyline.infer;
+
+export const HeatmapResponse = type({
+  polylines: HeatmapPolyline.array(),
+  activity_count: "number",
+  point_count: "number",
+  updated_at: "string",
+});
+export type HeatmapResponse = typeof HeatmapResponse.infer;

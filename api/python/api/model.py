@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from pydantic import BaseModel, field_serializer, field_validator, model_validator
+from sqlalchemy import JSON
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -425,3 +426,33 @@ class WeeklySummary(BaseModel):
 
 class WeeksResponse(BaseModel):
     weeks: list[WeeklySummary]
+
+
+class HeatmapPolyline(BaseModel):
+    coordinates: list[list[float]]
+    sport: str
+
+
+class HeatmapBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: str = Field(foreign_key="user.id", unique=True)
+    polylines: list[dict] = Field(default=[], sa_type=JSON)
+    activity_count: int = Field(default=0)
+    point_count: int = Field(default=0)
+    created_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+    updated_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+
+
+class Heatmap(HeatmapBase, table=True):
+    user: User = Relationship()
+
+
+class HeatmapPublic(BaseModel):
+    polylines: list[HeatmapPolyline]
+    activity_count: int
+    point_count: int
+    updated_at: datetime.datetime
