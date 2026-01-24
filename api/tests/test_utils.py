@@ -10,11 +10,7 @@ from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
 from api.model import Activity, Location, Tracepoint, Zone
-from api.services.storage import (
-    create_s3_client,
-    upload_content_to_s3,
-    upload_file_to_s3,
-)
+from api.services.storage import create_s3_client
 from api.utils import (
     calculate_activity_zone_data,
     create_default_zones,
@@ -449,121 +445,6 @@ class TestCreateS3Client:
             aws_secret_access_key="test-secret",
         )
         assert result == mock_client
-
-
-class TestUploadFileToS3:
-    @patch.dict(
-        os.environ,
-        {
-            "BUCKET": "test-bucket",
-            "SCW_ACCESS_KEY": "test-key",
-            "SCW_SECRET_KEY": "test-secret",
-            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
-            "OBJECT_STORAGE_REGION": "fr-par",
-        },
-    )
-    @patch("api.services.storage.create_s3_client")
-    def test_upload_success(self, mock_get_client):
-        mock_client = Mock()
-        mock_get_client.return_value = mock_client
-
-        upload_file_to_s3("/tmp/test.fit", "data/fit/test.fit")
-
-        mock_client.upload_file.assert_called_once_with(
-            "/tmp/test.fit", "test-bucket", "data/fit/test.fit"
-        )
-
-    @patch.dict(os.environ, {}, clear=True)
-    def test_missing_bucket_env(self):
-        from fastapi import HTTPException
-
-        with pytest.raises(HTTPException, match="BUCKET environment variable not set"):
-            upload_file_to_s3("/tmp/test.fit", "data/fit/test.fit")
-
-    @patch.dict(
-        os.environ,
-        {
-            "BUCKET": "test-bucket",
-            "SCW_ACCESS_KEY": "test-key",
-            "SCW_SECRET_KEY": "test-secret",
-            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
-            "OBJECT_STORAGE_REGION": "fr-par",
-        },
-    )
-    @patch("api.services.storage.create_s3_client")
-    def test_client_error(self, mock_get_client):
-        from botocore.exceptions import ClientError
-        from fastapi import HTTPException
-
-        mock_client = Mock()
-        mock_client.upload_file.side_effect = ClientError(
-            {"Error": {"Code": "500", "Message": "Server Error"}}, "upload_file"
-        )
-        mock_get_client.return_value = mock_client
-
-        with pytest.raises(
-            HTTPException, match="Failed to upload file to object storage"
-        ):
-            upload_file_to_s3("/tmp/test.fit", "data/fit/test.fit")
-
-
-class TestUploadContentToS3:
-    @patch.dict(
-        os.environ,
-        {
-            "BUCKET": "test-bucket",
-            "SCW_ACCESS_KEY": "test-key",
-            "SCW_SECRET_KEY": "test-secret",
-            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
-            "OBJECT_STORAGE_REGION": "fr-par",
-        },
-    )
-    @patch("api.services.storage.create_s3_client")
-    def test_upload_success(self, mock_get_client):
-        mock_client = Mock()
-        mock_get_client.return_value = mock_client
-
-        upload_content_to_s3("test content", "data/test.yaml")
-
-        mock_client.put_object.assert_called_once_with(
-            Bucket="test-bucket",
-            Key="data/test.yaml",
-            Body=b"test content",
-            ContentType="text/yaml",
-        )
-
-    @patch.dict(os.environ, {}, clear=True)
-    def test_missing_bucket_env(self):
-        from fastapi import HTTPException
-
-        with pytest.raises(HTTPException, match="BUCKET environment variable not set"):
-            upload_content_to_s3("test", "data/test.yaml")
-
-    @patch.dict(
-        os.environ,
-        {
-            "BUCKET": "test-bucket",
-            "SCW_ACCESS_KEY": "test-key",
-            "SCW_SECRET_KEY": "test-secret",
-            "OBJECT_STORAGE_ENDPOINT": "https://s3.fr-par.scw.cloud",
-            "OBJECT_STORAGE_REGION": "fr-par",
-        },
-    )
-    @patch("api.services.storage.create_s3_client")
-    def test_client_error(self, mock_get_client):
-        from botocore.exceptions import ClientError
-        from fastapi import HTTPException
-
-        mock_client = Mock()
-        mock_client.put_object.side_effect = ClientError(
-            {"Error": {"Code": "500", "Message": "Server Error"}}, "put_object"
-        )
-        mock_get_client.return_value = mock_client
-
-        with pytest.raises(
-            HTTPException, match="Failed to upload content to object storage"
-        ):
-            upload_content_to_s3("test", "data/test.yaml")
 
 
 class TestCreateDefaultZones:
