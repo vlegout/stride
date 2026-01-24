@@ -10,6 +10,11 @@ from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
 from api.model import Activity, Location, Tracepoint, Zone
+from api.services.storage import (
+    create_s3_client,
+    upload_content_to_s3,
+    upload_file_to_s3,
+)
 from api.utils import (
     calculate_activity_zone_data,
     create_default_zones,
@@ -20,11 +25,8 @@ from api.utils import (
     get_best_performances,
     get_delta_lat_lon,
     get_lat_lon,
-    get_s3_client,
     get_uuid,
     update_user_zones_from_activities,
-    upload_content_to_s3,
-    upload_file_to_s3,
     _calculate_heart_rate_zones,
     _calculate_pace_zones,
     _calculate_power_zones,
@@ -422,7 +424,7 @@ class TestGenerateRandomString:
         assert result1 != result2
 
 
-class TestGetS3Client:
+class TestCreateS3Client:
     @patch.dict(
         os.environ,
         {
@@ -437,7 +439,7 @@ class TestGetS3Client:
         mock_client = Mock()
         mock_boto_client.return_value = mock_client
 
-        result = get_s3_client()
+        result = create_s3_client()
 
         mock_boto_client.assert_called_once_with(
             "s3",
@@ -460,7 +462,7 @@ class TestUploadFileToS3:
             "OBJECT_STORAGE_REGION": "fr-par",
         },
     )
-    @patch("api.utils.get_s3_client")
+    @patch("api.services.storage.create_s3_client")
     def test_upload_success(self, mock_get_client):
         mock_client = Mock()
         mock_get_client.return_value = mock_client
@@ -488,7 +490,7 @@ class TestUploadFileToS3:
             "OBJECT_STORAGE_REGION": "fr-par",
         },
     )
-    @patch("api.utils.get_s3_client")
+    @patch("api.services.storage.create_s3_client")
     def test_client_error(self, mock_get_client):
         from botocore.exceptions import ClientError
         from fastapi import HTTPException
@@ -516,7 +518,7 @@ class TestUploadContentToS3:
             "OBJECT_STORAGE_REGION": "fr-par",
         },
     )
-    @patch("api.utils.get_s3_client")
+    @patch("api.services.storage.create_s3_client")
     def test_upload_success(self, mock_get_client):
         mock_client = Mock()
         mock_get_client.return_value = mock_client
@@ -547,7 +549,7 @@ class TestUploadContentToS3:
             "OBJECT_STORAGE_REGION": "fr-par",
         },
     )
-    @patch("api.utils.get_s3_client")
+    @patch("api.services.storage.create_s3_client")
     def test_client_error(self, mock_get_client):
         from botocore.exceptions import ClientError
         from fastapi import HTTPException

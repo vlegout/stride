@@ -5,8 +5,6 @@ import random
 import string
 import uuid
 
-from botocore.exceptions import ClientError
-from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from api.model import (
@@ -393,52 +391,8 @@ def detect_best_effort_achievements(
     return notifications
 
 
-def get_s3_client():
-    from api.services.storage import create_s3_client
-
-    return create_s3_client()
-
-
 def generate_random_string(length: int = 8) -> str:
     return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
-
-
-def upload_file_to_s3(file_path: str, s3_key: str) -> None:
-    bucket = os.environ.get("BUCKET")
-    if not bucket:
-        raise HTTPException(
-            status_code=500, detail="BUCKET environment variable not set"
-        )
-
-    try:
-        s3_client = get_s3_client()
-        s3_client.upload_file(file_path, bucket, s3_key)
-    except ClientError as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to upload file to object storage: {str(e)}"
-        )
-
-
-def upload_content_to_s3(content: str, s3_key: str) -> None:
-    bucket = os.environ.get("BUCKET")
-    if not bucket:
-        raise HTTPException(
-            status_code=500, detail="BUCKET environment variable not set"
-        )
-
-    try:
-        s3_client = get_s3_client()
-        s3_client.put_object(
-            Bucket=bucket,
-            Key=s3_key,
-            Body=content.encode("utf-8"),
-            ContentType="text/yaml",
-        )
-    except ClientError as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to upload content to object storage: {str(e)}",
-        )
 
 
 def get_activity_location(

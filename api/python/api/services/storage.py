@@ -5,6 +5,8 @@ import boto3
 import yaml
 from botocore.exceptions import ClientError
 
+from fastapi import HTTPException
+
 from api.services.exceptions import StorageServiceError
 from api.utils import generate_random_string
 
@@ -38,6 +40,44 @@ def create_s3_client():
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
     )
+
+
+def upload_file_to_s3(file_path: str, s3_key: str) -> None:
+    bucket = os.environ.get("BUCKET")
+    if not bucket:
+        raise HTTPException(
+            status_code=500, detail="BUCKET environment variable not set"
+        )
+
+    try:
+        s3_client = create_s3_client()
+        s3_client.upload_file(file_path, bucket, s3_key)
+    except ClientError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to upload file to object storage: {str(e)}"
+        )
+
+
+def upload_content_to_s3(content: str, s3_key: str) -> None:
+    bucket = os.environ.get("BUCKET")
+    if not bucket:
+        raise HTTPException(
+            status_code=500, detail="BUCKET environment variable not set"
+        )
+
+    try:
+        s3_client = create_s3_client()
+        s3_client.put_object(
+            Bucket=bucket,
+            Key=s3_key,
+            Body=content.encode("utf-8"),
+            ContentType="text/yaml",
+        )
+    except ClientError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to upload content to object storage: {str(e)}",
+        )
 
 
 class StorageService:
