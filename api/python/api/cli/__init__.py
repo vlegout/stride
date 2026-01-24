@@ -11,6 +11,7 @@ from api.db import engine
 from api.model import User
 from api.services.bulk_operations import BulkOperationService
 from api.services.fit_file import FitFileService
+from api.services.heatmap import HeatmapService
 from api.services.location import LocationService
 from api.services.performance import PerformanceService
 from api.services.storage import StorageService
@@ -302,6 +303,37 @@ def recompute_activities(
 
     finally:
         session.close()
+
+
+@app.command()
+def update_heatmap(
+    user_email: str | None = typer.Option(
+        None, "--user", "-u", help="Update heatmap for specific user only"
+    ),
+):
+    """Update or create heatmap for users."""
+    session = Session(engine)
+    heatmap_service = HeatmapService(session)
+
+    if user_email:
+        user = session.exec(select(User).where(User.email == user_email)).first()
+        if not user:
+            print(f"User with email {user_email} not found")
+            return
+        users = [user]
+    else:
+        users = list(session.exec(select(User)).all())
+
+    print(f"Updating heatmaps for {len(users)} user(s)...")
+
+    for user in users:
+        print(f"  Processing {user.email}...")
+        heatmap = heatmap_service.compute_heatmap(user.id)
+        print(
+            f"    -> {heatmap.activity_count} activities, {heatmap.point_count} points"
+        )
+
+    print("Done")
 
 
 if __name__ == "__main__":

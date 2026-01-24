@@ -1,6 +1,7 @@
 from sqlmodel import Session
 
 from .activity import ActivityService
+from .heatmap import HeatmapService
 from .notification import NotificationService
 from .performance import PerformanceService
 from .profile import ProfileService
@@ -28,6 +29,10 @@ def get_profile_service(session: Session) -> ProfileService:
     return ProfileService(session)
 
 
+def get_heatmap_service(session: Session) -> HeatmapService:
+    return HeatmapService(session)
+
+
 def get_activity_service(session: Session) -> ActivityService:
     storage = get_storage_service()
     zone = get_zone_service(session)
@@ -43,12 +48,14 @@ def get_activity_service(session: Session) -> ActivityService:
 
 __all__ = [
     "ActivityService",
+    "HeatmapService",
     "NotificationService",
     "PerformanceService",
     "ProfileService",
     "StorageService",
     "ZoneService",
     "get_activity_service",
+    "get_heatmap_service",
     "get_notification_service",
     "get_performance_service",
     "get_profile_service",

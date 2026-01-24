@@ -8,6 +8,7 @@ import type {
   ActivityUpdate,
   BestPerformanceResponse,
   FitnessResponse,
+  HeatmapResponse,
   PowerProfileResponse,
   Profile,
   User,
@@ -22,6 +23,7 @@ import {
   ActivityZonesRawResponse as ActivityZonesRawResponseValidator,
   BestPerformanceResponse as BestPerformanceResponseValidator,
   FitnessResponse as FitnessResponseValidator,
+  HeatmapResponse as HeatmapResponseValidator,
   PowerProfileResponse as PowerProfileResponseValidator,
   Profile as ProfileValidator,
   User as UserValidator,
@@ -277,4 +279,9 @@ export async function authenticateWithGoogle(userData: UserCreate): Promise<Goog
   });
 
   return validateResponse(response.data, GoogleAuthResponseValidator, "authenticateWithGoogle");
+}
+
+export async function fetchHeatmap(): Promise<HeatmapResponse> {
+  const data = await apiCall("/heatmap/");
+  return validateResponse(data, HeatmapResponseValidator, "fetchHeatmap");
 }
