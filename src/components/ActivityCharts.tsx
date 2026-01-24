@@ -19,6 +19,7 @@ const ActivityCharts = ({ chartData }: ActivityChartsProps) => {
             title="Speed"
             xAxisLabel="Distance (km)"
             yAxisLabel="Speed (km/h)"
+            unit="km/h"
           />
         </SectionContainer>
       )}
@@ -31,6 +32,7 @@ const ActivityCharts = ({ chartData }: ActivityChartsProps) => {
             title="Heart Rate"
             xAxisLabel="Distance (km)"
             yAxisLabel="Heart Rate (bpm)"
+            unit="bpm"
           />
         </SectionContainer>
       )}
@@ -43,6 +45,7 @@ const ActivityCharts = ({ chartData }: ActivityChartsProps) => {
             title="Altitude"
             xAxisLabel="Distance (km)"
             yAxisLabel="Altitude (m)"
+            unit="m"
           />
         </SectionContainer>
       )}
@@ -55,13 +58,21 @@ const ActivityCharts = ({ chartData }: ActivityChartsProps) => {
             title="Cadence"
             xAxisLabel="Distance (km)"
             yAxisLabel="Cadence (rpm)"
+            unit="rpm"
           />
         </SectionContainer>
       )}
 
       {hasValidData(powerData) && (
         <SectionContainer spacing="compact">
-          <LineChart labels={labels} data={powerData} title="Power" xAxisLabel="Distance (km)" yAxisLabel="Power (W)" />
+          <LineChart
+            labels={labels}
+            data={powerData}
+            title="Power"
+            xAxisLabel="Distance (km)"
+            yAxisLabel="Power (W)"
+            unit="W"
+          />
         </SectionContainer>
       )}
 
@@ -73,6 +84,7 @@ const ActivityCharts = ({ chartData }: ActivityChartsProps) => {
             title="Temperature"
             xAxisLabel="Distance (km)"
             yAxisLabel="Temperature (°C)"
+            unit="°C"
           />
         </SectionContainer>
       )}
