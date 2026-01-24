@@ -1,5 +1,5 @@
 import datetime
-
+from collections import defaultdict
 from collections.abc import Sequence
 
 from sqlmodel import Session, col, select
@@ -46,15 +46,24 @@ class HeatmapService:
             )
         ).all()
 
+        activity_ids = [activity.id for activity in activities]
+        activity_sport_map = {activity.id: activity.sport for activity in activities}
+
+        all_tracepoints = self.session.exec(
+            select(Tracepoint)
+            .where(col(Tracepoint.activity_id).in_(activity_ids))
+            .order_by(col(Tracepoint.activity_id), col(Tracepoint.timestamp))
+        ).all()
+
+        tracepoints_by_activity: dict[str, list[Tracepoint]] = defaultdict(list)
+        for tp in all_tracepoints:
+            tracepoints_by_activity[str(tp.activity_id)].append(tp)
+
         polylines: list[dict] = []
         total_points = 0
 
-        for activity in activities:
-            tracepoints = self.session.exec(
-                select(Tracepoint)
-                .where(Tracepoint.activity_id == activity.id)
-                .order_by(col(Tracepoint.timestamp))
-            ).all()
+        for activity_id in activity_ids:
+            tracepoints = tracepoints_by_activity.get(str(activity_id), [])
 
             if not tracepoints:
                 continue
@@ -66,7 +75,7 @@ class HeatmapService:
             polylines.append(
                 {
                     "coordinates": coordinates,
-                    "sport": activity.sport,
+                    "sport": activity_sport_map[activity_id],
                 }
             )
             total_points += len(coordinates)
