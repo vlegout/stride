@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { execSync } from "child_process";
 import { codecovVitePlugin } from "@codecov/vite-plugin";
+import istanbul from "vite-plugin-istanbul";
 
 // https://vite.dev/config/
 export default defineConfig(() => {
@@ -22,6 +23,16 @@ export default defineConfig(() => {
         bundleName: "stride",
         ...(process.env.CODECOV_TOKEN && { uploadToken: process.env.CODECOV_TOKEN }),
       }),
+      ...(process.env.PLAYWRIGHT_COVERAGE === "true"
+        ? [
+            istanbul({
+              include: "src/**/*",
+              exclude: ["node_modules", "**/*.stories.tsx", "**/*.test.tsx"],
+              extension: [".ts", ".tsx"],
+              forceBuildInstrument: true,
+            }),
+          ]
+        : []),
     ],
     define: {
       __APP_VERSION__: JSON.stringify(gitCommitSha),
