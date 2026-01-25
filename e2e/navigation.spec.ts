@@ -7,7 +7,7 @@ test.describe("Navigation", () => {
     await page.click('a[href="/activities"]');
 
     await expect(page).toHaveURL("/activities");
-    await expect(page.getByRole("heading", { name: "Activities" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Activities", exact: true })).toBeVisible();
   });
 
   test("navigates to home page from logo", async ({ page }) => {
@@ -20,10 +20,10 @@ test.describe("Navigation", () => {
 
   test("header is visible on all pages", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Activities")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Activities" })).toBeVisible();
 
     await page.goto("/activities");
-    await expect(page.getByText("Activities")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Activities" })).toBeVisible();
   });
 
   test("footer is visible on home page", async ({ page }) => {
