@@ -1,5 +1,5 @@
 import { MapContainer, Polyline, TileLayer } from "react-leaflet";
-import type { LatLngBoundsExpression } from "leaflet";
+import type { LatLngExpression } from "leaflet";
 import type { HeatmapPolyline } from "../types";
 
 const SPORT_COLORS: Record<string, string> = {
@@ -14,26 +14,21 @@ interface MapHeatmapProps {
   width?: string;
 }
 
-function calculateBounds(polylines: HeatmapPolyline[]): LatLngBoundsExpression {
-  let minLat = 90;
-  let maxLat = -90;
-  let minLon = 180;
-  let maxLon = -180;
+function calculateCenter(polylines: HeatmapPolyline[]): LatLngExpression {
+  const startPoints = polylines.map((p) => p.coordinates[0]).filter((c): c is [number, number] => c !== undefined);
 
-  for (const polyline of polylines) {
-    for (const [lat, lon] of polyline.coordinates) {
-      if (lat < minLat) minLat = lat;
-      if (lat > maxLat) maxLat = lat;
-      if (lon < minLon) minLon = lon;
-      if (lon > maxLon) maxLon = lon;
-    }
+  if (startPoints.length === 0) {
+    return [0, 0];
   }
 
-  const padding = 0.01;
-  return [
-    [minLat - padding, minLon - padding],
-    [maxLat + padding, maxLon + padding],
-  ];
+  const lats = startPoints.map((p) => p[0]).sort((a, b) => a - b);
+  const lons = startPoints.map((p) => p[1]).sort((a, b) => a - b);
+
+  const mid = Math.floor(lats.length / 2);
+  const medianLat = lats.length % 2 ? lats[mid] : (lats[mid - 1] + lats[mid]) / 2;
+  const medianLon = lons.length % 2 ? lons[mid] : (lons[mid - 1] + lons[mid]) / 2;
+
+  return [medianLat, medianLon];
 }
 
 const MapHeatmap = ({ polylines, height = "600px", width = "100%" }: MapHeatmapProps) => {
@@ -41,10 +36,10 @@ const MapHeatmap = ({ polylines, height = "600px", width = "100%" }: MapHeatmapP
     return null;
   }
 
-  const bounds = calculateBounds(polylines);
+  const center = calculateCenter(polylines);
 
   return (
-    <MapContainer bounds={bounds} style={{ height, width }} preferCanvas={true}>
+    <MapContainer center={center} zoom={8} style={{ height, width }} preferCanvas={true}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       {polylines.map((polyline, index) => (
         <Polyline
