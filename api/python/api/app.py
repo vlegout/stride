@@ -790,11 +790,3 @@ def read_heatmap(
     if not heatmap:
         raise HTTPException(status_code=404, detail="Heatmap not found")
     return heatmap
-
-
-@app.post("/heatmap/", response_model=HeatmapPublic)
-def compute_heatmap(
-    user_id: str = Depends(get_current_user_id),
-    heatmap_service: HeatmapService = Depends(get_heatmap_service_dependency),
-):
-    return heatmap_service.compute_heatmap(user_id)
