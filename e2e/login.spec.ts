@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./coverage";
 
 test.describe("Login Page", () => {
   test("displays login page with Google sign-in", async ({ page }) => {

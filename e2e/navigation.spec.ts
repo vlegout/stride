@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./coverage";
 
 test.describe("Navigation", () => {
   test("navigates to activities page from header", async ({ page }) => {
