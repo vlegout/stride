@@ -47,7 +47,7 @@ const MapHeatmap = ({ polylines, height = "600px", width = "100%" }: MapHeatmapP
           positions={polyline.coordinates as [number, number][]}
           pathOptions={{
             color: SPORT_COLORS[polyline.sport] || "#6366f1",
-            weight: 2,
+            weight: 3,
             opacity: 0.6,
           }}
         />
