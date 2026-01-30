@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-import LineChart from "./LapChart";
+import LapChart from "./LapChart";
 import { Lap } from "../types";
 
 const theme = createTheme();
@@ -27,7 +27,7 @@ const createSampleLaps = (numLaps: number, baseTimeSeconds = 330): Lap[] => {
 
 const meta = {
   title: "Components/LapChart",
-  component: LineChart,
+  component: LapChart,
   parameters: {
     layout: "centered",
     docs: {
@@ -59,7 +59,7 @@ const meta = {
       </ThemeProvider>
     ),
   ],
-} satisfies Meta<typeof LineChart>;
+} satisfies Meta<typeof LapChart>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
