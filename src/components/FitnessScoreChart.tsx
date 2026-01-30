@@ -1,4 +1,6 @@
-import { Box } from "@mui/material";
+import { useRef } from "react";
+import { Box, IconButton, Stack, Tooltip as MuiTooltip } from "@mui/material";
+import { ZoomIn, ZoomOut, RestartAlt } from "@mui/icons-material";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,10 +13,11 @@ import {
   Legend,
   TooltipItem,
 } from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
 import { FitnessScore } from "../types";
 import { colors } from "../colors";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, zoomPlugin);
 
 interface FitnessScoreChartProps {
   scores: FitnessScore[];
@@ -22,6 +25,7 @@ interface FitnessScoreChartProps {
 }
 
 const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: FitnessScoreChartProps) => {
+  const chartRef = useRef<ChartJS<"line">>(null);
   const labels = scores.map((score) => score.date);
   const overallScores = scores.map((score) => score.overall);
   const runningScores = scores.map((score) => score.running);
@@ -101,6 +105,27 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
           },
         },
       },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "x" as const,
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          drag: {
+            enabled: true,
+            backgroundColor: "rgba(255, 107, 53, 0.1)",
+            borderColor: colors.primary,
+            borderWidth: 1,
+          },
+          mode: "x" as const,
+        },
+      },
     },
     scales: {
       y: {
@@ -122,9 +147,40 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
     },
   };
 
+  const handleZoomIn = () => {
+    chartRef.current?.zoom(1.2);
+  };
+
+  const handleZoomOut = () => {
+    chartRef.current?.zoom(0.8);
+  };
+
+  const handleResetZoom = () => {
+    chartRef.current?.resetZoom();
+  };
+
   return (
     <Box sx={{ height: 400, width: "100%", mb: 4 }}>
-      <Line data={chartData} options={chartOptions} />
+      <Stack direction="row" justifyContent="flex-end" spacing={0.5} sx={{ mb: 1 }}>
+        <MuiTooltip title="Zoom in">
+          <IconButton size="small" onClick={handleZoomIn}>
+            <ZoomIn fontSize="small" />
+          </IconButton>
+        </MuiTooltip>
+        <MuiTooltip title="Zoom out">
+          <IconButton size="small" onClick={handleZoomOut}>
+            <ZoomOut fontSize="small" />
+          </IconButton>
+        </MuiTooltip>
+        <MuiTooltip title="Reset zoom">
+          <IconButton size="small" onClick={handleResetZoom}>
+            <RestartAlt fontSize="small" />
+          </IconButton>
+        </MuiTooltip>
+      </Stack>
+      <Box sx={{ height: "calc(100% - 40px)" }}>
+        <Line ref={chartRef} data={chartData} options={chartOptions} />
+      </Box>
     </Box>
   );
 };
