@@ -10,6 +10,8 @@ export const getDaysFromRange = (range: DateRangeOption): number => {
       return 180;
     case "1y":
       return 365;
+    case "2y":
+      return 730;
     default:
       return 365;
   }
@@ -25,6 +27,8 @@ export const getWeeksFromRange = (range: DateRangeOption): number => {
       return 26;
     case "1y":
       return 52;
+    case "2y":
+      return 104;
     default:
       return 52;
   }
@@ -59,6 +63,8 @@ export const getDateRangeLabel = (range: DateRangeOption): string => {
       return "6 Months";
     case "1y":
       return "1 Year";
+    case "2y":
+      return "2 Years";
     default:
       return "1 Year";
   }
