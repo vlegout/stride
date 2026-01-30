@@ -231,14 +231,14 @@ class TestFitness(unittest.TestCase):
         mock_zones_result = Mock()
         mock_zones_result.all.return_value = []  # No zones
 
-        # Mock empty results for weekly activity queries (52 weeks)
+        # Mock empty results for weekly activity queries (104 weeks)
         mock_weekly_activities_result = Mock()
         mock_weekly_activities_result.all.return_value = []
 
         # Mock session.exec to return different results based on call order
-        # First call: main activities, second: FTP, third: zones, then 52 weekly queries
+        # First call: main activities, second: FTP, third: zones, then 104 weekly queries
         side_effects = [mock_activities_result, mock_ftp_result, mock_zones_result]
-        side_effects.extend([mock_weekly_activities_result] * 52)
+        side_effects.extend([mock_weekly_activities_result] * 104)
         mock_session.exec.side_effect = side_effects
 
         result = calculate_fitness_scores(mock_session, "test-user-id")
@@ -251,13 +251,13 @@ class TestFitness(unittest.TestCase):
         self.assertIn("weekly_zones", result)
         self.assertIn("ftp", result)
 
-        # Should have 365 daily scores
-        self.assertEqual(len(result["scores"]), 365)
+        # Should have 730 daily scores (2 years)
+        self.assertEqual(len(result["scores"]), 730)
 
-        # Should have 52 weekly data points
-        self.assertEqual(len(result["weekly_tss"]), 52)
-        self.assertEqual(len(result["weekly_running"]), 52)
-        self.assertEqual(len(result["weekly_cycling"]), 52)
+        # Should have 104 weekly data points (2 years)
+        self.assertEqual(len(result["weekly_tss"]), 104)
+        self.assertEqual(len(result["weekly_running"]), 104)
+        self.assertEqual(len(result["weekly_cycling"]), 104)
 
         # Verify structure of weekly data
         for weekly_data in result["weekly_running"]:

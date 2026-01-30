@@ -90,9 +90,9 @@ def calculate_activity_score(activity, sport_filter=None):
 
 
 def calculate_fitness_scores(session: Session, user_id: str):
-    """Calculate fitness scores for a user over the past 1.5 years"""
+    """Calculate fitness scores for a user over the past 2.5 years"""
     end_date = datetime.datetime.now()
-    total_days = int(365 * 1.5)
+    total_days = int(365 * 2.5)
     start_date = end_date - datetime.timedelta(days=total_days)
     start_timestamp = int(start_date.timestamp())
 
@@ -175,7 +175,7 @@ def calculate_fitness_scores(session: Session, user_id: str):
 
     daily_scores.reverse()
 
-    days_to_skip = total_days - 365
+    days_to_skip = total_days - 730
 
     weekly_tss_data = []
     weekly_running_data = []
@@ -183,7 +183,7 @@ def calculate_fitness_scores(session: Session, user_id: str):
     weekly_swimming_data = []
     current_date = datetime.datetime.now()
 
-    for weeks_back in range(52):
+    for weeks_back in range(104):
         week_start = current_date - datetime.timedelta(weeks=weeks_back)
         week_start = week_start - datetime.timedelta(days=week_start.weekday())
         week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -257,8 +257,8 @@ def calculate_fitness_scores(session: Session, user_id: str):
     weekly_cycling_data.reverse()
     weekly_swimming_data.reverse()
 
-    # Get FTP data for the same time period (past 1 year)
-    ftp_start_date = current_date - datetime.timedelta(days=365)
+    # Get FTP data for the same time period (past 2 years)
+    ftp_start_date = current_date - datetime.timedelta(days=730)
     ftp_records = session.exec(
         select(Ftp)
         .where(Ftp.user_id == user_id, Ftp.date >= ftp_start_date.date())
@@ -273,7 +273,7 @@ def calculate_fitness_scores(session: Session, user_id: str):
         )
 
     # Calculate weekly zone data
-    weekly_zones = calculate_weekly_zone_data(session, user_id, 52)
+    weekly_zones = calculate_weekly_zone_data(session, user_id, 104)
 
     return {
         "scores": daily_scores[days_to_skip:],
@@ -411,7 +411,7 @@ def update_ftp_for_date(session: Session, user_id: str, date: datetime.date) -> 
         session.commit()
 
 
-def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 52):
+def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 104):
     """Calculate weekly zone data for heart rate, pace, and power zones"""
     current_date = datetime.datetime.now()
 
