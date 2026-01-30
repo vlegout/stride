@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-import LineChart from "./LapChart";
+import LapChart from "./LapChart";
 import { Lap } from "../types";
 
 const theme = createTheme();
@@ -27,7 +27,7 @@ const createSampleLaps = (numLaps: number, baseTimeSeconds = 330): Lap[] => {
 
 const meta = {
   title: "Components/LapChart",
-  component: LineChart,
+  component: LapChart,
   parameters: {
     layout: "centered",
     docs: {
@@ -59,7 +59,7 @@ const meta = {
       </ThemeProvider>
     ),
   ],
-} satisfies Meta<typeof LineChart>;
+} satisfies Meta<typeof LapChart>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -100,7 +100,35 @@ export const ManyLaps: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Chart with many laps (15) showing how the component handles larger datasets.",
+        story: "Chart with 15 laps - shows every 2nd label on x-axis.",
+      },
+    },
+  },
+};
+
+export const TwentyFiveLaps: Story = {
+  args: {
+    laps: createSampleLaps(25, 300),
+    sport: "running",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Chart with 25 laps - shows every 5th label on x-axis (plus first and last).",
+      },
+    },
+  },
+};
+
+export const FortyLaps: Story = {
+  args: {
+    laps: createSampleLaps(40, 310),
+    sport: "running",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Chart with 40 laps - shows every 10th label on x-axis (plus first and last).",
       },
     },
   },
