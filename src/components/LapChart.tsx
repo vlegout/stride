@@ -20,6 +20,19 @@ const SPEED_MODULO_VALUES = { high: 10, medium: 5, low: 2 };
 const ANIMATION_DURATION = 600;
 const X_AXIS_HEIGHT = 20;
 
+const X_AXIS_LABEL_THRESHOLDS = {
+  showAll: 10,
+  showEverySecond: 20,
+  showEveryFifth: 30,
+};
+
+const X_AXIS_LABEL_INTERVALS = {
+  all: 1,
+  everySecond: 2,
+  everyFifth: 5,
+  everyTenth: 10,
+};
+
 interface LapData {
   index: number;
   total_distance: number;
@@ -202,7 +215,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     const mousePos = stage.getPointerPosition();
     if (!mousePos) return;
     setTooltipProps({
-      text: `${e.target.name()}`,
+      text: e.target.name?.() ?? "",
       visible: true,
       x: mousePos.x + 5,
       y: mousePos.y + 5,
@@ -215,7 +228,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     const touchPos = stage.getPointerPosition();
     if (!touchPos) return;
     setTooltipProps({
-      text: `${e.target.name()}`,
+      text: e.target.name?.() ?? "",
       visible: true,
       x: touchPos.x + 5,
       y: touchPos.y + 5,
@@ -230,7 +243,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     if (!hasValidData || sport === "swimming") return;
 
     let startTime: number | null = null;
-    let animationId: number;
+    let animationId: number | undefined;
 
     const animate = (currentTime: number) => {
       if (startTime === null) {
@@ -250,7 +263,11 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
 
     animationId = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      if (animationId !== undefined) {
+        cancelAnimationFrame(animationId);
+      }
+    };
   }, [laps, hasValidData, sport]);
 
   if (sport === "swimming" || !hasValidData) {
@@ -367,7 +384,14 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
         <Layer>
           {dataLaps.map((lap, index) => {
             const lapCount = dataLaps.length;
-            const labelInterval = lapCount <= 10 ? 1 : lapCount <= 20 ? 2 : lapCount <= 30 ? 5 : 10;
+            const labelInterval =
+              lapCount <= X_AXIS_LABEL_THRESHOLDS.showAll
+                ? X_AXIS_LABEL_INTERVALS.all
+                : lapCount <= X_AXIS_LABEL_THRESHOLDS.showEverySecond
+                  ? X_AXIS_LABEL_INTERVALS.everySecond
+                  : lapCount <= X_AXIS_LABEL_THRESHOLDS.showEveryFifth
+                    ? X_AXIS_LABEL_INTERVALS.everyFifth
+                    : X_AXIS_LABEL_INTERVALS.everyTenth;
 
             const isFirstLap = index === 0;
             const isLastLap = index === lapCount - 1;
