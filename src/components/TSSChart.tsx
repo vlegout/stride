@@ -1,10 +1,12 @@
 import { Box, Typography } from "@mui/material";
-import { Bar } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend,
@@ -13,23 +15,45 @@ import {
 import { WeeklyTSS } from "../types";
 import { colors } from "../colors";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
 interface TSSChartProps {
   weeklyTss: WeeklyTSS[];
 }
 
+const calculateRollingAverage = (data: number[], windowSize: number): (number | null)[] => {
+  return data.map((_, index) => {
+    if (index < windowSize - 1) return null;
+    const window = data.slice(index - windowSize + 1, index + 1);
+    return Math.round(window.reduce((sum, val) => sum + val, 0) / windowSize);
+  });
+};
+
 const TSSChart = ({ weeklyTss }: TSSChartProps) => {
   const weeklyTssLabels = weeklyTss.map((week) => week.week_start);
   const weeklyTssValues = weeklyTss.map((week) => week.total_tss);
+  const rollingAverage = calculateRollingAverage(weeklyTssValues, 4);
 
   const weeklyTssChartData = {
     labels: weeklyTssLabels,
     datasets: [
       {
+        type: "bar" as const,
         label: "Weekly TSS",
         data: weeklyTssValues,
         backgroundColor: colors.chart.primary,
+        order: 2,
+      },
+      {
+        type: "line" as const,
+        label: "4-Week Average",
+        data: rollingAverage,
+        borderColor: colors.chart.overall,
+        backgroundColor: colors.chart.overallLight,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        order: 1,
       },
     ],
   };
@@ -39,7 +63,8 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: "top" as const,
       },
       title: {
         display: true,
@@ -47,11 +72,13 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
       },
       tooltip: {
         callbacks: {
-          title: function (context: TooltipItem<"bar">[]) {
+          title: function (context: TooltipItem<"bar" | "line">[]) {
             return context[0].label || "";
           },
-          label: function (context: TooltipItem<"bar">) {
-            return `TSS: ${context.parsed.y}`;
+          label: function (context: TooltipItem<"bar" | "line">) {
+            const label = context.dataset.label || "";
+            if (context.parsed.y === null) return "";
+            return `${label}: ${context.parsed.y}`;
           },
         },
       },
@@ -85,7 +112,7 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
       </Box>
 
       <Box sx={{ height: 400, width: "100%" }}>
-        <Bar data={weeklyTssChartData} options={weeklyTssChartOptions} />
+        <Chart type="bar" data={weeklyTssChartData} options={weeklyTssChartOptions} />
       </Box>
     </Box>
   );
