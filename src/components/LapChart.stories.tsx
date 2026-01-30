@@ -100,7 +100,35 @@ export const ManyLaps: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Chart with many laps (15) showing how the component handles larger datasets.",
+        story: "Chart with 15 laps - shows every 2nd label on x-axis.",
+      },
+    },
+  },
+};
+
+export const TwentyFiveLaps: Story = {
+  args: {
+    laps: createSampleLaps(25, 300),
+    sport: "running",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Chart with 25 laps - shows every 5th label on x-axis (plus first and last).",
+      },
+    },
+  },
+};
+
+export const FortyLaps: Story = {
+  args: {
+    laps: createSampleLaps(40, 310),
+    sport: "running",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Chart with 40 laps - shows every 10th label on x-axis (plus first and last).",
       },
     },
   },

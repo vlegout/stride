@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
-import { Stage, Layer, Rect, Text } from "react-konva";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Stage, Layer, Rect, Text, Line } from "react-konva";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -16,6 +16,9 @@ const SPEED_MODULO_THRESHOLDS = { high: 20, medium: 10 };
 
 const PACE_MODULO_VALUES = { high: 60, medium: 30, low: 15 };
 const SPEED_MODULO_VALUES = { high: 10, medium: 5, low: 2 };
+
+const ANIMATION_DURATION = 600;
+const X_AXIS_HEIGHT = 20;
 
 interface LapData {
   index: number;
@@ -66,6 +69,8 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     x: 0,
     y: 0,
   });
+
+  const [animationProgress, setAnimationProgress] = useState(0);
 
   const hasValidData =
     laps.length > 1 && laps.every((lap) => lap.total_timer_time != null && lap.total_distance != null);
@@ -221,17 +226,49 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     setTooltipProps((prev) => ({ ...prev, visible: false }));
   }, []);
 
+  useEffect(() => {
+    if (!hasValidData || sport === "swimming") return;
+
+    let startTime: number | null = null;
+    let animationId: number;
+
+    const animate = (currentTime: number) => {
+      if (startTime === null) {
+        startTime = currentTime;
+        setAnimationProgress(0);
+      }
+
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setAnimationProgress(eased);
+
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate);
+      }
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationId);
+  }, [laps, hasValidData, sport]);
+
   if (sport === "swimming" || !hasValidData) {
     return null;
   }
 
   const responsiveFontSize = isSmall ? 12 : 14;
+  const xAxisFontSize = isSmall ? 10 : 12;
   const tooltipFontSize = isSmall ? 14 : 16;
 
   const textColor = theme.palette.mode === "dark" ? "#aaa" : "#666";
   const tooltipTextColor = theme.palette.mode === "dark" ? "#fff" : "#000";
   const strokeColor = theme.palette.mode === "dark" ? "#333" : "#fff";
   const tooltipBgColor = theme.palette.mode === "dark" ? "rgba(50,50,50,0.9)" : "rgba(255,255,255,0.9)";
+  const gridLineColor = theme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)";
+
+  const stageHeight = height + 30 + X_AXIS_HEIGHT;
+  const baselineY = height + 10;
 
   return (
     <Box
@@ -247,31 +284,51 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
       role="img"
       aria-label={`Lap ${isCycling ? "speed" : "pace"} chart showing ${laps.length} laps`}
     >
-      <Stage width={width} height={height + 30}>
+      <Stage width={width} height={stageHeight}>
+        <Layer>
+          {yAxisLabels.map((value, index) => {
+            const yPos = isCycling
+              ? height - (height * (value - minValue)) / valueRange
+              : height - (height * (maxValue - value)) / valueRange;
+
+            return (
+              <Line
+                key={`grid-${index}`}
+                points={[leftMargin, yPos + 10, width - rightMargin, yPos + 10]}
+                stroke={gridLineColor}
+                strokeWidth={1}
+              />
+            );
+          })}
+        </Layer>
         <Layer
           onMouseMove={handleMouseMove}
           onMouseOut={handleMouseOut}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleMouseOut}
         >
-          {dataLaps.map((lap, index) => (
-            <Rect
-              key={index}
-              x={lap.x}
-              y={lap.y}
-              width={lap.width}
-              height={lap.height}
-              name={lap.name}
-              fill={lap.color}
-              stroke={strokeColor}
-              strokeWidth={1}
-              {...(isMobile && {
-                shadowBlur: 2,
-                shadowColor: "rgba(0,0,0,0.3)",
-                shadowOffsetY: 1,
-              })}
-            />
-          ))}
+          {dataLaps.map((lap, index) => {
+            const animatedHeight = lap.height * animationProgress;
+
+            return (
+              <Rect
+                key={index}
+                x={lap.x}
+                y={baselineY}
+                width={lap.width}
+                height={animatedHeight}
+                name={lap.name}
+                fill={lap.color}
+                stroke={strokeColor}
+                strokeWidth={1}
+                {...(isMobile && {
+                  shadowBlur: 2,
+                  shadowColor: "rgba(0,0,0,0.3)",
+                  shadowOffsetY: 1,
+                })}
+              />
+            );
+          })}
         </Layer>
         <Layer>
           <Text
@@ -303,6 +360,35 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
                 text={labelText}
                 fontSize={responsiveFontSize}
                 fill={textColor}
+              />
+            );
+          })}
+        </Layer>
+        <Layer>
+          {dataLaps.map((lap, index) => {
+            const lapCount = dataLaps.length;
+            const labelInterval = lapCount <= 10 ? 1 : lapCount <= 20 ? 2 : lapCount <= 30 ? 5 : 10;
+
+            const isFirstLap = index === 0;
+            const isLastLap = index === lapCount - 1;
+            const isIntervalLap = (index + 1) % labelInterval === 0;
+            const shouldShowLabel = isFirstLap || isLastLap || isIntervalLap;
+
+            if (!shouldShowLabel) return null;
+
+            const labelX = lap.x + lap.width / 2;
+            const labelY = baselineY + 5;
+
+            return (
+              <Text
+                key={`x-label-${index}`}
+                x={labelX}
+                y={labelY}
+                text={`${lap.index + 1}`}
+                fontSize={xAxisFontSize}
+                fill={textColor}
+                align="center"
+                offsetX={xAxisFontSize / 4}
               />
             );
           })}
