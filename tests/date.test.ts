@@ -25,6 +25,7 @@ describe("date utils", () => {
       expect(getDaysFromRange("90d")).toBe(90);
       expect(getDaysFromRange("6m")).toBe(180);
       expect(getDaysFromRange("1y")).toBe(365);
+      expect(getDaysFromRange("2y")).toBe(730);
     });
 
     it("should return default value for invalid range", () => {
@@ -38,6 +39,7 @@ describe("date utils", () => {
       expect(getWeeksFromRange("90d")).toBe(13);
       expect(getWeeksFromRange("6m")).toBe(26);
       expect(getWeeksFromRange("1y")).toBe(52);
+      expect(getWeeksFromRange("2y")).toBe(104);
     });
 
     it("should return default value for invalid range", () => {
@@ -51,6 +53,7 @@ describe("date utils", () => {
       expect(getDateRangeLabel("90d")).toBe("90 Days");
       expect(getDateRangeLabel("6m")).toBe("6 Months");
       expect(getDateRangeLabel("1y")).toBe("1 Year");
+      expect(getDateRangeLabel("2y")).toBe("2 Years");
     });
 
     it("should return default label for invalid range", () => {
@@ -92,6 +95,12 @@ describe("date utils", () => {
       const result = filterDataByDateRange(mockData, "1y");
       expect(result).toHaveLength(7);
       expect(result.map((item) => item.id)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    });
+
+    it("should filter data for 2 year range", () => {
+      const result = filterDataByDateRange(mockData, "2y");
+      expect(result).toHaveLength(8);
+      expect(result.map((item) => item.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     });
 
     it("should handle empty data array", () => {
@@ -176,6 +185,12 @@ describe("date utils", () => {
     it("should return last 52 weeks for 1y range", () => {
       const result = filterWeeklyDataByDateRange(mockWeeklyData, "1y");
       expect(result).toHaveLength(10); // Less than 52 available
+      expect(result.map((item) => item.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    });
+
+    it("should return last 104 weeks for 2y range", () => {
+      const result = filterWeeklyDataByDateRange(mockWeeklyData, "2y");
+      expect(result).toHaveLength(10); // Less than 104 available
       expect(result.map((item) => item.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     });
 

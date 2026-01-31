@@ -385,5 +385,97 @@ class TestActivityStatusFunctionality(unittest.TestCase):
         self.assertEqual(activity.status, "created")
 
 
+class TestBestEndpointRequiresAuth(unittest.TestCase):
+    """Test /best/ endpoint requires authentication"""
+
+    def setUp(self):
+        """Set up test fixtures"""
+        self.client = TestClient(app)
+
+    def test_best_endpoint_requires_auth(self):
+        """Test /best/ endpoint requires authentication"""
+        response = self.client.get("/best/?sport=cycling&distance=20")
+        self.assertEqual(response.status_code, 401)
+
+    def test_power_profile_requires_auth(self):
+        """Test /best/power-profile/ endpoint requires authentication"""
+        response = self.client.get("/best/power-profile/")
+        self.assertEqual(response.status_code, 401)
+
+
+class TestAppEnumsAndModels(unittest.TestCase):
+    """Test app enums and model validation"""
+
+    def test_sport_enum_values(self):
+        """Test Sport enum has expected values"""
+        from api.app import Sport
+
+        self.assertEqual(Sport.running.value, "running")
+        self.assertEqual(Sport.cycling.value, "cycling")
+        self.assertEqual(Sport.swimming.value, "swimming")
+
+    def test_cycling_distance_enum_values(self):
+        """Test CyclingDistance enum has expected values"""
+        from api.app import CyclingDistance
+
+        self.assertEqual(CyclingDistance.one_minute.value, "1")
+        self.assertEqual(CyclingDistance.five_minutes.value, "5")
+        self.assertEqual(CyclingDistance.ten_minutes.value, "10")
+        self.assertEqual(CyclingDistance.twenty_minutes.value, "20")
+        self.assertEqual(CyclingDistance.one_hour.value, "60")
+        self.assertEqual(CyclingDistance.two_hours.value, "120")
+        self.assertEqual(CyclingDistance.four_hours.value, "240")
+
+    def test_running_distance_enum_values(self):
+        """Test RunningDistance enum has expected values"""
+        from api.app import RunningDistance
+
+        self.assertEqual(RunningDistance.one_km.value, "1")
+        self.assertEqual(RunningDistance.five_km.value, "5")
+        self.assertEqual(RunningDistance.ten_km.value, "10")
+        self.assertEqual(RunningDistance.half_marathon.value, "21.098")
+        self.assertEqual(RunningDistance.full_marathon.value, "42.195")
+
+    def test_activity_zones_response_model(self):
+        """Test ActivityZonesResponse model structure"""
+        from api.app import ActivityZonesResponse
+
+        response = ActivityZonesResponse(pace=[], power=[], heart_rate=[])
+        self.assertEqual(response.pace, [])
+        self.assertEqual(response.power, [])
+        self.assertEqual(response.heart_rate, [])
+
+
+class TestActivitiesEndpointRequiresAuth(unittest.TestCase):
+    """Test /activities/ endpoints require authentication"""
+
+    def setUp(self):
+        """Set up test fixtures"""
+        self.client = TestClient(app)
+        self.test_activity_id = uuid.uuid4()
+
+    def test_activity_zones_requires_auth(self):
+        """Test /activities/{id}/zones/ requires authentication"""
+        response = self.client.get(f"/activities/{self.test_activity_id}/zones/")
+        self.assertEqual(response.status_code, 401)
+
+    def test_update_activity_requires_auth(self):
+        """Test PATCH /activities/{id}/ requires authentication"""
+        response = self.client.patch(
+            f"/activities/{self.test_activity_id}/", json={"title": "New Title"}
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_fitness_requires_auth(self):
+        """Test /fitness/ requires authentication"""
+        response = self.client.get("/fitness/")
+        self.assertEqual(response.status_code, 401)
+
+    def test_heatmap_requires_auth(self):
+        """Test /heatmap/ requires authentication"""
+        response = self.client.get("/heatmap/")
+        self.assertEqual(response.status_code, 401)
+
+
 if __name__ == "__main__":
     unittest.main()
