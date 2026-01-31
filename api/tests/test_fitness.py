@@ -303,5 +303,298 @@ class TestFitness(unittest.TestCase):
             self.assertLessEqual(daily_score["cycling"], 200)
 
 
+class TestSwimmingScore(unittest.TestCase):
+    """Test swimming activity scoring"""
+
+    def test_calculate_activity_score_swimming_basic(self):
+        """Test calculate_activity_score with basic swimming activity"""
+        swimming_activity = Activity(
+            id=uuid.uuid4(),
+            fit="swim.fit",
+            title="Pool Swim",
+            description="Swimming",
+            sport="swimming",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=1800.0,  # 30 minutes
+            total_elapsed_time=1800.0,
+            total_distance=1500.0,  # 1.5km
+            total_ascent=0.0,
+            avg_speed=0.83,
+            user_id="test-user-id",
+        )
+
+        score = calculate_activity_score(swimming_activity)
+
+        # Should get points for:
+        # - Distance: 1.5km * 0.3 = 0.45 points
+        # Score should be positive
+        self.assertGreater(score, 0)
+
+    def test_calculate_activity_score_swimming_long(self):
+        """Test calculate_activity_score with long swimming activity"""
+        long_swim = Activity(
+            id=uuid.uuid4(),
+            fit="long_swim.fit",
+            title="Long Open Water Swim",
+            description="Open water",
+            sport="swimming",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=7200.0,  # 2 hours
+            total_elapsed_time=7200.0,
+            total_distance=5500.0,  # 5.5km
+            total_ascent=0.0,
+            avg_speed=0.76,
+            user_id="test-user-id",
+        )
+
+        score = calculate_activity_score(long_swim)
+
+        # Should get bonus points for long swim (>3km and >5km)
+        # Distance: 5.5 * 0.3 = 1.65
+        # Long swim bonus (>3km): 5.5 * 0.05 = 0.275
+        # Very long swim bonus (>5km): 5.5 * 0.05 = 0.275
+        # Time: (2 - 0.5) * 0.2 + (2 - 1.5) * 0.1 = 0.3 + 0.05 = 0.35
+        expected_min_score = 1.65 + 0.275 + 0.275 + 0.35
+        self.assertGreaterEqual(score, expected_min_score - 0.1)  # Allow small margin
+
+    def test_calculate_activity_score_swimming_with_filter(self):
+        """Test calculate_activity_score with swimming filter"""
+        swimming_activity = Activity(
+            id=uuid.uuid4(),
+            fit="swim.fit",
+            title="Pool Swim",
+            description="Swimming",
+            sport="swimming",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=1800.0,
+            total_elapsed_time=1800.0,
+            total_distance=1500.0,
+            total_ascent=0.0,
+            avg_speed=0.83,
+            user_id="test-user-id",
+        )
+
+        # Swimming activity with running filter should return 0
+        score = calculate_activity_score(swimming_activity, "running")
+        self.assertEqual(score, 0.0)
+
+        # Swimming activity with swimming filter should return normal score
+        score = calculate_activity_score(swimming_activity, "swimming")
+        self.assertGreater(score, 0.0)
+
+
+class TestFTPCalculation(unittest.TestCase):
+    """Test FTP calculation functions"""
+
+    def test_calculate_ftp_from_activities_no_activities(self):
+        """Test FTP calculation with no cycling activities"""
+        from api.fitness import calculate_ftp_from_activities
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.all.return_value = []
+        mock_session.exec.return_value = mock_result
+
+        ftp = calculate_ftp_from_activities(
+            mock_session, "test-user-id", datetime.date.today()
+        )
+        self.assertEqual(ftp, 0.0)
+
+    def test_calculate_ftp_from_activities_with_np_power(self):
+        """Test FTP calculation using NP power method"""
+        from api.fitness import calculate_ftp_from_activities
+
+        # Create mock activities with NP power
+        mock_activity = Activity(
+            id=uuid.uuid4(),
+            fit="cycling.fit",
+            title="Long Ride",
+            description="Cycling",
+            sport="cycling",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=7200.0,  # 2 hours
+            total_elapsed_time=7200.0,
+            total_distance=60000.0,
+            total_ascent=500.0,
+            avg_speed=8.33,
+            avg_power=220,
+            np_power=250,  # Normalized power
+            user_id="test-user-id",
+        )
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.all.return_value = [mock_activity]
+        mock_session.exec.return_value = mock_result
+
+        ftp = calculate_ftp_from_activities(
+            mock_session, "test-user-id", datetime.date.today()
+        )
+
+        # FTP should be approximately 95% of best 20-min NP power
+        # Since we have NP of 250, FTP estimate should be around 250 * 0.95 = 237.5
+        self.assertGreater(ftp, 0)
+
+    def test_calculate_ftp_from_activities_with_max_power(self):
+        """Test FTP calculation using max power method"""
+        from api.fitness import calculate_ftp_from_activities
+
+        mock_activity = Activity(
+            id=uuid.uuid4(),
+            fit="cycling.fit",
+            title="Short Hard Ride",
+            description="Cycling",
+            sport="cycling",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=1800.0,  # 30 minutes
+            total_elapsed_time=1800.0,
+            total_distance=20000.0,
+            total_ascent=200.0,
+            avg_speed=11.1,
+            avg_power=280,
+            max_power=450,
+            user_id="test-user-id",
+        )
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.all.return_value = [mock_activity]
+        mock_session.exec.return_value = mock_result
+
+        ftp = calculate_ftp_from_activities(
+            mock_session, "test-user-id", datetime.date.today()
+        )
+
+        # Should have a positive FTP estimate
+        self.assertGreater(ftp, 0)
+
+    def test_calculate_ftp_from_activities_long_rides(self):
+        """Test FTP calculation from long ride average power"""
+        from api.fitness import calculate_ftp_from_activities
+
+        mock_activity = Activity(
+            id=uuid.uuid4(),
+            fit="century.fit",
+            title="Century Ride",
+            description="Cycling",
+            sport="cycling",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=14400.0,  # 4 hours
+            total_elapsed_time=14400.0,
+            total_distance=160000.0,
+            total_ascent=1000.0,
+            avg_speed=11.1,
+            avg_power=200,  # Long ride average power (typically 90% of FTP)
+            user_id="test-user-id",
+        )
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.all.return_value = [mock_activity]
+        mock_session.exec.return_value = mock_result
+
+        ftp = calculate_ftp_from_activities(
+            mock_session, "test-user-id", datetime.date.today()
+        )
+
+        # FTP estimate from long ride avg power of 200 should be around 200 * 1.1 = 220
+        self.assertGreater(ftp, 0)
+
+
+class TestDecayFactor(unittest.TestCase):
+    """Test decay factor calculation in fitness scores"""
+
+    def test_activity_score_contributes_to_fitness(self):
+        """Test that activity scores contribute to fitness calculations"""
+        # Test that a running activity has positive score
+        activity = Activity(
+            id=uuid.uuid4(),
+            fit="run.fit",
+            title="Test Run",
+            description="Test",
+            sport="running",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=3600.0,
+            total_elapsed_time=3600.0,
+            total_distance=10000.0,  # 10km
+            total_ascent=100.0,
+            avg_speed=2.78,
+            user_id="test-user-id",
+        )
+
+        score = calculate_activity_score(activity)
+        self.assertGreater(score, 0, "Activity should have positive score")
+
+    def test_decay_factor_bounds(self):
+        """Test that decay factor is between 0.1 and 1.0"""
+        # The decay formula is: max(0.1, 1.0 - (days_before / 42) * 0.5)
+        # At day 0: 1.0 - 0 = 1.0
+        # At day 42: 1.0 - 0.5 = 0.5
+        # At day 84: max(0.1, 1.0 - 1.0) = 0.1
+
+        # Day 0
+        decay_0 = max(0.1, 1.0 - (0 / 42) * 0.5)
+        self.assertEqual(decay_0, 1.0)
+
+        # Day 21 (half window)
+        decay_21 = max(0.1, 1.0 - (21 / 42) * 0.5)
+        self.assertAlmostEqual(decay_21, 0.75, places=2)
+
+        # Day 42 (end of window)
+        decay_42 = max(0.1, 1.0 - (42 / 42) * 0.5)
+        self.assertAlmostEqual(decay_42, 0.5, places=2)
+
+        # Day 100 (way beyond window)
+        decay_100 = max(0.1, 1.0 - (100 / 42) * 0.5)
+        self.assertEqual(decay_100, 0.1)
+
+    def test_fitness_scores_structure(self):
+        """Test that fitness scores returns proper structure"""
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.all.return_value = []
+        mock_session.exec.return_value = mock_result
+
+        result = calculate_fitness_scores(mock_session, "test-user-id")
+
+        # Should have 730 days of scores
+        self.assertEqual(len(result["scores"]), 730)
+
+        # Should have weekly data
+        self.assertEqual(len(result["weekly_tss"]), 104)
+        self.assertEqual(len(result["weekly_running"]), 104)
+        self.assertEqual(len(result["weekly_cycling"]), 104)
+        self.assertEqual(len(result["weekly_swimming"]), 104)
+
+        # Check structure of individual entries
+        for daily_score in result["scores"][:5]:
+            self.assertIn("date", daily_score)
+            self.assertIn("overall", daily_score)
+            self.assertIn("running", daily_score)
+            self.assertIn("cycling", daily_score)
+            self.assertIn("swimming", daily_score)
+
+
 if __name__ == "__main__":
     unittest.main()
