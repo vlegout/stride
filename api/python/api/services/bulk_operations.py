@@ -27,11 +27,7 @@ from api.services.notification import NotificationService
 from api.services.performance import PerformanceService
 from api.services.storage import StorageService
 from api.services.zone import ZoneService
-from api.utils import (
-    MAX_TRACEPOINTS_FOR_RESPONSE,
-    get_best_performance_power,
-    get_best_performances,
-)
+from api.utils import MAX_TRACEPOINTS_FOR_RESPONSE
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +94,11 @@ class BulkOperationService:
                 if not tracepoints:
                     continue
 
-                performance_powers = get_best_performance_power(activity, tracepoints)
+                performance_powers = (
+                    self.performance_service.calculate_cycling_performances(
+                        activity, tracepoints
+                    )
+                )
 
                 if performance_powers:
                     for performance_power in performance_powers:
@@ -466,12 +466,16 @@ class BulkOperationService:
                     lap.activity_id = activity.id
                     self.session.add(lap)
 
-                performances = get_best_performances(activity, new_tracepoints)
+                performances = self.performance_service.calculate_running_performances(
+                    activity, new_tracepoints
+                )
                 for perf in performances:
                     self.session.add(perf)
 
-                performance_powers = get_best_performance_power(
-                    activity, new_tracepoints
+                performance_powers = (
+                    self.performance_service.calculate_cycling_performances(
+                        activity, new_tracepoints
+                    )
                 )
                 for pp in performance_powers:
                     self.session.add(pp)
