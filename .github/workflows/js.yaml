@@ -53,7 +53,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
+          files: ./coverage/lcov.info,./coverage-storybook/lcov.info
           flags: front
 
   playwright:

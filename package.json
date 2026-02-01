@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ci": "vitest run --project=unit --coverage --reporter=junit --outputFile=test-report.junit.xml --reporter=default && vitest run --project=storybook --coverage --reporter=junit --outputFile=test-report-storybook.junit.xml --reporter=default",
+    "test:ci": "vitest run --project=unit --coverage --reporter=junit --outputFile=test-report.junit.xml --reporter=default && vitest run --project=storybook --coverage --coverage.reportsDirectory=./coverage-storybook --reporter=junit --outputFile=test-report-storybook.junit.xml --reporter=default",
     "test:ui": "vitest --ui",
     "test:e2e": "npx playwright test",
     "test:e2e:coverage": "PLAYWRIGHT_COVERAGE=true npm run build && PLAYWRIGHT_COVERAGE=true npx playwright test && nyc report",

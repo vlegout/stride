@@ -48,12 +48,6 @@ export default defineConfig({
               },
             ],
           },
-          coverage: {
-            provider: 'istanbul',
-            reportsDirectory: './coverage-storybook',
-            include: ['src/**/*.tsx', 'src/**/*.ts'],
-            exclude: ['**/*.stories.tsx', '**/*.d.ts', '**/vite-env.d.ts'],
-          },
           setupFiles: ['./.storybook/vitest.setup.ts'],
         },
       },
