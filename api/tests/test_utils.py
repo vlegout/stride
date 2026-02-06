@@ -94,7 +94,7 @@ class TestGetLatLon:
         assert lat == pytest.approx(47.2183, abs=0.001)
         assert lon == pytest.approx(-1.5536, abs=0.001)
 
-    @given(st.lists(tracepoint_strategy(), min_size=0, max_size=0))
+    @given(st.lists(tracepoint_strategy(), min_size=0, max_size=0))  # type: ignore[call-arg]
     def test_empty_property(self, empty_tracepoints):
         lat, lon = get_lat_lon(empty_tracepoints)
         assert lat == 0.0
@@ -127,7 +127,7 @@ class TestGetLatLon:
         assert 47.21 < lat < 47.23
         assert -1.56 < lon < -1.54
 
-    @given(st.lists(tracepoint_strategy(), min_size=2, max_size=5))
+    @given(st.lists(tracepoint_strategy(), min_size=2, max_size=5))  # type: ignore[call-arg]
     def test_multiple_points_property(self, tracepoints):
         lat, lon = get_lat_lon(tracepoints)
         assert math.isfinite(lat)
