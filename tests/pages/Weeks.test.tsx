@@ -196,8 +196,8 @@ describe("WeeksPage", () => {
 
     await waitFor(() => {
       expect(screen.getByText("3")).toBeInTheDocument();
-      expect(screen.getByText("25.00 km")).toBeInTheDocument();
-      expect(screen.getByText("2h")).toBeInTheDocument();
+      expect(screen.getAllByText("25.00 km").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("2h").length).toBeGreaterThan(0);
       expect(screen.getByText("TSS")).toBeInTheDocument();
       expect(screen.getByText("150")).toBeInTheDocument();
     });
@@ -213,14 +213,14 @@ describe("WeeksPage", () => {
     });
   });
 
-  it("renders sports breakdown chips", async () => {
+  it("renders sports breakdown with legend", async () => {
     vi.mocked(api.fetchWeeks).mockResolvedValue(mockWeeksResponse);
 
     renderWithProviders(<WeeksPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/running: 2/)).toBeInTheDocument();
-      expect(screen.getByText(/cycling: 1/)).toBeInTheDocument();
+      expect(screen.getByText(/running \(2\)/)).toBeInTheDocument();
+      expect(screen.getByText(/cycling \(1\)/)).toBeInTheDocument();
     });
   });
 

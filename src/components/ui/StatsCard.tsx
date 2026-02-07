@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { motion } from "framer-motion";
@@ -10,9 +10,11 @@ interface StatsCardProps {
   value: string | number | null;
   variant?: "primary" | "default";
   size?: "small" | "large";
+  subtitle?: string;
+  tooltip?: string;
 }
 
-const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsCardProps) => {
+const StatsCard = ({ title, value, variant = "default", size = "small", subtitle, tooltip }: StatsCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -50,7 +52,7 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
     }
   };
 
-  return (
+  const cardContent = (
     <Box
       component={motion.div}
       initial={{ opacity: 0, y: 8 }}
@@ -68,6 +70,7 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
         borderRadius: 2,
         border: variant === "primary" ? `1px solid ${colors.primary}` : `1px solid ${colors.grey[200]}`,
         boxShadow: shadows.card,
+        cursor: "default",
       }}
     >
       <Typography
@@ -94,8 +97,31 @@ const StatsCard = ({ title, value, variant = "default", size = "small" }: StatsC
       >
         {title}
       </Typography>
+      {subtitle && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{
+            display: "block",
+            mt: 0.5,
+            opacity: 0.7,
+          }}
+        >
+          {subtitle}
+        </Typography>
+      )}
     </Box>
   );
+
+  if (tooltip) {
+    return (
+      <Tooltip title={tooltip} arrow placement="top">
+        {cardContent}
+      </Tooltip>
+    );
+  }
+
+  return cardContent;
 };
 
 export default StatsCard;
