@@ -408,14 +408,29 @@ describe("API", () => {
   });
 
   describe("fetchWeeks", () => {
-    it("should fetch weekly data", async () => {
+    it("should fetch weekly data with default pagination", async () => {
       const mockWeeks = createMockWeeksResponse();
       mockedAxios.get.mockResolvedValue({ data: mockWeeks });
 
       const result = await api.fetchWeeks();
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/weeks/",
+        "/weeks/?offset=0&limit=5",
+        expect.objectContaining({
+          headers: { Authorization: `Bearer ${mockToken}` },
+        }),
+      );
+      expect(result).toEqual(mockWeeks);
+    });
+
+    it("should fetch weekly data with custom pagination", async () => {
+      const mockWeeks = createMockWeeksResponse();
+      mockedAxios.get.mockResolvedValue({ data: mockWeeks });
+
+      const result = await api.fetchWeeks(5, 10);
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        "/weeks/?offset=5&limit=10",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),

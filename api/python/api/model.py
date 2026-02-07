@@ -426,6 +426,8 @@ class WeeklySummary(BaseModel):
 
 class WeeksResponse(BaseModel):
     weeks: list[WeeklySummary]
+    has_more: bool
+    next_offset: int
 
 
 class HeatmapPolyline(BaseModel):

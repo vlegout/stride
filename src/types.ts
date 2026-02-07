@@ -301,6 +301,8 @@ export type WeeklySummary = typeof WeeklySummary.infer;
 
 export const WeeksResponse = type({
   weeks: WeeklySummary.array(),
+  has_more: "boolean",
+  next_offset: "number",
 });
 export type WeeksResponse = typeof WeeksResponse.infer;
 
