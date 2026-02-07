@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { test as baseTest } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
