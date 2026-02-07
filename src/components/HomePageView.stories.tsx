@@ -273,17 +273,26 @@ type Story = StoryObj<typeof meta>;
 export const RecentActivities: Story = {
   args: {
     activities: mockActivities,
+    hasMore: true,
+    isLoadingMore: false,
+    onLoadMore: () => undefined,
   },
 };
 
 export const SingleActivity: Story = {
   args: {
     activities: [mockActivities[0]],
+    hasMore: false,
+    isLoadingMore: false,
+    onLoadMore: () => undefined,
   },
 };
 
 export const EmptyState: Story = {
   args: {
     activities: [],
+    hasMore: false,
+    isLoadingMore: false,
+    onLoadMore: () => undefined,
   },
 };

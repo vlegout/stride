@@ -1,14 +1,36 @@
-import QueryBoundary from "../components/QueryBoundary";
+import { Box, Alert, CircularProgress } from "@mui/material";
+
 import HomePageView from "../components/HomePageView";
 import { useHomeActivities } from "../hooks";
 
 const Home = () => {
-  const query = useHomeActivities();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } = useHomeActivities();
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Alert severity="error">Error loading activities: {error?.message ?? "Unknown error"}</Alert>
+      </Box>
+    );
+  }
+
+  const allActivities = data?.pages.flatMap((page) => page.activities) ?? [];
 
   return (
-    <QueryBoundary query={query} loadingMessage="Loading activities...">
-      {(data) => <HomePageView activities={data.activities} />}
-    </QueryBoundary>
+    <HomePageView
+      activities={allActivities}
+      hasMore={hasNextPage ?? false}
+      isLoadingMore={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
+    />
   );
 };
 
