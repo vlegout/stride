@@ -144,6 +144,8 @@ export const createMockWeeksResponse = (): WeeksResponse => ({
       },
     },
   ],
+  has_more: false,
+  next_offset: 1,
 });
 
 export const createMockFitnessResponse = (): FitnessResponse => ({

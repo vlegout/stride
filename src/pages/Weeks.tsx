@@ -1,13 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { Box, Card, CardContent, Grid, Chip, Alert, Typography } from "@mui/material";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Box, Card, CardContent, Grid, Chip, Alert, Typography, Button, CircularProgress } from "@mui/material";
 import { Link } from "react-router-dom";
 import MuiLink from "@mui/material/Link";
 
 import { fetchWeeks } from "../api";
-import type { Sport } from "../types";
+import type { Sport, WeeksResponse } from "../types";
 import { formatDate, formatDuration, formatDistance, formatSpeed } from "../utils";
 import ActivityLogo from "../components/ActivityLogo";
-import QueryBoundary from "../components/QueryBoundary";
 import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../components/ui";
 
 interface ActivityRow {
@@ -16,34 +15,65 @@ interface ActivityRow {
   sport: Sport;
 }
 
+const WEEKS_PER_PAGE = 5;
+
 const WeeksPage = () => {
-  const query = useQuery({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } = useInfiniteQuery({
     queryKey: ["weeks"],
-    queryFn: fetchWeeks,
+    queryFn: ({ pageParam = 0 }) => fetchWeeks(pageParam, WEEKS_PER_PAGE),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.has_more) {
+        return lastPage.next_offset;
+      }
+      return undefined;
+    },
+    initialPageParam: 0,
   });
 
-  return (
-    <QueryBoundary query={query} loadingMessage="Loading weekly summary...">
-      {(weeksData) => {
-        if (!weeksData || !weeksData.weeks) {
-          return (
-            <Box sx={{ mt: 2 }}>
-              <Alert severity="info">No weeks data available</Alert>
-            </Box>
-          );
-        }
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-        return <WeeksContent weeksData={weeksData} />;
-      }}
-    </QueryBoundary>
+  if (isError) {
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Alert severity="error">Error loading weeks: {error?.message ?? "Unknown error"}</Alert>
+      </Box>
+    );
+  }
+
+  const allWeeks = data?.pages.flatMap((page) => page.weeks) ?? [];
+
+  if (allWeeks.length === 0) {
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Alert severity="info">No weeks data available</Alert>
+      </Box>
+    );
+  }
+
+  return (
+    <WeeksContent
+      weeks={allWeeks}
+      hasMore={hasNextPage ?? false}
+      isLoadingMore={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
+    />
   );
 };
 
 interface WeeksContentProps {
-  weeksData: NonNullable<Awaited<ReturnType<typeof fetchWeeks>>>;
+  weeks: WeeksResponse["weeks"];
+  hasMore: boolean;
+  isLoadingMore: boolean;
+  onLoadMore: () => void;
 }
 
-const WeeksContent = ({ weeksData }: WeeksContentProps) => {
+const WeeksContent = ({ weeks, hasMore, isLoadingMore, onLoadMore }: WeeksContentProps) => {
   const activityColumns: Column<ActivityRow>[] = [
     {
       id: "start_time",
@@ -98,7 +128,7 @@ const WeeksContent = ({ weeksData }: WeeksContentProps) => {
     <Box sx={{ width: "100%" }}>
       <PageHeader title="Weekly Summary" />
 
-      {weeksData.weeks.map((week) => {
+      {weeks.map((week) => {
         const sportsBreakdown = week.sports_breakdown;
 
         return (
@@ -162,6 +192,15 @@ const WeeksContent = ({ weeksData }: WeeksContentProps) => {
           </Card>
         );
       })}
+
+      {hasMore && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 4 }}>
+          <Button variant="outlined" onClick={onLoadMore} disabled={isLoadingMore}>
+            {isLoadingMore ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
+            {isLoadingMore ? "Loading..." : "Load More Weeks"}
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

@@ -166,8 +166,11 @@ export async function fetchProfile(): Promise<Profile> {
   return validateResponse(data, ProfileValidator, "fetchProfile");
 }
 
-export async function fetchWeeks(): Promise<WeeksResponse> {
-  const data = await apiCall("/weeks/");
+export async function fetchWeeks(offset = 0, limit = 5): Promise<WeeksResponse> {
+  const params = new URLSearchParams();
+  params.append("offset", offset.toString());
+  params.append("limit", limit.toString());
+  const data = await apiCall(`/weeks/?${params.toString()}`);
   return validateResponse(data, WeeksResponseValidator, "fetchWeeks");
 }
 
