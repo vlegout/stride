@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHomeActivities } from "../../src/hooks/useHomeActivities";
 import * as api from "../../src/api";
-import { createMockActivitiesResponse } from "../mocks/apiMocks";
+import { createMockActivity, createMockActivitiesResponse } from "../mocks/apiMocks";
 
 vi.mock("../../src/api", () => ({
   fetchActivities: vi.fn(),
@@ -29,7 +29,7 @@ describe("useHomeActivities", () => {
   });
 
   it("should fetch activities with home page params", async () => {
-    const mockResponse = createMockActivitiesResponse();
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 1);
     vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => useHomeActivities(), {
@@ -38,36 +38,25 @@ describe("useHomeActivities", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(api.fetchActivities).toHaveBeenCalled();
-    expect(result.current.data).toEqual(mockResponse);
-  });
-
-  it("should use specific query params for home page", async () => {
-    const mockResponse = createMockActivitiesResponse();
-    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
-
-    renderHook(() => useHomeActivities(), {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() => {
-      expect(api.createActivitiesQueryKey).toHaveBeenCalledWith({
-        sport: undefined,
-        distance: [0, 100],
-        fetchMap: true,
-        limit: 5,
-        race: false,
-        page: 1,
-        order: "desc",
-        orderBy: "",
-      });
+    expect(api.fetchActivities).toHaveBeenCalledWith({
+      queryKey: [
+        "activities",
+        {
+          sport: undefined,
+          distance: [0, 100],
+          fetchMap: true,
+          limit: 5,
+          race: false,
+          page: 1,
+          order: "desc",
+          orderBy: "",
+        },
+      ],
     });
   });
 
   it("should return loading state initially", () => {
-    vi.mocked(api.fetchActivities).mockImplementation(
-      () => new Promise(() => undefined), // Never resolves
-    );
+    vi.mocked(api.fetchActivities).mockImplementation(() => new Promise(() => undefined));
 
     const { result } = renderHook(() => useHomeActivities(), {
       wrapper: createWrapper(),
@@ -88,5 +77,68 @@ describe("useHomeActivities", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     expect(result.current.error).toBeDefined();
+  });
+
+  it("should have next page when more activities exist", async () => {
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 10);
+    mockResponse.pagination.per_page = 5;
+    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(result.current.hasNextPage).toBe(true);
+  });
+
+  it("should not have next page when all activities loaded", async () => {
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 3);
+    mockResponse.pagination.per_page = 5;
+    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(result.current.hasNextPage).toBe(false);
+  });
+
+  it("should fetch next page with incremented page param", async () => {
+    const firstPage = createMockActivitiesResponse([createMockActivity()], 1, 10);
+    firstPage.pagination.per_page = 5;
+    const secondPage = createMockActivitiesResponse([createMockActivity({ id: "second-page-activity" })], 2, 10);
+    secondPage.pagination.per_page = 5;
+
+    vi.mocked(api.fetchActivities).mockResolvedValueOnce(firstPage).mockResolvedValueOnce(secondPage);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    result.current.fetchNextPage();
+
+    await waitFor(() => expect(result.current.data?.pages).toHaveLength(2));
+
+    expect(api.fetchActivities).toHaveBeenLastCalledWith({
+      queryKey: [
+        "activities",
+        {
+          sport: undefined,
+          distance: [0, 100],
+          fetchMap: true,
+          limit: 5,
+          race: false,
+          page: 2,
+          order: "desc",
+          orderBy: "",
+        },
+      ],
+    });
   });
 });
