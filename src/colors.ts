@@ -103,10 +103,13 @@ export const colors = {
     // Sport-specific colors (harmonious with primary orange)
     running: "#E85D4A", // Warm red-orange
     runningLight: "rgba(232, 93, 74, 0.15)",
+    runningMuted: "rgba(232, 93, 74, 0.6)",
     cycling: "#3B82F6", // Vibrant blue
     cyclingLight: "rgba(59, 130, 246, 0.15)",
+    cyclingMuted: "rgba(59, 130, 246, 0.6)",
     swimming: "#0EA5E9", // Sky blue
     swimmingLight: "rgba(14, 165, 233, 0.15)",
+    swimmingMuted: "rgba(14, 165, 233, 0.6)",
 
     // Secondary metrics
     overall: "#1E293B", // Slate for overall/aggregate data
