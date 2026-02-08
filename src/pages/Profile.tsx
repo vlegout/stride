@@ -131,11 +131,7 @@ const Profile = () => {
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "bold" }}>
-                    {[
-                      runningEnabled && "Running",
-                      cyclingEnabled && "Cycling",
-                      swimmingEnabled && "Swimming",
-                    ]
+                    {[runningEnabled && "Running", cyclingEnabled && "Cycling", swimmingEnabled && "Swimming"]
                       .filter(Boolean)
                       .join("\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0")}
                   </Typography>
