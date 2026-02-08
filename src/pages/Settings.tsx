@@ -69,6 +69,13 @@ const Settings = () => {
           { id: 3, field: "Email", value: user.email },
         ];
 
+        const sports = [
+          { key: "running_enabled" as const, label: "Running" },
+          { key: "cycling_enabled" as const, label: "Cycling" },
+          { key: "swimming_enabled" as const, label: "Swimming" },
+        ];
+        const enabledCount = sports.filter(({ key }) => user[key]).length;
+
         return (
           <Box sx={{ width: "100%" }}>
             <PageHeader title="Settings" />
@@ -99,28 +106,20 @@ const Settings = () => {
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
                   Enabled Sports
                 </Typography>
-                {(() => {
-                  const sports = [
-                    { key: "running_enabled" as const, label: "Running" },
-                    { key: "cycling_enabled" as const, label: "Cycling" },
-                    { key: "swimming_enabled" as const, label: "Swimming" },
-                  ];
-                  const enabledCount = sports.filter(({ key }) => user[key]).length;
-                  return sports.map(({ key, label }) => (
-                    <FormControlLabel
-                      key={key}
-                      control={
-                        <Switch
-                          checked={user[key]}
-                          onChange={(e) => handleSportToggle(key, e.target.checked)}
-                          disabled={updateUserMutation.isPending || (user[key] && enabledCount === 1)}
-                        />
-                      }
-                      label={label}
-                      sx={{ display: "block" }}
-                    />
-                  ));
-                })()}
+                {sports.map(({ key, label }) => (
+                  <FormControlLabel
+                    key={key}
+                    control={
+                      <Switch
+                        checked={user[key]}
+                        onChange={(e) => handleSportToggle(key, e.target.checked)}
+                        disabled={updateUserMutation.isPending || (user[key] && enabledCount === 1)}
+                      />
+                    }
+                    label={label}
+                    sx={{ display: "block" }}
+                  />
+                ))}
               </Box>
             </SectionContainer>
           </Box>
