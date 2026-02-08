@@ -10,8 +10,11 @@ import { formatDistance } from "../utils";
 import QueryBoundary from "../components/QueryBoundary";
 import ZoneTables from "../components/ZoneTables";
 import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
+import { useAuthStore } from "../store";
 
 const Profile = () => {
+  const { user } = useAuthStore();
+
   const query = useQuery({
     queryKey: ["id"],
     queryFn: fetchProfile,
@@ -36,36 +39,73 @@ const Profile = () => {
           },
         ];
 
+        const runningEnabled = user?.running_enabled ?? true;
+        const cyclingEnabled = user?.cycling_enabled ?? true;
+        const swimmingEnabled = user?.swimming_enabled ?? true;
+
         const profileStatsRows = [
           { id: 1, metric: "Total Activities", value: data.n_activities },
-          { id: 2, metric: "Run Total Activities", value: data.run_n_activities },
-          { id: 3, metric: "Run Total Distance", value: formatDistance(data.run_total_distance) },
-          { id: 4, metric: "Cycling Total Activities", value: data.cycling_n_activities },
-          { id: 5, metric: "Cycling Total Distance", value: formatDistance(data.cycling_total_distance) },
-          { id: 6, metric: "Swimming Total Activities", value: data.swimming_n_activities },
-          { id: 7, metric: "Swimming Total Distance", value: formatDistance(data.swimming_total_distance) },
+          ...(runningEnabled
+            ? [
+                { id: 2, metric: "Run Total Activities", value: data.run_n_activities },
+                { id: 3, metric: "Run Total Distance", value: formatDistance(data.run_total_distance) },
+              ]
+            : []),
+          ...(cyclingEnabled
+            ? [
+                { id: 4, metric: "Cycling Total Activities", value: data.cycling_n_activities },
+                { id: 5, metric: "Cycling Total Distance", value: formatDistance(data.cycling_total_distance) },
+              ]
+            : []),
+          ...(swimmingEnabled
+            ? [
+                { id: 6, metric: "Swimming Total Activities", value: data.swimming_n_activities },
+                { id: 7, metric: "Swimming Total Distance", value: formatDistance(data.swimming_total_distance) },
+              ]
+            : []),
         ];
 
         const yearlyStatsColumns: Column[] = [
           { id: "year", label: "Year" },
-          { id: "run_activities", label: "Activities", align: "center" as const },
-          { id: "run_distance", label: "Distance", align: "center" as const },
-          { id: "cycling_activities", label: "Activities", align: "center" as const },
-          { id: "cycling_distance", label: "Distance", align: "center" as const },
-          { id: "swimming_activities", label: "Activities", align: "center" as const },
-          { id: "swimming_distance", label: "Distance", align: "center" as const },
+          ...(runningEnabled
+            ? [
+                { id: "run_activities", label: "Activities", align: "center" as const },
+                { id: "run_distance", label: "Distance", align: "center" as const },
+              ]
+            : []),
+          ...(cyclingEnabled
+            ? [
+                { id: "cycling_activities", label: "Activities", align: "center" as const },
+                { id: "cycling_distance", label: "Distance", align: "center" as const },
+              ]
+            : []),
+          ...(swimmingEnabled
+            ? [
+                { id: "swimming_activities", label: "Activities", align: "center" as const },
+                { id: "swimming_distance", label: "Distance", align: "center" as const },
+              ]
+            : []),
         ];
 
-        const yearlyStatsRows = data.years.map((year) => ({
-          id: year.year,
-          year: year.year,
-          run_activities: year.statistics[0].n_activities,
-          run_distance: formatDistance(year.statistics[0].total_distance),
-          cycling_activities: year.statistics[1].n_activities,
-          cycling_distance: formatDistance(year.statistics[1].total_distance),
-          swimming_activities: year.statistics[2].n_activities,
-          swimming_distance: formatDistance(year.statistics[2].total_distance),
-        }));
+        const yearlyStatsRows = data.years.map((year) => {
+          const statsBySport = Object.fromEntries(year.statistics.map((s) => [s.sport, s]));
+          return {
+            id: year.year,
+            year: year.year,
+            ...(runningEnabled && {
+              run_activities: statsBySport.running?.n_activities ?? 0,
+              run_distance: formatDistance(statsBySport.running?.total_distance ?? 0),
+            }),
+            ...(cyclingEnabled && {
+              cycling_activities: statsBySport.cycling?.n_activities ?? 0,
+              cycling_distance: formatDistance(statsBySport.cycling?.total_distance ?? 0),
+            }),
+            ...(swimmingEnabled && {
+              swimming_activities: statsBySport.swimming?.n_activities ?? 0,
+              swimming_distance: formatDistance(statsBySport.swimming?.total_distance ?? 0),
+            }),
+          };
+        });
 
         return (
           <Box sx={{ width: "100%" }}>
@@ -91,8 +131,9 @@ const Profile = () => {
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "bold" }}>
-                    Running &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cycling
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Swimming
+                    {[runningEnabled && "Running", cyclingEnabled && "Cycling", swimmingEnabled && "Swimming"]
+                      .filter(Boolean)
+                      .join("\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0")}
                   </Typography>
                 </Box>
               </Box>

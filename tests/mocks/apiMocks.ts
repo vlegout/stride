@@ -109,6 +109,9 @@ export const createMockUser = (): User => ({
   google_id: "google-123",
   google_picture: "https://example.com/pic.jpg",
   map: "leaflet",
+  running_enabled: true,
+  cycling_enabled: true,
+  swimming_enabled: true,
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
 });

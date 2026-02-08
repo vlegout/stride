@@ -734,6 +734,11 @@ def update_current_user(
     for field, value in update_data.items():
         setattr(user, field, value)
 
+    if not (user.running_enabled or user.cycling_enabled or user.swimming_enabled):
+        raise HTTPException(
+            status_code=422, detail="At least one sport must be enabled"
+        )
+
     user.updated_at = datetime.datetime.now(datetime.timezone.utc)
     session.add(user)
     session.commit()
