@@ -14,6 +14,9 @@ class UserBase(SQLModel):
     google_id: str = Field(unique=True)
     google_picture: str | None = None
     map: str = Field(default="leaflet")
+    running_enabled: bool = Field(default=True)
+    cycling_enabled: bool = Field(default=True)
+    swimming_enabled: bool = Field(default=True)
     created_at: datetime.datetime = Field(
         default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
     )
@@ -49,6 +52,9 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     map: str | None = None
+    running_enabled: bool | None = None
+    cycling_enabled: bool | None = None
+    swimming_enabled: bool | None = None
 
     @field_validator("map")
     @classmethod

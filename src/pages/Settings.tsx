@@ -1,9 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Switch from "@mui/material/Switch";
+import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
@@ -35,6 +38,13 @@ const Settings = () => {
 
   const handleMapChange = (mapProvider: "leaflet" | "openlayers" | "mapbox"): void => {
     updateUserMutation.mutate({ map: mapProvider });
+  };
+
+  const handleSportToggle = (
+    sport: "running_enabled" | "cycling_enabled" | "swimming_enabled",
+    value: boolean,
+  ): void => {
+    updateUserMutation.mutate({ [sport]: value });
   };
 
   return (
@@ -85,6 +95,33 @@ const Settings = () => {
                   <MenuItem value="mapbox">Mapbox</MenuItem>
                 </Select>
               </FormControl>
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                  Enabled Sports
+                </Typography>
+                {(() => {
+                  const sports = [
+                    { key: "running_enabled" as const, label: "Running" },
+                    { key: "cycling_enabled" as const, label: "Cycling" },
+                    { key: "swimming_enabled" as const, label: "Swimming" },
+                  ];
+                  const enabledCount = sports.filter(({ key }) => user[key]).length;
+                  return sports.map(({ key, label }) => (
+                    <FormControlLabel
+                      key={key}
+                      control={
+                        <Switch
+                          checked={user[key]}
+                          onChange={(e) => handleSportToggle(key, e.target.checked)}
+                          disabled={updateUserMutation.isPending || (user[key] && enabledCount === 1)}
+                        />
+                      }
+                      label={label}
+                      sx={{ display: "block" }}
+                    />
+                  ));
+                })()}
+              </Box>
             </SectionContainer>
           </Box>
         );

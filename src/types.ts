@@ -234,6 +234,9 @@ export const User = type({
   google_id: "string",
   google_picture: "string?",
   map: "'leaflet'|'openlayers'|'mapbox'",
+  running_enabled: "boolean",
+  cycling_enabled: "boolean",
+  swimming_enabled: "boolean",
   created_at: "string",
   updated_at: "string",
 });
@@ -250,6 +253,9 @@ export type UserCreate = typeof UserCreate.infer;
 
 export const UserUpdate = type({
   map: "'leaflet'|'openlayers'|'mapbox'?",
+  running_enabled: "boolean?",
+  cycling_enabled: "boolean?",
+  swimming_enabled: "boolean?",
 });
 export type UserUpdate = typeof UserUpdate.infer;
 
