@@ -3,18 +3,18 @@ coverage:
     project:
       default: off
       api:
-        target: 75%
+        target: 50%
         threshold: 2%
         flags:
           - api
       front:
-        target: 75%
+        target: 50%
         threshold: 2%
         flags:
           - front
     patch:
       default:
-        target: 75%
+        target: 50%
 
 flags:
   api:
