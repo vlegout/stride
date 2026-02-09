@@ -118,7 +118,18 @@ def read_activities(
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
-        query = query.where(Activity.sport == sport)
+        valid_sports = {s.value for s in Sport}
+        sport_list = [s.strip() for s in sport.split(",") if s.strip()]
+        invalid = [s for s in sport_list if s not in valid_sports]
+        if invalid:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid sport(s): {', '.join(invalid)}",
+            )
+        if len(sport_list) == 1:
+            query = query.where(Activity.sport == sport_list[0])
+        elif len(sport_list) > 1:
+            query = query.where(col(Activity.sport).in_(sport_list))
     if min_distance is not None:
         query = query.where(Activity.total_distance >= min_distance * 1000)
     if max_distance is not None:

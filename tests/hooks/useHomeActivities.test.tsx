@@ -2,8 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHomeActivities } from "../../src/hooks/useHomeActivities";
+import { useAuthStore } from "../../src/store";
 import * as api from "../../src/api";
-import { createMockActivity, createMockActivitiesResponse } from "../mocks/apiMocks";
+import { createMockActivity, createMockActivitiesResponse, createMockUser } from "../mocks/apiMocks";
 
 vi.mock("../../src/api", () => ({
   fetchActivities: vi.fn(),
@@ -26,6 +27,7 @@ const createWrapper = () => {
 describe("useHomeActivities", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthStore.setState({ user: null });
   });
 
   it("should fetch activities with home page params", async () => {
@@ -140,5 +142,101 @@ describe("useHomeActivities", () => {
         },
       ],
     });
+  });
+
+  it("should not filter by sport when all sports are enabled", async () => {
+    useAuthStore.setState({ user: createMockUser() });
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 1);
+    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(api.fetchActivities).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["activities", expect.objectContaining({ sport: undefined })]),
+      }),
+    );
+  });
+
+  it("should filter by single enabled sport", async () => {
+    useAuthStore.setState({
+      user: { ...createMockUser(), running_enabled: true, cycling_enabled: false, swimming_enabled: false },
+    });
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 1);
+    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(api.fetchActivities).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["activities", expect.objectContaining({ sport: "running" })]),
+      }),
+    );
+  });
+
+  it("should filter by multiple enabled sports", async () => {
+    useAuthStore.setState({
+      user: { ...createMockUser(), running_enabled: true, cycling_enabled: true, swimming_enabled: false },
+    });
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 1);
+    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(api.fetchActivities).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["activities", expect.objectContaining({ sport: "running,cycling" })]),
+      }),
+    );
+  });
+
+  it("should not filter by sport when user is null", async () => {
+    useAuthStore.setState({ user: null });
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 1);
+    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(api.fetchActivities).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["activities", expect.objectContaining({ sport: undefined })]),
+      }),
+    );
+  });
+
+  it("should not filter when no sports are enabled", async () => {
+    useAuthStore.setState({
+      user: { ...createMockUser(), running_enabled: false, cycling_enabled: false, swimming_enabled: false },
+    });
+    const mockResponse = createMockActivitiesResponse([createMockActivity()], 1, 1);
+    vi.mocked(api.fetchActivities).mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useHomeActivities(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(api.fetchActivities).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(["activities", expect.objectContaining({ sport: undefined })]),
+      }),
+    );
   });
 });

@@ -18,7 +18,7 @@ export const FileExtension = type("string").narrow((name, ctx) => {
 export type FileExtension = typeof FileExtension.infer;
 
 export const ActivitiesQueryParams = type({
-  sport: Sport.or("undefined"),
+  sport: "string | undefined",
   distance: "number[]",
   fetchMap: "boolean",
   limit: "number",
