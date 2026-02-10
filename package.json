@@ -30,7 +30,7 @@
     "axios": "^1.13.5",
     "chart.js": "^4.5.1",
     "chartjs-plugin-zoom": "^2.2.0",
-    "framer-motion": "^12.33.0",
+    "framer-motion": "^12.34.0",
     "jszip": "^3.10.1",
     "konva": "^10.2.0",
     "leaflet": "^1.9.4",
