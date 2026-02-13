@@ -48,7 +48,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.1",
     "@codecov/vite-plugin": "^1.9.1",
-    "@eslint/js": "^9.38.0",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "@storybook/addon-docs": "^10.2.8",
     "@storybook/addon-vitest": "^10.2.8",
@@ -70,7 +70,7 @@
     "@vitest/ui": "^4.0.18",
     "baseline-browser-mapping": "^2.9.19",
     "chromatic": "^15.0.0",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-react-refresh": "^0.5.0",
     "eslint-plugin-storybook": "^10.2.8",
