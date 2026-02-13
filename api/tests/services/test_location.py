@@ -41,7 +41,7 @@ def create_test_activity(**kwargs):
         "total_distance": 0.0,
     }
     defaults.update(kwargs)
-    return Activity(**defaults)
+    return Activity(**defaults)  # type: ignore[arg-type]
 
 
 def test_fetch_location_from_api_success(location_service):
@@ -155,6 +155,7 @@ def test_update_activity_location_success(session, location_service):
         lat=37.7749,
         lon=-122.4194,
         distance=0,
+        heart_rate=None,
         speed=0,
     )
     session.add(tracepoint)

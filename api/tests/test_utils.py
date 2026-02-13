@@ -47,8 +47,8 @@ def tracepoint_strategy(draw):
                 allow_infinity=False,
             )
         ),
-        timestamp=datetime.timedelta(
-            seconds=draw(st.integers(min_value=0, max_value=36000))
+        timestamp=datetime.datetime.fromtimestamp(
+            draw(st.integers(min_value=0, max_value=36000))
         ),
         distance=draw(
             st.floats(
@@ -85,7 +85,7 @@ class TestGetLatLon:
             activity_id=uuid.uuid4(),
             lat=47.2183,
             lon=-1.5536,
-            timestamp=datetime.timedelta(seconds=0),
+            timestamp=datetime.datetime.fromtimestamp(0),
             distance=0.0,
             heart_rate=150,
             speed=5.0,
@@ -107,7 +107,7 @@ class TestGetLatLon:
                 activity_id=uuid.uuid4(),
                 lat=47.2183,
                 lon=-1.5536,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0.0,
                 heart_rate=150,
                 speed=5.0,
@@ -117,7 +117,7 @@ class TestGetLatLon:
                 activity_id=uuid.uuid4(),
                 lat=47.2200,
                 lon=-1.5500,
-                timestamp=datetime.timedelta(seconds=100),
+                timestamp=datetime.datetime.fromtimestamp(100),
                 distance=100.0,
                 heart_rate=155,
                 speed=5.2,
@@ -299,23 +299,32 @@ class TestCalculateHeartRateZones:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=0),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=60),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=200,
                 heart_rate=110,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=120),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(120),
                 distance=400,
                 heart_rate=None,
+                speed=0.0,
             ),
         ]
 
@@ -343,23 +352,32 @@ class TestCalculateHeartRateZones:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=0),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 heart_rate=110,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=60),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=200,
                 heart_rate=130,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=120),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(120),
                 distance=400,
                 heart_rate=130,
+                speed=0.0,
             ),
         ]
 
@@ -386,15 +404,21 @@ class TestCalculatePaceZones:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=0),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                heart_rate=None,
                 speed=0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=60),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=200,
+                heart_rate=None,
                 speed=10.0,
             ),
         ]
@@ -419,22 +443,34 @@ class TestCalculatePowerZones:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=0),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                heart_rate=None,
+                speed=0.0,
                 power=None,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=60),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=500,
-                power=120.0,
+                heart_rate=None,
+                speed=0.0,
+                power=120,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=120),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(120),
                 distance=1000,
+                heart_rate=None,
+                speed=0.0,
                 power=None,
             ),
         ]
@@ -448,10 +484,14 @@ class TestCalculateActivityZoneData:
         mock_session = Mock()
         activity = Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="running",
+            device="Test",
+            race=False,
             user_id="test-user",
             title="Test",
             start_time=0,
+            timestamp=0,
             total_distance=5000,
             total_elapsed_time=1800,
             total_timer_time=1800,
@@ -464,10 +504,14 @@ class TestCalculateActivityZoneData:
         mock_session = Mock()
         activity = Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="running",
+            device="Test",
+            race=False,
             user_id=None,
             title="Test",
             start_time=0,
+            timestamp=0,
             total_distance=5000,
             total_elapsed_time=1800,
             total_timer_time=1800,
@@ -476,8 +520,12 @@ class TestCalculateActivityZoneData:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                lat=0.0,
+                lon=0.0,
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                heart_rate=None,
+                speed=0.0,
             )
         ]
 
@@ -505,10 +553,14 @@ class TestDetectBestEffortAchievements:
     def test_non_running_sport(self, mock_session):
         activity = Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="cycling",
+            device="Test",
+            race=False,
             user_id="test-user",
             title="Test",
             start_time=int(datetime.datetime.now().timestamp()),
+            timestamp=0,
             total_distance=20000,
             total_elapsed_time=3600,
             total_timer_time=3600,
@@ -520,10 +572,14 @@ class TestDetectBestEffortAchievements:
     def test_no_performances(self, mock_session):
         activity = Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="running",
+            device="Test",
+            race=False,
             user_id="test-user",
             title="Test",
             start_time=int(datetime.datetime.now().timestamp()),
+            timestamp=0,
             total_distance=5000,
             total_elapsed_time=1800,
             total_timer_time=1800,
