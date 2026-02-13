@@ -19,6 +19,10 @@ class TestPerformanceService:
             sport="running",
             user_id="test-user",
             title="Test Run",
+            fit="test.fit",
+            device="Test",
+            race=False,
+            timestamp=0,
             start_time=0,
             total_distance=10000,
             total_elapsed_time=3000,
@@ -32,6 +36,10 @@ class TestPerformanceService:
             sport="cycling",
             user_id="test-user",
             title="Test Ride",
+            fit="test.fit",
+            device="Test",
+            race=False,
+            timestamp=0,
             start_time=0,
             total_distance=20000,
             total_elapsed_time=3600,
@@ -51,8 +59,12 @@ class TestPerformanceService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=cycling_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             )
         ]
         performances = service.calculate_running_performances(
@@ -65,14 +77,22 @@ class TestPerformanceService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=300),
+                timestamp=datetime.datetime.fromtimestamp(300),
                 distance=500,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
         ]
         performances = service.calculate_running_performances(
@@ -85,14 +105,22 @@ class TestPerformanceService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=240),
+                timestamp=datetime.datetime.fromtimestamp(240),
                 distance=1000,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
         ]
         performances = service.calculate_running_performances(
@@ -105,7 +133,7 @@ class TestPerformanceService:
         assert performances[0].activity_id == running_activity.id
 
     def test_calculate_running_performances_5km_run(self, service, running_activity):
-        start_time = datetime.timedelta(seconds=0)
+        start_time = datetime.datetime.fromtimestamp(0)
         tracepoints = []
         for i in range(51):
             tracepoints.append(
@@ -114,6 +142,10 @@ class TestPerformanceService:
                     activity_id=running_activity.id,
                     timestamp=start_time + datetime.timedelta(seconds=i * 20),
                     distance=i * 100,
+                    lat=0.0,
+                    lon=0.0,
+                    heart_rate=None,
+                    speed=0.0,
                 )
             )
 
@@ -139,8 +171,12 @@ class TestPerformanceService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             )
         ]
         performances = service.calculate_cycling_performances(
@@ -155,16 +191,24 @@ class TestPerformanceService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=cycling_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 power=None,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=cycling_activity.id,
-                timestamp=datetime.timedelta(seconds=300),
+                timestamp=datetime.datetime.fromtimestamp(300),
                 distance=5000,
                 power=None,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
         ]
         performances = service.calculate_cycling_performances(
@@ -183,9 +227,13 @@ class TestPerformanceService:
                 Tracepoint(
                     id=uuid.uuid4(),
                     activity_id=cycling_activity.id,
-                    timestamp=datetime.timedelta(seconds=i),
+                    timestamp=datetime.datetime.fromtimestamp(i),
                     distance=i * 10,
-                    power=200.0 + i,
+                    power=200 + i,
+                    lat=0.0,
+                    lon=0.0,
+                    heart_rate=None,
+                    speed=0.0,
                 )
             )
 
@@ -205,16 +253,24 @@ class TestPerformanceService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=cycling_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
-                power=250.0,
+                power=250,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=cycling_activity.id,
-                timestamp=datetime.timedelta(seconds=30),
+                timestamp=datetime.datetime.fromtimestamp(30),
                 distance=500,
-                power=260.0,
+                power=260,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
         ]
         performances = service.calculate_cycling_performances(
@@ -233,20 +289,32 @@ class TestPerformanceService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=300),
+                timestamp=datetime.datetime.fromtimestamp(300),
                 distance=1000,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=550),
+                timestamp=datetime.datetime.fromtimestamp(550),
                 distance=2000,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
         ]
         performances = service.calculate_running_performances(

@@ -277,9 +277,9 @@ class ZoneService:
         for zone_data in default_zones:
             zone = Zone(
                 user_id=user_id,
-                index=zone_data["index"],
-                type=zone_data["type"],
-                max_value=zone_data["max_value"],
+                index=zone_data["index"],  # type: ignore[arg-type]
+                type=zone_data["type"],  # type: ignore[arg-type]
+                max_value=zone_data["max_value"],  # type: ignore[arg-type]
             )
             self.session.add(zone)
 

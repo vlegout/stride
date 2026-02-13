@@ -38,7 +38,14 @@ def test_get_fit_file_path_exists_locally(session, fit_file_service):
             id=uuid.uuid4(),
             fit=fit_filename,
             sport="running",
+            title="Test",
+            device="Test",
+            race=False,
+            start_time=1234567890,
             timestamp=1234567890,
+            total_timer_time=0.0,
+            total_elapsed_time=0.0,
+            total_distance=0.0,
         )
 
         path = fit_file_service.get_fit_file_path(
@@ -54,7 +61,14 @@ def test_get_fit_file_path_not_found(session, fit_file_service):
             id=uuid.uuid4(),
             fit="nonexistent.fit",
             sport="running",
+            title="Test",
+            device="Test",
+            race=False,
+            start_time=1234567890,
             timestamp=1234567890,
+            total_timer_time=0.0,
+            total_elapsed_time=0.0,
+            total_distance=0.0,
         )
 
         path = fit_file_service.get_fit_file_path(
@@ -70,7 +84,14 @@ def test_get_fit_file_path_path_traversal_detected(session, fit_file_service):
             id=uuid.uuid4(),
             fit="../../../etc/passwd",
             sport="running",
+            title="Test",
+            device="Test",
+            race=False,
+            start_time=1234567890,
             timestamp=1234567890,
+            total_timer_time=0.0,
+            total_elapsed_time=0.0,
+            total_distance=0.0,
         )
 
         with pytest.raises(ValueError, match="path traversal detected"):
@@ -88,7 +109,14 @@ def test_get_fit_file_path_download_from_s3(session):
             id=uuid.uuid4(),
             fit="test.fit",
             sport="running",
+            title="Test",
+            device="Test",
+            race=False,
+            start_time=1234567890,
             timestamp=1234567890,
+            total_timer_time=0.0,
+            total_elapsed_time=0.0,
+            total_distance=0.0,
         )
 
         path = fit_file_service.get_fit_file_path(
@@ -110,7 +138,14 @@ def test_get_fit_file_path_s3_traversal_blocked(session):
             id=uuid.uuid4(),
             fit="../bad.fit",
             sport="running",
+            title="Test",
+            device="Test",
+            race=False,
+            start_time=1234567890,
             timestamp=1234567890,
+            total_timer_time=0.0,
+            total_elapsed_time=0.0,
+            total_distance=0.0,
         )
 
         with pytest.raises(ValueError, match="path traversal"):
@@ -119,7 +154,17 @@ def test_get_fit_file_path_s3_traversal_blocked(session):
 
 def test_read_fit_file_direct(session, fit_file_service):
     mock_activity = Activity(
-        id=uuid.uuid4(), fit="test.fit", sport="running", timestamp=1234567890
+        id=uuid.uuid4(),
+        fit="test.fit",
+        sport="running",
+        title="Test",
+        device="Test",
+        race=False,
+        start_time=1234567890,
+        timestamp=1234567890,
+        total_timer_time=0.0,
+        total_elapsed_time=0.0,
+        total_distance=0.0,
     )
 
     with patch("api.services.fit_file.get_activity_from_fit") as mock_get:

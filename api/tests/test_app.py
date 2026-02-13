@@ -544,7 +544,7 @@ def _make_activity(**overrides):
         "zone_heart_rates": [],
     }
     defaults.update(overrides)
-    return Activity(**defaults)
+    return Activity(**defaults)  # type: ignore[arg-type]
 
 
 def _make_user(**overrides):
@@ -561,7 +561,7 @@ def _make_user(**overrides):
         "updated_at": datetime.datetime.now(datetime.timezone.utc),
     }
     defaults.update(overrides)
-    return User(**defaults)
+    return User(**defaults)  # type: ignore[arg-type]
 
 
 class _AuthenticatedTestCase(unittest.TestCase):

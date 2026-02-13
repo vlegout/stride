@@ -53,6 +53,10 @@ class TestActivityService:
             sport="running",
             user_id=None,
             title="Test Run",
+            fit="test.fit",
+            device="Test",
+            race=False,
+            timestamp=0,
             start_time=int(datetime.datetime.now().timestamp()),
             total_distance=5000,
             total_elapsed_time=1800,
@@ -66,6 +70,10 @@ class TestActivityService:
             sport="cycling",
             user_id=None,
             title="Test Ride",
+            fit="test.fit",
+            device="Test",
+            race=False,
+            timestamp=0,
             start_time=int(datetime.datetime.now().timestamp()),
             total_distance=20000,
             total_elapsed_time=3600,
@@ -78,10 +86,10 @@ class TestActivityService:
             Lap(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
+                index=0,
                 start_time=0,
-                timestamp=datetime.timedelta(seconds=600),
-                total_elapsed_time=datetime.timedelta(seconds=600),
-                total_timer_time=datetime.timedelta(seconds=600),
+                total_elapsed_time=600.0,
+                total_timer_time=600.0,
                 total_distance=1000,
             )
         ]
@@ -92,7 +100,12 @@ class TestActivityService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=i * 10),
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
+                timestamp=datetime.datetime(2024, 1, 1)
+                + datetime.timedelta(seconds=i * 10),
                 distance=i * 100,
             )
             for i in range(10)
@@ -284,7 +297,11 @@ class TestActivityService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=i),
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
+                timestamp=datetime.datetime.fromtimestamp(i),
                 distance=i * 10,
             )
             for i in range(MAX_TRACEPOINTS_FOR_RESPONSE + 1000)
@@ -317,7 +334,11 @@ class TestActivityService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=i),
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
+                timestamp=datetime.datetime.fromtimestamp(i),
                 distance=i * 10,
             )
             for i in range(MAX_TRACEPOINTS_FOR_RESPONSE + 1000)

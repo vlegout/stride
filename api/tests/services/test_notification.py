@@ -21,10 +21,14 @@ class TestNotificationService:
     def running_activity(self):
         return Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="running",
+            device="Test",
+            race=False,
             user_id="test-user",
             title="Test Run",
             start_time=int(datetime.datetime(2024, 6, 15).timestamp()),
+            timestamp=0,
             total_distance=10000,
             total_elapsed_time=3000,
             total_timer_time=3000,
@@ -34,10 +38,14 @@ class TestNotificationService:
     def cycling_activity(self):
         return Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="cycling",
+            device="Test",
+            race=False,
             user_id="test-user",
             title="Test Ride",
             start_time=int(datetime.datetime(2024, 6, 15).timestamp()),
+            timestamp=0,
             total_distance=20000,
             total_elapsed_time=3600,
             total_timer_time=3600,
@@ -447,10 +455,14 @@ class TestNotificationService:
     ):
         past_activity = Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="running",
+            device="Test",
+            race=False,
             user_id="test-user",
             title="Past Run",
             start_time=int(datetime.datetime(2024, 1, 15).timestamp()),
+            timestamp=0,
             total_distance=10000,
             total_elapsed_time=3000,
             total_timer_time=3000,
@@ -489,10 +501,14 @@ class TestNotificationService:
     ):
         past_activity = Activity(
             id=uuid.uuid4(),
+            fit="test.fit",
             sport="cycling",
+            device="Test",
+            race=False,
             user_id="test-user",
             title="Past Ride",
             start_time=int(datetime.datetime(2024, 1, 15).timestamp()),
+            timestamp=0,
             total_distance=20000,
             total_elapsed_time=3600,
             total_timer_time=3600,

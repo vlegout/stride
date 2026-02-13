@@ -28,6 +28,10 @@ class TestZoneService:
             total_distance=5000,
             total_elapsed_time=1800,
             total_timer_time=1800,
+            fit="test.fit",
+            device="Test",
+            race=False,
+            timestamp=0,
         )
 
     @pytest.fixture
@@ -41,6 +45,10 @@ class TestZoneService:
             total_distance=20000,
             total_elapsed_time=3600,
             total_timer_time=3600,
+            fit="test.fit",
+            device="Test",
+            race=False,
+            timestamp=0,
         )
 
     def test_calculate_activity_zones_no_tracepoints(
@@ -59,13 +67,21 @@ class TestZoneService:
             total_distance=5000,
             total_elapsed_time=1800,
             total_timer_time=1800,
+            fit="test.fit",
+            device="Test",
+            race=False,
+            timestamp=0,
         )
         tracepoints = [
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             )
         ]
 
@@ -79,8 +95,12 @@ class TestZoneService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             )
         ]
 
@@ -116,16 +136,22 @@ class TestZoneService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 heart_rate=110,
+                lat=0.0,
+                lon=0.0,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=60),
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=200,
                 heart_rate=130,
+                lat=0.0,
+                lon=0.0,
+                speed=0.0,
             ),
         ]
 
@@ -154,16 +180,22 @@ class TestZoneService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 speed=10.0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=running_activity.id,
-                timestamp=datetime.timedelta(seconds=60),
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=200,
                 speed=12.0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
             ),
         ]
 
@@ -192,16 +224,24 @@ class TestZoneService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=cycling_activity.id,
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
-                power=120.0,
+                power=120,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=cycling_activity.id,
-                timestamp=datetime.timedelta(seconds=60),
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=500,
-                power=140.0,
+                power=140,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
         ]
 
@@ -235,6 +275,10 @@ class TestZoneService:
                 total_timer_time=1800,
                 max_heart_rate=180,
                 avg_speed=10.0,
+                fit="test.fit",
+                device="Test",
+                race=False,
+                timestamp=0,
             ),
             Activity(
                 id=uuid.uuid4(),
@@ -247,6 +291,10 @@ class TestZoneService:
                 total_timer_time=1800,
                 max_heart_rate=185,
                 avg_speed=10.5,
+                fit="test.fit",
+                device="Test",
+                race=False,
+                timestamp=0,
             ),
         ]
 
@@ -282,6 +330,10 @@ class TestZoneService:
                 total_elapsed_time=3000,
                 total_timer_time=3000,
                 avg_speed=12.0,
+                fit="test.fit",
+                device="Test",
+                race=False,
+                timestamp=0,
             ),
         ]
 
@@ -317,6 +369,10 @@ class TestZoneService:
                 total_elapsed_time=3600,
                 total_timer_time=3600,
                 max_power=300.0,
+                fit="test.fit",
+                device="Test",
+                race=False,
+                timestamp=0,
             ),
         ]
 
@@ -368,23 +424,32 @@ class TestZoneService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 heart_rate=None,
+                lat=0.0,
+                lon=0.0,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=60),
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=200,
                 heart_rate=110,
+                lat=0.0,
+                lon=0.0,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=120),
+                timestamp=datetime.datetime.fromtimestamp(120),
                 distance=400,
                 heart_rate=None,
+                lat=0.0,
+                lon=0.0,
+                speed=0.0,
             ),
         ]
 
@@ -407,16 +472,22 @@ class TestZoneService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 speed=0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=60),
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=200,
                 speed=10.0,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
             ),
         ]
 
@@ -439,23 +510,35 @@ class TestZoneService:
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=0),
+                timestamp=datetime.datetime.fromtimestamp(0),
                 distance=0,
                 power=None,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=60),
+                timestamp=datetime.datetime.fromtimestamp(60),
                 distance=500,
-                power=120.0,
+                power=120,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
             Tracepoint(
                 id=uuid.uuid4(),
                 activity_id=uuid.uuid4(),
-                timestamp=datetime.timedelta(seconds=120),
+                timestamp=datetime.datetime.fromtimestamp(120),
                 distance=1000,
                 power=None,
+                lat=0.0,
+                lon=0.0,
+                heart_rate=None,
+                speed=0.0,
             ),
         ]
 
