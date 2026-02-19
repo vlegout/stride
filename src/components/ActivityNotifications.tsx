@@ -1,5 +1,5 @@
 import { Alert, Stack } from "@mui/material";
-import { Notification } from "../types";
+import type { Notification } from "../types";
 import { getNotificationMessage } from "./activityNotificationUtils";
 
 interface ActivityNotificationsProps {

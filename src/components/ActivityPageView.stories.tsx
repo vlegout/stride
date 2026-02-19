@@ -13,7 +13,7 @@ import {
 } from "chart.js";
 
 import ActivityPageView from "./ActivityPageView";
-import { Activity } from "../types";
+import type { Activity } from "../types";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Filler);
 

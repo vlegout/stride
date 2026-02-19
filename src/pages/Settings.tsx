@@ -12,7 +12,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { fetchCurrentUser, updateUser } from "../api";
 import QueryBoundary from "../components/QueryBoundary";
-import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
+import { PageHeader, DataTable, SectionContainer, type Column } from "../components/ui";
 import { useAuthStore } from "../store";
 import type { User } from "../types";
 

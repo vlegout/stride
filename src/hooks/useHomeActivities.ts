@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchActivities } from "../api";
-import { ActivitiesQueryParams, Sport } from "../types";
+import type { ActivitiesQueryParams, Sport } from "../types";
 import { useAuthStore } from "../store";
 
 const ACTIVITIES_PER_PAGE = 5;

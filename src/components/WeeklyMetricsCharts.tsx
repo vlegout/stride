@@ -3,7 +3,7 @@ import { Box, Typography, Grid, ToggleButtonGroup, ToggleButton, Stack } from "@
 import { ViewModule, ViewStream } from "@mui/icons-material";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
-import { WeeklyActivityData } from "../types";
+import type { WeeklyActivityData } from "../types";
 import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);

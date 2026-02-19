@@ -4,8 +4,8 @@ export const formatDuration = (duration: string): string => {
   const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/);
   if (!match) return duration;
 
-  const hours = parseInt(match[1] || "0");
-  const minutes = parseInt(match[2] || "0");
+  const hours = parseInt(match[1] || "0", 10);
+  const minutes = parseInt(match[2] || "0", 10);
   const seconds = Math.round(parseFloat(match[3] || "0"));
 
   if (hours > 0) {

@@ -43,6 +43,7 @@ const MapHeatmap = ({ polylines, height = "600px", width = "100%" }: MapHeatmapP
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       {polylines.map((polyline, index) => (
         <Polyline
+          // biome-ignore lint/suspicious/noArrayIndexKey: polylines have no unique identifier
           key={index}
           positions={polyline.coordinates as [number, number][]}
           pathOptions={{

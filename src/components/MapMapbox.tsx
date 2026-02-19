@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { MapComponentProps } from "./MapTypes";
+import type { MapComponentProps } from "./MapTypes";
+
+const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const MapMapbox = ({ bounds, points, height = "400px", width = "400px", showMarkers = true }: MapComponentProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-
-  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
   useEffect(() => {
     if (!mapboxToken) return;
@@ -91,7 +91,7 @@ const MapMapbox = ({ bounds, points, height = "400px", width = "400px", showMark
         map.current = null;
       }
     };
-  }, [bounds, points, showMarkers, mapboxToken]);
+  }, [bounds, points, showMarkers]);
 
   if (!mapboxToken) {
     return (

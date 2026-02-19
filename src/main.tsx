@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { StrictMode, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -100,7 +101,7 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 /* eslint-disable */
-
+// biome-ignore lint/style/noNonNullAssertion: entry point, root element always exists
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>

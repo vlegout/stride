@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import WeeklyZonesCharts from "./WeeklyZonesCharts";
-import { WeeklyZoneData } from "../types";
+import type { WeeklyZoneData } from "../types";
 
 const meta = {
   title: "Components/WeeklyZonesCharts",

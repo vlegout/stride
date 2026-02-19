@@ -35,30 +35,28 @@ const Heatmap = () => {
             sportFilter === "all" ? data.polylines : data.polylines.filter((p) => p.sport === sportFilter);
 
           return (
-            <>
-              <SectionContainer>
-                <Box sx={{ mb: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    Filter by sport:
-                  </Typography>
-                  <ToggleButtonGroup value={sportFilter} exclusive onChange={handleSportChange} size="small">
-                    <ToggleButton value="all">All</ToggleButton>
-                    <ToggleButton value="running">Running</ToggleButton>
-                    <ToggleButton value="cycling">Cycling</ToggleButton>
-                  </ToggleButtonGroup>
-                </Box>
+            <SectionContainer>
+              <Box sx={{ mb: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Filter by sport:
+                </Typography>
+                <ToggleButtonGroup value={sportFilter} exclusive onChange={handleSportChange} size="small">
+                  <ToggleButton value="all">All</ToggleButton>
+                  <ToggleButton value="running">Running</ToggleButton>
+                  <ToggleButton value="cycling">Cycling</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
 
-                {filteredPolylines.length > 0 ? (
-                  <Box sx={{ borderRadius: 2, overflow: "hidden" }}>
-                    <MapHeatmap polylines={filteredPolylines} height="70vh" />
-                  </Box>
-                ) : (
-                  <Typography color="text.secondary">
-                    No activities found. Upload some activities to see your heatmap.
-                  </Typography>
-                )}
-              </SectionContainer>
-            </>
+              {filteredPolylines.length > 0 ? (
+                <Box sx={{ borderRadius: 2, overflow: "hidden" }}>
+                  <MapHeatmap polylines={filteredPolylines} height="70vh" />
+                </Box>
+              ) : (
+                <Typography color="text.secondary">
+                  No activities found. Upload some activities to see your heatmap.
+                </Typography>
+              )}
+            </SectionContainer>
           );
         }}
       </QueryBoundary>

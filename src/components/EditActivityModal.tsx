@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Alert, CircularProgress } from "@mui/material";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 import { updateActivity, deleteActivity } from "../api";
 import { FormField } from "./ui";

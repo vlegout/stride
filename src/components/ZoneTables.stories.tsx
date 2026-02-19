@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import ZoneTables from "./ZoneTables";
-import { Zone } from "../types";
+import type { Zone } from "../types";
 
 const meta: Meta<typeof ZoneTables> = {
   title: "Components/ZoneTables",

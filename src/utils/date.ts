@@ -1,4 +1,4 @@
-import { DateRangeOption } from "../components/DateSelector";
+import type { DateRangeOption } from "../components/DateSelector";
 
 export const getDaysFromRange = (range: DateRangeOption): number => {
   switch (range) {

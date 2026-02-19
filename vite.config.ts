@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
-import { execSync } from "child_process";
+import { execSync } from "node:child_process";
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import istanbul from "vite-plugin-istanbul";
 

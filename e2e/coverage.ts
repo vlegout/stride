@@ -1,7 +1,7 @@
 import { test as baseTest } from "@playwright/test";
-import * as fs from "fs";
-import * as path from "path";
-import { randomUUID } from "crypto";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { randomUUID } from "node:crypto";
 
 const coverageDir = path.join(process.cwd(), ".nyc_output");
 

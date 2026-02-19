@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import DataTable, { Column } from "./DataTable";
+import DataTable, { type Column } from "./DataTable";
 
 interface MockData extends Record<string, unknown> {
   id: string;

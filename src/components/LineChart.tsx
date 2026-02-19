@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { ChartOptions, Chart, Plugin, Decimation } from "chart.js";
+import { type ChartOptions, Chart, type Plugin, Decimation } from "chart.js";
 import { Line } from "react-chartjs-2";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { useTheme } from "@mui/material/styles";

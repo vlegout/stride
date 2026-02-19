@@ -12,7 +12,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
-import { Activity } from "../types";
+import type { Activity } from "../types";
 import { useAuthStore } from "../store";
 
 import MapComponent from "./Map";
@@ -81,7 +81,7 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   return (
     <Grid container spacing={isMobile ? 1 : 2} marginBottom={isMobile ? "16px" : "20px"}>
       <Grid size={{ xs: 12, md: 6 }}>
-        {isDetailed ? <>{title}</> : title}
+        {title}
         <Grid container spacing={1} marginTop={"10px"} marginBottom={"10px"}>
           <Grid size={isSmall ? 2 : 1}>
             <ActivityLogo sport={activity.sport} />

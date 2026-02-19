@@ -3,9 +3,9 @@ import { Stage, Layer, Rect, Text, Line } from "react-konva";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { KonvaEventObject } from "konva/lib/Node";
+import type { KonvaEventObject } from "konva/lib/Node";
 
-import { Lap, Sport } from "../types";
+import type { Lap, Sport } from "../types";
 import { colors, hexToRgb } from "../colors";
 
 const CYCLING_VALUE_PADDING = 2;
@@ -253,7 +253,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
 
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - (1 - progress) ** 3;
       setAnimationProgress(eased);
 
       if (progress < 1) {
@@ -268,7 +268,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [laps, hasValidData, sport]);
+  }, [hasValidData, sport]);
 
   if (sport === "swimming" || !hasValidData) {
     return null;
@@ -303,14 +303,14 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     >
       <Stage width={width} height={stageHeight}>
         <Layer>
-          {yAxisLabels.map((value, index) => {
+          {yAxisLabels.map((value) => {
             const yPos = isCycling
               ? height - (height * (value - minValue)) / valueRange
               : height - (height * (maxValue - value)) / valueRange;
 
             return (
               <Line
-                key={`grid-${index}`}
+                key={`grid-${value}`}
                 points={[leftMargin, yPos + 10, width - rightMargin, yPos + 10]}
                 stroke={gridLineColor}
                 strokeWidth={1}
@@ -324,12 +324,12 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleMouseOut}
         >
-          {dataLaps.map((lap, index) => {
+          {dataLaps.map((lap) => {
             const animatedHeight = lap.height * animationProgress;
 
             return (
               <Rect
-                key={index}
+                key={lap.name}
                 x={lap.x}
                 y={baselineY}
                 width={lap.width}
@@ -362,12 +362,12 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
           />
         </Layer>
         <Layer>
-          {yAxisLabels.map((value, index) => {
+          {yAxisLabels.map((value) => {
             const labelText = isCycling ? `${value.toFixed(0)}` : formatPace(value);
 
             return (
               <Text
-                key={index}
+                key={value}
                 x={0}
                 y={
                   isCycling
@@ -405,7 +405,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
 
             return (
               <Text
-                key={`x-label-${index}`}
+                key={`x-label-${lap.index}`}
                 x={labelX}
                 y={labelY}
                 text={`${lap.index + 1}`}

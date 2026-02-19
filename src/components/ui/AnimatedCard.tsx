@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { motion, MotionStyle } from "framer-motion";
+import type { ReactNode } from "react";
+import { motion, type MotionStyle } from "framer-motion";
 import { cardHoverVariants } from "../../animations";
 import { colors } from "../../colors";
 

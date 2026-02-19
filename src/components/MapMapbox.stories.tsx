@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import MapMapbox from "./MapMapbox";
-import { MapComponentProps } from "./MapTypes";
+import type { MapComponentProps } from "./MapTypes";
 
 const MockMapMapbox = (props: MapComponentProps) => {
   if (!import.meta.env.VITE_MAPBOX_TOKEN) {
