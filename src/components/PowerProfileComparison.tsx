@@ -36,7 +36,7 @@ const PowerProfileComparison = () => {
           if (selection === "overall") {
             return data.overall;
           }
-          const year = parseInt(selection);
+          const year = parseInt(selection, 10);
           return data.years[year] || [];
         };
 

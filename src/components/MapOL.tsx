@@ -75,6 +75,7 @@ const MapOLComponent = ({
 
     const [[minLat, minLng], [maxLat, maxLng]] = bounds;
     const extent = [fromLonLat([minLng, minLat]), fromLonLat([maxLng, maxLat])].flat();
+    // biome-ignore lint/suspicious/noFocusedTests: OpenLayers API method, not a test
     map.getView().fit(extent, { padding: [20, 20, 20, 20] });
 
     return () => map.setTarget(undefined);

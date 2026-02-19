@@ -131,6 +131,7 @@ export const SkeletonTable = ({ rows = 5 }: { rows?: number }) => {
       <Skeleton variant="rectangular" height={48} borderRadius="8px 8px 0 0" />
       {Array.from({ length: rows }).map((_, i) => (
         <Box
+          // biome-ignore lint/suspicious/noArrayIndexKey: generated skeleton rows have no unique identifier
           key={i}
           sx={{
             display: "flex",

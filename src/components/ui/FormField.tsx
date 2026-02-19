@@ -163,7 +163,7 @@ const FormField = ({
             <Box sx={{ px: { xs: 2, sm: 3 } }}>
               <Slider
                 value={(value as number | number[]) || 0}
-                onChange={(event, newValue) => onChange && onChange(newValue, event)}
+                onChange={(event, newValue) => onChange?.(newValue, event)}
                 {...(sliderProps?.onChangeCommitted && { onChangeCommitted: sliderProps.onChangeCommitted })}
                 min={sliderProps?.min || 0}
                 max={sliderProps?.max || 100}

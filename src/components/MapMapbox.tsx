@@ -91,7 +91,7 @@ const MapMapbox = ({ bounds, points, height = "400px", width = "400px", showMark
         map.current = null;
       }
     };
-  }, [bounds, points, showMarkers, mapboxToken]);
+  }, [bounds, points, showMarkers]);
 
   if (!mapboxToken) {
     return (

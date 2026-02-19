@@ -201,6 +201,7 @@ export const Interactive: Story = {
     return (
       <div>
         <button
+          type="button"
           onClick={() => setOpen(true)}
           style={{
             padding: "12px 24px",

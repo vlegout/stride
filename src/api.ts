@@ -91,14 +91,14 @@ export async function fetchActivities({
   if (limit) urlParams.push(`limit=${limit}`);
   if (distance && distance.length === 2) {
     const [min, max] = distance;
-    if (min !== undefined && min != 0) urlParams.push(`min_distance=${min}`);
-    if (max !== undefined && max != 100) urlParams.push(`max_distance=${max}`);
+    if (min !== undefined && min !== 0) urlParams.push(`min_distance=${min}`);
+    if (max !== undefined && max !== 100) urlParams.push(`max_distance=${max}`);
   }
   if (order) urlParams.push(`order=${order}`);
   if (orderBy) urlParams.push(`order_by=${orderBy}`);
-  const queryString = urlParams.length ? "?" + urlParams.join("&") : "";
+  const queryString = urlParams.length ? `?${urlParams.join("&")}` : "";
 
-  const data = await apiCall("/activities/" + queryString);
+  const data = await apiCall(`/activities/${queryString}`);
   return validateResponse(data, ActivitiesResponseValidator, "fetchActivities");
 }
 
@@ -109,7 +109,7 @@ export async function fetchLastActivities(): Promise<Activity[]> {
 }
 
 export async function fetchActivity(id: string): Promise<Activity> {
-  const data = await apiCall("/activities/" + id + "/");
+  const data = await apiCall(`/activities/${id}/`);
   return validateResponse(data, ActivityValidator, "fetchActivity");
 }
 
@@ -118,7 +118,7 @@ export async function fetchActivityZones(id: string): Promise<{
   power?: { zone: number; time: number; percentage: number }[];
   pace?: { zone: number; time: number; percentage: number }[];
 }> {
-  const data = await apiCall("/activities/" + id + "/zones/");
+  const data = await apiCall(`/activities/${id}/zones/`);
   const response = validateResponse(data, ActivityZonesRawResponseValidator, "fetchActivityZones");
 
   // Transform API response to match frontend expectations

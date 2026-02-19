@@ -268,7 +268,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [laps, hasValidData, sport]);
+  }, [hasValidData, sport]);
 
   if (sport === "swimming" || !hasValidData) {
     return null;
@@ -303,14 +303,14 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     >
       <Stage width={width} height={stageHeight}>
         <Layer>
-          {yAxisLabels.map((value, index) => {
+          {yAxisLabels.map((value) => {
             const yPos = isCycling
               ? height - (height * (value - minValue)) / valueRange
               : height - (height * (maxValue - value)) / valueRange;
 
             return (
               <Line
-                key={`grid-${index}`}
+                key={`grid-${value}`}
                 points={[leftMargin, yPos + 10, width - rightMargin, yPos + 10]}
                 stroke={gridLineColor}
                 strokeWidth={1}
@@ -324,12 +324,12 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleMouseOut}
         >
-          {dataLaps.map((lap, index) => {
+          {dataLaps.map((lap) => {
             const animatedHeight = lap.height * animationProgress;
 
             return (
               <Rect
-                key={index}
+                key={lap.name}
                 x={lap.x}
                 y={baselineY}
                 width={lap.width}
@@ -362,12 +362,12 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
           />
         </Layer>
         <Layer>
-          {yAxisLabels.map((value, index) => {
+          {yAxisLabels.map((value) => {
             const labelText = isCycling ? `${value.toFixed(0)}` : formatPace(value);
 
             return (
               <Text
-                key={index}
+                key={value}
                 x={0}
                 y={
                   isCycling
@@ -405,7 +405,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
 
             return (
               <Text
-                key={`x-label-${index}`}
+                key={`x-label-${lap.index}`}
                 x={labelX}
                 y={labelY}
                 text={`${lap.index + 1}`}
