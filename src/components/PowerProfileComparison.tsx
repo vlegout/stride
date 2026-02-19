@@ -7,7 +7,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import { Line } from "react-chartjs-2";
-import { ChartOptions } from "chart.js";
+import type { ChartOptions } from "chart.js";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 

@@ -12,7 +12,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
 
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
-import { Activity } from "../types";
+import type { Activity } from "../types";
 import { useAuthStore } from "../store";
 
 import MapComponent from "./Map";

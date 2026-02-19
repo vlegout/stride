@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
-import { Activity } from "../types";
+import type { Activity } from "../types";
 import ActivityBox from "./ActivityBox";
 import { PageHeader, SectionContainer } from "./ui";
 

@@ -1,10 +1,10 @@
-import React from "react";
+import type React from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
-import { Zone } from "../types";
-import { DataTable, Column, SectionContainer } from "./ui";
+import type { Zone } from "../types";
+import { DataTable, type Column, SectionContainer } from "./ui";
 
 interface ZoneTablesProps {
   zones: Zone[];

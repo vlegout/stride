@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import DataTable, { Column } from "../../../src/components/ui/DataTable";
+import DataTable, { type Column } from "../../../src/components/ui/DataTable";
 
 const theme = createTheme();
 

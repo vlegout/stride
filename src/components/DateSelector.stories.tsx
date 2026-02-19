@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { Box } from "@mui/material";
-import DateSelector, { DateRangeOption } from "./DateSelector";
+import DateSelector, { type DateRangeOption } from "./DateSelector";
 
 const meta = {
   title: "Components/DateSelector",

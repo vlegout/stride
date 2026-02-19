@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { Box } from "@mui/material";
-import FormField, { SelectOption } from "./FormField";
+import FormField, { type SelectOption } from "./FormField";
 
 const selectOptions: SelectOption[] = [
   { value: "option1", label: "Option 1" },

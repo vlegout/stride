@@ -10,9 +10,9 @@ import {
   Title,
   Tooltip,
   Legend,
-  TooltipItem,
+  type TooltipItem,
 } from "chart.js";
-import { WeeklyTSS } from "../types";
+import type { WeeklyTSS } from "../types";
 import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
@@ -72,10 +72,8 @@ const TSSChart = ({ weeklyTss }: TSSChartProps) => {
       },
       tooltip: {
         callbacks: {
-          title: function (context: TooltipItem<"bar" | "line">[]) {
-            return context[0].label || "";
-          },
-          label: function (context: TooltipItem<"bar" | "line">) {
+          title: (context: TooltipItem<"bar" | "line">[]) => context[0].label || "",
+          label: (context: TooltipItem<"bar" | "line">) => {
             const label = context.dataset.label || "";
             if (context.parsed.y === null) return "";
             return `${label}: ${context.parsed.y}`;

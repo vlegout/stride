@@ -22,7 +22,7 @@ import WeeklyMetricsCharts from "../components/WeeklyMetricsCharts";
 import WeeklyZonesCharts from "../components/WeeklyZonesCharts";
 import TSSChart from "../components/TSSChart";
 import FTPChart from "../components/FTPChart";
-import DateSelector, { DateRangeOption } from "../components/DateSelector";
+import DateSelector, { type DateRangeOption } from "../components/DateSelector";
 import { fetchFitness } from "../api";
 import { filterDataByDateRange, filterWeeklyDataByDateRange, getDateRangeLabel } from "../utils/date";
 

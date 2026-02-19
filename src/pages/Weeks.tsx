@@ -9,7 +9,7 @@ import type { Sport, WeeksResponse } from "../types";
 import { formatDate, formatDuration, formatDistance, formatSpeed } from "../utils";
 import ActivityLogo from "../components/ActivityLogo";
 import SportsBreakdownBar from "../components/SportsBreakdownBar";
-import { PageHeader, StatsCard, DataTable, SectionContainer, Column } from "../components/ui";
+import { PageHeader, StatsCard, DataTable, SectionContainer, type Column } from "../components/ui";
 import { fadeInVariants } from "../animations";
 
 interface ActivityRow {

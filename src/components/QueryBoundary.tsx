@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { UseQueryResult } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+import type { UseQueryResult } from "@tanstack/react-query";
 import Alert from "@mui/material/Alert";
 
 import LoadingIndicator from "./LoadingIndicator";

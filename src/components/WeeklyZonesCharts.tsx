@@ -1,7 +1,7 @@
 import { Box, Typography, Grid } from "@mui/material";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
-import { WeeklyZoneData } from "../types";
+import type { WeeklyZoneData } from "../types";
 import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);

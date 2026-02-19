@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid";
 import ActivitiesTable from "./ActivitiesTable";
 import type { Sport } from "../types";
 import { DistanceRange, Sport as SportValidator } from "../types";
-import { PageHeader, FormField, SelectOption } from "./ui";
+import { PageHeader, FormField, type SelectOption } from "./ui";
 import { type } from "arktype";
 
 interface ActivitiesPageViewProps {

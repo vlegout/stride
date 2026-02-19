@@ -1,6 +1,6 @@
 import { divIcon } from "leaflet";
 import { MapContainer, Polyline, TileLayer, Marker } from "react-leaflet";
-import { MapComponentProps } from "./MapTypes";
+import type { MapComponentProps } from "./MapTypes";
 
 const startIcon = divIcon({
   html: '<div style="background-color: #22c55e; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">S</div>',

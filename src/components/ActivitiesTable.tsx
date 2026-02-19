@@ -6,11 +6,11 @@ import Pagination from "@mui/material/Pagination";
 
 import { fetchActivities, createActivitiesQueryKey } from "../api";
 import { formatDateTime, formatDistance, formatSpeed } from "../utils";
-import { Activity, ActivitiesQueryParams, Sport } from "../types";
+import type { Activity, ActivitiesQueryParams, Sport } from "../types";
 import ActivityLogo from "./ActivityLogo";
 import { useActivitiesStore } from "../store";
 import LoadingIndicator from "./LoadingIndicator";
-import { DataTable, Column } from "./ui";
+import { DataTable, type Column } from "./ui";
 
 const ActivitiesTable = () => {
   const { sport, distance, race, page, order, orderBy, setPage, setOrder, setOrderBy } = useActivitiesStore();

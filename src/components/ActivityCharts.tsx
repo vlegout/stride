@@ -1,6 +1,6 @@
 import LineChart from "./LineChart";
 import { SectionContainer } from "./ui";
-import { ProcessedChartData, hasValidData } from "../utils";
+import { type ProcessedChartData, hasValidData } from "../utils";
 
 interface ActivityChartsProps {
   chartData: ProcessedChartData;

@@ -11,10 +11,10 @@ import {
   Title,
   Tooltip,
   Legend,
-  TooltipItem,
+  type TooltipItem,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
-import { FitnessScore } from "../types";
+import type { FitnessScore } from "../types";
 import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, zoomPlugin);
@@ -82,11 +82,11 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
       },
       tooltip: {
         callbacks: {
-          title: function (context: TooltipItem<"line">[]) {
+          title: (context: TooltipItem<"line">[]) => {
             const index = context[0].dataIndex * 7;
             return scores[index]?.date || "";
           },
-          label: function (context: TooltipItem<"line">) {
+          label: (context: TooltipItem<"line">) => {
             const index = context.dataIndex * 7;
             const datasetLabel = context.dataset.label || "";
             let actualScore = 0;

@@ -10,9 +10,9 @@ import {
   Tooltip,
   Legend,
   Filler,
-  TooltipItem,
+  type TooltipItem,
 } from "chart.js";
-import { FtpData } from "../types";
+import type { FtpData } from "../types";
 import { colors } from "../colors";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
@@ -52,12 +52,8 @@ const FTPChart = ({ ftp }: FTPChartProps) => {
       },
       tooltip: {
         callbacks: {
-          title: function (context: TooltipItem<"line">[]) {
-            return context[0].label || "";
-          },
-          label: function (context: TooltipItem<"line">) {
-            return `FTP: ${context.parsed.y}W`;
-          },
+          title: (context: TooltipItem<"line">[]) => context[0].label || "",
+          label: (context: TooltipItem<"line">) => `FTP: ${context.parsed.y}W`,
         },
       },
     },

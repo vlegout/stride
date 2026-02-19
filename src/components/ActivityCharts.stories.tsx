@@ -10,7 +10,7 @@ import {
   Filler,
 } from "chart.js";
 import ActivityCharts from "./ActivityCharts";
-import { ProcessedChartData } from "../utils";
+import type { ProcessedChartData } from "../utils";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Filler);
 

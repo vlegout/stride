@@ -3,9 +3,9 @@ import { Stage, Layer, Rect, Text, Line } from "react-konva";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { KonvaEventObject } from "konva/lib/Node";
+import type { KonvaEventObject } from "konva/lib/Node";
 
-import { Lap, Sport } from "../types";
+import type { Lap, Sport } from "../types";
 import { colors, hexToRgb } from "../colors";
 
 const CYCLING_VALUE_PADDING = 2;
@@ -253,7 +253,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
 
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - (1 - progress) ** 3;
       setAnimationProgress(eased);
 
       if (progress < 1) {

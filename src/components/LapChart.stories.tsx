@@ -3,7 +3,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 import LapChart from "./LapChart";
-import { Lap } from "../types";
+import type { Lap } from "../types";
 
 const theme = createTheme();
 

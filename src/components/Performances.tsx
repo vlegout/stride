@@ -1,6 +1,6 @@
-import { Performance } from "../types";
+import type { Performance } from "../types";
 import { formatDistance, formatInterval } from "../utils";
-import { DataTable, Column, SectionContainer } from "./ui";
+import { DataTable, type Column, SectionContainer } from "./ui";
 import { Link } from "react-router-dom";
 
 const Performances = ({ performances, showTitle = true }: { performances: Performance[]; showTitle?: boolean }) => {

@@ -1,8 +1,8 @@
-import { PowerPerformance } from "../types";
+import type { PowerPerformance } from "../types";
 import { formatInterval } from "../utils";
-import { DataTable, Column, SectionContainer } from "./ui";
+import { DataTable, type Column, SectionContainer } from "./ui";
 import { Line } from "react-chartjs-2";
-import { ChartOptions } from "chart.js";
+import type { ChartOptions } from "chart.js";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";

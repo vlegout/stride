@@ -12,7 +12,7 @@ import { formatDistance, formatDuration } from "../utils";
 import QueryBoundary from "../components/QueryBoundary";
 import PerformanceFilters from "../components/PerformanceFilters";
 import PowerProfileComparison from "../components/PowerProfileComparison";
-import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
+import { PageHeader, DataTable, SectionContainer, type Column } from "../components/ui";
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 

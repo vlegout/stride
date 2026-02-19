@@ -9,7 +9,7 @@ import { formatDistance } from "../utils";
 
 import QueryBoundary from "../components/QueryBoundary";
 import ZoneTables from "../components/ZoneTables";
-import { PageHeader, DataTable, SectionContainer, Column } from "../components/ui";
+import { PageHeader, DataTable, SectionContainer, type Column } from "../components/ui";
 import { useAuthStore } from "../store";
 
 const Profile = () => {

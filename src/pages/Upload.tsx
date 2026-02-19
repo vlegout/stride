@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Alert, CircularProgress } from "@mui/material";
 import JSZip from "jszip";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 import { uploadActivity } from "../api";
 import { PageHeader, FormField, SectionContainer } from "../components/ui";

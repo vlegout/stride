@@ -11,7 +11,7 @@ import {
   Typography,
   Button,
 } from "@mui/material";
-import { SelectChangeEvent } from "@mui/material/Select";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 

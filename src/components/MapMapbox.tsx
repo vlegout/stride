@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { MapComponentProps } from "./MapTypes";
+import type { MapComponentProps } from "./MapTypes";
 
 const MapMapbox = ({ bounds, points, height = "400px", width = "400px", showMarkers = true }: MapComponentProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);

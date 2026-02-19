@@ -9,8 +9,8 @@ import { LineString, Point } from "ol/geom";
 import { Feature } from "ol";
 import { Style, Stroke, Circle, Fill, Text } from "ol/style";
 import { fromLonLat } from "ol/proj";
-import { MapComponentProps } from "./MapTypes";
-import { LatLngExpression } from "leaflet";
+import type { MapComponentProps } from "./MapTypes";
+import type { LatLngExpression } from "leaflet";
 
 const latLngToCoord = (point: LatLngExpression): number[] => {
   const [lat, lon] = Array.isArray(point) ? point : [point.lat, point.lng];

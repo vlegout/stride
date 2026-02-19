@@ -8,7 +8,7 @@ import {
   Title,
   Tooltip,
   Legend,
-  TooltipItem,
+  type TooltipItem,
 } from "chart.js";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";

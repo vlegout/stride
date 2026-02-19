@@ -11,7 +11,7 @@ import ActivityZones from "./ActivityZones";
 
 import { SectionContainer } from "./ui";
 import { processTracePointData } from "../utils";
-import { Activity } from "../types";
+import type { Activity } from "../types";
 import { useActivityZones } from "../hooks";
 
 interface ActivityPageViewProps {
