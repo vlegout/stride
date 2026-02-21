@@ -86,7 +86,9 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
   const [animationProgress, setAnimationProgress] = useState(0);
 
   const hasValidData =
-    laps.length > 1 && laps.every((lap) => lap.total_timer_time != null && lap.total_distance != null);
+    laps.length > 1 &&
+    sport !== "swimming" &&
+    laps.every((lap) => lap.total_timer_time != null && lap.total_distance != null);
 
   const isCycling = sport === "cycling";
 
@@ -97,7 +99,10 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
   const leftMargin = isSmall ? 35 : 40;
   const rightMargin = isSmall ? 30 : 35;
 
-  const values = useMemo(() => (isCycling ? laps.map(getSpeedKmh) : laps.map(getPaceSecondsPerKm)), [laps, isCycling]);
+  const values = useMemo(
+    () => (!hasValidData ? [] : isCycling ? laps.map(getSpeedKmh) : laps.map(getPaceSecondsPerKm)),
+    [hasValidData, laps, isCycling],
+  );
 
   const { minValue, maxValue, valueRange } = useMemo(() => {
     if (values.length === 0) {
@@ -126,9 +131,13 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
     [isCycling, minValue, maxValue, valueRange],
   );
 
-  const totalDistance = useMemo(() => laps.reduce((sum, lap) => sum + lap.total_distance, 0), [laps]);
+  const totalDistance = useMemo(
+    () => (!hasValidData ? 0 : laps.reduce((sum, lap) => sum + lap.total_distance, 0)),
+    [hasValidData, laps],
+  );
 
   const dataLaps = useMemo(() => {
+    if (!hasValidData) return [];
     const result: LapData[] = [];
     let currentX = leftMargin;
 
@@ -158,6 +167,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
 
     return result;
   }, [
+    hasValidData,
     laps,
     leftMargin,
     rightMargin,
@@ -240,7 +250,7 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
   }, []);
 
   useEffect(() => {
-    if (!hasValidData || sport === "swimming") return;
+    if (!hasValidData) return;
 
     let startTime: number | null = null;
     let animationId: number | undefined;
@@ -268,9 +278,9 @@ const LapChart = ({ laps, sport }: { laps: Lap[]; sport: Sport }) => {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [hasValidData, sport]);
+  }, [hasValidData]);
 
-  if (sport === "swimming" || !hasValidData) {
+  if (!hasValidData) {
     return null;
   }
 
