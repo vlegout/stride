@@ -25,6 +25,7 @@ jobs:
       - run: npm install --include=dev
       - run: npx prettier ./src ./tests --check
       - run: npm run lint
+      - run: npx biome format .
       - run: npm run biome:lint
       - run: CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} npm run build
       - uses: chromaui/action@latest
