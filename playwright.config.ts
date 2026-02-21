@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * Read environment variables from file.
@@ -12,8 +12,8 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './e2e',
-  testMatch: '**/*.spec.ts',
+  testDir: "./e2e",
+  testMatch: "**/*.spec.ts",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -23,42 +23,42 @@ export default defineConfig({
   /* Use 2 workers on CI for parallelism */
   workers: process.env.CI ? 2 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'html',
+  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:5173',
+    baseURL: "http://localhost:5173",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: "on-first-retry",
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'setup',
+      name: "setup",
       testMatch: /auth\.setup\.ts/,
     },
     {
-      name: 'chromium',
+      name: "chromium",
       use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'e2e/.auth/user.json',
+        ...devices["Desktop Chrome"],
+        storageState: "e2e/.auth/user.json",
       },
-      dependencies: ['setup'],
+      dependencies: ["setup"],
       testIgnore: /login\.spec\.ts/,
     },
     {
-      name: 'chromium-no-auth',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium-no-auth",
+      use: { ...devices["Desktop Chrome"] },
       testMatch: /login\.spec\.ts/,
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: process.env.CI ? 'npx vite preview --port 5173' : 'npm run dev',
-    url: 'http://localhost:5173',
+    command: process.env.CI ? "npx vite preview --port 5173" : "npm run dev",
+    url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
     timeout: 60000,
   },
