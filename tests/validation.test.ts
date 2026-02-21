@@ -155,8 +155,7 @@ describe("validation", () => {
     });
 
     it("should reject activity with missing required field", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { title, ...withoutTitle } = validActivity;
+      const { title: _, ...withoutTitle } = validActivity;
       const result = Activity(withoutTitle);
       expect(result instanceof type.errors).toBe(true);
     });
@@ -222,8 +221,7 @@ describe("validation", () => {
     });
 
     it("should accept user without google_picture field", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { google_picture, ...userWithoutPicture } = validUser;
+      const { google_picture: _, ...userWithoutPicture } = validUser;
       const result = User(userWithoutPicture);
       if (result instanceof type.errors) {
         throw new Error(`Validation failed: ${result.summary}`);

@@ -118,8 +118,7 @@ VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id
 - All checks must pass before committing
 
 ### TypeScript
-- ESLint for linting
-- Prettier for formatting
+- Biome for linting and formatting
 - TypeScript strict mode
 
 ## Key Technologies
