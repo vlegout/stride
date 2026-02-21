@@ -67,6 +67,17 @@ describe("LapChart", () => {
       expect(container.firstChild).toBeNull();
     });
 
+    it("should render nothing for swimming laps with zero distance", () => {
+      const laps = [
+        createMockLap({ total_distance: 500 }, 0),
+        createMockLap({ total_distance: 100 }, 1),
+        createMockLap({ total_distance: 0 }, 2),
+        createMockLap({ total_distance: 0 }, 3),
+      ];
+      const { container } = renderWithTheme(<LapChart laps={laps} sport="swimming" />);
+      expect(container.firstChild).toBeNull();
+    });
+
     it("should render nothing for single lap", () => {
       const { container } = renderWithTheme(<LapChart laps={createMockLaps(1)} sport="running" />);
       expect(container.firstChild).toBeNull();
