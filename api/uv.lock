@@ -1206,15 +1206,15 @@ wheels = [
 
 [[package]]
 name = "sqlmodel"
-version = "0.0.35"
+version = "0.0.37"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/fd/6f468f52977b85f8b1af3f0d7d4396ed77804a59bf589f2f47c524383388/sqlmodel-0.0.35.tar.gz", hash = "sha256:e0079a6ec569323587ffb7326bbbc9d9a1a92e9be271b18e83f54d4a4200d6ac", size = 86087, upload-time = "2026-02-20T16:42:21.254Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/26/1d2faa0fd5a765267f49751de533adac6b9ff9366c7c6e7692df4f32230f/sqlmodel-0.0.37.tar.gz", hash = "sha256:d2c19327175794faf50b1ee31cc966764f55b1dedefc046450bc5741a3d68352", size = 85527, upload-time = "2026-02-21T16:39:47.038Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8f/f3/90f7b2eb86e590b74cf33e37a5313c074092684666355201afe9a1ae7ef5/sqlmodel-0.0.35-py3-none-any.whl", hash = "sha256:367c11719bc4967430d5aadc43ee1a6f7638b9c82ee7c8835401400e05ec9431", size = 27221, upload-time = "2026-02-20T16:42:20.301Z" },
+    { url = "https://files.pythonhosted.org/packages/b1/e1/7c8d18e737433f3b5bbe27b56a9072a9fcb36342b48f1bef34b6da1d61f2/sqlmodel-0.0.37-py3-none-any.whl", hash = "sha256:2137a4045ef3fd66a917a7717ada959a1ceb3630d95e1f6aaab39dd2c0aef278", size = 27224, upload-time = "2026-02-21T16:39:47.781Z" },
 ]
 
 [[package]]
