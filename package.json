@@ -26,7 +26,7 @@
     "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.8",
     "@tanstack/react-query": "^5.90.21",
-    "arktype": "^2.1.29",
+    "arktype": "^2.2.0",
     "axios": "^1.13.6",
     "chart.js": "^4.5.1",
     "chartjs-plugin-zoom": "^2.2.0",
