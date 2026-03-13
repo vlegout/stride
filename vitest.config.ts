@@ -2,7 +2,6 @@ import { defineConfig } from "vitest/config";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import react from "@vitejs/plugin-react";
-import svgr from "vite-plugin-svgr";
 import path from "node:path";
 
 // Vitest configuration
@@ -18,7 +17,7 @@ export default defineConfig({
     projects: [
       // Regular unit tests
       {
-        plugins: [react(), svgr()],
+        plugins: [react()],
         test: {
           name: "unit",
           environment: "jsdom",
@@ -32,7 +31,6 @@ export default defineConfig({
       {
         plugins: [
           react(),
-          svgr(),
           storybookTest({
             configDir: path.join(__dirname, ".storybook"),
           }),

@@ -1,8 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import svgr from "vite-plugin-svgr";
 import { execSync } from "node:child_process";
-import { codecovVitePlugin } from "@codecov/vite-plugin";
 import istanbul from "vite-plugin-istanbul";
 
 // https://vite.dev/config/
@@ -17,12 +15,6 @@ export default defineConfig(() => {
   return {
     plugins: [
       react(),
-      svgr(),
-      codecovVitePlugin({
-        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-        bundleName: "stride",
-        ...(process.env.CODECOV_TOKEN && { uploadToken: process.env.CODECOV_TOKEN }),
-      }),
       ...(process.env.PLAYWRIGHT_COVERAGE === "true"
         ? [
             istanbul({
