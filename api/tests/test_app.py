@@ -245,7 +245,7 @@ class TestApp(unittest.TestCase):
         """Test create_activity with invalid file extension"""
         files = {"fit_file": ("test.txt", b"not a fit file", "text/plain")}
         data = {"title": "Test Activity", "race": "false"}
-        response = self.client.post("/activities/", files=files, data=data)  # type: ignore[arg-type]
+        response = self.client.post("/activities/", files=files, data=data)
 
         self.assertEqual(response.status_code, 401)  # Should fail auth first
 

@@ -114,7 +114,7 @@ def read_activities(
 ):
     query = select(Activity).where(
         Activity.user_id == user_id, Activity.status == "created"
-    )  # type: ignore
+    )
     if race is True:
         query = query.where(Activity.race)
     if sport is not None:
@@ -138,15 +138,15 @@ def read_activities(
     if order_by == "total_distance":
         order_column = Activity.total_distance
     elif order_by == "avg_speed":
-        order_column = Activity.avg_speed  # type: ignore
+        order_column = Activity.avg_speed  # type: ignore[assignment]
     elif order_by == "avg_power":
-        order_column = Activity.avg_power  # type: ignore
+        order_column = Activity.avg_power  # type: ignore[assignment]
     elif order_by == "total_ascent":
-        order_column = Activity.total_ascent  # type: ignore
+        order_column = Activity.total_ascent  # type: ignore[assignment]
     elif order_by == "total_calories":
-        order_column = Activity.total_calories  # type: ignore
+        order_column = Activity.total_calories  # type: ignore[assignment]
     elif order_by == "training_stress_score":
-        order_column = Activity.training_stress_score  # type: ignore
+        order_column = Activity.training_stress_score  # type: ignore[assignment]
     else:
         order_column = Activity.start_time
 
@@ -463,7 +463,7 @@ def read_best_performances(
             WHERE a.user_id = :user_id AND a.status = 'created'
             AND pp.time = :target_time
         """
-        params = {"user_id": user_id, "target_time": target_time}
+        params: dict[str, object] = {"user_id": user_id, "target_time": target_time}
 
         if year is not None:
             query += " AND EXTRACT(YEAR FROM to_timestamp(a.start_time)) = :year"

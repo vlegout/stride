@@ -204,7 +204,7 @@ class NotificationService:
                 Activity.start_time < activity.start_time,
                 PerformancePower.time.in_(list(current_perfs.keys())),  # type: ignore[attr-defined]
                 PerformancePower.power.is_not(None),  # type: ignore[attr-defined]
-                PerformancePower.power > 0,  # type: ignore[operator]
+                PerformancePower.power > 0,
             )
         )
         historical_results = self.session.exec(stmt).all()
