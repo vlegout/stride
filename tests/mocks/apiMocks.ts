@@ -4,7 +4,9 @@ import type {
   Profile,
   User,
   WeeksResponse,
-  FitnessResponse,
+  FitnessScoresResponse,
+  FitnessZonesResponse,
+  FitnessFtpResponse,
   BestPerformanceResponse,
   GoogleAuthResponse,
   ActivityZonesRawResponse,
@@ -151,7 +153,7 @@ export const createMockWeeksResponse = (): WeeksResponse => ({
   next_offset: 1,
 });
 
-export const createMockFitnessResponse = (): FitnessResponse => ({
+export const createMockFitnessScoresResponse = (): FitnessScoresResponse => ({
   scores: [
     {
       date: "2024-01-01",
@@ -188,6 +190,9 @@ export const createMockFitnessResponse = (): FitnessResponse => ({
       time: 1800,
     },
   ],
+});
+
+export const createMockFitnessZonesResponse = (): FitnessZonesResponse => ({
   weekly_zones: [
     {
       week_start: "2024-01-01",
@@ -204,6 +209,9 @@ export const createMockFitnessResponse = (): FitnessResponse => ({
       power_zones: [],
     },
   ],
+});
+
+export const createMockFitnessFtpResponse = (): FitnessFtpResponse => ({
   ftp: [
     {
       date: "2024-01-01",

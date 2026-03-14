@@ -4,10 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import Fitness from "../../src/pages/Fitness";
 import * as api from "../../src/api";
-import type { FitnessResponse } from "../../src/types";
+import type { FitnessScoresResponse, FitnessZonesResponse, FitnessFtpResponse } from "../../src/types";
 
 vi.mock("../../src/api", () => ({
-  fetchFitness: vi.fn(),
+  fetchFitnessScores: vi.fn(),
+  fetchFitnessZones: vi.fn(),
+  fetchFitnessFtp: vi.fn(),
 }));
 
 vi.mock("../../src/components/FitnessScoreChart", () => ({
@@ -48,7 +50,7 @@ const renderWithProviders = (ui: React.ReactElement) => {
   );
 };
 
-const mockFitnessResponse: FitnessResponse = {
+const mockScoresResponse: FitnessScoresResponse = {
   scores: [
     { date: "2026-01-01", overall: 50, running: 45, cycling: 55, swimming: 30 },
     { date: "2026-01-08", overall: 55, running: 50, cycling: 60, swimming: 32 },
@@ -74,6 +76,9 @@ const mockFitnessResponse: FitnessResponse = {
     { week_start: "2026-01-08", distance: 2500, time: 4500 },
     { week_start: "2026-01-15", distance: 3000, time: 5400 },
   ],
+};
+
+const mockZonesResponse: FitnessZonesResponse = {
   weekly_zones: [
     {
       week_start: "2026-01-01",
@@ -85,6 +90,9 @@ const mockFitnessResponse: FitnessResponse = {
       power_zones: [],
     },
   ],
+};
+
+const mockFtpResponse: FitnessFtpResponse = {
   ftp: [
     { date: "2026-01-01", ftp: 250 },
     { date: "2026-01-15", ftp: 255 },
@@ -94,6 +102,8 @@ const mockFitnessResponse: FitnessResponse = {
 describe("Fitness", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(api.fetchFitnessZones).mockResolvedValue(mockZonesResponse);
+    vi.mocked(api.fetchFitnessFtp).mockResolvedValue(mockFtpResponse);
   });
 
   afterEach(() => {
@@ -101,7 +111,7 @@ describe("Fitness", () => {
   });
 
   it("renders loading state initially", () => {
-    vi.mocked(api.fetchFitness).mockImplementation(() => new Promise(() => undefined));
+    vi.mocked(api.fetchFitnessScores).mockImplementation(() => new Promise(() => undefined));
 
     renderWithProviders(<Fitness />);
 
@@ -109,7 +119,7 @@ describe("Fitness", () => {
   });
 
   it("renders error state when fetch fails", async () => {
-    vi.mocked(api.fetchFitness).mockRejectedValue(new Error("Network error"));
+    vi.mocked(api.fetchFitnessScores).mockRejectedValue(new Error("Network error"));
 
     renderWithProviders(<Fitness />);
 
@@ -125,10 +135,8 @@ describe("Fitness", () => {
       weekly_running: [],
       weekly_cycling: [],
       weekly_swimming: [],
-      weekly_zones: [],
-      ftp: [],
-    } as unknown as FitnessResponse;
-    vi.mocked(api.fetchFitness).mockResolvedValue(nullDataResponse);
+    } as unknown as FitnessScoresResponse;
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(nullDataResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -138,7 +146,7 @@ describe("Fitness", () => {
   });
 
   it("renders page header with title", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -148,7 +156,7 @@ describe("Fitness", () => {
   });
 
   it("renders date selector", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -158,7 +166,7 @@ describe("Fitness", () => {
   });
 
   it("renders fitness overview with current scores", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -169,7 +177,7 @@ describe("Fitness", () => {
   });
 
   it("renders fitness score chart", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -179,7 +187,7 @@ describe("Fitness", () => {
   });
 
   it("renders weekly metrics charts", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -189,7 +197,7 @@ describe("Fitness", () => {
   });
 
   it("renders TSS chart", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -199,7 +207,7 @@ describe("Fitness", () => {
   });
 
   it("renders weekly zones charts when zones data available", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -209,11 +217,8 @@ describe("Fitness", () => {
   });
 
   it("does not render weekly zones charts when no zones data", async () => {
-    const responseNoZones: FitnessResponse = {
-      ...mockFitnessResponse,
-      weekly_zones: [],
-    };
-    vi.mocked(api.fetchFitness).mockResolvedValue(responseNoZones);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
+    vi.mocked(api.fetchFitnessZones).mockResolvedValue({ weekly_zones: [] });
 
     renderWithProviders(<Fitness />);
 
@@ -225,7 +230,7 @@ describe("Fitness", () => {
   });
 
   it("renders FTP chart when FTP data available", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -235,11 +240,8 @@ describe("Fitness", () => {
   });
 
   it("does not render FTP chart when no FTP data", async () => {
-    const responseNoFtp: FitnessResponse = {
-      ...mockFitnessResponse,
-      ftp: [],
-    };
-    vi.mocked(api.fetchFitness).mockResolvedValue(responseNoFtp);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
+    vi.mocked(api.fetchFitnessFtp).mockResolvedValue({ ftp: [] });
 
     renderWithProviders(<Fitness />);
 
@@ -251,7 +253,7 @@ describe("Fitness", () => {
   });
 
   it("changes date range when selector is clicked", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -268,7 +270,7 @@ describe("Fitness", () => {
   });
 
   it("displays chart title with correct date range label", async () => {
-    vi.mocked(api.fetchFitness).mockResolvedValue(mockFitnessResponse);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(mockScoresResponse);
 
     renderWithProviders(<Fitness />);
 
@@ -278,11 +280,11 @@ describe("Fitness", () => {
   });
 
   it("handles null weekly swimming data gracefully", async () => {
-    const responseNullSwimming: FitnessResponse = {
-      ...mockFitnessResponse,
+    const responseNullSwimming: FitnessScoresResponse = {
+      ...mockScoresResponse,
       weekly_swimming: [],
     };
-    vi.mocked(api.fetchFitness).mockResolvedValue(responseNullSwimming);
+    vi.mocked(api.fetchFitnessScores).mockResolvedValue(responseNullSwimming);
 
     renderWithProviders(<Fitness />);
 

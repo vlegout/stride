@@ -8,7 +8,9 @@ import {
   createMockProfile,
   createMockUser,
   createMockWeeksResponse,
-  createMockFitnessResponse,
+  createMockFitnessScoresResponse,
+  createMockFitnessZonesResponse,
+  createMockFitnessFtpResponse,
   createMockBestPerformanceResponse,
   createMockGoogleAuthResponse,
   createMockActivityZonesResponse,
@@ -439,20 +441,54 @@ describe("API", () => {
     });
   });
 
-  describe("fetchFitness", () => {
-    it("should fetch fitness data", async () => {
-      const mockFitness = createMockFitnessResponse();
+  describe("fetchFitnessScores", () => {
+    it("should fetch fitness scores data", async () => {
+      const mockFitness = createMockFitnessScoresResponse();
       mockedAxios.get.mockResolvedValue({ data: mockFitness });
 
-      const result = await api.fetchFitness();
+      const result = await api.fetchFitnessScores();
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        "/fitness/",
+        "/fitness/scores/",
         expect.objectContaining({
           headers: { Authorization: `Bearer ${mockToken}` },
         }),
       );
       expect(result).toEqual(mockFitness);
+    });
+  });
+
+  describe("fetchFitnessZones", () => {
+    it("should fetch fitness zones data", async () => {
+      const mockZones = createMockFitnessZonesResponse();
+      mockedAxios.get.mockResolvedValue({ data: mockZones });
+
+      const result = await api.fetchFitnessZones();
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        "/fitness/zones/",
+        expect.objectContaining({
+          headers: { Authorization: `Bearer ${mockToken}` },
+        }),
+      );
+      expect(result).toEqual(mockZones);
+    });
+  });
+
+  describe("fetchFitnessFtp", () => {
+    it("should fetch fitness FTP data", async () => {
+      const mockFtp = createMockFitnessFtpResponse();
+      mockedAxios.get.mockResolvedValue({ data: mockFtp });
+
+      const result = await api.fetchFitnessFtp();
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        "/fitness/ftp/",
+        expect.objectContaining({
+          headers: { Authorization: `Bearer ${mockToken}` },
+        }),
+      );
+      expect(result).toEqual(mockFtp);
     });
   });
 

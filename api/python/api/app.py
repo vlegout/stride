@@ -23,7 +23,11 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from api.auth import Token, create_token_response
 from api.dependencies import get_current_user_id, get_session, verify_jwt_token
-from api.fitness import calculate_fitness_scores
+from api.fitness import (
+    calculate_fitness_and_weekly_data,
+    calculate_weekly_zone_data,
+    get_ftp_data,
+)
 from api.model import (
     Activity,
     ActivityList,
@@ -816,12 +820,28 @@ def google_auth(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@app.get("/fitness/")
-def read_fitness_score(
+@app.get("/fitness/scores/")
+def read_fitness_scores(
     session: Session = Depends(get_session),
     user_id: str = Depends(get_current_user_id),
 ):
-    return calculate_fitness_scores(session, user_id)
+    return calculate_fitness_and_weekly_data(session, user_id)
+
+
+@app.get("/fitness/zones/")
+def read_fitness_zones(
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    return {"weekly_zones": calculate_weekly_zone_data(session, user_id)}
+
+
+@app.get("/fitness/ftp/")
+def read_fitness_ftp(
+    session: Session = Depends(get_session),
+    user_id: str = Depends(get_current_user_id),
+):
+    return {"ftp": get_ftp_data(session, user_id)}
 
 
 @app.get("/heatmap/", response_model=HeatmapPublic)

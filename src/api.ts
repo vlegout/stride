@@ -7,7 +7,9 @@ import type {
   ActivitiesQueryParams,
   ActivityUpdate,
   BestPerformanceResponse,
-  FitnessResponse,
+  FitnessScoresResponse,
+  FitnessZonesResponse,
+  FitnessFtpResponse,
   HeatmapResponse,
   PowerProfileResponse,
   Profile,
@@ -22,7 +24,9 @@ import {
   ActivitiesResponse as ActivitiesResponseValidator,
   ActivityZonesRawResponse as ActivityZonesRawResponseValidator,
   BestPerformanceResponse as BestPerformanceResponseValidator,
-  FitnessResponse as FitnessResponseValidator,
+  FitnessScoresResponse as FitnessScoresResponseValidator,
+  FitnessZonesResponse as FitnessZonesResponseValidator,
+  FitnessFtpResponse as FitnessFtpResponseValidator,
   HeatmapResponse as HeatmapResponseValidator,
   PowerProfileResponse as PowerProfileResponseValidator,
   Profile as ProfileValidator,
@@ -174,9 +178,19 @@ export async function fetchWeeks(offset = 0, limit = 5): Promise<WeeksResponse> 
   return validateResponse(data, WeeksResponseValidator, "fetchWeeks");
 }
 
-export async function fetchFitness(): Promise<FitnessResponse> {
-  const data = await apiCall("/fitness/");
-  return validateResponse(data, FitnessResponseValidator, "fetchFitness");
+export async function fetchFitnessScores(): Promise<FitnessScoresResponse> {
+  const data = await apiCall("/fitness/scores/");
+  return validateResponse(data, FitnessScoresResponseValidator, "fetchFitnessScores");
+}
+
+export async function fetchFitnessZones(): Promise<FitnessZonesResponse> {
+  const data = await apiCall("/fitness/zones/");
+  return validateResponse(data, FitnessZonesResponseValidator, "fetchFitnessZones");
+}
+
+export async function fetchFitnessFtp(): Promise<FitnessFtpResponse> {
+  const data = await apiCall("/fitness/ftp/");
+  return validateResponse(data, FitnessFtpResponseValidator, "fetchFitnessFtp");
 }
 
 export async function fetchBestPerformances(
