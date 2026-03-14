@@ -4,7 +4,7 @@ import uuid
 from unittest.mock import Mock
 
 from api.model import Activity
-from api.fitness import calculate_activity_score, calculate_fitness_scores
+from api.fitness import calculate_activity_score, calculate_fitness_and_weekly_data
 
 
 class TestFitness(unittest.TestCase):
@@ -170,22 +170,20 @@ class TestFitness(unittest.TestCase):
         # Should include TSS contribution: 100 * 0.005 = 0.5
         self.assertGreater(score, 0.5)
 
-    def test_calculate_fitness_scores_empty_activities(self):
-        """Test calculate_fitness_scores with no activities"""
+    def test_calculate_fitness_and_weekly_data_empty_activities(self):
+        """Test calculate_fitness_and_weekly_data with no activities"""
         mock_session = Mock()
         mock_result = Mock()
         mock_result.all.return_value = []
         mock_session.exec.return_value = mock_result
 
-        result = calculate_fitness_scores(mock_session, "test-user-id")
+        result = calculate_fitness_and_weekly_data(mock_session, "test-user-id")
 
         # Should return structure with empty/zero scores
         self.assertIn("scores", result)
         self.assertIn("weekly_tss", result)
         self.assertIn("weekly_running", result)
         self.assertIn("weekly_cycling", result)
-        self.assertIn("weekly_zones", result)
-        self.assertIn("ftp", result)
 
         # All daily scores should be 0
         for daily_score in result["scores"]:
@@ -193,8 +191,8 @@ class TestFitness(unittest.TestCase):
             self.assertEqual(daily_score["running"], 0)
             self.assertEqual(daily_score["cycling"], 0)
 
-    def test_calculate_fitness_scores_with_activities(self):
-        """Test calculate_fitness_scores with some activities"""
+    def test_calculate_fitness_and_weekly_data_with_activities(self):
+        """Test calculate_fitness_and_weekly_data with some activities"""
         # Create mock activities - make it a longer run to ensure scoring
         now = datetime.datetime.now()
         recent_timestamp = int((now - datetime.timedelta(days=1)).timestamp())
@@ -221,7 +219,7 @@ class TestFitness(unittest.TestCase):
 
         mock_session = Mock()
 
-        # Create mock results for all the queries made by calculate_fitness_scores
+        # Create mock results for all the queries made by calculate_fitness_and_weekly_data
         mock_activities_result = Mock()
         mock_activities_result.all.return_value = mock_activities
 
@@ -235,21 +233,16 @@ class TestFitness(unittest.TestCase):
         mock_weekly_activities_result = Mock()
         mock_weekly_activities_result.all.return_value = []
 
-        # Mock session.exec to return different results based on call order
-        # First call: main activities, second: FTP, third: zones, then 104 weekly queries
-        side_effects = [mock_activities_result, mock_ftp_result, mock_zones_result]
-        side_effects.extend([mock_weekly_activities_result] * 104)
-        mock_session.exec.side_effect = side_effects
+        # Mock session.exec to return the activities result for the single main query
+        mock_session.exec.return_value = mock_activities_result
 
-        result = calculate_fitness_scores(mock_session, "test-user-id")
+        result = calculate_fitness_and_weekly_data(mock_session, "test-user-id")
 
         # Should return structure with some non-zero scores
         self.assertIn("scores", result)
         self.assertIn("weekly_tss", result)
         self.assertIn("weekly_running", result)
         self.assertIn("weekly_cycling", result)
-        self.assertIn("weekly_zones", result)
-        self.assertIn("ftp", result)
 
         # Should have 730 daily scores (2 years)
         self.assertEqual(len(result["scores"]), 730)
@@ -260,6 +253,7 @@ class TestFitness(unittest.TestCase):
         self.assertEqual(len(result["weekly_cycling"]), 104)
 
         # Verify structure of weekly data
+
         for weekly_data in result["weekly_running"]:
             self.assertIn("week_start", weekly_data)
             self.assertIn("distance", weekly_data)
@@ -267,14 +261,14 @@ class TestFitness(unittest.TestCase):
             self.assertGreaterEqual(weekly_data["distance"], 0)
             self.assertGreaterEqual(weekly_data["time"], 0)
 
-    def test_calculate_fitness_scores_date_format(self):
-        """Test that calculate_fitness_scores returns proper date formats"""
+    def test_calculate_fitness_and_weekly_data_date_format(self):
+        """Test that calculate_fitness_and_weekly_data returns proper date formats"""
         mock_session = Mock()
         mock_result = Mock()
         mock_result.all.return_value = []
         mock_session.exec.return_value = mock_result
 
-        result = calculate_fitness_scores(mock_session, "test-user-id")
+        result = calculate_fitness_and_weekly_data(mock_session, "test-user-id")
 
         # Check date format in scores
         for daily_score in result["scores"][:5]:  # Check first 5
@@ -284,14 +278,14 @@ class TestFitness(unittest.TestCase):
         for weekly_data in result["weekly_tss"][:5]:  # Check first 5
             self.assertRegex(weekly_data["week_start"], r"^\d{4}-\d{2}-\d{2}$")
 
-    def test_calculate_fitness_scores_score_bounds(self):
+    def test_calculate_fitness_and_weekly_data_score_bounds(self):
         """Test that fitness scores are within expected bounds (0-200)"""
         mock_session = Mock()
         mock_result = Mock()
         mock_result.all.return_value = []
         mock_session.exec.return_value = mock_result
 
-        result = calculate_fitness_scores(mock_session, "test-user-id")
+        result = calculate_fitness_and_weekly_data(mock_session, "test-user-id")
 
         # All scores should be between 0 and 200
         for daily_score in result["scores"]:
@@ -576,7 +570,7 @@ class TestDecayFactor(unittest.TestCase):
         mock_result.all.return_value = []
         mock_session.exec.return_value = mock_result
 
-        result = calculate_fitness_scores(mock_session, "test-user-id")
+        result = calculate_fitness_and_weekly_data(mock_session, "test-user-id")
 
         # Should have 730 days of scores
         self.assertEqual(len(result["scores"]), 730)
@@ -594,6 +588,41 @@ class TestDecayFactor(unittest.TestCase):
             self.assertIn("running", daily_score)
             self.assertIn("cycling", daily_score)
             self.assertIn("swimming", daily_score)
+
+
+class TestGetFtpData(unittest.TestCase):
+    """Test get_ftp_data function"""
+
+    def test_returns_empty_list_when_no_records(self):
+        from api.fitness import get_ftp_data
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.all.return_value = []
+        mock_session.exec.return_value = mock_result
+
+        result = get_ftp_data(mock_session, "test-user-id")
+        self.assertEqual(result, [])
+
+    def test_returns_formatted_ftp_records(self):
+        from api.fitness import get_ftp_data
+        from api.model import Ftp
+
+        ftp_record = Ftp(
+            user_id="test-user-id",
+            date=datetime.date(2024, 1, 15),
+            ftp=280,
+        )
+
+        mock_session = Mock()
+        mock_result = Mock()
+        mock_result.all.return_value = [ftp_record]
+        mock_session.exec.return_value = mock_result
+
+        result = get_ftp_data(mock_session, "test-user-id")
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["date"], "2024-01-15")
+        self.assertEqual(result[0]["ftp"], 280)
 
 
 if __name__ == "__main__":

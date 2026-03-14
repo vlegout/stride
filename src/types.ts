@@ -357,16 +357,24 @@ export const WeeklyZoneData = type({
 });
 export type WeeklyZoneData = typeof WeeklyZoneData.infer;
 
-export const FitnessResponse = type({
+export const FitnessScoresResponse = type({
   scores: FitnessScore.array(),
   weekly_tss: WeeklyTSS.array(),
   weekly_running: WeeklyActivityData.array(),
   weekly_cycling: WeeklyActivityData.array(),
   weekly_swimming: WeeklyActivityData.array(),
+});
+export type FitnessScoresResponse = typeof FitnessScoresResponse.infer;
+
+export const FitnessZonesResponse = type({
   weekly_zones: WeeklyZoneData.array(),
+});
+export type FitnessZonesResponse = typeof FitnessZonesResponse.infer;
+
+export const FitnessFtpResponse = type({
   ftp: FtpData.array(),
 });
-export type FitnessResponse = typeof FitnessResponse.infer;
+export type FitnessFtpResponse = typeof FitnessFtpResponse.infer;
 
 export const ActivityZoneRaw = type({
   id: "string",

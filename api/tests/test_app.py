@@ -480,8 +480,18 @@ class TestActivitiesEndpointRequiresAuth(unittest.TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_fitness_requires_auth(self):
-        """Test /fitness/ requires authentication"""
-        response = self.client.get("/fitness/")
+        """Test /fitness/scores/ requires authentication"""
+        response = self.client.get("/fitness/scores/")
+        self.assertEqual(response.status_code, 401)
+
+    def test_fitness_zones_requires_auth(self):
+        """Test /fitness/zones/ requires authentication"""
+        response = self.client.get("/fitness/zones/")
+        self.assertEqual(response.status_code, 401)
+
+    def test_fitness_ftp_requires_auth(self):
+        """Test /fitness/ftp/ requires authentication"""
+        response = self.client.get("/fitness/ftp/")
         self.assertEqual(response.status_code, 401)
 
     def test_heatmap_requires_auth(self):
@@ -1370,15 +1380,47 @@ class TestGoogleAuth(_AuthenticatedTestCase):
 
 
 class TestReadFitness(_AuthenticatedTestCase):
-    """Test GET /fitness/ endpoint logic."""
+    """Test GET /fitness/scores/ endpoint logic."""
 
-    @patch("api.app.calculate_fitness_scores")
+    @patch("api.app.calculate_fitness_and_weekly_data")
     def test_returns_fitness_scores(self, mock_fitness):
-        mock_fitness.return_value = {"fitness": 50, "fatigue": 30}
+        mock_fitness.return_value = {
+            "scores": [],
+            "weekly_tss": [],
+            "weekly_running": [],
+            "weekly_cycling": [],
+            "weekly_swimming": [],
+        }
 
-        response = self.client.get("/fitness/", headers=self.auth_headers)
+        response = self.client.get("/fitness/scores/", headers=self.auth_headers)
         self.assertEqual(response.status_code, 200)
         mock_fitness.assert_called_once_with(self.mock_session, self.test_user_id)
+
+
+class TestReadFitnessZones(_AuthenticatedTestCase):
+    """Test GET /fitness/zones/ endpoint logic."""
+
+    @patch("api.app.calculate_weekly_zone_data")
+    def test_returns_weekly_zones(self, mock_zones):
+        mock_zones.return_value = []
+
+        response = self.client.get("/fitness/zones/", headers=self.auth_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"weekly_zones": []})
+        mock_zones.assert_called_once_with(self.mock_session, self.test_user_id)
+
+
+class TestReadFitnessFtp(_AuthenticatedTestCase):
+    """Test GET /fitness/ftp/ endpoint logic."""
+
+    @patch("api.app.get_ftp_data")
+    def test_returns_ftp(self, mock_ftp):
+        mock_ftp.return_value = [{"date": "2024-01-01", "ftp": 250}]
+
+        response = self.client.get("/fitness/ftp/", headers=self.auth_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"ftp": [{"date": "2024-01-01", "ftp": 250}]})
+        mock_ftp.assert_called_once_with(self.mock_session, self.test_user_id)
 
 
 class TestReadHeatmap(_AuthenticatedTestCase):

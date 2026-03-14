@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from collections import defaultdict
 from typing import Any
 from sqlmodel import Session, select, col
 from api.model import (
@@ -89,8 +90,8 @@ def calculate_activity_score(activity, sport_filter=None):
     return activity_score
 
 
-def calculate_fitness_scores(session: Session, user_id: str):
-    """Calculate fitness scores for a user over the past 2.5 years"""
+def calculate_fitness_and_weekly_data(session: Session, user_id: str):
+    """Calculate fitness scores and weekly metrics for a user over the past 2.5 years"""
     end_date = datetime.datetime.now()
     total_days = int(365 * 2.5)
     start_date = end_date - datetime.timedelta(days=total_days)
@@ -257,33 +258,25 @@ def calculate_fitness_scores(session: Session, user_id: str):
     weekly_cycling_data.reverse()
     weekly_swimming_data.reverse()
 
-    # Get FTP data for the same time period (past 2 years)
-    ftp_start_date = current_date - datetime.timedelta(days=730)
-    ftp_records = session.exec(
-        select(Ftp)
-        .where(Ftp.user_id == user_id, Ftp.date >= ftp_start_date.date())
-        .order_by(Ftp.date.asc())  # type: ignore[attr-defined]
-    ).all()
-
-    # Convert FTP records to the format expected by the frontend
-    ftp_data = []
-    for ftp_record in ftp_records:
-        ftp_data.append(
-            {"date": ftp_record.date.strftime("%Y-%m-%d"), "ftp": ftp_record.ftp}
-        )
-
-    # Calculate weekly zone data
-    weekly_zones = calculate_weekly_zone_data(session, user_id, 104)
-
     return {
         "scores": daily_scores[days_to_skip:],
         "weekly_tss": weekly_tss_data,
         "weekly_running": weekly_running_data,
         "weekly_cycling": weekly_cycling_data,
         "weekly_swimming": weekly_swimming_data,
-        "weekly_zones": weekly_zones,
-        "ftp": ftp_data,
     }
+
+
+def get_ftp_data(session: Session, user_id: str):
+    """Get FTP records for the past 2 years"""
+    current_date = datetime.datetime.now()
+    ftp_start_date = current_date - datetime.timedelta(days=730)
+    ftp_records = session.exec(
+        select(Ftp)
+        .where(Ftp.user_id == user_id, Ftp.date >= ftp_start_date.date())
+        .order_by(Ftp.date.asc())  # type: ignore[attr-defined]
+    ).all()
+    return [{"date": r.date.strftime("%Y-%m-%d"), "ftp": r.ftp} for r in ftp_records]
 
 
 def calculate_ftp_from_activities(
@@ -425,9 +418,62 @@ def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 104)
             zones_by_type[zone.type] = []
         zones_by_type[zone.type].append(zone)
 
-    # Sort zones by index for each type
     for zone_type in zones_by_type:
         zones_by_type[zone_type].sort(key=lambda z: z.index)
+
+    # Compute the start of the oldest week to bound the activity query
+    oldest_week_start = current_date - datetime.timedelta(weeks=weeks)
+    oldest_week_start = oldest_week_start - datetime.timedelta(
+        days=oldest_week_start.weekday()
+    )
+    oldest_week_start = oldest_week_start.replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    oldest_week_start_ts = int(oldest_week_start.timestamp())
+
+    # Load all activities for the period in a single query
+    all_activities = session.exec(
+        select(Activity).where(
+            Activity.user_id == user_id,
+            Activity.status == "created",
+            Activity.start_time >= oldest_week_start_ts,
+        )
+    ).all()
+
+    activity_ids = [a.id for a in all_activities]
+    activity_sport_by_id = {a.id: a.sport for a in all_activities}
+
+    # Build start_time lookup for week bucketing
+    activity_start_by_id = {a.id: a.start_time for a in all_activities}
+
+    # Load all zone data in 3 bulk queries instead of up to 312
+    hr_by_activity: dict[uuid.UUID, list[ActivityZoneHeartRate]] = defaultdict(list)
+    pace_by_activity: dict[uuid.UUID, list[ActivityZonePace]] = defaultdict(list)
+    power_by_activity: dict[uuid.UUID, list[ActivityZonePower]] = defaultdict(list)
+
+    if activity_ids and "heart_rate" in zones_by_type:
+        for hr_zt in session.exec(
+            select(ActivityZoneHeartRate).where(
+                col(ActivityZoneHeartRate.activity_id).in_(activity_ids)
+            )
+        ).all():
+            hr_by_activity[hr_zt.activity_id].append(hr_zt)
+
+    if activity_ids and "pace" in zones_by_type:
+        for pace_zt in session.exec(
+            select(ActivityZonePace).where(
+                col(ActivityZonePace.activity_id).in_(activity_ids)
+            )
+        ).all():
+            pace_by_activity[pace_zt.activity_id].append(pace_zt)
+
+    if activity_ids and "power" in zones_by_type:
+        for power_zt in session.exec(
+            select(ActivityZonePower).where(
+                col(ActivityZonePower.activity_id).in_(activity_ids)
+            )
+        ).all():
+            power_by_activity[power_zt.activity_id].append(power_zt)
 
     weekly_zone_data = []
 
@@ -440,19 +486,12 @@ def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 104)
         week_start_ts = int(week_start.timestamp())
         week_end_ts = int(week_end.timestamp())
 
-        # Get activities for this week
-        week_activities = session.exec(
-            select(Activity).where(
-                Activity.user_id == user_id,
-                Activity.status == "created",
-                Activity.start_time >= week_start_ts,
-                Activity.start_time < week_end_ts,
-            )
-        ).all()
+        week_activity_ids = {
+            act_id
+            for act_id, start_time in activity_start_by_id.items()
+            if week_start_ts <= start_time < week_end_ts
+        }
 
-        activity_ids = [activity.id for activity in week_activities]
-
-        # Initialize zone data for this week
         week_data: dict[str, Any] = {
             "week_start": week_start.strftime("%Y-%m-%d"),
             "heart_rate_zones": [],
@@ -460,100 +499,70 @@ def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 104)
             "power_zones": [],
         }
 
-        # Calculate heart rate zones split by sport
-        if "heart_rate" in zones_by_type and activity_ids:
-            hr_zone_times = session.exec(
-                select(ActivityZoneHeartRate).where(
-                    col(ActivityZoneHeartRate.activity_id).in_(activity_ids)
-                )
-            ).all()
-
-            # Create a mapping from activity_id to sport
-            activity_sports = {
-                activity.id: activity.sport for activity in week_activities
-            }
-
+        if week_activity_ids and "heart_rate" in zones_by_type:
             hr_zone_totals: ZoneTimeData = {}
             hr_zone_running_totals: ZoneTimeData = {}
             hr_zone_cycling_totals: ZoneTimeData = {}
 
-            for zone_time in hr_zone_times:
-                zone_id = zone_time.zone_id
-                activity_sport = activity_sports.get(zone_time.activity_id)
-
-                if zone_id not in hr_zone_totals:
-                    hr_zone_totals[zone_id] = 0.0
-                    hr_zone_running_totals[zone_id] = 0.0
-                    hr_zone_cycling_totals[zone_id] = 0.0
-
-                hr_zone_totals[zone_id] += zone_time.time_in_zone
-
-                if activity_sport == "running":
-                    hr_zone_running_totals[zone_id] += zone_time.time_in_zone
-                elif activity_sport == "cycling":
-                    hr_zone_cycling_totals[zone_id] += zone_time.time_in_zone
+            for act_id in week_activity_ids:
+                sport = activity_sport_by_id[act_id]
+                for zt in hr_by_activity[act_id]:
+                    zid = zt.zone_id
+                    hr_zone_totals[zid] = hr_zone_totals.get(zid, 0.0) + zt.time_in_zone
+                    if sport == "running":
+                        hr_zone_running_totals[zid] = (
+                            hr_zone_running_totals.get(zid, 0.0) + zt.time_in_zone
+                        )
+                    elif sport == "cycling":
+                        hr_zone_cycling_totals[zid] = (
+                            hr_zone_cycling_totals.get(zid, 0.0) + zt.time_in_zone
+                        )
 
             for zone in zones_by_type["heart_rate"]:
-                total_time = hr_zone_totals.get(zone.id, 0.0)
-                running_time = hr_zone_running_totals.get(zone.id, 0.0)
-                cycling_time = hr_zone_cycling_totals.get(zone.id, 0.0)
-
                 week_data["heart_rate_zones"].append(
                     {
                         "zone_index": zone.index,
-                        "total_time": total_time,
-                        "running_time": running_time,
-                        "cycling_time": cycling_time,
+                        "total_time": hr_zone_totals.get(zone.id, 0.0),
+                        "running_time": hr_zone_running_totals.get(zone.id, 0.0),
+                        "cycling_time": hr_zone_cycling_totals.get(zone.id, 0.0),
                         "max_value": zone.max_value,
                     }
                 )
 
-        # Calculate pace zones
-        if "pace" in zones_by_type and activity_ids:
-            pace_zone_times = session.exec(
-                select(ActivityZonePace).where(
-                    col(ActivityZonePace.activity_id).in_(activity_ids)
-                )
-            ).all()
-
+        if week_activity_ids and "pace" in zones_by_type:
             pace_zone_totals: ZoneTimeData = {}
-            for pace_zone_time in pace_zone_times:
-                zone_id = pace_zone_time.zone_id
-                if zone_id not in pace_zone_totals:
-                    pace_zone_totals[zone_id] = 0.0
-                pace_zone_totals[zone_id] += pace_zone_time.time_in_zone
+
+            for act_id in week_activity_ids:
+                for pace_zt in pace_by_activity[act_id]:
+                    zid = pace_zt.zone_id
+                    pace_zone_totals[zid] = (
+                        pace_zone_totals.get(zid, 0.0) + pace_zt.time_in_zone
+                    )
 
             for zone in zones_by_type["pace"]:
-                total_time = pace_zone_totals.get(zone.id, 0.0)
                 week_data["pace_zones"].append(
                     {
                         "zone_index": zone.index,
-                        "total_time": total_time,
+                        "total_time": pace_zone_totals.get(zone.id, 0.0),
                         "max_value": zone.max_value,
                     }
                 )
 
-        # Calculate power zones
-        if "power" in zones_by_type and activity_ids:
-            power_zone_times = session.exec(
-                select(ActivityZonePower).where(
-                    col(ActivityZonePower.activity_id).in_(activity_ids)
-                )
-            ).all()
-
+        if week_activity_ids and "power" in zones_by_type:
             power_zone_totals: ZoneTimeData = {}
-            for power_zone_time in power_zone_times:
-                zone_id = power_zone_time.zone_id
-                if zone_id not in power_zone_totals:
-                    power_zone_totals[zone_id] = 0.0
-                power_zone_totals[zone_id] += power_zone_time.time_in_zone
+
+            for act_id in week_activity_ids:
+                for power_zt in power_by_activity[act_id]:
+                    zid = power_zt.zone_id
+                    power_zone_totals[zid] = (
+                        power_zone_totals.get(zid, 0.0) + power_zt.time_in_zone
+                    )
 
             for zone in zones_by_type["power"]:
-                total_time = power_zone_totals.get(zone.id, 0.0)
                 week_data["power_zones"].append(
                     {
                         "zone_index": zone.index,
-                        "total_time": total_time,
+                        "total_time": power_zone_totals.get(zone.id, 0.0),
                         "max_value": zone.max_value,
                     }
                 )
