@@ -74,7 +74,7 @@
     "playwright": "^1.58.2",
     "storybook": "^10.3.1",
     "typescript": "~5.9.3",
-    "vite": "^8.0.1",
+    "vite": "^8.0.2",
     "vite-plugin-istanbul": "^8.0.0",
     "vitest": "^4.1.0",
     "vitest-browser-react": "^2.0.5"
