@@ -76,7 +76,7 @@
     "typescript": "~5.9.3",
     "vite": "^8.0.2",
     "vite-plugin-istanbul": "^8.0.0",
-    "vitest": "^4.1.0",
+    "vitest": "^4.1.1",
     "vitest-browser-react": "^2.0.5"
   },
   "browserslist": [
