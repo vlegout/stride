@@ -117,6 +117,7 @@ dependencies = [
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/74/ec/636ab2aa7ad9e6bf6e297240ac2d44dba63cc6611e2d5038db318436d449/boto3-1.42.74.tar.gz", hash = "sha256:dbacd808cf2a3dadbf35f3dbd8de97b94dc9f78b1ebd439f38f552e0f9753577", size = 112739, upload-time = "2026-03-23T19:34:09.815Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f0/dc/21b3dfb135125eb7e3a46b9aab0aede847726f239fc8f39474742a87ebb0/boto3-1.42.76-py3-none-any.whl", hash = "sha256:63c6779c814847016b89ae1b72ed968f8a63d80e589ba337511aa6fc1b59585e", size = 140557, upload-time = "2026-03-25T19:33:23.289Z" },
 ]
@@ -1275,15 +1276,15 @@ wheels = [
 
 [[package]]
 name = "types-boto3"
-version = "1.42.74"
+version = "1.42.76"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore-stubs" },
     { name = "types-s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/66/d2/5f1c3dfd75993084c8cf5d31e169c342fb394d7905d6438428245661c39b/types_boto3-1.42.74.tar.gz", hash = "sha256:8013a2dfc1ba398217d2d2dc6b54b37494df65cbae363f9430af4824697cb655", size = 101691, upload-time = "2026-03-23T19:56:24.402Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2e/49/065066b7ab04660a02dee2c1835d40baa2e5abbb2e9e5f974ddac92a787c/types_boto3-1.42.76.tar.gz", hash = "sha256:fd947e58e015d6dac56eef826a897244185ea1776389bdf76b6ba9c1860296e6", size = 101995, upload-time = "2026-03-25T19:39:38.487Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/b1/8836349f6c9a3bf2066fb8eaec74180406f0a11e8ce00fc33232f97a8c38/types_boto3-1.42.74-py3-none-any.whl", hash = "sha256:3791c49c694b5c6d980e38994032eff4ed90ab4f7b1ad4fb34f3501b7fc60d02", size = 69907, upload-time = "2026-03-23T19:56:19.283Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/85/b11d0337dd0aac5de42fa414905f95e8aabf00c7f670f0c795c11b1e0a09/types_boto3-1.42.76-py3-none-any.whl", hash = "sha256:af93970c88fd10b1e7e30532ff56517ae187c4d3fb4fbcee14a310ce771c5873", size = 70061, upload-time = "2026-03-25T19:39:31.498Z" },
 ]
 
 [[package]]
