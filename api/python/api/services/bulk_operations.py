@@ -155,7 +155,7 @@ class BulkOperationService:
         cycling_activities = self.session.exec(
             select(Activity)
             .where(Activity.sport == "cycling", Activity.status == "created")
-            .order_by(Activity.start_time)  # type: ignore[arg-type]
+            .order_by(col(Activity.start_time))
         ).all()
 
         processed_count = 0
@@ -220,7 +220,7 @@ class BulkOperationService:
         activities = self.session.exec(
             select(Activity)
             .where(Activity.status == "created")
-            .order_by(Activity.start_time)  # type: ignore[arg-type]
+            .order_by(col(Activity.start_time))
         ).all()
 
         processed_count = 0
@@ -354,7 +354,7 @@ class BulkOperationService:
             except ValueError:
                 raise ValueError(f"Invalid end date format: {end_date}. Use YYYY-MM-DD")
 
-        query = query.order_by(Activity.start_time)  # type: ignore[arg-type]
+        query = query.order_by(col(Activity.start_time))
 
         activities = self.session.exec(query).all()
 

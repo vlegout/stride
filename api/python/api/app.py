@@ -475,7 +475,7 @@ def read_best_performances(
 
         query += " ORDER BY pp.power DESC LIMIT 10"
 
-        power_performances = session.exec(text(query).bindparams(**params)).all()  # type: ignore[call-overload]
+        power_performances = session.execute(text(query).bindparams(**params)).all()  # ty: ignore[deprecated]
 
         for row in power_performances:
             power = row[0]
@@ -517,7 +517,7 @@ def read_best_performances(
 
         query += " ORDER BY p.time ASC LIMIT 10"
 
-        running_performances = session.exec(text(query).bindparams(**params)).all()  # type: ignore[call-overload]
+        running_performances = session.execute(text(query).bindparams(**params)).all()  # ty: ignore[deprecated]
 
         for row in running_performances:
             time_seconds = row[0]
@@ -576,7 +576,7 @@ def read_power_profile(
         GROUP BY pp.time, year
         ORDER BY year DESC, pp.time
     """
-    results = session.exec(  # type: ignore[call-overload]
+    results = session.execute(  # ty: ignore[deprecated]
         text(query).bindparams(user_id=user_id, time_values=time_values)
     ).all()
 

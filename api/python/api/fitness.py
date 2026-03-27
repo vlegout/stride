@@ -274,7 +274,7 @@ def get_ftp_data(session: Session, user_id: str):
     ftp_records = session.exec(
         select(Ftp)
         .where(Ftp.user_id == user_id, Ftp.date >= ftp_start_date.date())
-        .order_by(Ftp.date.asc())  # type: ignore[attr-defined]
+        .order_by(col(Ftp.date).asc())
     ).all()
     return [{"date": r.date.strftime("%Y-%m-%d"), "ftp": r.ftp} for r in ftp_records]
 
@@ -299,7 +299,7 @@ def calculate_ftp_from_activities(
             Activity.sport == "cycling",
             Activity.start_time >= start_timestamp,
             Activity.start_time <= end_timestamp,
-            Activity.avg_power.is_not(None),  # type: ignore[union-attr]
+            col(Activity.avg_power).is_not(None),
         )
     ).all()
 

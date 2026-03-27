@@ -344,7 +344,7 @@ class TestActivityStatusFunctionality(unittest.TestCase):
         activity_delete_routes = [
             route
             for route in delete_routes
-            if "/activities/{activity_id}/" in str(route.path)  # type: ignore[attr-defined]
+            if "/activities/{activity_id}/" in str(getattr(route, "path", ""))
         ]
 
         self.assertTrue(
@@ -554,7 +554,7 @@ def _make_activity(**overrides):
         "zone_heart_rates": [],
     }
     defaults.update(overrides)
-    return Activity(**defaults)  # type: ignore[arg-type]
+    return Activity(**defaults)  # ty: ignore[invalid-argument-type]
 
 
 def _make_user(**overrides):
@@ -571,7 +571,7 @@ def _make_user(**overrides):
         "updated_at": datetime.datetime.now(datetime.timezone.utc),
     }
     defaults.update(overrides)
-    return User(**defaults)  # type: ignore[arg-type]
+    return User(**defaults)  # ty: ignore[invalid-argument-type]
 
 
 class _AuthenticatedTestCase(unittest.TestCase):
