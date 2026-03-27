@@ -2,7 +2,7 @@ import time
 import uuid
 
 import httpx
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from api.model import Location, Activity, Tracepoint
 
@@ -70,7 +70,7 @@ class LocationService:
         first_tracepoint = self.session.exec(
             select(Tracepoint)
             .where(Tracepoint.activity_id == activity.id)
-            .order_by(Tracepoint.timestamp)  # type: ignore[arg-type]
+            .order_by(col(Tracepoint.timestamp))
         ).first()
 
         if first_tracepoint is None:

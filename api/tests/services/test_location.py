@@ -41,7 +41,7 @@ def create_test_activity(**kwargs):
         "total_distance": 0.0,
     }
     defaults.update(kwargs)
-    return Activity(**defaults)  # type: ignore[arg-type]
+    return Activity(**defaults)  # ty: ignore[invalid-argument-type]
 
 
 def test_fetch_location_from_api_success(location_service):

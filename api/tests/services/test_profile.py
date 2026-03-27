@@ -43,11 +43,8 @@ class TestProfileService:
         mock_exec_zones = Mock()
         mock_exec_zones.all.return_value = [mock_zone]
 
-        mock_session.exec.side_effect = [
-            mock_exec_overall,
-            mock_exec_yearly,
-            mock_exec_zones,
-        ]
+        mock_session.execute.side_effect = [mock_exec_overall, mock_exec_yearly]
+        mock_session.exec.return_value = mock_exec_zones
 
         profile = service.get_user_profile("test-user")
 
@@ -77,11 +74,8 @@ class TestProfileService:
         mock_exec_zones = Mock()
         mock_exec_zones.all.return_value = []
 
-        mock_session.exec.side_effect = [
-            mock_exec_overall,
-            mock_exec_yearly,
-            mock_exec_zones,
-        ]
+        mock_session.execute.side_effect = [mock_exec_overall, mock_exec_yearly]
+        mock_session.exec.return_value = mock_exec_zones
 
         profile = service.get_user_profile("test-user")
 
@@ -115,11 +109,8 @@ class TestProfileService:
         mock_exec_zones = Mock()
         mock_exec_zones.all.return_value = []
 
-        mock_session.exec.side_effect = [
-            mock_exec_overall,
-            mock_exec_yearly,
-            mock_exec_zones,
-        ]
+        mock_session.execute.side_effect = [mock_exec_overall, mock_exec_yearly]
+        mock_session.exec.return_value = mock_exec_zones
 
         profile = service.get_user_profile("test-user")
 
@@ -148,11 +139,8 @@ class TestProfileService:
         mock_exec_zones = Mock()
         mock_exec_zones.all.return_value = zones
 
-        mock_session.exec.side_effect = [
-            mock_exec_overall,
-            mock_exec_yearly,
-            mock_exec_zones,
-        ]
+        mock_session.execute.side_effect = [mock_exec_overall, mock_exec_yearly]
+        mock_session.exec.return_value = mock_exec_zones
 
         profile = service.get_user_profile("test-user")
 

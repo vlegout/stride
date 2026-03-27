@@ -1,6 +1,6 @@
 import datetime
 
-from sqlmodel import Session, select, text
+from sqlmodel import Session, col, select, text
 
 from api.model import Profile, Statistic, YearsStatistics, Zone, ZonePublic
 
@@ -16,7 +16,7 @@ class ProfileService:
     def get_user_profile(self, user_id: str) -> Profile:
         current_date = datetime.datetime.now()
 
-        overall_stats = self.session.exec(  # type: ignore[call-overload]
+        overall_stats = self.session.execute(
             text("""
                 SELECT
                     COUNT(*) as total_activities,
@@ -31,7 +31,7 @@ class ProfileService:
             """).bindparams(user_id=user_id)
         ).one()
 
-        yearly_stats = self.session.exec(  # type: ignore[call-overload]
+        yearly_stats = self.session.execute(
             text("""
                 SELECT
                     EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
@@ -95,7 +95,9 @@ class ProfileService:
             )
 
         zones = self.session.exec(
-            select(Zone).where(Zone.user_id == user_id).order_by(Zone.type, Zone.index)  # type: ignore[arg-type]
+            select(Zone)
+            .where(Zone.user_id == user_id)
+            .order_by(col(Zone.type), col(Zone.index))
         ).all()
 
         zones_public = [ZonePublic.model_validate(zone) for zone in zones]

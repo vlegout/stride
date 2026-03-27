@@ -1,5 +1,6 @@
 import datetime
 import math
+import os
 import uuid
 from unittest.mock import Mock, patch
 
@@ -185,7 +186,7 @@ class TestGetUuid:
 
     @given(st.text(min_size=1, max_size=100), st.text(min_size=1, max_size=100))
     def test_different_filenames_property(self, filename1, filename2):
-        assume(filename1 != filename2)
+        assume(os.path.basename(filename1) != os.path.basename(filename2))
         uuid1 = get_uuid(filename1)
         uuid2 = get_uuid(filename2)
         assert uuid1 != uuid2

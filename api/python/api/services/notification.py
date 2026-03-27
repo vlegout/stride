@@ -1,7 +1,7 @@
 import bisect
 import datetime
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from api.model import Activity, Notification, Performance, PerformancePower
 from api.utils import (
@@ -57,8 +57,8 @@ class NotificationService:
                 Activity.status == "created",
                 Activity.id != activity.id,
                 Activity.start_time < activity.start_time,
-                Performance.distance.in_(list(current_perfs.keys())),  # type: ignore[attr-defined]
-                Performance.time.is_not(None),  # type: ignore[union-attr]
+                col(Performance.distance).in_(list(current_perfs.keys())),
+                col(Performance.time).is_not(None),
             )
         )
         historical_results = self.session.exec(stmt).all()
@@ -202,8 +202,8 @@ class NotificationService:
                 Activity.status == "created",
                 Activity.id != activity.id,
                 Activity.start_time < activity.start_time,
-                PerformancePower.time.in_(list(current_perfs.keys())),  # type: ignore[attr-defined]
-                PerformancePower.power.is_not(None),  # type: ignore[attr-defined]
+                col(PerformancePower.time).in_(list(current_perfs.keys())),
+                col(PerformancePower.power).is_not(None),
                 PerformancePower.power > 0,
             )
         )
