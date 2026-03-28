@@ -62,11 +62,11 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/browser": "^4.1.0",
-    "@vitest/browser-playwright": "^4.1.0",
-    "@vitest/coverage-istanbul": "^4.1.0",
-    "@vitest/coverage-v8": "^4.1.0",
-    "@vitest/ui": "^4.1.0",
+    "@vitest/browser": "^4.1.2",
+    "@vitest/browser-playwright": "^4.1.2",
+    "@vitest/coverage-istanbul": "^4.1.2",
+    "@vitest/coverage-v8": "^4.1.2",
+    "@vitest/ui": "^4.1.2",
     "baseline-browser-mapping": "^2.10.9",
     "chromatic": "^16.0.0",
     "jsdom": "^29.0.1",
@@ -76,8 +76,8 @@
     "typescript": "~5.9.3",
     "vite": "^8.0.3",
     "vite-plugin-istanbul": "^8.0.0",
-    "vitest": "^4.1.0",
-    "vitest-browser-react": "^2.0.5"
+    "vitest": "^4.1.2",
+    "vitest-browser-react": "^2.1.0"
   },
   "browserslist": [
     "> 1%",
