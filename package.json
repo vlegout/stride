@@ -27,7 +27,7 @@
     "@mui/material": "^7.3.9",
     "@tanstack/react-query": "^5.95.2",
     "arktype": "^2.2.0",
-    "axios": "^1.13.6",
+    "axios": "^1.14.0",
     "chart.js": "^4.5.1",
     "chartjs-plugin-zoom": "^2.2.0",
     "framer-motion": "^12.38.0",
