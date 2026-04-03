@@ -12,9 +12,9 @@ export interface ProcessedChartData {
 }
 
 function formatRunningPace(speed: number): string {
-  const minPerKm = 60 / speed;
-  const minutes = Math.floor(minPerKm);
-  const seconds = Math.round((minPerKm - minutes) * 60);
+  const totalSeconds = Math.round((60 / speed) * 60);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
   return `${minutes}:${seconds.toString().padStart(2, "0")} /km`;
 }
 
@@ -22,9 +22,9 @@ export function formatSpeed(speed: number | null, sport?: Sport, fallback = ""):
   if (speed == null || speed === 0) return fallback;
 
   if (sport === "swimming") {
-    const pacePerHundredMeters = 6 / speed;
-    const minutes = Math.floor(pacePerHundredMeters);
-    const seconds = Math.round((pacePerHundredMeters - minutes) * 60);
+    const totalSeconds = Math.round((6 / speed) * 60);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")} /100m`;
   } else if (sport === "running") {
     return formatRunningPace(speed);
