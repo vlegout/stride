@@ -68,7 +68,7 @@
     "@vitest/coverage-v8": "^4.1.2",
     "@vitest/ui": "^4.1.2",
     "baseline-browser-mapping": "^2.10.14",
-    "chromatic": "^16.0.0",
+    "chromatic": "^16.1.0",
     "jsdom": "^29.0.1",
     "nyc": "^18.0.0",
     "playwright": "^1.59.1",
