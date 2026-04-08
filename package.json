@@ -37,7 +37,7 @@
     "luxon": "^3.7.2",
     "mapbox-gl": "^3.21.0",
     "ol": "^10.8.0",
-    "react": "^19.2.3",
+    "react": "^19.2.5",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.4",
     "react-konva": "^19.2.3",
