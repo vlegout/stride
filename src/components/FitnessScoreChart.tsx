@@ -161,7 +161,7 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
 
   return (
     <Box sx={{ height: 400, width: "100%", mb: 4 }}>
-      <Stack direction="row" justifyContent="flex-end" spacing={0.5} sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={0.5} sx={{ mb: 1, justifyContent: "flex-end" }}>
         <MuiTooltip title="Zoom in">
           <IconButton size="small" onClick={handleZoomIn}>
             <ZoomIn fontSize="small" />

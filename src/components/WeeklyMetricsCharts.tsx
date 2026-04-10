@@ -216,7 +216,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+      <Stack direction="row" sx={{ mb: 3, justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="h6">Weekly Activity Metrics</Typography>
         <ToggleButtonGroup value={viewMode} exclusive onChange={handleViewModeChange} size="small">
           <ToggleButton value="individual">

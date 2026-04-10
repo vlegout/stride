@@ -79,14 +79,14 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
   );
 
   return (
-    <Grid container spacing={isMobile ? 1 : 2} marginBottom={isMobile ? "16px" : "20px"}>
+    <Grid container spacing={isMobile ? 1 : 2} sx={{ marginBottom: isMobile ? "16px" : "20px" }}>
       <Grid size={{ xs: 12, md: 6 }}>
         {title}
-        <Grid container spacing={1} marginTop={"10px"} marginBottom={"10px"}>
+        <Grid container spacing={1} sx={{ marginTop: "10px", marginBottom: "10px" }}>
           <Grid size={isSmall ? 2 : 1}>
             <ActivityLogo sport={activity.sport} />
           </Grid>
-          <Grid size={isSmall ? 10 : 11} display="flex" alignItems="center">
+          <Grid size={isSmall ? 10 : 11} sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant={isSmall ? "body2" : "body1"}>{formatDateTime(activity.start_time)}</Typography>
           </Grid>
         </Grid>
