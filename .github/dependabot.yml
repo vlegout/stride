@@ -4,15 +4,23 @@ updates:
   directory: "/"
   schedule:
     interval: "daily"
+  cooldown:
+    default-days: 7
 - package-ecosystem: "npm"
   directory: "/docs"
   schedule:
     interval: "daily"
+  cooldown:
+    default-days: 7
 - package-ecosystem: "uv"
   directory: "/api"
   schedule:
     interval: "daily"
+  cooldown:
+    default-days: 7
 - package-ecosystem: "cargo"
   directory: "/api"
   schedule:
     interval: "daily"
+  cooldown:
+    default-days: 7
