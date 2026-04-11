@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Typography, Grid, ToggleButtonGroup, ToggleButton, Stack } from "@mui/material";
-import { ViewModule, ViewStream } from "@mui/icons-material";
+import ViewModule from "@mui/icons-material/ViewModule";
+import ViewStream from "@mui/icons-material/ViewStream";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import type { WeeklyActivityData } from "../types";

@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { Box, IconButton, Stack, Tooltip as MuiTooltip } from "@mui/material";
-import { ZoomIn, ZoomOut, RestartAlt } from "@mui/icons-material";
+import ZoomIn from "@mui/icons-material/ZoomIn";
+import ZoomOut from "@mui/icons-material/ZoomOut";
+import RestartAlt from "@mui/icons-material/RestartAlt";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
