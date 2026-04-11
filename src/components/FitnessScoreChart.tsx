@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { Box, IconButton, Stack, Tooltip as MuiTooltip } from "@mui/material";
-import { ZoomIn, ZoomOut, RestartAlt } from "@mui/icons-material";
+import ZoomIn from "@mui/icons-material/ZoomIn";
+import ZoomOut from "@mui/icons-material/ZoomOut";
+import RestartAlt from "@mui/icons-material/RestartAlt";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -161,7 +163,7 @@ const FitnessScoreChart = ({ scores, title = "Fitness Score Over Time" }: Fitnes
 
   return (
     <Box sx={{ height: 400, width: "100%", mb: 4 }}>
-      <Stack direction="row" justifyContent="flex-end" spacing={0.5} sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={0.5} sx={{ mb: 1, justifyContent: "flex-end" }}>
         <MuiTooltip title="Zoom in">
           <IconButton size="small" onClick={handleZoomIn}>
             <ZoomIn fontSize="small" />

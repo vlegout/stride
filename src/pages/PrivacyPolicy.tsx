@@ -10,18 +10,18 @@ export default function PrivacyPolicy() {
       <SectionContainer maxWidth={{ xs: "100%", sm: "800px", md: "900px" }} centered variant="paper" elevation={2}>
         <Box sx={{ textAlign: "left" }}>
           <LegalSection title="1. Introduction">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Welcome to Stride. This Privacy Policy explains how Vincent Legout ("we", "us", or "our") collects, uses,
               and protects your personal data when you use the Stride web application (the "Service").
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We are committed to protecting your privacy and complying with the General Data Protection Regulation
               (GDPR) and other applicable data protection laws.
             </Typography>
           </LegalSection>
 
           <LegalSection title="2. Data Controller">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               The data controller responsible for your personal data is:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -34,7 +34,7 @@ export default function PrivacyPolicy() {
           </LegalSection>
 
           <LegalSection title="3. Data We Collect">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We collect the following types of personal data:
             </Typography>
 
@@ -95,7 +95,7 @@ export default function PrivacyPolicy() {
           </LegalSection>
 
           <LegalSection title="4. How We Use Your Data">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We process your personal data for the following purposes:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -114,7 +114,7 @@ export default function PrivacyPolicy() {
           </LegalSection>
 
           <LegalSection title="5. Legal Basis for Processing (GDPR)">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Under GDPR Article 6, we process your data based on:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -135,7 +135,7 @@ export default function PrivacyPolicy() {
           </LegalSection>
 
           <LegalSection title="6. Data Storage and Security">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Your data is stored securely using the following measures:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -159,25 +159,25 @@ export default function PrivacyPolicy() {
                 </ul>
               </Typography>
             </Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               While we implement reasonable security measures, no method of transmission over the internet is 100%
               secure. We cannot guarantee absolute security.
             </Typography>
           </LegalSection>
 
           <LegalSection title="7. Data Retention">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We retain your personal data for as long as your account is active or as needed to provide you with the
               Service. You may request deletion of your account and associated data at any time by contacting us.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               When you delete an activity, it is marked as deleted in our system but may remain in backups for a limited
               period.
             </Typography>
           </LegalSection>
 
           <LegalSection title="8. Your Rights Under GDPR">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               As a data subject under GDPR, you have the following rights:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -207,14 +207,14 @@ export default function PrivacyPolicy() {
                 </ul>
               </Typography>
             </Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               To exercise any of these rights, please contact us at{" "}
               <MuiLink href="mailto:vincent@legout.info">vincent@legout.info</MuiLink>. We will respond within 30 days.
             </Typography>
           </LegalSection>
 
           <LegalSection title="9. Third-Party Services">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We use the following third-party services that may process your data:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -258,7 +258,7 @@ export default function PrivacyPolicy() {
           </LegalSection>
 
           <LegalSection title="10. Cookies and Tracking">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We use local storage in your browser to:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -270,13 +270,13 @@ export default function PrivacyPolicy() {
                 </ul>
               </Typography>
             </Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We do not use third-party tracking cookies or analytics tools.
             </Typography>
           </LegalSection>
 
           <LegalSection title="11. International Data Transfers">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Your data is primarily processed and stored within the European Union. Some third-party services
               (Scaleway, Google OAuth) may transfer data outside the EU. These transfers are protected by appropriate
               safeguards such as Standard Contractual Clauses approved by the European Commission.
@@ -284,14 +284,14 @@ export default function PrivacyPolicy() {
           </LegalSection>
 
           <LegalSection title="12. Children's Privacy">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Our Service is not intended for children under 16 years of age. We do not knowingly collect personal data
               from children. If you believe we have collected data from a child, please contact us immediately.
             </Typography>
           </LegalSection>
 
           <LegalSection title="13. Changes to This Privacy Policy">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We may update this Privacy Policy from time to time. We will notify you of significant changes by updating
               the "Last Updated" date at the top of this page. Your continued use of the Service after changes
               constitutes acceptance of the updated policy.
@@ -299,7 +299,7 @@ export default function PrivacyPolicy() {
           </LegalSection>
 
           <LegalSection title="14. Contact Us">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               If you have any questions about this Privacy Policy or wish to exercise your rights, please contact:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -308,7 +308,7 @@ export default function PrivacyPolicy() {
                 Email: <MuiLink href="mailto:vincent@legout.info">vincent@legout.info</MuiLink>
               </Typography>
             </Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               You also have the right to lodge a complaint with the French data protection authority (CNIL) if you
               believe your data protection rights have been violated.
             </Typography>

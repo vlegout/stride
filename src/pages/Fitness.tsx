@@ -156,7 +156,7 @@ const Fitness = () => {
 
             {zonesQuery.isPending ? (
               <SectionContainer>
-                <Box display="flex" alignItems="center" gap={2} py={2}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2, py: 2 }}>
                   <CircularProgress size={20} />
                   <Typography color="text.secondary">Loading zone data...</Typography>
                 </Box>
@@ -169,7 +169,7 @@ const Fitness = () => {
 
             {ftpQuery.isPending ? (
               <SectionContainer>
-                <Box display="flex" alignItems="center" gap={2} py={2}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2, py: 2 }}>
                   <CircularProgress size={20} />
                   <Typography color="text.secondary">Loading FTP data...</Typography>
                 </Box>

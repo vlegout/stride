@@ -300,22 +300,22 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-        },
-        standardSuccess: {
-          backgroundColor: "rgba(34, 197, 94, 0.1)",
-          color: "#15803d",
-        },
-        standardError: {
-          backgroundColor: "rgba(239, 68, 68, 0.1)",
-          color: "#b91c1c",
-        },
-        standardWarning: {
-          backgroundColor: "rgba(249, 115, 22, 0.1)",
-          color: "#c2410c",
-        },
-        standardInfo: {
-          backgroundColor: "rgba(59, 130, 246, 0.1)",
-          color: "#1d4ed8",
+          "&.MuiAlert-standardSuccess": {
+            backgroundColor: "rgba(34, 197, 94, 0.1)",
+            color: "#15803d",
+          },
+          "&.MuiAlert-standardError": {
+            backgroundColor: "rgba(239, 68, 68, 0.1)",
+            color: "#b91c1c",
+          },
+          "&.MuiAlert-standardWarning": {
+            backgroundColor: "rgba(249, 115, 22, 0.1)",
+            color: "#c2410c",
+          },
+          "&.MuiAlert-standardInfo": {
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            color: "#1d4ed8",
+          },
         },
       },
     },

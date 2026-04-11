@@ -26,10 +26,17 @@ jobs:
       - run: npx biome format .
       - run: npm run lint
       - run: CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} npm run build
+      - name: Build Storybook
+        if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
+        run: npm run build-storybook
+        env:
+          VITE_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN_DEV }}
+          NODE_OPTIONS: "--max-old-space-size=4096"
       - uses: chromaui/action@latest
         if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          storybookBuildDir: storybook-static
           skip: "dependabot/**"
           autoAcceptChanges: "main"
           exitOnceUploaded: true

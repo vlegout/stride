@@ -10,17 +10,17 @@ export default function TermsOfService() {
       <SectionContainer maxWidth={{ xs: "100%", sm: "800px", md: "900px" }} centered variant="paper" elevation={2}>
         <Box sx={{ textAlign: "left" }}>
           <LegalSection title="1. Acceptance of Terms">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               By accessing or using Stride (the "Service"), you agree to be bound by these Terms of Service ("Terms").
               If you do not agree to these Terms, you may not use the Service.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               The Service is operated by Vincent Legout ("we", "us", or "our"), an individual based in France.
             </Typography>
           </LegalSection>
 
           <LegalSection title="2. Service Description">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Stride is a web application that allows users to:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -37,14 +37,14 @@ export default function TermsOfService() {
           </LegalSection>
 
           <LegalSection title="3. Eligibility">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               You must be at least 16 years old to use the Service. By using the Service, you represent and warrant that
               you meet this age requirement.
             </Typography>
           </LegalSection>
 
           <LegalSection title="4. User Accounts">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               To use the Service, you must create an account using Google OAuth authentication. You are responsible for:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -59,7 +59,7 @@ export default function TermsOfService() {
           </LegalSection>
 
           <LegalSection title="5. User Responsibilities">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               When using the Service, you agree to:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -77,7 +77,7 @@ export default function TermsOfService() {
           </LegalSection>
 
           <LegalSection title="6. Acceptable Use Policy">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               You may not use the Service to:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -95,7 +95,7 @@ export default function TermsOfService() {
           </LegalSection>
 
           <LegalSection title="7. Content Ownership and License">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               You retain ownership of all activity data, FIT files, and other content you upload to the Service ("User
               Content"). By uploading User Content, you grant us a limited, non-exclusive, royalty-free license to:
             </Typography>
@@ -111,26 +111,26 @@ export default function TermsOfService() {
                 </ul>
               </Typography>
             </Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               This license terminates when you delete your User Content or close your account, except for content
               retained in backups for a limited period.
             </Typography>
           </LegalSection>
 
           <LegalSection title="8. Intellectual Property Rights">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               The Service, including its design, code, features, and branding, is owned by Vincent Legout and protected
               by copyright and other intellectual property laws. The source code is available under the MIT License on
               GitHub.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               You may not copy, modify, distribute, or create derivative works from the Service without our express
               written permission, except as permitted by the MIT License for the open-source code.
             </Typography>
           </LegalSection>
 
           <LegalSection title="9. Limitation of Liability">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               TO THE MAXIMUM EXTENT PERMITTED BY LAW:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -151,30 +151,30 @@ export default function TermsOfService() {
                 </ul>
               </Typography>
             </Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Our total liability to you for any claims arising from your use of the Service shall not exceed €100 or
               the amount you paid to us in the past 12 months, whichever is greater.
             </Typography>
           </LegalSection>
 
           <LegalSection title="10. Disclaimers">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               <strong>Health and Safety:</strong> The Service provides fitness data for informational purposes only. It
               is not a substitute for professional medical advice, diagnosis, or treatment. Consult with a healthcare
               provider before starting any fitness program.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               <strong>Data Accuracy:</strong> While we strive for accuracy, we do not guarantee that activity metrics,
               GPS data, or performance calculations are completely accurate or reliable.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               <strong>Third-Party Services:</strong> We are not responsible for the availability, content, or actions of
               third-party services (Google OAuth, Garmin Connect, Scaleway, etc.).
             </Typography>
           </LegalSection>
 
           <LegalSection title="11. Service Availability and Modifications">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We reserve the right to:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>
@@ -187,29 +187,29 @@ export default function TermsOfService() {
                 </ul>
               </Typography>
             </Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We will make reasonable efforts to notify users of significant changes, but are not obligated to do so.
             </Typography>
           </LegalSection>
 
           <LegalSection title="12. Termination">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               You may terminate your account at any time by contacting us at{" "}
               <MuiLink href="mailto:vincent@legout.info">vincent@legout.info</MuiLink>. Upon termination, your right to
               access the Service will cease immediately.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We reserve the right to suspend or terminate your account if you violate these Terms or engage in conduct
               that we deem harmful to the Service or other users.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Upon termination, we may delete your User Content, subject to our data retention policies and legal
               obligations. We recommend exporting your data before terminating your account.
             </Typography>
           </LegalSection>
 
           <LegalSection title="13. Privacy and Data Protection">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Your use of the Service is also governed by our <MuiLink href="/privacy">Privacy Policy</MuiLink>, which
               explains how we collect, use, and protect your personal data in compliance with GDPR and other applicable
               data protection laws.
@@ -217,7 +217,7 @@ export default function TermsOfService() {
           </LegalSection>
 
           <LegalSection title="14. Indemnification">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               You agree to indemnify and hold harmless Vincent Legout from any claims, damages, losses, liabilities, and
               expenses (including legal fees) arising from:
             </Typography>
@@ -234,32 +234,32 @@ export default function TermsOfService() {
           </LegalSection>
 
           <LegalSection title="15. Governing Law and Jurisdiction">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               These Terms are governed by and construed in accordance with the laws of France, without regard to its
               conflict of law provisions.
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Any disputes arising from these Terms or your use of the Service shall be subject to the exclusive
               jurisdiction of the courts of France.
             </Typography>
           </LegalSection>
 
           <LegalSection title="16. Severability">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will
               remain in full force and effect.
             </Typography>
           </LegalSection>
 
           <LegalSection title="17. Entire Agreement">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               These Terms, together with our Privacy Policy, constitute the entire agreement between you and us
               regarding the Service and supersede any prior agreements.
             </Typography>
           </LegalSection>
 
           <LegalSection title="18. Changes to These Terms">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               We may update these Terms from time to time. Significant changes will be communicated by updating the
               "Effective Date" at the top of this page. Your continued use of the Service after changes constitutes
               acceptance of the updated Terms.
@@ -267,7 +267,7 @@ export default function TermsOfService() {
           </LegalSection>
 
           <LegalSection title="19. Contact Information">
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" sx={{ mb: 2 }}>
               If you have any questions about these Terms of Service, please contact:
             </Typography>
             <Box sx={{ ml: 2, mb: 2 }}>

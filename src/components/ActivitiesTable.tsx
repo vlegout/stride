@@ -130,7 +130,7 @@ const ActivitiesTable = () => {
         onSort={sortHandler}
         responsive
       />
-      <Box margin={"auto"} marginTop="20px" display="flex" justifyContent="center">
+      <Box sx={{ margin: "auto", marginTop: "20px", display: "flex", justifyContent: "center" }}>
         <Pagination
           count={Math.ceil(data.pagination.total / data.pagination.per_page)}
           shape="rounded"

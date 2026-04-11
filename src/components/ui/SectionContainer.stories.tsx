@@ -4,7 +4,7 @@ import SectionContainer from "./SectionContainer";
 
 const SampleContent = () => (
   <Box>
-    <Typography variant="body1" paragraph>
+    <Typography variant="body1" sx={{ mb: 2 }}>
       This is sample content inside the section container. It demonstrates how the container wraps and styles the
       content within it.
     </Typography>
