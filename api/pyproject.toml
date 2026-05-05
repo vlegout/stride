@@ -26,7 +26,7 @@ dev = [
     "types-pyyaml>=6.0.12.20250915",
     "types-boto3>=1.42.96",
     "ty>=0.0.32",
-    "hypothesis>=6.152.2",
+    "hypothesis>=6.152.4",
     "types-shapely>=2.1.0.20250917",
 ]
 
