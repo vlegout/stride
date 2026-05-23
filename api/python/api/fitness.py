@@ -16,6 +16,29 @@ type ZonesByType = dict[str, list[Zone]]
 type ZoneTimeData = dict[uuid.UUID, float]
 
 
+def estimate_running_tss(
+    activity: Activity, threshold_hr: float | None
+) -> float | None:
+    """Estimate hrTSS for a running activity when the watch did not record TSS.
+
+    Uses the TrainingPeaks heart-rate TSS formula:
+        hrTSS = duration_hours * IF^2 * 100
+        IF = avg_HR / threshold_HR (LTHR, top of HR zone 4)
+    """
+    if activity.sport != "running":
+        return None
+    if not threshold_hr or threshold_hr <= 0:
+        return None
+    if not activity.avg_heart_rate or activity.avg_heart_rate <= 0:
+        return None
+    if not activity.total_timer_time or activity.total_timer_time <= 0:
+        return None
+
+    duration_hours = activity.total_timer_time / 3600
+    intensity_factor = activity.avg_heart_rate / threshold_hr
+    return round(duration_hours * (intensity_factor**2) * 100, 1)
+
+
 def calculate_activity_score(activity, sport_filter=None):
     """Calculate the base score for an activity, optionally filtered by sport"""
     if sport_filter and activity.sport != sport_filter:

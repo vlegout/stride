@@ -3,7 +3,7 @@ import datetime
 from sqlmodel import Session
 
 from api.fit import get_activity_from_fit
-from api.fitness import update_ftp_for_date
+from api.fitness import estimate_running_tss, update_ftp_for_date
 from api.model import (
     Activity,
     Lap,
@@ -79,6 +79,11 @@ class ActivityService:
 
         self.zone.calculate_activity_zones(activity, original_tracepoints)
         self.zone.update_user_zones(user_id)
+
+        if activity.sport == "running" and activity.training_stress_score is None:
+            activity.training_stress_score = estimate_running_tss(
+                activity, self.zone.get_threshold_hr(user_id)
+            )
 
         try:
             self.storage.upload_activity_files(

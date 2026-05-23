@@ -113,6 +113,16 @@ class ZoneService:
                     )
                     self.session.add(activity_zone_power)
 
+    def get_threshold_hr(self, user_id: str) -> float | None:
+        zone_4 = self.session.exec(
+            select(Zone).where(
+                Zone.user_id == user_id,
+                Zone.type == "heart_rate",
+                Zone.index == 4,
+            )
+        ).first()
+        return zone_4.max_value if zone_4 else None
+
     def update_user_zones(self, user_id: str) -> None:
         one_year_ago = datetime.datetime.now() - datetime.timedelta(
             days=ONE_YEAR_IN_DAYS

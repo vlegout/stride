@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from sqlmodel import Session, col, delete, select
 
 from api.fit import get_activity_from_fit
-from api.fitness import update_ftp_for_date
+from api.fitness import estimate_running_tss, update_ftp_for_date
 from api.model import (
     Activity,
     ActivityZoneHeartRate,
@@ -512,6 +512,16 @@ class BulkOperationService:
 
                 if activity.user_id:
                     self.zone_service.update_user_zones(activity.user_id)
+
+                if (
+                    activity.sport == "running"
+                    and activity.training_stress_score is None
+                    and activity.user_id
+                ):
+                    activity.training_stress_score = estimate_running_tss(
+                        activity,
+                        self.zone_service.get_threshold_hr(activity.user_id),
+                    )
 
                 if activity.sport == "cycling" and activity.user_id:
                     activity_date = datetime.date.fromtimestamp(activity.start_time)
