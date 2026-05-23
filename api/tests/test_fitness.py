@@ -4,7 +4,11 @@ import uuid
 from unittest.mock import Mock
 
 from api.model import Activity
-from api.fitness import calculate_activity_score, calculate_fitness_and_weekly_data
+from api.fitness import (
+    calculate_activity_score,
+    calculate_fitness_and_weekly_data,
+    estimate_running_tss,
+)
 
 
 class TestFitness(unittest.TestCase):
@@ -169,6 +173,85 @@ class TestFitness(unittest.TestCase):
 
         # Should include TSS contribution: 100 * 0.005 = 0.5
         self.assertGreater(score, 0.5)
+
+    def test_estimate_running_tss_basic(self):
+        """Threshold-HR-based hrTSS for a 1h run at threshold HR equals 100."""
+        activity = Activity(
+            id=uuid.uuid4(),
+            fit="run.fit",
+            title="Threshold run",
+            description="",
+            sport="running",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=3600.0,
+            total_elapsed_time=3600.0,
+            total_distance=10000.0,
+            avg_heart_rate=170.0,
+            user_id="test-user-id",
+        )
+
+        tss = estimate_running_tss(activity, threshold_hr=170.0)
+        assert tss is not None
+        self.assertAlmostEqual(tss, 100.0, places=1)
+
+    def test_estimate_running_tss_easy_run(self):
+        """An easier run (IF < 1) yields proportionally lower hrTSS."""
+        activity = Activity(
+            id=uuid.uuid4(),
+            fit="easy.fit",
+            title="Easy run",
+            description="",
+            sport="running",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=1800.0,  # 30 min
+            total_elapsed_time=1800.0,
+            total_distance=5000.0,
+            avg_heart_rate=136.0,  # IF = 0.8
+            user_id="test-user-id",
+        )
+
+        # 0.5h * 0.8^2 * 100 = 32.0
+        tss = estimate_running_tss(activity, threshold_hr=170.0)
+        assert tss is not None
+        self.assertAlmostEqual(tss, 32.0, places=1)
+
+    def test_estimate_running_tss_returns_none_without_hr(self):
+        activity = Activity(
+            id=uuid.uuid4(),
+            fit="run.fit",
+            title="No HR run",
+            description="",
+            sport="running",
+            device="test",
+            race=False,
+            start_time=1640995200,
+            timestamp=1640995200,
+            total_timer_time=3600.0,
+            total_elapsed_time=3600.0,
+            total_distance=10000.0,
+            user_id="test-user-id",
+        )
+
+        self.assertIsNone(estimate_running_tss(activity, threshold_hr=170.0))
+
+    def test_estimate_running_tss_returns_none_without_threshold(self):
+        self.running_activity.avg_heart_rate = 150.0
+        self.assertIsNone(
+            estimate_running_tss(self.running_activity, threshold_hr=None)
+        )
+        self.assertIsNone(estimate_running_tss(self.running_activity, threshold_hr=0))
+
+    def test_estimate_running_tss_returns_none_for_non_running(self):
+        self.cycling_activity.avg_heart_rate = 150.0
+        self.assertIsNone(
+            estimate_running_tss(self.cycling_activity, threshold_hr=170.0)
+        )
 
     def test_calculate_fitness_and_weekly_data_empty_activities(self):
         """Test calculate_fitness_and_weekly_data with no activities"""

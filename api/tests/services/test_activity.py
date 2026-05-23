@@ -19,7 +19,9 @@ class TestActivityService:
 
     @pytest.fixture
     def mock_zone_service(self):
-        return Mock()
+        service = Mock()
+        service.get_threshold_hr.return_value = None
+        return service
 
     @pytest.fixture
     def mock_notification_service(self):
