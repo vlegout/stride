@@ -25,7 +25,7 @@ dev = [
     "ruff>=0.15.13",
     "types-pyyaml>=6.0.12.20260510",
     "types-boto3>=1.43.10",
-    "ty>=0.0.36",
+    "ty>=0.0.37",
     "hypothesis>=6.152.8",
     "types-shapely>=2.1.0.20260508",
 ]
