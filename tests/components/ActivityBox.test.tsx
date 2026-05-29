@@ -112,8 +112,23 @@ describe("ActivityBox", () => {
     expect(screen.queryByTestId("map-mapbox")).not.toBeInTheDocument();
   });
 
-  it("does not render map when tracepoints are absent", () => {
-    const activity = createMockActivity({ tracepoints: undefined });
+  it("does not render map when tracepoints has only 1 point", () => {
+    const activity = createMockActivity({
+      tracepoints: [
+        {
+          lat: 48.85,
+          lon: 2.35,
+          timestamp: "2024-01-01T00:00:00Z",
+          distance: 0,
+          heart_rate: 150,
+          speed: 10,
+          cadence: null,
+          power: null,
+          altitude: 100,
+          temperature: null,
+        },
+      ],
+    });
     renderWithProviders(<ActivityBox activity={activity} />);
     expect(screen.queryByTestId("map-leaflet")).not.toBeInTheDocument();
   });
