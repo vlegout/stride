@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ActivityBox from "../../src/components/ActivityBox";
 import type { Activity } from "../../src/types";
 
@@ -121,8 +121,30 @@ describe("ActivityBox", () => {
   it("renders map when tracepoints has 2 or more points", () => {
     const activity = createMockActivity({
       tracepoints: [
-        { lat: 48.85, lon: 2.35, timestamp: "2024-01-01T00:00:00Z", distance: 0, heart_rate: 150, speed: 10, cadence: null, power: null, altitude: 100, temperature: null },
-        { lat: 48.86, lon: 2.36, timestamp: "2024-01-01T00:01:00Z", distance: 100, heart_rate: 155, speed: 11, cadence: null, power: null, altitude: 101, temperature: null },
+        {
+          lat: 48.85,
+          lon: 2.35,
+          timestamp: "2024-01-01T00:00:00Z",
+          distance: 0,
+          heart_rate: 150,
+          speed: 10,
+          cadence: null,
+          power: null,
+          altitude: 100,
+          temperature: null,
+        },
+        {
+          lat: 48.86,
+          lon: 2.36,
+          timestamp: "2024-01-01T00:01:00Z",
+          distance: 100,
+          heart_rate: 155,
+          speed: 11,
+          cadence: null,
+          power: null,
+          altitude: 101,
+          temperature: null,
+        },
       ],
     });
     renderWithProviders(<ActivityBox activity={activity} />);
