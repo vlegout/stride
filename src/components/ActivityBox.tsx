@@ -1,26 +1,24 @@
-import { Link } from "react-router-dom";
-import MuiLink from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Badge from "@mui/material/Badge";
 import EditIcon from "@mui/icons-material/Edit";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import Badge from "@mui/material/Badge";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import MuiLink from "@mui/material/Link";
 import { useTheme } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useState } from "react";
-
-import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
-import type { Activity } from "../types";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../store";
-
-import MapComponent from "./Map";
-import MapOLComponent from "./MapOL";
-import MapMapbox from "./MapMapbox";
+import type { Activity } from "../types";
+import { formatDateTime, formatDistance, formatDuration, formatSpeed } from "../utils";
 import ActivityLogo from "./ActivityLogo";
 import EditActivityModal from "./EditActivityModal";
-import { StatsCard, PageHeader } from "./ui";
+import MapComponent from "./Map";
+import MapMapbox from "./MapMapbox";
+import MapOLComponent from "./MapOL";
+import { PageHeader, StatsCard } from "./ui";
 
 interface ActivityBoxProps {
   activity: Activity;
@@ -78,9 +76,11 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
     </Box>
   );
 
+  const hasMap = mapPoints.length >= 2 && activity.sport !== "swimming";
+
   return (
     <Grid container spacing={isMobile ? 1 : 2} sx={{ marginBottom: isMobile ? "16px" : "20px" }}>
-      <Grid size={{ xs: 12, md: 6 }}>
+      <Grid size={{ xs: 12, md: hasMap ? 6 : 12 }}>
         {title}
         <Grid container spacing={1} sx={{ marginTop: "10px", marginBottom: "10px" }}>
           <Grid size={isSmall ? 2 : 1}>
@@ -210,35 +210,35 @@ const ActivityBox = ({ activity, isDetailed = false }: ActivityBoxProps) => {
           )}
         </Grid>
       </Grid>
-      <Grid size={{ xs: 12, md: 6 }} sx={{ minHeight: isMobile ? "250px" : "auto" }}>
-        {mapPoints.length >= 2 && activity.sport !== "swimming" && mapProvider === "leaflet" ? (
-          <MapComponent
-            bounds={[
-              [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
-              [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
-            ]}
-            points={mapPoints}
-          />
-        ) : mapPoints.length >= 2 && activity.sport !== "swimming" && mapProvider === "openlayers" ? (
-          <MapOLComponent
-            bounds={[
-              [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
-              [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
-            ]}
-            points={mapPoints}
-          />
-        ) : mapPoints.length >= 2 && activity.sport !== "swimming" ? (
-          <MapMapbox
-            bounds={[
-              [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
-              [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
-            ]}
-            points={mapPoints}
-          />
-        ) : (
-          <Box></Box>
-        )}
-      </Grid>
+      {hasMap && (
+        <Grid size={{ xs: 12, md: 6 }} sx={{ minHeight: isMobile ? "250px" : "auto" }}>
+          {mapProvider === "leaflet" ? (
+            <MapComponent
+              bounds={[
+                [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
+                [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
+              ]}
+              points={mapPoints}
+            />
+          ) : mapProvider === "openlayers" ? (
+            <MapOLComponent
+              bounds={[
+                [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
+                [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
+              ]}
+              points={mapPoints}
+            />
+          ) : (
+            <MapMapbox
+              bounds={[
+                [activity.lat - activity.delta_lat, activity.lon - activity.delta_lon],
+                [activity.lat + activity.delta_lat, activity.lon + activity.delta_lon],
+              ]}
+              points={mapPoints}
+            />
+          )}
+        </Grid>
+      )}
       {isDetailed && (
         <EditActivityModal open={editModalOpen} onClose={() => setEditModalOpen(false)} activity={activity} />
       )}
