@@ -59,7 +59,7 @@
     "@types/luxon": "^3.7.1",
     "@types/mapbox-gl": "^3.5.0",
     "@types/node": "^25.9.1",
-    "@types/react": "^19.2.16",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/browser": "^4.1.8",
