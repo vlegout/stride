@@ -67,7 +67,7 @@
     "@vitest/coverage-istanbul": "^4.1.2",
     "@vitest/coverage-v8": "^4.1.8",
     "@vitest/ui": "^4.1.7",
-    "baseline-browser-mapping": "^2.10.33",
+    "baseline-browser-mapping": "^2.10.34",
     "chromatic": "^17.2.0",
     "jsdom": "^29.1.1",
     "nyc": "^18.0.0",
