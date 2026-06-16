@@ -25,6 +25,11 @@ export default defineConfig({
           exclude: ["**/node_modules/**", "**/e2e/**"],
           globals: false,
           setupFiles: ["./tests/setup.ts"],
+          server: {
+            deps: {
+              inline: ["@mui/material"],
+            },
+          },
         },
       },
       // Storybook tests
