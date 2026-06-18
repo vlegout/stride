@@ -2,7 +2,7 @@ FROM python:3.13-alpine AS builder
 
 WORKDIR /code
 
-RUN apk add --no-cache postgresql-dev
+RUN apk add --no-cache postgresql-dev gcc musl-dev
 
 RUN pip install --no-cache-dir uv
 
