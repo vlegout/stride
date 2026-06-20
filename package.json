@@ -50,7 +50,7 @@
     "@chromatic-com/storybook": "^5.2.1",
     "@playwright/test": "^1.60.0",
     "@storybook/addon-docs": "^10.4.4",
-    "@storybook/addon-vitest": "^10.4.3",
+    "@storybook/addon-vitest": "^10.4.4",
     "@storybook/react": "^10.4.3",
     "@storybook/react-vite": "^10.4.4",
     "@testing-library/jest-dom": "^6.9.1",
