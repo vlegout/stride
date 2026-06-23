@@ -48,7 +48,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.0",
     "@chromatic-com/storybook": "^5.2.1",
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.61.0",
     "@storybook/addon-docs": "^10.4.5",
     "@storybook/addon-vitest": "^10.4.4",
     "@storybook/react": "^10.4.3",
