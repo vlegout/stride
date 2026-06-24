@@ -42,7 +42,7 @@
     "react-dom": "^19.2.7",
     "react-konva": "^19.2.5",
     "react-leaflet": "^5.0.0",
-    "react-router-dom": "^7.17.0",
+    "react-router-dom": "^7.18.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
