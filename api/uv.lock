@@ -99,7 +99,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "alembic", specifier = ">=1.17.2" },
-    { name = "hypothesis", specifier = ">=6.155.5" },
+    { name = "hypothesis", specifier = ">=6.155.6" },
     { name = "maturin", specifier = ">=1.13.3" },
     { name = "mypy", specifier = ">=2.1.0" },
     { name = "pydantic-settings", specifier = ">=2.14.2" },
@@ -527,14 +527,14 @@ wheels = [
 
 [[package]]
 name = "hypothesis"
-version = "6.155.5"
+version = "6.155.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "sortedcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/da/7e6cca4f0ad6b2f3a2380d72993ad3482c8ecb126f0908af26d2427455a1/hypothesis-6.155.5.tar.gz", hash = "sha256:f7f8f803e05a69cd70399b07ed89a89b673c9ff3530977c4a768ed3acb702169", size = 478083, upload-time = "2026-06-18T19:23:04.405Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/10/aa/9a91a4addf285702a98713da44b3581799539426436617bfb8914478c166/hypothesis-6.155.6.tar.gz", hash = "sha256:7569e1897690336c85d49d8391b49ec6ab83d951009515bfc29faebbac286cf5", size = 478038, upload-time = "2026-06-19T13:21:23.379Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2e/db/04b7cfc3cc6d49eecc6a390e61c5b941a0a32a98884fdf0701228a9b9c4f/hypothesis-6.155.5-py3-none-any.whl", hash = "sha256:b0eb5645f4c962dffdafef36d05329aa704a5322ee1273495fa98d5a986daf70", size = 544524, upload-time = "2026-06-18T19:23:02.975Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/a9/4c17e962c2e9cbc314bb579ed2e2b2da45d7b6b942aab6948d14d85abfea/hypothesis-6.155.6-py3-none-any.whl", hash = "sha256:a96d9a29f6bbc8ccac39dd84e140892da76765464929f401a4181b90c20c9ad1", size = 544521, upload-time = "2026-06-19T13:21:20.934Z" },
 ]
 
 [[package]]
