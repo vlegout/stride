@@ -44,8 +44,8 @@ class TestActivityService:
             zone_service=mock_zone_service,
             notification_service=mock_notification_service,
         )
-        service.performance.calculate_running_performances = Mock(return_value=[])  # type: ignore
-        service.performance.calculate_cycling_performances = Mock(return_value=[])  # type: ignore
+        service.performance.calculate_running_performances = Mock(return_value=[])
+        service.performance.calculate_cycling_performances = Mock(return_value=[])
         return service
 
     @pytest.fixture

@@ -16,7 +16,7 @@ class ProfileService:
     def get_user_profile(self, user_id: str) -> Profile:
         current_date = datetime.datetime.now()
 
-        overall_stats = self.session.execute(
+        overall_stats = self.session.execute(  # ty: ignore[deprecated]
             text("""
                 SELECT
                     COUNT(*) as total_activities,
@@ -31,7 +31,7 @@ class ProfileService:
             """).bindparams(user_id=user_id)
         ).one()
 
-        yearly_stats = self.session.execute(
+        yearly_stats = self.session.execute(  # ty: ignore[deprecated]
             text("""
                 SELECT
                     EXTRACT(YEAR FROM TO_TIMESTAMP(start_time)) as year,
