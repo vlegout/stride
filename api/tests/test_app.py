@@ -553,7 +553,7 @@ def _make_activity(**overrides):
         "zone_heart_rates": [],
     }
     defaults.update(overrides)
-    return Activity(**defaults)  # ty: ignore[invalid-argument-type]
+    return Activity(**defaults)
 
 
 def _make_user(**overrides):
