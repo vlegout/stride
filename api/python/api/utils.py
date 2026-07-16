@@ -554,9 +554,9 @@ def create_default_zones(session: Session, user_id: str):
     for zone_data in default_zones:
         zone = Zone(
             user_id=user_id,
-            index=zone_data["index"],  # ty: ignore[invalid-argument-type]
+            index=zone_data["index"],
             type=zone_data["type"],  # ty: ignore[invalid-argument-type]
-            max_value=zone_data["max_value"],  # ty: ignore[invalid-argument-type]
+            max_value=zone_data["max_value"],
         )
         session.add(zone)
 
