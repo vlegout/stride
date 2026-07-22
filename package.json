@@ -46,7 +46,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.3",
+    "@biomejs/biome": "^2.5.4",
     "@chromatic-com/storybook": "^5.2.1",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-docs": "^10.5.0",
