@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 
-from api.model import Activity, Lap, Tracepoint, Performance, PerformancePower, Zone
+from api.model import Activity, Lap, Performance, PerformancePower, Tracepoint, Zone
 from api.utils import (
     _calculate_heart_rate_zones,
     _calculate_pace_zones,

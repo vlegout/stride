@@ -2,9 +2,10 @@ import math
 import os
 import uuid
 
-from pydantic import field_validator, ValidationInfo
+from pydantic import ValidationInfo, field_validator
 from sqlmodel import Session
 
+import api.api
 from api.model import (
     Activity,
     ActivityBase,
@@ -14,14 +15,12 @@ from api.model import (
     TracepointBase,
 )
 from api.utils import (
+    METERS_PER_DEGREE,
+    get_activity_location,
+    get_delta_lat_lon,
     get_lat_lon,
     get_uuid,
-    get_delta_lat_lon,
-    get_activity_location,
-    METERS_PER_DEGREE,
 )
-
-import api.api
 
 SPEED_MS_TO_KMH = 3.6
 SPEED_CONVERSION_DIVISOR = 1000.0

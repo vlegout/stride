@@ -22,7 +22,7 @@ jobs:
       - uses: astral-sh/ruff-action@v3
         with:
           src: api
-          version: 0.15.21
+          version: 0.16.0
       - run: ruff format
       - run: ruff check
 

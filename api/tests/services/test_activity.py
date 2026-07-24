@@ -3,7 +3,6 @@ import uuid
 from unittest.mock import Mock, patch
 
 import pytest
-
 from api.model import Activity, Lap, Performance, PerformancePower, Tracepoint
 from api.services.activity import ActivityService
 

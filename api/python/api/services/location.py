@@ -4,7 +4,7 @@ import uuid
 import httpx
 from sqlmodel import Session, col, select
 
-from api.model import Location, Activity, Tracepoint
+from api.model import Activity, Location, Tracepoint
 
 
 class LocationService:

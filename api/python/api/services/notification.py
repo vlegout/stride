@@ -9,15 +9,15 @@ from api.utils import (
     DISTANCE_1MILE,
     DISTANCE_5KM,
     DISTANCE_10KM,
-    DISTANCE_HALF_MARATHON,
     DISTANCE_FULL_MARATHON,
-    DURATION_5S,
-    DURATION_1MIN,
-    DURATION_5MIN,
-    DURATION_20MIN,
+    DISTANCE_HALF_MARATHON,
     DURATION_1HR,
+    DURATION_1MIN,
     DURATION_2HR,
     DURATION_4HR,
+    DURATION_5MIN,
+    DURATION_5S,
+    DURATION_20MIN,
 )
 
 
@@ -146,24 +146,23 @@ class NotificationService:
                     rank = (
                         bisect.bisect_left(yearly_times_sorted, current_perf.time) + 1
                     )
-                    if rank <= 5:
-                        # Only create yearly notification if not already created all-time
-                        if not any(
-                            n.type == "best_effort_all_time"
-                            and n.distance == target_distance
-                            for n in notifications
-                        ):
-                            notifications.append(
-                                Notification(
-                                    activity_id=activity.id,
-                                    type="best_effort_yearly",
-                                    distance=target_distance,
-                                    duration=current_perf.time,
-                                    achievement_year=current_year,
-                                    rank=rank,
-                                    message="",
-                                )
+                    # Only create yearly notification if not already created all-time
+                    if rank <= 5 and not any(
+                        n.type == "best_effort_all_time"
+                        and n.distance == target_distance
+                        for n in notifications
+                    ):
+                        notifications.append(
+                            Notification(
+                                activity_id=activity.id,
+                                type="best_effort_yearly",
+                                distance=target_distance,
+                                duration=current_perf.time,
+                                achievement_year=current_year,
+                                rank=rank,
+                                message="",
                             )
+                        )
 
         return notifications
 
@@ -303,23 +302,22 @@ class NotificationService:
                         )
                         + 1
                     )
-                    if rank <= 5:
-                        # Only create yearly notification if not already created all-time
-                        if not any(
-                            n.type == "best_effort_all_time"
-                            and n.duration == target_duration
-                            for n in notifications
-                        ):
-                            notifications.append(
-                                Notification(
-                                    activity_id=activity.id,
-                                    type="best_effort_yearly",
-                                    duration=target_duration,
-                                    power=current_perf.power,
-                                    achievement_year=current_year,
-                                    rank=rank,
-                                    message="",
-                                )
+                    # Only create yearly notification if not already created all-time
+                    if rank <= 5 and not any(
+                        n.type == "best_effort_all_time"
+                        and n.duration == target_duration
+                        for n in notifications
+                    ):
+                        notifications.append(
+                            Notification(
+                                activity_id=activity.id,
+                                type="best_effort_yearly",
+                                duration=target_duration,
+                                power=current_perf.power,
+                                achievement_year=current_year,
+                                rank=rank,
+                                message="",
                             )
+                        )
 
         return notifications

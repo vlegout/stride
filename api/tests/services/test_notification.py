@@ -3,7 +3,6 @@ import uuid
 from unittest.mock import Mock
 
 import pytest
-
 from api.model import Activity, Performance, PerformancePower
 from api.services.notification import NotificationService
 

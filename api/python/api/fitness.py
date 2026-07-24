@@ -2,13 +2,15 @@ import datetime
 import uuid
 from collections import defaultdict
 from typing import Any
-from sqlmodel import Session, select, col
+
+from sqlmodel import Session, col, select
+
 from api.model import (
     Activity,
-    Ftp,
     ActivityZoneHeartRate,
     ActivityZonePace,
     ActivityZonePower,
+    Ftp,
     Zone,
 )
 
@@ -105,10 +107,11 @@ def calculate_activity_score(activity, sport_filter=None):
     # Power/intensity contribution - minimal
     if activity.training_stress_score:
         activity_score += activity.training_stress_score * 0.005
-    elif activity.avg_power and activity.sport == "cycling":
-        # Rough TSS estimation for cycling without TSS
-        if activity.avg_power > 200:
-            activity_score += (activity.avg_power - 200) * 0.0005 * duration_hours
+    # Rough TSS estimation for cycling without TSS
+    elif (
+        activity.avg_power and activity.sport == "cycling" and activity.avg_power > 200
+    ):
+        activity_score += (activity.avg_power - 200) * 0.0005 * duration_hours
 
     return activity_score
 

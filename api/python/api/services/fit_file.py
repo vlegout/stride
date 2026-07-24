@@ -45,7 +45,7 @@ class FitFileService:
                     os.makedirs(os.path.dirname(path), exist_ok=True)
                     self.storage_service.download_file(s3_key, path)
                     return path
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001
                     logger.debug(
                         f"Failed to download {s3_key} from object storage: {e}"
                     )

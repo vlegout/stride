@@ -3,7 +3,6 @@ import uuid
 from unittest.mock import Mock
 
 import pytest
-
 from api.model import Activity, Tracepoint, Zone
 from api.services.zone import ZoneService
 

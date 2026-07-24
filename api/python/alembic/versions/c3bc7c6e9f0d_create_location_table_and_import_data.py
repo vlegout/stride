@@ -8,18 +8,17 @@ Create Date: 2025-06-22 10:23:35.043804
 
 import json
 import uuid
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "c3bc7c6e9f0d"
-down_revision: Union[str, Sequence[str], None] = "c7872b2cf926"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = "c7872b2cf926"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def parse_location(location_str: str) -> tuple[str | None, str | None, str | None]:

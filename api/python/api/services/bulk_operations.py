@@ -423,7 +423,7 @@ class BulkOperationService:
                     value = getattr(parsed_activity, field, None)
                     setattr(activity, field, value)
 
-                activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
+                activity.updated_at = datetime.datetime.now(datetime.UTC)
 
                 self.session.exec(
                     delete(Lap).where(col(Lap.activity_id) == activity.id)

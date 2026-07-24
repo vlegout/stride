@@ -316,11 +316,9 @@ def create_activity(
         )
         return ActivityPublic.model_validate(activity)
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         session.rollback()
-        raise HTTPException(
-            status_code=500, detail=f"Error processing FIT file: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Error processing FIT file: {e!s}")
     finally:
         try:
             os.unlink(temp_fit_path)
@@ -345,7 +343,7 @@ def delete_activity(
         raise HTTPException(status_code=404, detail="Activity not found")
 
     activity.status = "deleted"
-    activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
+    activity.updated_at = datetime.datetime.now(datetime.UTC)
     session.add(activity)
     session.commit()
 
@@ -371,7 +369,7 @@ def update_activity(
     for field, value in update_data.items():
         setattr(activity, field, value)
 
-    activity.updated_at = datetime.datetime.now(datetime.timezone.utc)
+    activity.updated_at = datetime.datetime.now(datetime.UTC)
 
     session.add(activity)
     session.commit()
@@ -754,7 +752,7 @@ def update_current_user(
             status_code=422, detail="At least one sport must be enabled"
         )
 
-    user.updated_at = datetime.datetime.now(datetime.timezone.utc)
+    user.updated_at = datetime.datetime.now(datetime.UTC)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -782,7 +780,7 @@ def google_auth(
             existing_user.last_name = user_data.last_name
             existing_user.email = user_data.email
             existing_user.google_picture = user_data.google_picture
-            existing_user.updated_at = datetime.datetime.now(datetime.timezone.utc)
+            existing_user.updated_at = datetime.datetime.now(datetime.UTC)
 
             session.add(existing_user)
             session.commit()
@@ -815,9 +813,9 @@ def google_auth(
 
             return GoogleAuthResponse(user=user_public, token=token)
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         session.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Database error: {e!s}")
 
 
 @app.get("/fitness/scores/")

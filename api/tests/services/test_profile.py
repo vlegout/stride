@@ -2,7 +2,6 @@ import datetime
 from unittest.mock import Mock
 
 import pytest
-
 from api.model import Profile, Zone, ZonePublic
 from api.services.profile import ProfileService
 

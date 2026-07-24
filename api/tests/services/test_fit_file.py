@@ -4,11 +4,10 @@ import uuid
 from unittest.mock import Mock, patch
 
 import pytest
-from sqlmodel import Session, create_engine
-from sqlmodel.pool import StaticPool
-
 from api.model import Activity, SQLModel
 from api.services.fit_file import FitFileService
+from sqlmodel import Session, create_engine
+from sqlmodel.pool import StaticPool
 
 
 @pytest.fixture

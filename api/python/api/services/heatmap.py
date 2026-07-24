@@ -85,7 +85,7 @@ class HeatmapService:
             select(Heatmap).where(Heatmap.user_id == user_id)
         ).first()
 
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(datetime.UTC)
 
         if heatmap:
             heatmap.polylines = polylines

@@ -1,11 +1,10 @@
 import uuid
 
 import pytest
-from sqlmodel import Session, create_engine, select
-from sqlmodel.pool import StaticPool
-
 from api.model import Activity, SQLModel, User, Zone
 from api.services.bulk_operations import BulkOperationService
+from sqlmodel import Session, create_engine, select
+from sqlmodel.pool import StaticPool
 
 
 @pytest.fixture
@@ -136,8 +135,9 @@ def test_update_performance_powers_skips_activities_with_existing_powers(
     session.add(activity)
     session.commit()
 
-    from api.model import PerformancePower
     import datetime
+
+    from api.model import PerformancePower
 
     pp = PerformancePower(
         id=uuid.uuid4(),
@@ -209,6 +209,7 @@ def test_update_ftps_skips_activities_without_user(session, bulk_service):
 
 def test_update_ftps_skips_existing_ftp_records(session, bulk_service, test_user):
     import datetime
+
     from api.model import Ftp
 
     activity = Activity(
