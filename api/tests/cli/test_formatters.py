@@ -3,9 +3,8 @@ import uuid
 from unittest.mock import Mock
 
 import pytest
-
 from api.cli.formatters import ActivityFormatter
-from api.model import Activity, Lap, Tracepoint, Performance, PerformancePower, Zone
+from api.model import Activity, Lap, Performance, PerformancePower, Tracepoint, Zone
 
 
 class TestActivityFormatter:

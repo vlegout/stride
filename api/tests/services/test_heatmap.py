@@ -3,7 +3,6 @@ import uuid
 from unittest.mock import Mock
 
 import pytest
-
 from api.model import Activity, Heatmap, Tracepoint
 from api.services.heatmap import HeatmapService
 
@@ -78,7 +77,7 @@ class TestHeatmapService:
     def test_get_heatmap_returns_heatmap_public(
         self, service, mock_session, sample_user_id
     ):
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(datetime.UTC)
         heatmap = Heatmap(
             id=uuid.uuid4(),
             user_id=sample_user_id,
@@ -219,7 +218,7 @@ class TestHeatmapService:
     def test_compute_heatmap_updates_existing_heatmap(
         self, service, mock_session, sample_user_id, sample_activity, sample_tracepoints
     ):
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(datetime.UTC)
         existing_heatmap = Heatmap(
             id=uuid.uuid4(),
             user_id=sample_user_id,

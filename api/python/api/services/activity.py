@@ -93,8 +93,8 @@ class ActivityService:
                 race=race,
             )
         except Exception as e:
-            raise Exception(
-                f"Failed to upload files for activity '{title}': {str(e)}"
+            raise RuntimeError(
+                f"Failed to upload files for activity '{title}': {e!s}"
             ) from e
 
         self.session.commit()

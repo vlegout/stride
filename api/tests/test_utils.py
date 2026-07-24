@@ -5,13 +5,12 @@ import uuid
 from unittest.mock import Mock, patch
 
 import pytest
-from hypothesis import assume, given
-from hypothesis import strategies as st
-from hypothesis.strategies import composite
-
 from api.model import Activity, Location, Tracepoint, Zone
 from api.services.storage import create_s3_client
 from api.utils import (
+    _calculate_heart_rate_zones,
+    _calculate_pace_zones,
+    _calculate_power_zones,
     calculate_activity_zone_data,
     create_default_zones,
     detect_best_effort_achievements,
@@ -21,10 +20,10 @@ from api.utils import (
     get_lat_lon,
     get_uuid,
     update_user_zones_from_activities,
-    _calculate_heart_rate_zones,
-    _calculate_pace_zones,
-    _calculate_power_zones,
 )
+from hypothesis import assume, given
+from hypothesis import strategies as st
+from hypothesis.strategies import composite
 
 
 @composite

@@ -3,12 +3,12 @@ import unittest
 import uuid
 from unittest.mock import Mock
 
-from api.model import Activity
 from api.fitness import (
     calculate_activity_score,
     calculate_fitness_and_weekly_data,
     estimate_running_tss,
 )
+from api.model import Activity
 
 
 class TestFitness(unittest.TestCase):

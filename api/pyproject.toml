@@ -22,7 +22,7 @@ dev = [
     "pydantic-settings>=2.14.2",
     "pytest>=9.1.1",
     "pytest-cov>=7.0.0",
-    "ruff>=0.15.21",
+    "ruff>=0.16.0",
     "types-pyyaml>=6.0.12.20260518",
     "types-boto3>=1.43.47",
     "ty>=0.0.59",
@@ -33,6 +33,12 @@ dev = [
 [build-system]
 requires = ["maturin>=1.13.3,<2.0"]
 build-backend = "maturin"
+
+[tool.ruff.lint]
+ignore = ["DTZ"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.File"]
 
 [tool.coverage.run]
 relative_files = true

@@ -1,10 +1,9 @@
 from unittest.mock import Mock, patch
 
 import pytest
-from botocore.exceptions import ClientError
-
 from api.services.exceptions import StorageServiceError
 from api.services.storage import StorageService
+from botocore.exceptions import ClientError
 
 
 class TestStorageService:

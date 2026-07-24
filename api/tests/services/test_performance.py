@@ -2,7 +2,6 @@ import datetime
 import uuid
 
 import pytest
-
 from api.model import Activity, Tracepoint
 from api.services.performance import PerformanceService
 

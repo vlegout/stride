@@ -4,11 +4,10 @@ from unittest.mock import Mock, patch
 
 import httpx
 import pytest
+from api.model import Activity, Location, SQLModel, Tracepoint
+from api.services.location import LocationService
 from sqlmodel import Session, create_engine, select
 from sqlmodel.pool import StaticPool
-
-from api.model import Activity, Location, Tracepoint, SQLModel
-from api.services.location import LocationService
 
 
 @pytest.fixture

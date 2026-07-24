@@ -18,10 +18,10 @@ class UserBase(SQLModel):
     cycling_enabled: bool = Field(default=True)
     swimming_enabled: bool = Field(default=True)
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
     updated_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
 
     @field_validator("map")
@@ -128,10 +128,10 @@ class ActivityBase(SQLModel):
     user_id: str | None = Field(foreign_key="user.id", default=None)
 
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
     updated_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
 
 
@@ -231,7 +231,7 @@ class NotificationBase(SQLModel):
     rank: int | None = None
     message: str
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
 
     @model_validator(mode="after")
@@ -448,10 +448,10 @@ class HeatmapBase(SQLModel):
     activity_count: int = Field(default=0)
     point_count: int = Field(default=0)
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
     updated_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
 
 

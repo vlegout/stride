@@ -4,11 +4,7 @@ import json
 import os
 import unittest
 import uuid
-from unittest.mock import Mock, MagicMock, patch
-
-from fastapi import HTTPException
-from fastapi.testclient import TestClient
-from sqlmodel import Session
+from unittest.mock import MagicMock, Mock, patch
 
 from api.app import (
     app,
@@ -16,15 +12,18 @@ from api.app import (
     get_heatmap_service_dependency,
     get_profile_service_dependency,
 )
-from api.dependencies import get_session, get_current_user_id, verify_jwt_token
 from api.auth import create_token_response
+from api.dependencies import get_current_user_id, get_session, verify_jwt_token
 from api.model import (
     Activity,
-    HeatmapPublic,
     HeatmapPolyline,
+    HeatmapPublic,
     Profile,
     User,
 )
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 
 class TestApp(unittest.TestCase):
@@ -355,6 +354,7 @@ class TestActivityStatusFunctionality(unittest.TestCase):
         """Test that activity queries include status filtering logic"""
         # This test examines the source code to verify status filtering is implemented
         import inspect
+
         from api.app import read_activities, read_activity
 
         # Check that read_activities function includes status filtering
@@ -541,8 +541,8 @@ def _make_activity(**overrides):
         "subdivision": None,
         "country": "France",
         "user_id": "test-user-123",
-        "created_at": datetime.datetime.now(datetime.timezone.utc),
-        "updated_at": datetime.datetime.now(datetime.timezone.utc),
+        "created_at": datetime.datetime.now(datetime.UTC),
+        "updated_at": datetime.datetime.now(datetime.UTC),
         "laps": [],
         "performances": [],
         "performance_power": [],
@@ -566,8 +566,8 @@ def _make_user(**overrides):
         "google_id": "google-123",
         "google_picture": "http://example.com/pic.jpg",
         "map": "leaflet",
-        "created_at": datetime.datetime.now(datetime.timezone.utc),
-        "updated_at": datetime.datetime.now(datetime.timezone.utc),
+        "created_at": datetime.datetime.now(datetime.UTC),
+        "updated_at": datetime.datetime.now(datetime.UTC),
     }
     defaults.update(overrides)
     return User(**defaults)  # ty: ignore[invalid-argument-type]
@@ -1435,7 +1435,7 @@ class TestReadHeatmap(_AuthenticatedTestCase):
             ],
             activity_count=5,
             point_count=100,
-            updated_at=datetime.datetime.now(datetime.timezone.utc),
+            updated_at=datetime.datetime.now(datetime.UTC),
         )
         mock_service = MagicMock()
         mock_service.get_heatmap.return_value = mock_heatmap

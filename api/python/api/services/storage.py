@@ -58,7 +58,7 @@ class StorageService:
             self.client.upload_file(file_path, self.bucket, s3_key)
         except ClientError as e:
             raise StorageServiceError(
-                f"Failed to upload file to object storage: {str(e)}"
+                f"Failed to upload file to object storage: {e!s}"
             ) from e
 
     def upload_content(
@@ -76,7 +76,7 @@ class StorageService:
             )
         except ClientError as e:
             raise StorageServiceError(
-                f"Failed to upload content to object storage: {str(e)}"
+                f"Failed to upload content to object storage: {e!s}"
             ) from e
 
     def download_file(self, s3_key: str, local_path: str) -> None:
@@ -89,5 +89,5 @@ class StorageService:
                     f"File not found in object storage: {s3_key}"
                 ) from e
             raise StorageServiceError(
-                f"Failed to download file from object storage: {str(e)}"
+                f"Failed to download file from object storage: {e!s}"
             ) from e

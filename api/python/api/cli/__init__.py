@@ -3,7 +3,6 @@ import json
 import os
 
 import typer
-
 from sqlmodel import Session, SQLModel, select
 
 from api.cli.formatters import ActivityFormatter
@@ -98,7 +97,7 @@ def create_db():
             input_file = future_activities[future]
             try:
                 future.result()
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 print(f"Error processing {input_file}: {e}")
 
     print("Done")
@@ -272,7 +271,7 @@ def recompute_activities(
         if download_from_s3:
             try:
                 storage_service = StorageService()
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 print(f"Warning: Could not initialize object storage: {e}")
                 print("Will only use local FIT files")
 

@@ -180,7 +180,7 @@ def detect_best_effort_achievements(
             Activity.status == "created",
             Activity.id != activity.id,
             Performance.distance.in_(list(current_perfs.keys())),  # type: ignore
-            Performance.time != None,  # noqa: E711
+            Performance.time != None,
         )
     )
     historical_results = session.exec(stmt).all()

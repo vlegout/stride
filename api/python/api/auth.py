@@ -1,7 +1,7 @@
 import datetime
 
-from fastapi import HTTPException, status
 import jwt
+from fastapi import HTTPException, status
 from jwt.exceptions import PyJWTError
 from pydantic import BaseModel
 
@@ -44,7 +44,7 @@ def verify_token(token: str) -> TokenData:
 
 
 def create_token_response(user_id: str, email: str) -> Token:
-    expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+    expire = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
         minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES
     )
 

@@ -3,9 +3,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from fastapi import HTTPException
 import jwt
-
 from api.auth import (
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
     JWT_ALGORITHM,
@@ -15,6 +13,7 @@ from api.auth import (
     create_token_response,
     verify_token,
 )
+from fastapi import HTTPException
 
 
 class TestAuth(unittest.TestCase):
@@ -67,16 +66,14 @@ class TestAuth(unittest.TestCase):
 
     def test_create_token_response_expiration(self):
         """Test that token expiration is set correctly"""
-        before_creation = datetime.datetime.now(datetime.timezone.utc)
+        before_creation = datetime.datetime.now(datetime.UTC)
         token = create_token_response(self.test_user_id, self.test_email)
-        after_creation = datetime.datetime.now(datetime.timezone.utc)
+        after_creation = datetime.datetime.now(datetime.UTC)
 
         payload = jwt.decode(
             token.access_token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM]
         )
-        token_exp = datetime.datetime.fromtimestamp(
-            payload["exp"], datetime.timezone.utc
-        )
+        token_exp = datetime.datetime.fromtimestamp(payload["exp"], datetime.UTC)
 
         # Account for JWT timestamp precision (seconds only, no microseconds)
         expected_exp_min = (
@@ -106,9 +103,7 @@ class TestAuth(unittest.TestCase):
         """Test verify_token with token signed with wrong key"""
         # Create token with different secret
         wrong_secret = "wrong-secret-key"
-        expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
-            minutes=30
-        )
+        expire = datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=30)
 
         malformed_token = jwt.encode(
             {"sub": self.test_user_id, "email": self.test_email, "exp": expire},
@@ -125,9 +120,9 @@ class TestAuth(unittest.TestCase):
     def test_verify_token_expired_token(self):
         """Test verify_token with expired token"""
         # Create an expired token
-        expired_time = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(minutes=1)
+        expired_time = datetime.datetime.now(datetime.UTC) - datetime.timedelta(
+            minutes=1
+        )
 
         expired_token = jwt.encode(
             {"sub": self.test_user_id, "email": self.test_email, "exp": expired_time},
@@ -143,9 +138,7 @@ class TestAuth(unittest.TestCase):
 
     def test_verify_token_missing_subject(self):
         """Test verify_token with token missing 'sub' field"""
-        expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
-            minutes=30
-        )
+        expire = datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=30)
 
         token_without_sub = jwt.encode(
             {"email": self.test_email, "exp": expire},  # Missing 'sub'
@@ -177,9 +170,7 @@ class TestAuth(unittest.TestCase):
 
     def test_verify_token_optional_email(self):
         """Test verify_token works with token that has no email field"""
-        expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
-            minutes=30
-        )
+        expire = datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=30)
 
         token_without_email = jwt.encode(
             {"sub": self.test_user_id, "exp": expire},  # No email field
