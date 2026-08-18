@@ -16,7 +16,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "alembic>=1.19.0",
+    "alembic>=1.19.1",
     "maturin>=1.13.3",
     "mypy>=2.3.0",
     "pydantic-settings>=2.15.0",
