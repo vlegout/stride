@@ -107,7 +107,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "ruff", specifier = ">=0.16.3" },
     { name = "ty", specifier = ">=0.0.73" },
-    { name = "types-boto3", specifier = ">=1.43.73" },
+    { name = "types-boto3", specifier = ">=1.43.75" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20260815" },
     { name = "types-shapely", specifier = ">=2.1.0.20260728" },
 ]
@@ -1464,15 +1464,15 @@ wheels = [
 
 [[package]]
 name = "types-boto3"
-version = "1.43.73"
+version = "1.43.75"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore-stubs" },
     { name = "types-s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/4b/64a83ec8441c592e947e622243eba6a147d58ae3322807b7d8b3402f8a1b/types_boto3-1.43.73.tar.gz", hash = "sha256:c487e6fc696a4d8d508266e72e3d8cb5152327ea19c1477a41b2ba422eed5cd8", size = 104647, upload-time = "2026-08-17T20:45:12.06Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/44/1f/779fe6fd54d291bdabf9b7368e7f485065d073119ef791f52c1d86d5133a/types_boto3-1.43.75.tar.gz", hash = "sha256:b2872dba3f112126683aa0c8b54f24f4a2b06dcbcf2b0a1969330be411ce79ce", size = 104648, upload-time = "2026-08-19T20:15:29.12Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e7/8f/b96fa03fe83d8a0f1b24c03c567e125863f149e859de9403db94a4ebec8c/types_boto3-1.43.73-py3-none-any.whl", hash = "sha256:2bec9f1d041b82f0105daa49b7875daaae15d46ed6934d50cbfabf4da7090ee6", size = 71270, upload-time = "2026-08-17T20:45:09.203Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/9e/529edcde5bb44bbb61bc42fe051070b2cf98d718131a5e819eef162842d5/types_boto3-1.43.75-py3-none-any.whl", hash = "sha256:9fc6105e56c1eb62e0e5709dd5a4e3fde8df15f0713f420e519d7af32bc34310", size = 71275, upload-time = "2026-08-19T20:15:25.341Z" },
 ]
 
 [[package]]
