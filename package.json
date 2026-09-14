@@ -40,7 +40,7 @@
     "react": "^19.2.8",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.8",
-    "react-konva": "^19.2.5",
+    "react-konva": "^19.2.6",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.18.3",
     "zustand": "^5.0.15"
