@@ -36,3 +36,8 @@ global.ResizeObserver = class MockResizeObserver implements ResizeObserver {
     // noop
   }
 };
+
+// jsdom >= 30.1 reports Document as focus relatedTarget, which MUI FocusTrap tries to refocus
+if (typeof (Document.prototype as { focus?: unknown }).focus !== "function") {
+  Object.defineProperty(Document.prototype, "focus", { value: () => undefined, configurable: true });
+}
