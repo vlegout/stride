@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import Any
 
 from sqlmodel import Session, select
 
@@ -266,7 +267,7 @@ class ZoneService:
                     self.session.add(zone)
 
     def create_default_zones(self, user_id: str):
-        default_zones = [
+        default_zones: list[dict[str, Any]] = [
             {"type": "heart_rate", "index": 1, "max_value": DEFAULT_HR_ZONE_1_MAX},
             {"type": "heart_rate", "index": 2, "max_value": DEFAULT_HR_ZONE_2_MAX},
             {"type": "heart_rate", "index": 3, "max_value": DEFAULT_HR_ZONE_3_MAX},
@@ -288,7 +289,7 @@ class ZoneService:
             zone = Zone(
                 user_id=user_id,
                 index=zone_data["index"],
-                type=zone_data["type"],  # ty: ignore[invalid-argument-type]
+                type=zone_data["type"],
                 max_value=zone_data["max_value"],
             )
             self.session.add(zone)

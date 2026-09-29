@@ -4,6 +4,7 @@ import os
 import random
 import string
 import uuid
+from typing import Any
 
 from sqlmodel import Session, select
 
@@ -482,7 +483,7 @@ def update_user_zones_from_activities(session: Session, user_id: str) -> None:
 
 def create_default_zones(session: Session, user_id: str):
     """Create default zones for a new user"""
-    default_zones = [
+    default_zones: list[dict[str, Any]] = [
         # Heart rate zones (typical zones based on max HR)
         {
             "type": "heart_rate",
@@ -555,7 +556,7 @@ def create_default_zones(session: Session, user_id: str):
         zone = Zone(
             user_id=user_id,
             index=zone_data["index"],
-            type=zone_data["type"],  # ty: ignore[invalid-argument-type]
+            type=zone_data["type"],
             max_value=zone_data["max_value"],
         )
         session.add(zone)
