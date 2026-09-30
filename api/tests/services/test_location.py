@@ -150,7 +150,7 @@ def test_update_activity_location_success(session, location_service):
     tracepoint = Tracepoint(
         id=uuid.uuid4(),
         activity_id=activity_id,
-        timestamp=datetime.datetime.fromtimestamp(1234567890),
+        timestamp=datetime.datetime.fromtimestamp(1234567890, datetime.UTC),
         lat=37.7749,
         lon=-122.4194,
         distance=0,
