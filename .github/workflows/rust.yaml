@@ -4,6 +4,13 @@ on:
   push:
     branches: [main]
   pull_request:
+    paths:
+      - 'api/src/**'
+      - 'api/Cargo.*'
+      - 'api/pyproject.toml'
+      - 'api/uv.lock'
+      - 'api/python/**'
+      - '.github/workflows/rust.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
