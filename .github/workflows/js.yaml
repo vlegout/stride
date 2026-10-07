@@ -13,6 +13,8 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'biome.json'
+      - '.storybook/**'
+      - '.nycrc.json'
       - 'tsconfig.json'
       - 'vite.config.ts'
       - 'vitest*.config.ts'

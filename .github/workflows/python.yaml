@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'api/**'
+      - '.pre-commit-config.yaml'
       - '.github/workflows/python.yaml'
 
 concurrency:
