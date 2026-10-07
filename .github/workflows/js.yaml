@@ -4,6 +4,23 @@ on:
   push:
     branches: [main]
   pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'biome.json'
+      - '.storybook/**'
+      - '.nycrc.json'
+      - 'tsconfig.json'
+      - 'vite.config.ts'
+      - 'vitest*.config.ts'
+      - 'playwright.config.ts'
+      - 'codecov.yml'
+      - '.github/workflows/js.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
