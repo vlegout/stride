@@ -6,7 +6,7 @@ import LegalSection from "../components/LegalSection";
 export default function TermsOfService() {
   return (
     <Box sx={{ width: "100%" }}>
-      <PageHeader title="Terms of Service" subtitle="Effective Date: January 4, 2026" />
+      <PageHeader title="Terms of Service" subtitle="Effective Date: October 10, 2026" />
       <SectionContainer maxWidth={{ xs: "100%", sm: "800px", md: "900px" }} centered variant="paper" elevation={2}>
         <Box sx={{ textAlign: "left" }}>
           <LegalSection title="1. Acceptance of Terms">
@@ -30,7 +30,6 @@ export default function TermsOfService() {
                   <li>Visualize running and cycling activities with interactive charts and maps</li>
                   <li>Analyze performance metrics including pace, heart rate, power, and training zones</li>
                   <li>Track fitness progress and best performances</li>
-                  <li>Sync activities from third-party services (such as Garmin Connect)</li>
                 </ul>
               </Typography>
             </Box>
@@ -169,7 +168,7 @@ export default function TermsOfService() {
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>
               <strong>Third-Party Services:</strong> We are not responsible for the availability, content, or actions of
-              third-party services (Google OAuth, Garmin Connect, Scaleway, etc.).
+              third-party services (Google OAuth, Scaleway, etc.).
             </Typography>
           </LegalSection>
 

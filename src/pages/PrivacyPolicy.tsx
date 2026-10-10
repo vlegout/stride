@@ -6,7 +6,7 @@ import LegalSection from "../components/LegalSection";
 export default function PrivacyPolicy() {
   return (
     <Box sx={{ width: "100%" }}>
-      <PageHeader title="Privacy Policy" subtitle="Last Updated: January 4, 2026" />
+      <PageHeader title="Privacy Policy" subtitle="Last Updated: October 10, 2026" />
       <SectionContainer maxWidth={{ xs: "100%", sm: "800px", md: "900px" }} centered variant="paper" elevation={2}>
         <Box sx={{ textAlign: "left" }}>
           <LegalSection title="1. Introduction">
@@ -235,13 +235,6 @@ export default function PrivacyPolicy() {
                       rel="noopener noreferrer"
                     >
                       Scaleway Privacy Policy
-                    </MuiLink>
-                    )
-                  </li>
-                  <li>
-                    <strong>Garmin Connect API</strong>: For activity sync (subject to{" "}
-                    <MuiLink href="https://www.garmin.com/privacy/" target="_blank" rel="noopener noreferrer">
-                      Garmin Privacy Policy
                     </MuiLink>
                     )
                   </li>
