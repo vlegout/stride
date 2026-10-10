@@ -9,6 +9,7 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
+    "generate:api": "uv --project api run python -m api.export_openapi > openapi.json && npx --yes openapi-typescript@7.13.0 openapi.json -o src/apiSchema.d.ts && rm openapi.json",
     "preview": "vite preview",
     "test": "vitest",
     "test:ci": "vitest run --project=unit --coverage --reporter=junit --outputFile=test-report.junit.xml --reporter=default && vitest run --project=storybook --coverage --coverage.reportsDirectory=./coverage-storybook --reporter=junit --outputFile=test-report-storybook.junit.xml --reporter=default",

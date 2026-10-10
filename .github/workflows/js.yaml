@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'src/**'
+      - 'api/python/**'
       - 'tests/**'
       - 'e2e/**'
       - 'public/**'
@@ -42,6 +43,13 @@ jobs:
       - run: npm install --include=dev
       - run: npx biome format .
       - run: npm run lint
+      - uses: astral-sh/setup-uv@v5
+      - name: Check generated API types are up to date
+        run: |
+          uv --project api sync
+          npm run generate:api
+          git diff --exit-code src/apiSchema.d.ts
+      - run: npm run typecheck
       - run: CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }} npm run build
       - name: Build Storybook
         if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
