@@ -11,7 +11,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "shapely>=2.1.2",
     "sqlmodel>=0.0.48",
-    "typer>=0.27.2",
+    "typer>=0.27.3",
 ]
 
 [dependency-groups]
