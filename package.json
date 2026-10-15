@@ -48,7 +48,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@chromatic-com/storybook": "^5.4.0",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@storybook/addon-docs": "^10.6.1",
     "@storybook/addon-vitest": "^10.6.1",
     "@storybook/react": "^10.6.1",
@@ -71,7 +71,7 @@
     "chromatic": "^18.11.0",
     "jsdom": "^30.1.2",
     "nyc": "^18.0.0",
-    "playwright": "^1.63.0",
+    "playwright": "^1.64.0",
     "storybook": "^10.6.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.3",
