@@ -66,7 +66,7 @@
     "@vitest/browser-playwright": "^5.0.3",
     "@vitest/coverage-istanbul": "^5.0.0",
     "@vitest/coverage-v8": "^5.0.0",
-    "@vitest/ui": "^5.0.0",
+    "@vitest/ui": "^5.0.5",
     "baseline-browser-mapping": "^2.11.28",
     "chromatic": "^18.12.1",
     "jsdom": "^30.1.2",
