@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import Box from "@mui/material/Box";
@@ -9,6 +8,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement
 
 import { fetchBestPerformances } from "../api";
 import { formatDistance, formatDuration } from "../utils";
+import { useBestStore } from "../store";
 import QueryBoundary from "../components/QueryBoundary";
 import PerformanceFilters from "../components/PerformanceFilters";
 import PowerProfileComparison from "../components/PowerProfileComparison";
@@ -17,10 +17,16 @@ import { PageHeader, DataTable, SectionContainer, SkeletonTable, type Column } f
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
 const Best = () => {
-  const [sport, setSport] = useState("running");
-  const [selectedDistance, setSelectedDistance] = useState("");
-  const [selectedTime, setSelectedTime] = useState("42.195");
-  const [selectedYear, setSelectedYear] = useState<string>("all");
+  const {
+    sport,
+    distance: selectedDistance,
+    time: selectedTime,
+    year: selectedYear,
+    setSport,
+    setDistance: setSelectedDistance,
+    setTime: setSelectedTime,
+    setYear: setSelectedYear,
+  } = useBestStore();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -35,17 +41,6 @@ const Best = () => {
         selectedYear === "all" ? undefined : Number(selectedYear),
       ),
   });
-
-  const handleSportChange = (newSport: string): void => {
-    setSport(newSport);
-    if (newSport === "cycling") {
-      setSelectedDistance("1");
-      setSelectedTime("");
-    } else {
-      setSelectedDistance("");
-      setSelectedTime("42.195");
-    }
-  };
 
   const columns: Column[] = [
     {
@@ -94,7 +89,7 @@ const Best = () => {
           selectedDistance={selectedDistance}
           selectedTime={selectedTime}
           selectedYear={selectedYear}
-          onSportChange={handleSportChange}
+          onSportChange={setSport}
           onDistanceChange={setSelectedDistance}
           onTimeChange={setSelectedTime}
           onYearChange={setSelectedYear}
