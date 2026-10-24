@@ -2,7 +2,7 @@ import datetime
 import os
 import tempfile
 import uuid
-from enum import Enum
+from enum import StrEnum
 
 from fastapi import (
     Depends,
@@ -386,13 +386,13 @@ def read_profile(
     return profile_service.get_user_profile(user_id)
 
 
-class Sport(str, Enum):
+class Sport(StrEnum):
     running = "running"
     cycling = "cycling"
     swimming = "swimming"
 
 
-class CyclingDistance(str, Enum):
+class CyclingDistance(StrEnum):
     one_minute = "1"
     five_minutes = "5"
     ten_minutes = "10"
@@ -402,7 +402,7 @@ class CyclingDistance(str, Enum):
     four_hours = "240"
 
 
-class RunningDistance(str, Enum):
+class RunningDistance(StrEnum):
     one_km = "1"
     five_km = "5"
     ten_km = "10"

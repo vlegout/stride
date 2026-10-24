@@ -35,7 +35,7 @@ class TestFit(unittest.TestCase):
             fit_service = FitFileService(mock_session)
             activity, _, _ = fit_service.read_fit_file(fit_path)
 
-            with open(json_path, "r") as f:
+            with open(json_path) as f:
                 data = json.load(f)
 
             self.maxDiff = None
