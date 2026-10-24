@@ -20,7 +20,7 @@ jobs:
   ruff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
       - uses: astral-sh/ruff-action@v3
@@ -33,11 +33,11 @@ jobs:
   typing:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: astral-sh/setup-uv@v5
-      - uses: actions/cache@v4
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/uv
           key: ${{ runner.os }}-uv-${{ hashFiles('api/uv.lock') }}
@@ -49,11 +49,11 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: actions/setup-python@v5
-      - uses: actions/cache@v4
+      - uses: actions/setup-python@v7
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/pre-commit
           key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
@@ -73,31 +73,31 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.14'
-      - uses: astral-sh/setup-uv@v5
-      - uses: actions/cache@v4
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/uv
           key: ${{ runner.os }}-uv-${{ hashFiles('api/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-uv-
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
           cache: true
           cache-workspaces: api
       - run: cd api && uv run maturin develop
       - run: cd api && DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test uv run python -m pytest --cov=api --cov-report=html --cov-report=term --cov-report=xml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: api/htmlcov/
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         if: ${{ !cancelled() }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -108,14 +108,14 @@ jobs:
     needs: [test]
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@v3
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           credentials_json: ${{ secrets.GCP_SA }}
-      - uses: google-github-actions/setup-gcloud@v2
+      - uses: google-github-actions/setup-gcloud@v3
       - run : gcloud auth configure-docker europe-west1-docker.pkg.dev
       - name: Generate image tag
         run: |
@@ -125,13 +125,13 @@ jobs:
         run: |
           docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ env.IMAGE_TAG }} api
           docker push europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ env.IMAGE_TAG }}
-      - uses: google-github-actions/deploy-cloudrun@v2
+      - uses: google-github-actions/deploy-cloudrun@v3
         with:
           region: europe-west1
           service: api
           image: europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/sport/api:${{ env.IMAGE_TAG }}
       - name: Login to Scaleway Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: rg.fr-par.scw.cloud/stride
           username: nologin
