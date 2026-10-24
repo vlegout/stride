@@ -58,7 +58,7 @@ class FitFileService:
     def read_fit_from_yaml(
         self, yaml_file: str
     ) -> tuple[Activity, list[Lap], list[Tracepoint]]:
-        with open(yaml_file, "r") as file:
+        with open(yaml_file) as file:
             config = yaml.safe_load(file)
 
         activity, laps, tracepoints = get_activity_from_fit(

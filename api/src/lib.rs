@@ -50,11 +50,11 @@ fn get_fit(file_name: &str) -> FitStruct {
     };
 
     for data in &fit_file.data {
-        match data {
-            FitMessage::Data(msg) => match msg.data.message_type {
+        if let FitMessage::Data(msg) = data {
+            match msg.data.message_type {
                 MessageType::DeviceInfo => {
                     for value in &msg.data.values {
-                        if value.field_num == 4 && fit.activity.device == "" {
+                        if value.field_num == 4 && fit.activity.device.is_empty() {
                             let device_id: u16 = extract_u16(&value.value);
                             fit.activity.device = Device::from_id(device_id).as_str().to_string();
                         }
@@ -194,7 +194,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                             }
                             9 => {
                                 fit.activity.total_distance = extract_u32(&value.value);
-                                fit.activity.total_distance = fit.activity.total_distance / 100;
+                                fit.activity.total_distance /= 100;
                             }
                             11 => {
                                 let raw_calories: u16 = extract_u16(&value.value);
@@ -338,8 +338,7 @@ fn get_fit(file_name: &str) -> FitStruct {
                     }
                 }
                 _ => {}
-            },
-            _ => {}
+            }
         }
     }
 

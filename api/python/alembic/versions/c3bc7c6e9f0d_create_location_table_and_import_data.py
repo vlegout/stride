@@ -65,7 +65,7 @@ def upgrade() -> None:
     )
 
     # Load and import data from locations.json
-    with open(data_file, "r") as f:
+    with open(data_file) as f:
         data = json.load(f)
 
     connection = op.get_bind()
