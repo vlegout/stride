@@ -236,6 +236,8 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ height: 300, width: "100%" }}>
               <Bar
+                role="img"
+                aria-label="Weekly Running Distance"
                 data={runningDistanceChartData}
                 options={createChartOptions("Weekly Running Distance", "Distance (km)")}
               />
@@ -243,12 +245,14 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ height: 300, width: "100%" }}>
-              <Bar data={runningTimeChartData} options={createChartOptions("Weekly Running Time", "Time (hours)")} />
+              <Bar role="img" aria-label="Weekly Running Time" data={runningTimeChartData} options={createChartOptions("Weekly Running Time", "Time (hours)")} />
             </Box>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ height: 300, width: "100%" }}>
               <Bar
+                role="img"
+                aria-label="Weekly Cycling Distance"
                 data={cyclingDistanceChartData}
                 options={createChartOptions("Weekly Cycling Distance", "Distance (km)")}
               />
@@ -256,12 +260,14 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ height: 300, width: "100%" }}>
-              <Bar data={cyclingTimeChartData} options={createChartOptions("Weekly Cycling Time", "Time (hours)")} />
+              <Bar role="img" aria-label="Weekly Cycling Time" data={cyclingTimeChartData} options={createChartOptions("Weekly Cycling Time", "Time (hours)")} />
             </Box>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ height: 300, width: "100%" }}>
               <Bar
+                role="img"
+                aria-label="Weekly Swimming Distance"
                 data={swimmingDistanceChartData}
                 options={createChartOptions("Weekly Swimming Distance", "Distance (km)")}
               />
@@ -269,7 +275,7 @@ const WeeklyMetricsCharts = ({ weeklyRunning, weeklyCycling, weeklySwimming }: W
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ height: 300, width: "100%" }}>
-              <Bar data={swimmingTimeChartData} options={createChartOptions("Weekly Swimming Time", "Time (hours)")} />
+              <Bar role="img" aria-label="Weekly Swimming Time" data={swimmingTimeChartData} options={createChartOptions("Weekly Swimming Time", "Time (hours)")} />
             </Box>
           </Grid>
         </Grid>

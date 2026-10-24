@@ -12,7 +12,7 @@ import { formatDistance, formatDuration } from "../utils";
 import QueryBoundary from "../components/QueryBoundary";
 import PerformanceFilters from "../components/PerformanceFilters";
 import PowerProfileComparison from "../components/PowerProfileComparison";
-import { PageHeader, DataTable, SectionContainer, type Column } from "../components/ui";
+import { PageHeader, DataTable, SectionContainer, SkeletonTable, type Column } from "../components/ui";
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
@@ -100,7 +100,7 @@ const Best = () => {
           onYearChange={setSelectedYear}
         />
 
-        <QueryBoundary query={query} loadingMessage="Loading best performances...">
+        <QueryBoundary query={query} loadingMessage="Loading best performances..." skeleton={<SkeletonTable rows={10} />}>
           {(data) => {
             const rows =
               data?.performances.map((performance, index) => ({

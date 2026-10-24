@@ -86,7 +86,7 @@ const FTPChart = ({ ftp }: FTPChartProps) => {
       </Box>
 
       <Box sx={{ height: 400, width: "100%" }}>
-        <Line data={ftpChartData} options={ftpChartOptions} />
+        <Line role="img" aria-label="FTP evolution over time" data={ftpChartData} options={ftpChartOptions} />
       </Box>
     </Box>
   );

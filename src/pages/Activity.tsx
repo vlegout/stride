@@ -10,6 +10,8 @@ import {
   Filler,
 } from "chart.js";
 
+import Box from "@mui/material/Box";
+import { SkeletonStats, SkeletonChart } from "../components/ui/Skeleton";
 import QueryBoundary from "../components/QueryBoundary";
 import ActivityPageView from "../components/ActivityPageView";
 
@@ -22,7 +24,15 @@ const ActivityPage = () => {
   const query = useActivityData(params.id as string);
 
   return (
-    <QueryBoundary query={query} loadingMessage="Loading activity...">
+    <QueryBoundary query={query} loadingMessage="Loading activity..."
+      skeleton={
+        <Box sx={{ p: 2, display: "grid", gap: 2 }}>
+          <SkeletonStats />
+          <SkeletonChart />
+          <SkeletonChart />
+        </Box>
+      }
+    >
       {(data) => <ActivityPageView data={data} />}
     </QueryBoundary>
   );

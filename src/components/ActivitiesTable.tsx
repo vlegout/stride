@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import MuiLink from "@mui/material/Link";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 
@@ -9,8 +10,7 @@ import { formatDateTime, formatDistance, formatSpeed } from "../utils";
 import type { Activity, ActivitiesQueryParams, Sport } from "../types";
 import ActivityLogo from "./ActivityLogo";
 import { useActivitiesStore } from "../store";
-import LoadingIndicator from "./LoadingIndicator";
-import { DataTable, type Column } from "./ui";
+import { DataTable, SkeletonTable, type Column } from "./ui";
 
 const ActivitiesTable = () => {
   const { sport, distance, race, page, order, orderBy, setPage, setOrder, setOrderBy } = useActivitiesStore();
@@ -117,8 +117,14 @@ const ActivitiesTable = () => {
     { id: "device", label: "Device" },
   ];
 
-  if (isPending || error) return <LoadingIndicator message="Loading activities..." />;
-  if (!data) return <LoadingIndicator message="Loading activities..." />;
+  if (error) return <Alert severity="error" sx={{ m: 3 }}>Failed to load activities. Please try again.</Alert>;
+  if (isPending || !data) {
+    return (
+      <div role="status" aria-busy="true" aria-label="Loading activities...">
+        <SkeletonTable rows={10} />
+      </div>
+    );
+  }
 
   return (
     <>

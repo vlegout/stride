@@ -3,7 +3,7 @@ import { colors } from "./colors";
 
 // Font families
 const fontFamilyDisplay = '"Inter", "Helvetica Neue", Arial, sans-serif';
-const fontFamilyBody = '"Roboto", "Helvetica Neue", Arial, sans-serif';
+const fontFamilyBody = '"Inter", "Helvetica Neue", Arial, sans-serif';
 
 const baseLinkStyles = {
   color: colors.text.primary,
@@ -16,14 +16,11 @@ const baseLinkStyles = {
     textDecorationColor: colors.primary,
     textUnderlineOffset: "3px",
   },
-  "&:focus": {
-    color: colors.primary,
-    outline: "none",
-    boxShadow: "none",
-  },
   "&:focus-visible": {
-    outline: "none",
-    boxShadow: "none",
+    color: colors.primary,
+    outline: `2px solid ${colors.primary}`,
+    outlineOffset: "2px",
+    borderRadius: "2px",
   },
 };
 
@@ -94,19 +91,19 @@ export const theme = createTheme({
       letterSpacing: "0",
       color: colors.text.primary,
     },
-    // Body text - Roboto
+    // Body text - Inter
     body1: {
       fontFamily: fontFamilyBody,
       fontSize: "1rem",
       lineHeight: 1.6,
-      letterSpacing: "0.01em",
+      letterSpacing: "0",
       color: colors.text.primary,
     },
     body2: {
       fontFamily: fontFamilyBody,
       fontSize: "0.875rem",
       lineHeight: 1.5,
-      letterSpacing: "0.01em",
+      letterSpacing: "0",
       color: colors.text.secondary,
     },
     // Labels and captions - slightly wider letter-spacing

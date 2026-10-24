@@ -189,7 +189,7 @@ const PowerProfileComparison = () => {
             </Grid>
 
             <Box sx={{ mb: 1, height: 500, width: "100%" }}>
-              <Line id={chartId} options={chartOptions} data={lineData} />
+              <Line role="img" aria-label="Power profile comparison" id={chartId} options={chartOptions} data={lineData} />
             </Box>
           </SectionContainer>
         );

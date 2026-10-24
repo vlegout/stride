@@ -141,7 +141,7 @@ const PowerPerformances = ({
     <SectionContainer {...(showTitle ? { title: "Power Performances" } : {})} maxWidth="100%">
       {showChart && (
         <Box sx={{ mb: 1, height: 500, width: "100%" }}>
-          <Line options={chartOptions} data={lineData} />
+          <Line role="img" aria-label="Power performances over time" options={chartOptions} data={lineData} />
         </Box>
       )}
       {filteredPerformances.length > 0 && (

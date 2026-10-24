@@ -13,6 +13,7 @@ import {
   Filler,
 } from "chart.js";
 
+import { SkeletonStats, SkeletonChart } from "../components/ui/Skeleton";
 import PageHeader from "../components/ui/PageHeader";
 import SectionContainer from "../components/ui/SectionContainer";
 import QueryBoundary from "../components/QueryBoundary";
@@ -48,7 +49,15 @@ const Fitness = () => {
   });
 
   return (
-    <QueryBoundary query={scoresQuery} loadingMessage="Loading fitness data...">
+    <QueryBoundary query={scoresQuery} loadingMessage="Loading fitness data..."
+      skeleton={
+        <Box sx={{ p: 2, display: "grid", gap: 2 }}>
+          <SkeletonStats />
+          <SkeletonChart />
+          <SkeletonChart />
+        </Box>
+      }
+    >
       {(scoresData) => {
         if (!scoresData?.scores || !scoresData?.weekly_tss) {
           return (

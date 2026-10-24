@@ -1,4 +1,5 @@
 import { StrictMode, lazy, Suspense } from "react";
+import { MotionConfig } from "framer-motion";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,8 +27,7 @@ const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 
 import "leaflet/dist/leaflet.css";
 
-import "@fontsource/roboto/latin-400.css";
-import "@fontsource/roboto/latin-700.css";
+import "@fontsource/inter/latin-400.css";
 import "@fontsource/inter/latin-500.css";
 import "@fontsource/inter/latin-600.css";
 import "@fontsource/inter/latin-700.css";
@@ -102,6 +102,7 @@ const queryClient = new QueryClient();
 // biome-ignore lint/style/noNonNullAssertion: entry point, root element always exists
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <MotionConfig reducedMotion="user">
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
@@ -110,5 +111,6 @@ createRoot(document.getElementById("root")!).render(
         </Suspense>
       </QueryClientProvider>
     </ThemeProvider>
+    </MotionConfig>
   </StrictMode>,
 );

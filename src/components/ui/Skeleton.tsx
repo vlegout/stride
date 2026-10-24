@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { colors } from "../../colors";
 
 interface SkeletonProps {
@@ -10,6 +10,7 @@ interface SkeletonProps {
 }
 
 const Skeleton = ({ variant = "rectangular", width, height, borderRadius }: SkeletonProps) => {
+  const reduceMotion = useReducedMotion();
   const getStyles = () => {
     switch (variant) {
       case "text":
@@ -42,18 +43,23 @@ const Skeleton = ({ variant = "rectangular", width, height, borderRadius }: Skel
   return (
     <Box
       component={motion.div}
-      animate={{
-        background: [
-          `linear-gradient(90deg, ${colors.grey[100]} 0%, ${colors.grey[200]} 50%, ${colors.grey[100]} 100%)`,
-          `linear-gradient(90deg, ${colors.grey[200]} 0%, ${colors.grey[100]} 50%, ${colors.grey[200]} 100%)`,
-        ],
-      }}
+      animate={
+        reduceMotion
+          ? undefined
+          : {
+              background: [
+                `linear-gradient(90deg, ${colors.grey[100]} 0%, ${colors.grey[200]} 50%, ${colors.grey[100]} 100%)`,
+                `linear-gradient(90deg, ${colors.grey[200]} 0%, ${colors.grey[100]} 50%, ${colors.grey[200]} 100%)`,
+              ],
+            }
+      }
       transition={{
         duration: 1.5,
         repeat: Infinity,
         ease: "easeInOut",
       }}
       sx={{
+        background: colors.grey[100],
         ...getStyles(),
         backgroundSize: "200% 100%",
       }}
