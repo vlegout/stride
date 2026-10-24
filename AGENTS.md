@@ -5,9 +5,9 @@
 Stride is a web app to visualize run & ride activities from FIT files with charts, maps, and performance metrics.
 
 **Tech Stack**:
-- Frontend: React + TypeScript
-- Backend: Python + Rust API
-- Database: PostgreSQL
+- Frontend: React + TypeScript (Vite), MUI, Chart.js, Konva, framer-motion, arktype, axios
+- Backend: Python 3.14 (FastAPI) + Rust extension (PyO3, built with maturin)
+- Database: PostgreSQL (Alembic migrations)
 - Storage: Scaleway Object Storage
 
 ## Project Structure
@@ -15,12 +15,14 @@ Stride is a web app to visualize run & ride activities from FIT files with chart
 ```
 /
 ├── api/              # Backend (Python + Rust)
-│   ├── python/       # Python API code
-│   ├── src/          # Rust code
+│   ├── python/       # Python API code (api/, alembic/)
+│   ├── src/          # Rust code (compiled into the api.abi3.so extension)
 │   └── tests/        # Python tests
-├── src/              # Frontend React code
-├── tests/            # Frontend tests
+├── src/              # Frontend React code (components/, components/ui/, pages/, hooks/)
+├── tests/            # Frontend tests (components/, hooks/, pages/, mocks/)
 ├── e2e/              # Playwright E2E tests
+├── docs/             # Docusaurus documentation site
+├── data/             # Local data (FIT files)
 └── public/           # Static assets
 ```
 
@@ -49,10 +51,24 @@ uv --project api sync
 uv --project api run python <script>
 ```
 
-**Code Quality** (run before committing):
+**Rust extension**: Python tests need the compiled extension. Rebuild it after any change in `api/src/`:
+
+```bash
+uv --project api run maturin develop --manifest-path api/Cargo.toml
+```
+
+**Code Quality** (all must pass, same as CI):
 ```bash
 uv --project api run ruff check
 uv --project api run ruff format
+uv --project api run ty check
+uv --project api run mypy ./api
+```
+
+**Rust Quality** (when touching `api/src/`):
+```bash
+cargo fmt --check --manifest-path api/Cargo.toml
+cargo clippy --manifest-path api/Cargo.toml -- -D warnings
 ```
 
 **Testing**:
@@ -62,18 +78,25 @@ uv --project api run pytest
 
 ### Frontend Development
 
-**Code Quality**:
+**Code Quality** (same as CI):
 ```bash
+npm run format
 npm run lint
 npm run typecheck
-npm run format
+npm run build
 ```
 
 **Testing**:
 ```bash
-npm run test          # Vitest
-npm run test:ci       # CI mode with coverage
+npm run test          # Vitest (watch)
+npm run test:ci       # CI mode: unit + storybook projects, with coverage
 npm run test:ui       # UI mode
+```
+
+**Storybook** (components have `*.stories.tsx`, which are also run as tests):
+```bash
+npm run storybook
+npm run build-storybook
 ```
 
 **Development server**:
@@ -108,14 +131,18 @@ JWT_SECRET_KEY=your-jwt-secret-key
 ```bash
 VITE_API_URL=http://localhost:8000
 VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id
+VITE_MAPBOX_TOKEN=your-mapbox-token
 ```
 
 ## Code Quality Standards
 
 ### Python
-- Use `ruff` for linting and formatting
+- Use `ruff` for linting and formatting, `ty` and `mypy` for type checking
 - Minimal code comments
 - All checks must pass before committing
+
+### Rust
+- `cargo fmt` and `cargo clippy -D warnings` must pass
 
 ### TypeScript
 - Biome for linting and formatting
@@ -126,15 +153,16 @@ VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id
 ### Backend
 - **FastAPI**: Web framework
 - **SQLModel**: Database ORM
-- **FIT file parsing**: Extract activity data from FIT files
+- **Alembic**: Database migrations
+- **FIT file parsing**: Extract activity data from FIT files (Rust extension)
 
 ### Frontend
 - **React Query**: Data fetching and caching
 - **Zustand**: State management
-- **MUI**: Component library
-- **Chart.js**: Data visualization
-- **Leaflet/Mapbox**: Maps
-- **Vitest**: Testing
+- **MUI**: Component library (shared building blocks in `src/components/ui/`)
+- **Chart.js**: Data visualization (Konva for the lap chart)
+- **Leaflet / OpenLayers / Mapbox**: Maps
+- **Vitest + Storybook**: Testing
 
 ## Common Tasks
 
@@ -155,10 +183,11 @@ npm install <package>
 
 ## Pre-commit Workflow
 
-1. Run linting: `uv --project api run ruff check`
-2. Run formatting: `uv --project api run ruff format`
-3. Run tests if relevant
-4. Commit changes
+1. Python: `ruff check`, `ruff format`, `ty check`, `mypy ./api`
+2. Rust (if changed): `cargo fmt --check`, `cargo clippy -- -D warnings`
+3. Frontend: `npm run format`, `npm run lint`, `npm run typecheck`
+4. Run tests if relevant
+5. Commit changes
 
 ## Best Practices
 
