@@ -27,7 +27,7 @@ class LocationService:
 
             return city, subdivision, country
 
-        except (httpx.TimeoutException, httpx.RequestError, httpx.HTTPStatusError):
+        except httpx.TimeoutException, httpx.RequestError, httpx.HTTPStatusError:
             return None, None, None
 
     def get_or_fetch_location(
