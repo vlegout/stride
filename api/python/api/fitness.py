@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from bisect import bisect_left
 from collections import defaultdict
 from typing import Any
 
@@ -131,6 +132,10 @@ def calculate_fitness_and_weekly_data(session: Session, user_id: str):
         )
     ).all()
 
+    activities = sorted(activities, key=lambda a: a.start_time)
+    start_times = [a.start_time for a in activities]
+    base_scores = [calculate_activity_score(a) for a in activities]
+
     daily_scores = []
 
     for days_back in range(total_days):
@@ -143,13 +148,10 @@ def calculate_fitness_and_weekly_data(session: Session, user_id: str):
         fitness_window_start = day_start - datetime.timedelta(days=42)
         fitness_window_start_ts = int(fitness_window_start.timestamp())
 
-        relevant_activities = [
-            activity
-            for activity in activities
-            if fitness_window_start_ts <= activity.start_time < day_end_ts
-        ]
+        lo = bisect_left(start_times, fitness_window_start_ts)
+        hi = bisect_left(start_times, day_end_ts)
 
-        if not relevant_activities:
+        if lo == hi:
             daily_scores.append(
                 {
                     "date": day_date.strftime("%Y-%m-%d"),
@@ -168,22 +170,16 @@ def calculate_fitness_and_weekly_data(session: Session, user_id: str):
             "swimming": 0.0,
         }
 
-        for activity in relevant_activities:
+        for i in range(lo, hi):
+            activity = activities[i]
             days_before = (day_end_ts - activity.start_time) / 86400
 
             decay_factor = max(0.1, 1.0 - (days_before / 42) * 0.5)
+            score = base_scores[i] * decay_factor
 
-            overall_score = calculate_activity_score(activity) * decay_factor
-            running_score = calculate_activity_score(activity, "running") * decay_factor
-            cycling_score = calculate_activity_score(activity, "cycling") * decay_factor
-            swimming_score = (
-                calculate_activity_score(activity, "swimming") * decay_factor
-            )
-
-            weighted_scores["overall"] += overall_score
-            weighted_scores["running"] += running_score
-            weighted_scores["cycling"] += cycling_score
-            weighted_scores["swimming"] += swimming_score
+            weighted_scores["overall"] += score
+            if activity.sport in weighted_scores:
+                weighted_scores[activity.sport] += score
 
         final_scores = {
             sport: min(200, max(0, int(score * 0.5)))
@@ -219,11 +215,9 @@ def calculate_fitness_and_weekly_data(session: Session, user_id: str):
         week_start_ts = int(week_start.timestamp())
         week_end_ts = int(week_end.timestamp())
 
-        week_activities = [
-            activity
-            for activity in activities
-            if week_start_ts <= activity.start_time < week_end_ts
-        ]
+        lo = bisect_left(start_times, week_start_ts)
+        hi = bisect_left(start_times, week_end_ts)
+        week_activities = activities[lo:hi]
 
         total_tss = sum(
             activity.training_stress_score or 0.0 for activity in week_activities

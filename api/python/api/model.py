@@ -1,9 +1,16 @@
 import datetime
 import uuid
+from enum import StrEnum
 
 from pydantic import BaseModel, field_serializer, field_validator, model_validator
 from sqlalchemy import JSON
 from sqlmodel import Field, Relationship, SQLModel
+
+
+class Sport(StrEnum):
+    running = "running"
+    cycling = "cycling"
+    swimming = "swimming"
 
 
 class UserBase(SQLModel):
