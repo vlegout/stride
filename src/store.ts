@@ -44,6 +44,29 @@ export const useActivitiesStore = create<ActivitiesFilterState>((set) => ({
   resetFilters: () => set(initialState),
 }));
 
+interface BestFilterState {
+  sport: string;
+  distance: string;
+  time: string;
+  year: string;
+  setSport: (sport: string) => void;
+  setDistance: (distance: string) => void;
+  setTime: (time: string) => void;
+  setYear: (year: string) => void;
+}
+
+export const useBestStore = create<BestFilterState>((set) => ({
+  sport: "running",
+  distance: "",
+  time: "42.195",
+  year: "all",
+  setSport: (sport) =>
+    set(sport === "cycling" ? { sport, distance: "1", time: "" } : { sport, distance: "", time: "42.195" }),
+  setDistance: (distance) => set({ distance }),
+  setTime: (time) => set({ time }),
+  setYear: (year) => set({ year }),
+}));
+
 interface AuthState {
   user: User | null;
   token: string | null;
