@@ -33,9 +33,9 @@ class UserBase(SQLModel):
 
 
 class User(UserBase, table=True):
-    activities: list["Activity"] = Relationship(back_populates="user")
-    zones: list["Zone"] = Relationship(back_populates="user")
-    ftps: list["Ftp"] = Relationship()
+    activities: list[Activity] = Relationship(back_populates="user")
+    zones: list[Zone] = Relationship(back_populates="user")
+    ftps: list[Ftp] = Relationship()
 
 
 class UserPublic(UserBase):
@@ -136,37 +136,35 @@ class ActivityBase(SQLModel):
 
 
 class Activity(ActivityBase, table=True):
-    laps: list["Lap"] = Relationship()
-    performances: list["Performance"] = Relationship()
-    performance_power: list["PerformancePower"] = Relationship(
-        back_populates="activity"
-    )
-    notifications: list["Notification"] = Relationship(back_populates="activity")
-    tracepoints: list["Tracepoint"] = Relationship(back_populates="activity")
-    zone_paces: list["ActivityZonePace"] = Relationship(back_populates="activity")
-    zone_powers: list["ActivityZonePower"] = Relationship(back_populates="activity")
-    zone_heart_rates: list["ActivityZoneHeartRate"] = Relationship(
+    laps: list[Lap] = Relationship()
+    performances: list[Performance] = Relationship()
+    performance_power: list[PerformancePower] = Relationship(back_populates="activity")
+    notifications: list[Notification] = Relationship(back_populates="activity")
+    tracepoints: list[Tracepoint] = Relationship(back_populates="activity")
+    zone_paces: list[ActivityZonePace] = Relationship(back_populates="activity")
+    zone_powers: list[ActivityZonePower] = Relationship(back_populates="activity")
+    zone_heart_rates: list[ActivityZoneHeartRate] = Relationship(
         back_populates="activity"
     )
     user: User = Relationship(back_populates="activities")
 
 
 class ActivityPublic(ActivityBase):
-    laps: list["Lap"] = []
-    performances: list["Performance"] = []
-    performance_power: list["PerformancePower"] = []
-    notifications: list["NotificationPublic"] = []
-    tracepoints: list["Tracepoint"] = []
+    laps: list[Lap] = []
+    performances: list[Performance] = []
+    performance_power: list[PerformancePower] = []
+    notifications: list[NotificationPublic] = []
+    tracepoints: list[Tracepoint] = []
 
     @field_serializer("tracepoints")
-    def serialize_tracepoints(self, tracepoints: list["Tracepoint"]):
+    def serialize_tracepoints(self, tracepoints: list[Tracepoint]):
         return sorted(tracepoints, key=lambda a: a.timestamp)
 
 
 class ActivityPublicWithoutTracepoints(ActivityBase):
-    laps: list["Lap"] = []
-    performances: list["Performance"] = []
-    performance_power: list["PerformancePower"] = []
+    laps: list[Lap] = []
+    performances: list[Performance] = []
+    performance_power: list[PerformancePower] = []
     notification_count: int = 0
 
 
@@ -286,11 +284,11 @@ class ActivityZonePaceBase(SQLModel):
 
 class ActivityZonePace(ActivityZonePaceBase, table=True):
     activity: Activity = Relationship(back_populates="zone_paces")
-    zone: "Zone" = Relationship()
+    zone: Zone = Relationship()
 
 
 class ActivityZonePacePublic(ActivityZonePaceBase):
-    zone: "ZonePublic"
+    zone: ZonePublic
 
 
 class ActivityZonePowerBase(SQLModel):
@@ -302,11 +300,11 @@ class ActivityZonePowerBase(SQLModel):
 
 class ActivityZonePower(ActivityZonePowerBase, table=True):
     activity: Activity = Relationship(back_populates="zone_powers")
-    zone: "Zone" = Relationship()
+    zone: Zone = Relationship()
 
 
 class ActivityZonePowerPublic(ActivityZonePowerBase):
-    zone: "ZonePublic"
+    zone: ZonePublic
 
 
 class ActivityZoneHeartRateBase(SQLModel):
@@ -318,11 +316,11 @@ class ActivityZoneHeartRateBase(SQLModel):
 
 class ActivityZoneHeartRate(ActivityZoneHeartRateBase, table=True):
     activity: Activity = Relationship(back_populates="zone_heart_rates")
-    zone: "Zone" = Relationship()
+    zone: Zone = Relationship()
 
 
 class ActivityZoneHeartRatePublic(ActivityZoneHeartRateBase):
-    zone: "ZonePublic"
+    zone: ZonePublic
 
 
 class ZoneBase(SQLModel):

@@ -12,4 +12,4 @@ fit-rust = { git = "https://github.com/vlegout/fit-rust.git", "branch" = "fix" }
 
 [dependencies.pyo3]
 version = "0.30.1"
-features = ["abi3-py313"]
+features = ["abi3-py314"]
