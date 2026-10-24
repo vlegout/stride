@@ -116,7 +116,7 @@ const ActivityZones = ({ zones, title }: ActivityZonesProps) => {
           position: "relative",
         }}
       >
-        <Bar data={chartData} options={chartOptions} />
+        <Bar role="img" aria-label="Time spent in each training zone" data={chartData} options={chartOptions} />
       </Box>
     </Box>
   );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -63,7 +63,7 @@ const Header = () => {
             <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
               <img
                 src="/logo.svg"
-                alt="Logo"
+                alt="Stride home"
                 style={{
                   height: isMobile ? "28px" : "32px",
                   width: "auto",
@@ -111,16 +111,18 @@ const Header = () => {
               >
                 {menus.map(({ to, label }) => (
                   <MenuItem key={to} onClick={handleMenuClose}>
-                    <Link
+                    <NavLink
                       to={to}
-                      style={{
+                      end={to === "/"}
+                      style={({ isActive }) => ({
                         textDecoration: "none",
-                        color: colors.text.primary,
+                        color: isActive ? colors.primary : colors.text.primary,
+                        fontWeight: isActive ? 700 : undefined,
                         width: "100%",
-                      }}
+                      })}
                     >
                       {label}
-                    </Link>
+                    </NavLink>
                   </MenuItem>
                 ))}
                 <MenuItem onClick={handleMenuClose}>
@@ -135,7 +137,7 @@ const Header = () => {
                     Settings
                   </Link>
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>
+                <MenuItem onClick={handleLogout} aria-label="log out">
                   <LogoutIcon />
                 </MenuItem>
               </Menu>
@@ -144,29 +146,31 @@ const Header = () => {
             <>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {menus.map(({ to, label }) => (
-                  <Link
+                  <NavLink
                     key={to}
                     to={to}
-                    style={{
-                      textDecoration: "none",
-                      color: colors.text.onLight,
-                    }}
+                    end={to === "/"}
+                    style={{ textDecoration: "none", color: colors.text.onLight }}
                   >
-                    <Typography
-                      component="div"
-                      sx={{
-                        px: 2,
-                        py: 1,
-                        borderRadius: 1,
-                        transition: "background-color 0.2s",
-                        "&:hover": {
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        },
-                      }}
-                    >
-                      {label}
-                    </Typography>
-                  </Link>
+                    {({ isActive }) => (
+                      <Typography
+                        component="div"
+                        sx={{
+                          px: 2,
+                          py: 1,
+                          borderRadius: 1,
+                          fontWeight: isActive ? 700 : 400,
+                          boxShadow: isActive ? `inset 0 -3px 0 ${colors.primary}` : "none",
+                          transition: "background-color 0.2s",
+                          "&:hover": {
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          },
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                    )}
+                  </NavLink>
                 ))}
               </Box>
               <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 2 }}>
@@ -224,6 +228,7 @@ const Header = () => {
                   </>
                 )}
                 <IconButton
+                  aria-label="log out"
                   onClick={handleLogout}
                   sx={{
                     color: colors.text.onLight,

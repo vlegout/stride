@@ -163,6 +163,8 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 400, width: "100%" }}>
             <Bar
+              role="img"
+              aria-label="Weekly Running Heart Rate Zones"
               data={runningHeartRateData}
               options={createChartOptions("Weekly Running Heart Rate Zones", "Time (minutes)")}
             />
@@ -171,6 +173,8 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 400, width: "100%" }}>
             <Bar
+              role="img"
+              aria-label="Weekly Cycling Heart Rate Zones"
               data={cyclingHeartRateData}
               options={createChartOptions("Weekly Cycling Heart Rate Zones", "Time (minutes)")}
             />
@@ -178,12 +182,22 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 400, width: "100%" }}>
-            <Bar data={paceData} options={createChartOptions("Weekly Pace Zones", "Time (minutes)")} />
+            <Bar
+              role="img"
+              aria-label="Weekly Pace Zones"
+              data={paceData}
+              options={createChartOptions("Weekly Pace Zones", "Time (minutes)")}
+            />
           </Box>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 400, width: "100%" }}>
-            <Bar data={powerData} options={createChartOptions("Weekly Power Zones", "Time (minutes)")} />
+            <Bar
+              role="img"
+              aria-label="Weekly Power Zones"
+              data={powerData}
+              options={createChartOptions("Weekly Power Zones", "Time (minutes)")}
+            />
           </Box>
         </Grid>
       </Grid>

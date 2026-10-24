@@ -115,7 +115,7 @@ describe("Fitness", () => {
 
     renderWithProviders(<Fitness />);
 
-    expect(screen.getByText("Loading fitness data...")).toBeInTheDocument();
+    expect(screen.getByLabelText("Loading fitness data...")).toBeInTheDocument();
   });
 
   it("renders error state when fetch fails", async () => {
