@@ -250,7 +250,14 @@ const LineChart = ({ labels, data, title, xAxisLabel, yAxisLabel, unit }: LineCh
           touchAction: "pan-y",
         }}
       >
-        <Line role="img" aria-label="Activity data chart" ref={chartRef} options={lineOptions} data={lineData} plugins={[crosshairPlugin]} />
+        <Line
+          role="img"
+          aria-label="Activity data chart"
+          ref={chartRef}
+          options={lineOptions}
+          data={lineData}
+          plugins={[crosshairPlugin]}
+        />
       </Box>
     </Box>
   );

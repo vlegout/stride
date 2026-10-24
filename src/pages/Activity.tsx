@@ -24,7 +24,9 @@ const ActivityPage = () => {
   const query = useActivityData(params.id as string);
 
   return (
-    <QueryBoundary query={query} loadingMessage="Loading activity..."
+    <QueryBoundary
+      query={query}
+      loadingMessage="Loading activity..."
       skeleton={
         <Box sx={{ p: 2, display: "grid", gap: 2 }}>
           <SkeletonStats />

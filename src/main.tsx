@@ -103,14 +103,14 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MotionConfig reducedMotion="user">
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-          <RouterProvider router={router} />
-        </Suspense>
-      </QueryClientProvider>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <QueryClientProvider client={queryClient}>
+          <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+            <RouterProvider router={router} />
+          </Suspense>
+        </QueryClientProvider>
+      </ThemeProvider>
     </MotionConfig>
   </StrictMode>,
 );

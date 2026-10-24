@@ -146,7 +146,12 @@ const Header = () => {
             <>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {menus.map(({ to, label }) => (
-                  <NavLink key={to} to={to} end={to === "/"} style={{ textDecoration: "none", color: colors.text.onLight }}>
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={to === "/"}
+                    style={{ textDecoration: "none", color: colors.text.onLight }}
+                  >
                     {({ isActive }) => (
                       <Typography
                         component="div"

@@ -100,7 +100,11 @@ const Best = () => {
           onYearChange={setSelectedYear}
         />
 
-        <QueryBoundary query={query} loadingMessage="Loading best performances..." skeleton={<SkeletonTable rows={10} />}>
+        <QueryBoundary
+          query={query}
+          loadingMessage="Loading best performances..."
+          skeleton={<SkeletonTable rows={10} />}
+        >
           {(data) => {
             const rows =
               data?.performances.map((performance, index) => ({

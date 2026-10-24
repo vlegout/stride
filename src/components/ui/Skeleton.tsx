@@ -45,7 +45,7 @@ const Skeleton = ({ variant = "rectangular", width, height, borderRadius }: Skel
       component={motion.div}
       animate={
         reduceMotion
-          ? undefined
+          ? {}
           : {
               background: [
                 `linear-gradient(90deg, ${colors.grey[100]} 0%, ${colors.grey[200]} 50%, ${colors.grey[100]} 100%)`,

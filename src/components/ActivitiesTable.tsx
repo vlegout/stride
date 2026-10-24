@@ -117,7 +117,12 @@ const ActivitiesTable = () => {
     { id: "device", label: "Device" },
   ];
 
-  if (error) return <Alert severity="error" sx={{ m: 3 }}>Failed to load activities. Please try again.</Alert>;
+  if (error)
+    return (
+      <Alert severity="error" sx={{ m: 3 }}>
+        Failed to load activities. Please try again.
+      </Alert>
+    );
   if (isPending || !data) {
     return (
       <div role="status" aria-busy="true" aria-label="Loading activities...">

@@ -182,12 +182,22 @@ const WeeklyZonesCharts = ({ weeklyZones }: WeeklyZonesChartsProps) => {
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 400, width: "100%" }}>
-            <Bar role="img" aria-label="Weekly Pace Zones" data={paceData} options={createChartOptions("Weekly Pace Zones", "Time (minutes)")} />
+            <Bar
+              role="img"
+              aria-label="Weekly Pace Zones"
+              data={paceData}
+              options={createChartOptions("Weekly Pace Zones", "Time (minutes)")}
+            />
           </Box>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ height: 400, width: "100%" }}>
-            <Bar role="img" aria-label="Weekly Power Zones" data={powerData} options={createChartOptions("Weekly Power Zones", "Time (minutes)")} />
+            <Bar
+              role="img"
+              aria-label="Weekly Power Zones"
+              data={powerData}
+              options={createChartOptions("Weekly Power Zones", "Time (minutes)")}
+            />
           </Box>
         </Grid>
       </Grid>

@@ -49,7 +49,9 @@ const Fitness = () => {
   });
 
   return (
-    <QueryBoundary query={scoresQuery} loadingMessage="Loading fitness data..."
+    <QueryBoundary
+      query={scoresQuery}
+      loadingMessage="Loading fitness data..."
       skeleton={
         <Box sx={{ p: 2, display: "grid", gap: 2 }}>
           <SkeletonStats />
