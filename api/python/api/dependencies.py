@@ -1,14 +1,40 @@
-from fastapi import HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
 from api.auth import verify_token
 from api.db import engine
+from api.services import (
+    get_activity_service,
+    get_heatmap_service,
+    get_profile_service,
+)
+from api.services.activity import ActivityService
+from api.services.heatmap import HeatmapService
+from api.services.profile import ProfileService
 
 
 def get_session():
     with Session(engine) as session:
         yield session
+
+
+def get_activity_service_dependency(
+    session: Session = Depends(get_session),
+) -> ActivityService:
+    return get_activity_service(session)
+
+
+def get_profile_service_dependency(
+    session: Session = Depends(get_session),
+) -> ProfileService:
+    return get_profile_service(session)
+
+
+def get_heatmap_service_dependency(
+    session: Session = Depends(get_session),
+) -> HeatmapService:
+    return get_heatmap_service(session)
 
 
 def get_current_user_id(request: Request) -> str:

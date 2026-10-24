@@ -6,14 +6,16 @@ import unittest
 import uuid
 from unittest.mock import MagicMock, Mock, patch
 
-from api.app import (
-    app,
+from api.app import app
+from api.auth import create_token_response
+from api.dependencies import (
     get_activity_service_dependency,
+    get_current_user_id,
     get_heatmap_service_dependency,
     get_profile_service_dependency,
+    get_session,
+    verify_jwt_token,
 )
-from api.auth import create_token_response
-from api.dependencies import get_current_user_id, get_session, verify_jwt_token
 from api.model import (
     Activity,
     HeatmapPolyline,
@@ -334,19 +336,10 @@ class TestActivityStatusFunctionality(unittest.TestCase):
         """Test that delete activity endpoint is properly configured"""
         from api.app import app
 
-        # Check that the DELETE route exists by examining the route table
-        routes = app.routes
-        delete_routes = [
-            route for route in routes if "DELETE" in getattr(route, "methods", ())
-        ]
-        activity_delete_routes = [
-            route
-            for route in delete_routes
-            if "/activities/{activity_id}/" in str(getattr(route, "path", ""))
-        ]
-
-        self.assertTrue(
-            len(activity_delete_routes) > 0,
+        paths = app.openapi()["paths"]
+        self.assertIn(
+            "delete",
+            paths.get("/activities/{activity_id}/", {}),
             "DELETE /activities/{activity_id}/ route should exist",
         )
 
@@ -355,7 +348,7 @@ class TestActivityStatusFunctionality(unittest.TestCase):
         # This test examines the source code to verify status filtering is implemented
         import inspect
 
-        from api.app import read_activities, read_activity
+        from api.routers.activities import read_activities, read_activity
 
         # Check that read_activities function includes status filtering
         read_activities_source = inspect.getsource(read_activities)
@@ -420,7 +413,7 @@ class TestAppEnumsAndModels(unittest.TestCase):
 
     def test_sport_enum_values(self):
         """Test Sport enum has expected values"""
-        from api.app import Sport
+        from api.model import Sport
 
         self.assertEqual(Sport.running.value, "running")
         self.assertEqual(Sport.cycling.value, "cycling")
@@ -428,7 +421,7 @@ class TestAppEnumsAndModels(unittest.TestCase):
 
     def test_cycling_distance_enum_values(self):
         """Test CyclingDistance enum has expected values"""
-        from api.app import CyclingDistance
+        from api.routers.best import CyclingDistance
 
         self.assertEqual(CyclingDistance.one_minute.value, "1")
         self.assertEqual(CyclingDistance.five_minutes.value, "5")
@@ -440,7 +433,7 @@ class TestAppEnumsAndModels(unittest.TestCase):
 
     def test_running_distance_enum_values(self):
         """Test RunningDistance enum has expected values"""
-        from api.app import RunningDistance
+        from api.routers.best import RunningDistance
 
         self.assertEqual(RunningDistance.one_km.value, "1")
         self.assertEqual(RunningDistance.five_km.value, "5")
@@ -450,7 +443,7 @@ class TestAppEnumsAndModels(unittest.TestCase):
 
     def test_activity_zones_response_model(self):
         """Test ActivityZonesResponse model structure"""
-        from api.app import ActivityZonesResponse
+        from api.routers.activities import ActivityZonesResponse
 
         response = ActivityZonesResponse(pace=[], power=[], heart_rate=[])
         self.assertEqual(response.pace, [])
@@ -1337,7 +1330,7 @@ class TestGoogleAuth(_AuthenticatedTestCase):
             "google_picture": "http://example.com/pic.jpg",
         }
 
-        with patch("api.app.get_zone_service") as mock_zone_svc:
+        with patch("api.routers.auth.get_zone_service") as mock_zone_svc:
             mock_zone_svc.return_value = MagicMock()
             response = self.client.post("/auth/google/", json=user_data)
 
@@ -1384,7 +1377,7 @@ class TestGoogleAuth(_AuthenticatedTestCase):
 class TestReadFitness(_AuthenticatedTestCase):
     """Test GET /fitness/scores/ endpoint logic."""
 
-    @patch("api.app.calculate_fitness_and_weekly_data")
+    @patch("api.routers.fitness.calculate_fitness_and_weekly_data")
     def test_returns_fitness_scores(self, mock_fitness):
         mock_fitness.return_value = {
             "scores": [],
@@ -1402,7 +1395,7 @@ class TestReadFitness(_AuthenticatedTestCase):
 class TestReadFitnessZones(_AuthenticatedTestCase):
     """Test GET /fitness/zones/ endpoint logic."""
 
-    @patch("api.app.calculate_weekly_zone_data")
+    @patch("api.routers.fitness.calculate_weekly_zone_data")
     def test_returns_weekly_zones(self, mock_zones):
         mock_zones.return_value = []
 
@@ -1415,7 +1408,7 @@ class TestReadFitnessZones(_AuthenticatedTestCase):
 class TestReadFitnessFtp(_AuthenticatedTestCase):
     """Test GET /fitness/ftp/ endpoint logic."""
 
-    @patch("api.app.get_ftp_data")
+    @patch("api.routers.fitness.get_ftp_data")
     def test_returns_ftp(self, mock_ftp):
         mock_ftp.return_value = [{"date": "2024-01-01", "ftp": 250}]
 
@@ -1462,21 +1455,21 @@ class TestDependencyFunctions(unittest.TestCase):
 
     def test_get_activity_service_dependency(self):
         mock_session = MagicMock(spec=Session)
-        with patch("api.app.get_activity_service") as mock_get:
+        with patch("api.dependencies.get_activity_service") as mock_get:
             mock_get.return_value = MagicMock()
             get_activity_service_dependency(mock_session)
             mock_get.assert_called_once_with(mock_session)
 
     def test_get_profile_service_dependency(self):
         mock_session = MagicMock(spec=Session)
-        with patch("api.app.get_profile_service") as mock_get:
+        with patch("api.dependencies.get_profile_service") as mock_get:
             mock_get.return_value = MagicMock()
             get_profile_service_dependency(mock_session)
             mock_get.assert_called_once_with(mock_session)
 
     def test_get_heatmap_service_dependency(self):
         mock_session = MagicMock(spec=Session)
-        with patch("api.app.get_heatmap_service") as mock_get:
+        with patch("api.dependencies.get_heatmap_service") as mock_get:
             mock_get.return_value = MagicMock()
             get_heatmap_service_dependency(mock_session)
             mock_get.assert_called_once_with(mock_session)
