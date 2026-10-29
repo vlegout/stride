@@ -3,7 +3,7 @@ name = "api"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
-    "boto3>=1.43.117",
+    "boto3>=1.43.118",
     "fastapi[standard]>=0.159.1",
     "psycopg2>=2.9.13",
     "pydantic>=2.14.1",
