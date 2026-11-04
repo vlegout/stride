@@ -50,7 +50,7 @@ jobs:
         env:
           VITE_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN_DEV }}
           NODE_OPTIONS: "--max-old-space-size=4096"
-      - uses: chromaui/action@5bcadb5104b09e360e210c54f95a7437c2d82bab # v18
+      - uses: chromaui/action@dc6182ace06884faf1d3edf73f652a80ca6dfddc # v18
         if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
