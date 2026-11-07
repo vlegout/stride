@@ -27,7 +27,7 @@ dev = [
     "types-boto3>=1.43.122",
     "ty>=0.0.95",
     "hypothesis>=6.170.14",
-    "types-shapely>=2.1.0.20260728",
+    "types-shapely>=2.1.0.20261030",
 ]
 
 [build-system]
