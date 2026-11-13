@@ -1,6 +1,6 @@
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 
-export type DateRangeOption = "30d" | "90d" | "6m" | "1y" | "2y";
+export type DateRangeOption = "30d" | "90d" | "6m" | "1y" | "2y" | "5y";
 
 interface DateSelectorProps {
   selectedRange: DateRangeOption;
@@ -37,6 +37,9 @@ const DateSelector = ({ selectedRange, onChange }: DateSelectorProps) => {
         </ToggleButton>
         <ToggleButton value="2y" aria-label="2 years">
           2 years
+        </ToggleButton>
+        <ToggleButton value="5y" aria-label="5 years">
+          5 years
         </ToggleButton>
       </ToggleButtonGroup>
     </Box>

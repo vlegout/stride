@@ -26,6 +26,7 @@ describe("date utils", () => {
       expect(getDaysFromRange("6m")).toBe(180);
       expect(getDaysFromRange("1y")).toBe(365);
       expect(getDaysFromRange("2y")).toBe(730);
+      expect(getDaysFromRange("5y")).toBe(1825);
     });
 
     it("should return default value for invalid range", () => {
@@ -40,6 +41,7 @@ describe("date utils", () => {
       expect(getWeeksFromRange("6m")).toBe(26);
       expect(getWeeksFromRange("1y")).toBe(52);
       expect(getWeeksFromRange("2y")).toBe(104);
+      expect(getWeeksFromRange("5y")).toBe(260);
     });
 
     it("should return default value for invalid range", () => {
@@ -54,6 +56,7 @@ describe("date utils", () => {
       expect(getDateRangeLabel("6m")).toBe("6 Months");
       expect(getDateRangeLabel("1y")).toBe("1 Year");
       expect(getDateRangeLabel("2y")).toBe("2 Years");
+      expect(getDateRangeLabel("5y")).toBe("5 Years");
     });
 
     it("should return default label for invalid range", () => {

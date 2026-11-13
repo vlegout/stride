@@ -118,9 +118,10 @@ def calculate_activity_score(activity, sport_filter=None):
 
 
 def calculate_fitness_and_weekly_data(session: Session, user_id: str):
-    """Calculate fitness scores and weekly metrics for a user over the past 2.5 years"""
+    """Calculate fitness scores and weekly metrics for a user over the past 5 years"""
     end_date = datetime.datetime.now()
-    total_days = int(365 * 2.5)
+    output_days = 365 * 5
+    total_days = output_days + 42
     start_date = end_date - datetime.timedelta(days=total_days)
     start_timestamp = int(start_date.timestamp())
 
@@ -198,7 +199,7 @@ def calculate_fitness_and_weekly_data(session: Session, user_id: str):
 
     daily_scores.reverse()
 
-    days_to_skip = total_days - 730
+    days_to_skip = total_days - output_days
 
     weekly_tss_data = []
     weekly_running_data = []
@@ -206,7 +207,7 @@ def calculate_fitness_and_weekly_data(session: Session, user_id: str):
     weekly_swimming_data = []
     current_date = datetime.datetime.now()
 
-    for weeks_back in range(104):
+    for weeks_back in range(260):
         week_start = current_date - datetime.timedelta(weeks=weeks_back)
         week_start = week_start - datetime.timedelta(days=week_start.weekday())
         week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -288,9 +289,9 @@ def calculate_fitness_and_weekly_data(session: Session, user_id: str):
 
 
 def get_ftp_data(session: Session, user_id: str):
-    """Get FTP records for the past 2 years"""
+    """Get FTP records for the past 5 years"""
     current_date = datetime.datetime.now()
-    ftp_start_date = current_date - datetime.timedelta(days=730)
+    ftp_start_date = current_date - datetime.timedelta(days=1825)
     ftp_records = session.exec(
         select(Ftp)
         .where(Ftp.user_id == user_id, Ftp.date >= ftp_start_date.date())
@@ -424,7 +425,7 @@ def update_ftp_for_date(session: Session, user_id: str, date: datetime.date) -> 
         session.commit()
 
 
-def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 104):
+def calculate_weekly_zone_data(session: Session, user_id: str, weeks: int = 260):
     """Calculate weekly zone data for heart rate, pace, and power zones"""
     current_date = datetime.datetime.now()
 
