@@ -13,7 +13,7 @@ const meta = {
   argTypes: {
     selectedRange: {
       control: { type: "select" },
-      options: ["30d", "90d", "6m", "1y"],
+      options: ["30d", "90d", "6m", "1y", "2y", "5y"],
     },
   },
 } satisfies Meta<typeof DateSelector>;

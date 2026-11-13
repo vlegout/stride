@@ -312,7 +312,7 @@ class TestFitness(unittest.TestCase):
         mock_zones_result = Mock()
         mock_zones_result.all.return_value = []  # No zones
 
-        # Mock empty results for weekly activity queries (104 weeks)
+        # Mock empty results for weekly activity queries (260 weeks)
         mock_weekly_activities_result = Mock()
         mock_weekly_activities_result.all.return_value = []
 
@@ -327,13 +327,13 @@ class TestFitness(unittest.TestCase):
         self.assertIn("weekly_running", result)
         self.assertIn("weekly_cycling", result)
 
-        # Should have 730 daily scores (2 years)
-        self.assertEqual(len(result["scores"]), 730)
+        # Should have 1825 daily scores (5 years)
+        self.assertEqual(len(result["scores"]), 1825)
 
-        # Should have 104 weekly data points (2 years)
-        self.assertEqual(len(result["weekly_tss"]), 104)
-        self.assertEqual(len(result["weekly_running"]), 104)
-        self.assertEqual(len(result["weekly_cycling"]), 104)
+        # Should have 260 weekly data points (5 years)
+        self.assertEqual(len(result["weekly_tss"]), 260)
+        self.assertEqual(len(result["weekly_running"]), 260)
+        self.assertEqual(len(result["weekly_cycling"]), 260)
 
         # Verify structure of weekly data
 
@@ -655,14 +655,14 @@ class TestDecayFactor(unittest.TestCase):
 
         result = calculate_fitness_and_weekly_data(mock_session, "test-user-id")
 
-        # Should have 730 days of scores
-        self.assertEqual(len(result["scores"]), 730)
+        # Should have 1825 days of scores
+        self.assertEqual(len(result["scores"]), 1825)
 
         # Should have weekly data
-        self.assertEqual(len(result["weekly_tss"]), 104)
-        self.assertEqual(len(result["weekly_running"]), 104)
-        self.assertEqual(len(result["weekly_cycling"]), 104)
-        self.assertEqual(len(result["weekly_swimming"]), 104)
+        self.assertEqual(len(result["weekly_tss"]), 260)
+        self.assertEqual(len(result["weekly_running"]), 260)
+        self.assertEqual(len(result["weekly_cycling"]), 260)
+        self.assertEqual(len(result["weekly_swimming"]), 260)
 
         # Check structure of individual entries
         for daily_score in result["scores"][:5]:
