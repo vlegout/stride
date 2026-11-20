@@ -6,7 +6,7 @@ Stride is a web app to visualize run & ride activities from FIT files with chart
 
 **Tech Stack**:
 - Frontend: React + TypeScript (Vite), MUI, Chart.js, Konva, framer-motion, arktype, axios
-- Backend: Python 3.14 (FastAPI) + Rust extension (PyO3, built with maturin)
+- Backend: Python 3.15 (FastAPI) + Rust extension (PyO3, built with maturin)
 - Database: PostgreSQL (Alembic migrations)
 - Storage: Scaleway Object Storage
 
