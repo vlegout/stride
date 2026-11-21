@@ -69,7 +69,7 @@
     "@vitest/ui": "^5.0.5",
     "baseline-browser-mapping": "^2.11.37",
     "chromatic": "^18.14.3",
-    "jsdom": "^31.0.0",
+    "jsdom": "^31.0.1",
     "nyc": "^18.0.0",
     "playwright": "^1.65.0",
     "storybook": "^10.6.5",
